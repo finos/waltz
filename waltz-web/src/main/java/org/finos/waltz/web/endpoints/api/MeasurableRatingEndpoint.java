@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -26,6 +27,7 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
+import org.finos.waltz.model.bulk_upload.measurable_rating.BulkMeasurableRatingValidationResult;
 import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
@@ -34,7 +36,8 @@ import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
-import org.finos.waltz.service.measurable_rating.BulkMeasurableItemParser;
+import org.finos.waltz.service.measurable_rating.BulkMeasurableItemParser.InputFormat;
+import org.finos.waltz.service.measurable_rating.BulkMeasurableRatingService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingViewService;
 import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
@@ -56,8 +59,14 @@ import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.WebUtilities.readEnum;
+import static org.finos.waltz.web.WebUtilities.getEntityReference;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getLong;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.WebUtilities.requireRole;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForList;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -71,6 +80,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private final MeasurableRatingService measurableRatingService;
+    private final BulkMeasurableRatingService bulkMeasurableRatingService;
     private final MeasurableRatingViewService measurableRatingViewService;
     private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
     private final UserRoleService userRoleService;
@@ -78,6 +88,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     @Autowired
     public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService,
+                                    BulkMeasurableRatingService bulkMeasurableRatingService,
                                     MeasurableRatingViewService measurableRatingViewService,
                                     MeasurableRatingPermissionChecker measurableRatingPermissionChecker,
                                     UserRoleService userRoleService) {
@@ -90,6 +101,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         this.measurableRatingService = measurableRatingService;
         this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
         this.measurableRatingViewService = measurableRatingViewService;
+        this.bulkMeasurableRatingService = bulkMeasurableRatingService;
         this.userRoleService = userRoleService;
     }
 
@@ -115,7 +127,12 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String saveRatingDescriptionPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "description");
         String saveRatingIsPrimaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "is-primary");
 
-        registerPreviewBulkMeasurableRatingChanges(mkPath(BASE_URL, "bulk", "preview", ":kind", ":id"));
+        String bulkRatingPreviewPath = mkPath(BASE_URL, "bulk", "preview", "MEASURABLE_CATEGORY", ":id");
+        String bulkRatingApplyPath = mkPath(BASE_URL, "bulk", "apply", "MEASURABLE_CATEGORY", ":id");
+
+        registerPreviewBulkMeasurableRatingChanges(bulkRatingPreviewPath);
+        registerApplyBulkMeasurableRatingChanges(bulkRatingApplyPath);
+
         DatumRoute<MeasurableRating> getByIdRoute = (request, response)
                 -> measurableRatingService.getById(getId(request));
 
@@ -254,11 +271,26 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     private void registerPreviewBulkMeasurableRatingChanges(String path) {
         postForDatum(path, (req, resp) -> {
-            EntityReference measurableRatingRef = getEntityReference(req);
-            BulkMeasurableItemParser.InputFormat format = readEnum(req, "format", BulkMeasurableItemParser.InputFormat.class, s -> BulkMeasurableItemParser.InputFormat.TSV);
-            BulkUpdateMode mode = readEnum(req, "mode", BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
+            EntityReference categoryRef = mkRef(EntityKind.MEASURABLE_CATEGORY, getId(req));
+            String modeStr = req.queryParams("mode");
+            String formatStr = req.queryParams("format");
+            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
+            InputFormat format = EnumUtilities.readEnum(formatStr, InputFormat.class, s -> InputFormat.TSV);
             String body = req.body();
-            return measurableRatingService.bulkPreview(measurableRatingRef, body, format, mode);
+            return bulkMeasurableRatingService.bulkPreview(categoryRef, body, format, mode);
+        });
+    }
+
+    private void registerApplyBulkMeasurableRatingChanges(String path) {
+        postForDatum(path, (req, resp) -> {
+            EntityReference categoryRef = mkRef(EntityKind.MEASURABLE_CATEGORY, getId(req));
+            String modeStr = req.queryParams("mode");
+            String formatStr = req.queryParams("format");
+            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
+            InputFormat format = EnumUtilities.readEnum(formatStr, InputFormat.class, s -> InputFormat.TSV);
+            String body = req.body();
+            BulkMeasurableRatingValidationResult preview = bulkMeasurableRatingService.bulkPreview(categoryRef, body, format, mode);
+            return bulkMeasurableRatingService.apply(categoryRef, preview, mode, getUsername(req));
         });
     }
 }

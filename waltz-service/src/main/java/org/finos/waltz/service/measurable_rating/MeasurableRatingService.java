@@ -19,8 +19,6 @@
 package org.finos.waltz.service.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.application.ApplicationDao;
@@ -30,16 +28,21 @@ import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingIdSelectorFactory;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.application.Application;
-import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
-import org.finos.waltz.model.bulk_upload.measurable_rating.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
-import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import org.finos.waltz.model.measurable_rating.*;
-import org.finos.waltz.model.rating.RatingScheme;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingChangeSummary;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
+import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
@@ -51,29 +54,25 @@ import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple4;
-import org.jooq.lambda.tuple.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
-import static java.util.Optional.ofNullable;
-import static org.finos.waltz.common.Checks.*;
-import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.jooq.lambda.tuple.Tuple.tuple;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class MeasurableRatingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MeasurableRatingService.class);
+    private static final String PROVENANCE = "bulkMeasurableRatingUpdate";
+    private static final String DUMMY_USER = "test";
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
     private final MeasurableCategoryDao measurableCategoryDao;
@@ -472,119 +471,4 @@ public class MeasurableRatingService {
         return measurableRatingDao.findPrimaryRatingsForMeasurableIdSelector(ratingIdSelector);
     }
 
-    public BulkMeasurableRatingValidationResult bulkPreview(EntityReference measurableRatingRef,
-                                                            String inputStr,
-                                                            BulkMeasurableItemParser.InputFormat format,
-                                                            BulkUpdateMode mode) {
-
-        BulkMeasurableRatingParseResult result = new BulkMeasurableItemParser().parse(inputStr, format);
-        if (result.error() != null) {
-            return ImmutableBulkMeasurableRatingValidationResult
-                    .builder()
-                    .error(result.error())
-                    .build();
-        }
-        MeasurableCategory category = measurableCategoryService.getById(measurableRatingRef.id());
-        List<Measurable> existingMeasurables = measurableService.findByCategoryId(measurableRatingRef.id());
-        Map<String, Measurable>  existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
-
-        List<Application> allApplications = applicationDao.findAll();
-        Map<String, Application> allApplicationsByAssetCode = indexBy(allApplications, a -> a.assetCode()
-                .map(ExternalIdValue::value)
-                .map(StringUtilities::lower)
-                .orElse(""));
-
-        Set<RatingSchemeItem> ratingSchemeItemsBySchemeIds = ratingSchemeService.findRatingSchemeItemsBySchemeIds(asSet(category.ratingSchemeId()));
-        Map<String, RatingSchemeItem> ratingSchemeItemsByCode = indexBy(ratingSchemeItemsBySchemeIds, RatingSchemeItem::rating);
-
-
-        List<Tuple5<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, Set<ValidationError>>> validatedEntries = result
-                .parsedItems()
-                .stream()
-                .map(d -> {
-                    Application application = allApplicationsByAssetCode.get(d.assetCode().toLowerCase());
-                    Measurable measurable = existingByExtId.get(d.taxonomyExternalId());
-                    RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(String.valueOf(d.ratingCode()));
-                    return tuple(d, application, measurable, ratingSchemeItem);
-                })
-                .map(t -> {
-                    Set<ValidationError> validationErrors = new HashSet<>();
-                    if (t.v2 == null) {
-                        validationErrors.add(ValidationError.APPLICATION_NOT_FOUND);
-                    }
-                    if (t.v3 == null) {
-                        validationErrors.add(ValidationError.MEASURABLE_NOT_FOUND);
-                    }
-                    if (t.v4 == null) {
-                        validationErrors.add(ValidationError.RATING_NOT_FOUND);
-                    }
-                    if (t.v3 != null && !t.v3.concrete()) {
-                        validationErrors.add(ValidationError.MEASURABLE_NOT_CONCRETE);
-                    }
-                    if (t.v4 != null && !t.v4.userSelectable()) {
-                        validationErrors.add(ValidationError.RATING_NOT_USER_SELECTABLE);
-                    }
-
-                    return t.concat(validationErrors);
-                })
-                .collect(Collectors.toList());
-
-        Collection<MeasurableRating> existingRatings = measurableRatingDao.findByCategory(category.id().get());
-        //Optional<EntityReference> EntityRef = Optional.empty();
-        List<MeasurableRating> requiredRatings = validatedEntries
-                .stream()
-                .filter(t -> t.v1 !=null && t.v2 !=null && t.v4 !=null )
-                .map(t -> ImmutableMeasurableRating
-                        .builder()
-                        .entityReference(t.v2.entityReference())
-                        //.entityReference("null")
-                        .measurableId(t.v3.id().get())
-                        .description(t.v1.comment())
-                        .rating(t.v1.ratingCode())
-                        .isPrimary(t.v1.isPrimary())
-                        .lastUpdatedBy("test")
-                        .provenance("bulkMeasurableRatingUpdate")
-                        .build())
-                .collect(Collectors.toList());
-
-        DiffResult<MeasurableRating> diff = DiffResult
-                .mkDiff(
-                        existingRatings,
-                        requiredRatings,
-                        d -> tuple(d.entityReference(), d.measurableId()),
-                        (a, b) -> a.isPrimary() == b.isPrimary() 
-                                && StringUtilities.safeEq(a.description(), b.description())
-                                && a.rating() == b.rating());
-
-        Set<Tuple2<EntityReference, Long>> toAdd = SetUtilities.map(diff.otherOnly(), d -> tuple(d.entityReference(), d.measurableId()));
-        Set<Tuple2<EntityReference, Long>> toRemove = SetUtilities.map(diff.waltzOnly(), d -> tuple(d.entityReference(), d.measurableId()));
-        Set<Tuple2<EntityReference, Long>> toUpdate = SetUtilities.map(diff.differingIntersection(), d -> tuple(d.entityReference(), d.measurableId()));
-
-
-        List<BulkMeasurableRatingValidatedItem> validatedItems = validatedEntries
-                .stream()
-                //.filter(t -> t.v2 != null && t.v3 != null)
-                .map(t -> {
-                    Tuple2<EntityReference, Long> recordKey = tuple(t.v2.entityReference(), t.v3.id().get());
-                    if (toAdd.contains(recordKey)) {
-                        return t.concat(ChangeOperation.ADD);
-                    }
-                    if (toUpdate.contains(recordKey)) {
-                        return t.concat(ChangeOperation.UPDATE);
-                    }
-                    return t.concat(ChangeOperation.NONE);
-                })
-                .map(t -> ImmutableBulkMeasurableRatingValidatedItem
-                        .builder()
-                        .changeOperation(t.v6)
-                        .errors(t.v5)
-                        .parsedItem(t.v1)
-                        .build())
-                .collect(Collectors.toList());
-
-        return ImmutableBulkMeasurableRatingValidationResult
-                .builder()
-                .validatedItems(validatedItems)
-                .build();
-    }
 }

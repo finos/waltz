@@ -22,6 +22,7 @@ import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 
 @Service
 public class MeasurableHelper {
@@ -49,7 +50,7 @@ public class MeasurableHelper {
                 .maybeFirst(categories)
                 .map(c -> c.id().get())
                 .orElseGet(() -> {
-                    long schemeId = ratingSchemeHelper.createEmptyRatingScheme("test");
+                    long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName("measurableHelper", "defaultScheme"));
                     MeasurableCategoryRecord record = dsl.newRecord(MEASURABLE_CATEGORY);
                     record.setDescription(name);
                     record.setName(name);
