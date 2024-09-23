@@ -20,6 +20,7 @@ package org.finos.waltz.service.scheduled_job;
 
 
 import org.finos.waltz.common.ExcludeFromIntegrationTesting;
+import org.finos.waltz.data.assessment_rating.AssessmentRatingRippler;
 import org.finos.waltz.data.scheduled_job.ScheduledJobDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.scheduled_job.JobKey;
@@ -67,6 +68,7 @@ public class ScheduledJobService {
     private final CostService costService;
     private final SurveyInstanceActionQueueService surveyInstanceActionQueueService;
     private final ComplexityService complexityService;
+    private final AssessmentRatingRippler assessmentRatingRippler;
 
 
     @Autowired
@@ -81,7 +83,8 @@ public class ScheduledJobService {
                                ReportGridFilterViewService reportGridFilterViewService,
                                ScheduledJobDao scheduledJobDao,
                                SurveyInstanceActionQueueService surveyInstanceActionQueueService,
-                               SurveyInstanceService surveyInstanceService) {
+                               SurveyInstanceService surveyInstanceService,
+                               AssessmentRatingRippler assessmentRatingRippler) {
 
 
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
@@ -95,6 +98,7 @@ public class ScheduledJobService {
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
         checkNotNull(surveyInstanceActionQueueService, "surveyInstanceActionQueueService cannot be null");
         checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
+        checkNotNull(assessmentRatingRippler, "assessmentRatingRippler cannot be null");
 
         this.attestationRunService = attestationRunService;
         this.complexityService = complexityService;
@@ -108,6 +112,7 @@ public class ScheduledJobService {
         this.scheduledJobDao = scheduledJobDao;
         this.surveyInstanceActionQueueService = surveyInstanceActionQueueService;
         this.surveyInstanceService = surveyInstanceService;
+        this.assessmentRatingRippler = assessmentRatingRippler;
     }
 
 
@@ -163,6 +168,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.COMPLEXITY_REBUILD_MEASURABLE,
                 (jk) -> complexityService.populateMeasurableComplexities());
+
+        runIfNeeded(JobKey.RIPPLE_ASSESSMENTS,
+                (jk) -> assessmentRatingRippler.rippleAssessments());
 
         surveyInstanceActionQueueService.performActions();
 

@@ -2,6 +2,7 @@ package org.finos.waltz.data.assessment_rating;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
@@ -31,6 +32,8 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Comparator;
@@ -50,6 +53,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.PairDiffResult.mkPairDiff;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
+@Service
 public class AssessmentRatingRippler {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssessmentRatingRippler.class);
@@ -67,23 +71,34 @@ public class AssessmentRatingRippler {
     private static final MeasurableRating mr = Tables.MEASURABLE_RATING;
     private static final Measurable m = Tables.MEASURABLE;
 
+    private final DSLContext dsl;
+    private final SettingsDao settingsDao;
 
-    @SafeVarargs
-    public static void rippleAssessments(DSLContext tx,
-                                         String userId,
-                                         String provenance,
-                                         Tuple2<String, String>... listOfSrcAndTargetDefExtIds) {
-        for (Tuple2<String, String> fromTo: listOfSrcAndTargetDefExtIds) {
-            rippleAssessments(tx, userId, provenance, fromTo.v1, fromTo.v2);
-        }
+    @Autowired
+    public AssessmentRatingRippler(DSLContext dsl,
+                                   SettingsDao settingsDao) {
+        this.dsl = dsl;
+        this.settingsDao = settingsDao;
     }
 
 
-    private static void rippleAssessments(DSLContext tx,
-                                          String userId,
-                                          String provenance,
-                                          String from,
-                                          String to) {
+    public final void rippleAssessments() {
+        Map<String, String> requiredRipples = settingsDao.indexByPrefix("job.RIPPLE_ASSESSMENTS.");
+        requiredRipples.forEach((key, toExtId) -> {
+
+            String fromExtId = key.replaceAll("^job.RIPPLE_ASSESSMENTS.", "");
+
+            LOG.debug("Start ripple from: {} , to: {}", fromExtId, toExtId);
+            rippleAssessment(dsl, "waltz", "waltz-assessment-rippler", fromExtId, toExtId);
+        });
+    }
+
+
+    public static void rippleAssessment(DSLContext tx,
+                                        String userId,
+                                        String provenance,
+                                        String from,
+                                        String to) {
 
         Map<String, AssessmentDefinitionRecord> defs = tx
                 .selectFrom(ad)
@@ -91,18 +106,18 @@ public class AssessmentRatingRippler {
                 .fetchMap(r -> r.get(ad.EXTERNAL_ID));
 
         AssessmentDefinitionRecord fromDef = defs.get(from);
-        Checks.checkNotNull(fromDef, format("Cannot ripple assessment as definition: %s not found", from));
+        Checks.checkNotNull(fromDef, "Cannot ripple assessment as definition: %s not found", from);
         AssessmentDefinitionRecord toDef = defs.get(to);
-        Checks.checkNotNull(toDef, format("Cannot ripple assessment as definition: %s not found", toDef));
-        rippleAssessments(tx, userId, provenance, fromDef, toDef);
+        Checks.checkNotNull(toDef, "Cannot ripple assessment as definition: %s not found", toDef);
+        rippleAssessment(tx, userId, provenance, fromDef, toDef);
     }
 
 
-    private static void rippleAssessments(DSLContext tx,
-                                          String userId,
-                                          String provenance,
-                                          AssessmentDefinitionRecord from,
-                                          AssessmentDefinitionRecord to) {
+    private static void rippleAssessment(DSLContext tx,
+                                         String userId,
+                                         String provenance,
+                                         AssessmentDefinitionRecord from,
+                                         AssessmentDefinitionRecord to) {
         checkTrue(
                 from.getRatingSchemeId().equals(to.getRatingSchemeId()),
                 "Assessments must share a rating scheme when rippling (%s -> %s)",
@@ -115,7 +130,7 @@ public class AssessmentRatingRippler {
 
         if (kinds.equals(tuple(EntityKind.PHYSICAL_SPECIFICATION, EntityKind.PHYSICAL_FLOW))) {
             // PHYSICAL_SPEC -> PHYSICAL_FLOW
-            rippleAssessment(
+            rippleAssessments(
                     tx,
                     userId,
                     provenance,
@@ -131,7 +146,7 @@ public class AssessmentRatingRippler {
                                     .and(ps.IS_REMOVED.isFalse())));
         } else if (kinds.equals(tuple(EntityKind.PHYSICAL_FLOW, EntityKind.LOGICAL_DATA_FLOW))) {
             // PHYSICAL_FLOW -> LOGICAL
-            rippleAssessment(
+            rippleAssessments(
                     tx,
                     userId,
                     provenance,
@@ -163,7 +178,7 @@ public class AssessmentRatingRippler {
                     sourceName,
                     DSL.value(" -> "),
                     targetName);
-            rippleAssessment(
+            rippleAssessments(
                     tx,
                     userId,
                     provenance,
@@ -192,7 +207,7 @@ public class AssessmentRatingRippler {
                                             .and(lfIsActiveCondition))));
         } else if (kinds.v1 == EntityKind.MEASURABLE && kinds.v2 == EntityKind.APPLICATION) {
             // MEASURABLE -> APPLICTION
-            rippleAssessment(
+            rippleAssessments(
                     tx,
                     userId,
                     provenance,
@@ -206,7 +221,7 @@ public class AssessmentRatingRippler {
                             .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
         } else if (kinds.v1 == EntityKind.MEASURABLE && kinds.v2 == EntityKind.MEASURABLE_RATING) {
             // MEASURABLE -> MEASURABLE_RATING
-            rippleAssessment(
+            rippleAssessments(
                     tx,
                     userId,
                     provenance,
@@ -227,12 +242,12 @@ public class AssessmentRatingRippler {
     }
 
 
-    private static void rippleAssessment(DSLContext tx,
-                                         String userId,
-                                         String provenance,
-                                         AssessmentDefinitionRecord from,
-                                         AssessmentDefinitionRecord to,
-                                         Select<Record4<Long, Long, Long, String>> targetAndRatingProvider) {
+    private static void rippleAssessments(DSLContext tx,
+                                          String userId,
+                                          String provenance,
+                                          AssessmentDefinitionRecord from,
+                                          AssessmentDefinitionRecord to,
+                                          Select<Record4<Long, Long, Long, String>> targetAndRatingProvider) {
         Timestamp now = nowUtcTimestamp();
         Set<AssessmentRatingRecord> required = MapUtilities
                 .groupAndThen(
