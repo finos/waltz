@@ -52,13 +52,21 @@ export function mkDataTypeStore() {
             `api/data-types/suggested/entity/${ref.kind}/${ref.id}`,
             null,
             {force});
-    }
+    };
+
+    const migrate = (sourceDataTypeId, targetDataTypeId, removeSource = false) => {
+        return remote.execute(
+            "POST",
+            `api/data-types/migrate/${sourceDataTypeId}/to/${targetDataTypeId}?removeSource=${removeSource}`,
+            null);
+    };
 
     return {
         findAll,
         getById,
         findByParentId,
-        findSuggestedByRef
+        findSuggestedByRef,
+        migrate
     };
 }
 

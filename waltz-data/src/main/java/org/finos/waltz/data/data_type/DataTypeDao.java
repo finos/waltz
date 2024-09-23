@@ -23,6 +23,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeMigrationResult;
 import org.finos.waltz.model.datatype.ImmutableDataType;
 import org.finos.waltz.schema.tables.records.DataTypeRecord;
 import org.jooq.Condition;
@@ -76,6 +77,12 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
         this.dsl = dsl;
     }
 
+    public DataTypeMigrationResult migrate(Long fromId, Long toId, boolean deleteOldDataType) {
+        return dsl.transactionResult(ctx -> {
+            DSLContext tx = ctx.dsl();
+            return DataTypeUtilities.migrate(tx, fromId, toId, deleteOldDataType);
+        });
+    }
 
     public List<DataType> findAll() {
         return dsl

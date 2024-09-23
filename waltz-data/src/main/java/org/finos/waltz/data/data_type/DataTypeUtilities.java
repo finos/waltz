@@ -1,9 +1,12 @@
-package org.finos.waltz.jobs.tools;
+package org.finos.waltz.data.data_type;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.datatype.DataTypeMigrationResult;
+import org.finos.waltz.model.datatype.ImmutableDataTypeMigrationResult;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.DataTypeUsage;
@@ -14,7 +17,6 @@ import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.schema.tables.PhysicalSpecDataType;
 import org.finos.waltz.schema.tables.PhysicalSpecification;
 import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
-import org.finos.waltz.service.DIConfiguration;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -22,9 +24,7 @@ import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +34,12 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.DATA_TYPE;
 
 public class DataTypeUtilities {
 
     private static final Logger LOG  = LoggerFactory.getLogger(DataTypeUtilities.class);
-    private static final DataType dataType = Tables.DATA_TYPE;
+    private static final DataType dataType = DATA_TYPE;
     private static final LogicalFlow logicalFlow = Tables.LOGICAL_FLOW;
     private static final LogicalFlowDecorator logicalFlowDecorator = Tables.LOGICAL_FLOW_DECORATOR;
     private static final FlowClassificationRule flowClassificationRule = Tables.FLOW_CLASSIFICATION_RULE;
@@ -106,6 +107,15 @@ public class DataTypeUtilities {
     }
 
 
+    private static boolean removeDataType(DSLContext dsl,
+                                          long fromId) {
+        return dsl
+                .delete(dataType)
+                .where(dataType.ID.eq(fromId))
+                .execute() > 0;
+    }
+
+
     public static void migrate(DSLContext dsl,
                         String fromCode,
                         String toCode,
@@ -132,20 +142,41 @@ public class DataTypeUtilities {
         // 4) update flow_classification_rules set data_type_id = toId where data_type_id = fromId
         // x) delete from dataType where code = 'fromCode'
 
-        migrateDataTypeUsage(dsl, fromId, toId);
-        migrateFlowClassificationRules(dsl, fromId, toId);
-        migrateLogicalFlowDecorator(dsl, fromId, toId);
-        migratePhysicalSpecDataType(dsl, fromId, toId);
-
-        if (deleteOldDataType) {
-            removeDataType(dsl, fromCode);
-        }
+        migrate(dsl, fromId, toId, deleteOldDataType);
 
     }
 
-    private static void migratePhysicalSpecDataType(DSLContext dsl,
-                                                    Long fromId,
-                                                    Long toId) {
+    private static void verifyDataTypeHasNoChildren(DSLContext dsl, Long fromId) {
+        int childCount = dsl.fetchCount(DATA_TYPE, DATA_TYPE.PARENT_ID.eq(fromId));
+        Checks.checkTrue(childCount == 0, "Data Type, %d has %d children", fromId, childCount);
+    }
+
+    public static DataTypeMigrationResult migrate(DSLContext dsl, Long fromId, Long toId, boolean deleteOldDataType) {
+        if (deleteOldDataType) {
+            verifyDataTypeHasNoChildren(dsl, fromId);
+        }
+
+        int dtuCount = migrateDataTypeUsage(dsl, fromId, toId);
+        int crCount = migrateFlowClassificationRules(dsl, fromId, toId);
+        int lfCount = migrateLogicalFlowDecorator(dsl, fromId, toId);
+        int psCount = migratePhysicalSpecDataType(dsl, fromId, toId);
+        boolean dataTypeRemoved = deleteOldDataType
+                ? removeDataType(dsl, fromId)
+                : false;
+
+        return ImmutableDataTypeMigrationResult
+                .builder()
+                .usageCount(dtuCount)
+                .classificationRuleCount(crCount)
+                .logicalFlowDataTypeCount(lfCount)
+                .physicalSpecDataTypeCount(psCount)
+                .dataTypeRemoved(dataTypeRemoved)
+                .build();
+    }
+
+    private static int migratePhysicalSpecDataType(DSLContext dsl,
+                                                   Long fromId,
+                                                   Long toId) {
         PhysicalSpecDataType physicSpec = physicalSpecDataType.as("physicSpec");
         Condition notAlreadyExists = DSL
                 .notExists(DSL
@@ -167,12 +198,13 @@ public class DataTypeUtilities {
                 .execute();
 
         LOG.info("Migrate Phys Spec Data Type Usage: {} -> {},  updated: {}, removed: {}", fromId, toId, updateCount, rmCount);
+        return updateCount + rmCount;
 
     }
 
-    private static void migrateLogicalFlowDecorator(DSLContext dsl,
-                                                    Long fromId,
-                                                    Long toId) {
+    private static int migrateLogicalFlowDecorator(DSLContext dsl,
+                                                   Long fromId,
+                                                   Long toId) {
         LogicalFlowDecorator decorator = logicalFlowDecorator.as("decorator");
 
         Condition notAlreadyExists = DSL.notExists(DSL
@@ -197,12 +229,14 @@ public class DataTypeUtilities {
                 .execute();
 
         LOG.info("Migrate Logical Flow Decorator: {} -> {},  updated: {}, removed: {}", fromId, toId, updateCount, rmCount);
+
+        return updateCount + rmCount;
     }
 
 
-    private static void migrateFlowClassificationRules(DSLContext dsl,
-                                                       Long fromId,
-                                                       Long toId) {
+    private static int migrateFlowClassificationRules(DSLContext dsl,
+                                                      Long fromId,
+                                                      Long toId) {
 
         FlowClassificationRule authSrc = flowClassificationRule.as("authSrc");
 
@@ -228,12 +262,14 @@ public class DataTypeUtilities {
                 .execute();
 
         LOG.info("Migrate Flow Classification Rules: {} -> {},  updated: {}, removed: {}", fromId, toId, updateCount, rmCount);
+        return updateCount + rmCount;
+
     }
 
 
-    private static void migrateDataTypeUsage(DSLContext dsl,
-                                             Long fromId,
-                                             Long toId) {
+    private static int migrateDataTypeUsage(DSLContext dsl,
+                                            Long fromId,
+                                            Long toId) {
         DataTypeUsage dtu = dataTypeUsage.as("dtu");
 
         Condition condition = DSL.notExists(DSL
@@ -257,6 +293,8 @@ public class DataTypeUtilities {
                 .execute();
 
         LOG.info("Migrate DataType Usage: {} -> {},  updated: {}, removed: {}", fromId, toId, updateCount, rmCount);
+
+        return updateCount + rmCount;
     }
 
     public static List<Long> findLogicalFlowIdsForDataType(DSLContext dsl, Long datatype, Set<Long> logicalFlowIds) {
@@ -365,27 +403,5 @@ public class DataTypeUtilities {
                 .set(dataType.CONCRETE, true)
                 .where(dataType.CODE.in(dataTypeCodes))
                 .execute();
-    }
-
-
-    public static void main(String[] args) throws IOException {
-
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        DSLContext dsl = ctx.getBean(DSLContext.class);
-
-        String party = "DataTypeCode1";
-        String allocation = "DataTypeCode2";
-        String instrumentIdentifier = "DataTypeCode3";
-        String prospect = "DataTypeCode4";
-        String dealEvent = "DataTypeCode5";
-        String instrumentStatic = "DataTypeCode6";
-
-        dsl.transaction(context -> {
-            DSLContext tx = context.dsl();
-            migrate(tx, instrumentIdentifier, instrumentStatic, false);
-            migrate(tx, prospect, party, false);
-            migrate(tx, allocation, dealEvent, false);
-            //throw new RuntimeException("BoooM!");
-        });
     }
 }
