@@ -27,6 +27,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeMigrationResult;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -68,10 +69,14 @@ public class DataTypeService {
         this.logicalFlowDao = logicalFlowDao;
     }
 
+    public DataTypeMigrationResult migrate(Long fromId, Long toId, boolean deleteOldDataType) {
+        return dataTypeDao.migrate(fromId, toId, deleteOldDataType);
+    }
 
     public List<DataType> findAll() {
         return dataTypeDao.findAll();
     }
+
 
 
     public DataType getDataTypeById(long dataTypeId) {

@@ -18,7 +18,7 @@
 
 <div>
 
-    <waltz-page-header name="Data"
+    <waltz-page-header name="Data Types"
                        small="search"
                        icon="qrcode">
 
@@ -29,7 +29,7 @@
                         Home
                     </a>
                 </li>
-                <li>Data</li>
+                <li>Data Types</li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>
@@ -76,6 +76,13 @@
 
                 <waltz-data-type-usage-count-tree on-selection="ctrl.nodeSelected">
                 </waltz-data-type-usage-count-tree>
+                <hr/>
+                <button class="btn btn-primary btn-xs clickable"
+                        ui-sref="main.data-type.maintain">
+
+                    <waltz-icon name="wrench"></waltz-icon>
+                    Maintain
+                </button>
             </waltz-section>
         </div>
     </div>
