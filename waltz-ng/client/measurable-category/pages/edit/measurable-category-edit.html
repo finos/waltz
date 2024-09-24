@@ -74,7 +74,7 @@
 
                     <input type="radio"
                            ng-model="$ctrl.activeTab"
-                           value="BULK_RATINGS"
+                           value="BULK_RATING"
                            id="bulk_ratings">
                     <label class="wt-label"
                            for="bulk_ratings">
@@ -88,15 +88,9 @@
                             </waltz-svelte-component>
                         </div>
                         <div ng-if="$ctrl.activeTab === 'BULK_RATING'">
-                            <div class="help-block">
-                                The bulk rating editor can be used to upload multiple measurable ratings against this taxonomy.
-                                The file format should look like:
-                            </div>
-                            <pre>
-                                A,B,C
-                                1,2,3
-                                5,6,7
-                            </pre>
+                            <waltz-svelte-component component="$ctrl.BulkRatingEditor"
+                                                    primary-entity-ref="$ctrl.category">
+                            </waltz-svelte-component>
                         </div>
                         <div ng-if="$ctrl.activeTab === 'INTERACTIVE_TAXONOMY'">
                             <div ng-show="$ctrl.mode === 'SUMMARY'">

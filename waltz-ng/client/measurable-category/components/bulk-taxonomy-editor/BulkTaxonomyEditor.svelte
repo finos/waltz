@@ -134,12 +134,11 @@ a1.2\t a1\t A1_2\t Second child\t true`
             </dl>
             For example:
         </div>
-        <pre style="white-space: pre-line">
-            externalId	 parentExternalId	 name	 description	 concrete
-            a1		 A1	 Root node	 false
-            a1.1	 a1	 A1_1	 First child	 true
-            a1.2	 a1	 A1_2	 Second child	 true
-        </pre>
+        <pre>
+externalId	 parentExternalId	 name	 description	 concrete
+a1		 A1	 Root node	 false
+a1.1	 a1	 A1_1	 First child	 true
+a1.2	 a1	 A1_2	 Second child	 true</pre>
         Note, removal of items should be done via the Interactive Taxonomy Editor panel.
 
 

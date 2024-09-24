@@ -21,6 +21,7 @@ package org.finos.waltz.service.measurable_rating;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -45,11 +46,16 @@ import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,17 +64,25 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class MeasurableRatingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MeasurableRatingService.class);
+    private static final String PROVENANCE = "bulkMeasurableRatingUpdate";
+    private static final String DUMMY_USER = "test";
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
     private final MeasurableCategoryDao measurableCategoryDao;
     private final ChangeLogService changeLogService;
     private final RatingSchemeService ratingSchemeService;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
+    private final MeasurableService  measurableService;
+
+    private final MeasurableCategoryService measurableCategoryService;
+    private final ApplicationDao applicationDao;
 
     private static final MeasurableIdSelectorFactory MEASURABLE_ID_SELECTOR_FACTORY = new MeasurableIdSelectorFactory();
     private static final ApplicationIdSelectorFactory APPLICATION_ID_SELECTOR_FACTORY = new ApplicationIdSelectorFactory();
@@ -81,12 +95,17 @@ public class MeasurableRatingService {
                                    MeasurableCategoryDao measurableCategoryDao,
                                    ChangeLogService changeLogService,
                                    RatingSchemeService ratingSchemeService,
-                                   EntityReferenceNameResolver entityReferenceNameResolver) {
+                                   EntityReferenceNameResolver entityReferenceNameResolver,
+                                   MeasurableService measurableService, ApplicationService applicationService, MeasurableCategoryService measurableCategoryService, ApplicationDao applicationDao) {
+
+
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
+        checkNotNull(measurableService, "MeasurableService cannot be null");
+        checkNotNull(applicationDao, "ApplicationDao cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
@@ -94,6 +113,9 @@ public class MeasurableRatingService {
         this.changeLogService = changeLogService;
         this.ratingSchemeService = ratingSchemeService;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
+        this.measurableService = measurableService;
+        this.applicationDao = applicationDao;
+        this.measurableCategoryService = measurableCategoryService;
     }
 
     // -- READ
@@ -448,4 +470,5 @@ public class MeasurableRatingService {
     public Set<MeasurableRating> findPrimaryRatingsForMeasurableIdSelector(Select<Record1<Long>> ratingIdSelector) {
         return measurableRatingDao.findPrimaryRatingsForMeasurableIdSelector(ratingIdSelector);
     }
+
 }

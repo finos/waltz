@@ -22,6 +22,7 @@ import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import BulkTaxonomyEditor from "../../components/bulk-taxonomy-editor/BulkTaxonomyEditor.svelte";
+import BulkRatingEditor from "../../../measurable-rating/components/bulk-rating-editor/BulkRatingEditor.svelte";
 
 
 const modes = {
@@ -46,7 +47,8 @@ const initialState = {
     pendingChanges: [],
     mode: modes.SUMMARY,
     activeTab: tabs.INTERACTIVE_TAXONOMY,
-    BulkTaxonomyEditor
+    BulkTaxonomyEditor,
+    BulkRatingEditor
 };
 
 
