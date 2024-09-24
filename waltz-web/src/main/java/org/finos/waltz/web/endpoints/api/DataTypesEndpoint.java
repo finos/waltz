@@ -18,7 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.datatype.DataTypeMigrationResult;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -28,11 +31,9 @@ import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -43,12 +44,15 @@ public class DataTypesEndpoint implements Endpoint {
 
     private static final String BASE_URL = WebUtilities.mkPath("api", "data-types");
 
-    private final DataTypeService service;
+    private final DataTypeService dataTypeService;
+    private final UserRoleService userRoleService;
 
     @Autowired
-    public DataTypesEndpoint(DataTypeService service) {
-        checkNotNull(service, "service must not be null");
-        this.service = service;
+    public DataTypesEndpoint(DataTypeService dataTypeService, UserRoleService userRoleService) {
+        checkNotNull(dataTypeService, "dataTypeService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
+        this.userRoleService = userRoleService;
+        this.dataTypeService = dataTypeService;
     }
 
 
@@ -59,30 +63,45 @@ public class DataTypesEndpoint implements Endpoint {
         String getDataTypeByCodePath = mkPath(BASE_URL, "code", ":code");
         String findSuggestedByEntityRefPath = mkPath(BASE_URL, "suggested", "entity", ":kind", ":id");
         String findByParentIdPath = mkPath(BASE_URL, "parent-id", ":id");
+        String migratePath = mkPath(BASE_URL, "migrate", ":sourceDataTypeId", "to", ":targetDataTypeId");
 
         ListRoute<DataType> searchRoute = (request, response) ->
-                service.search(EntitySearchOptions
+                dataTypeService.search(EntitySearchOptions
                         .mkForEntity(EntityKind.DATA_TYPE, readBody(request, String.class)));
 
         DatumRoute<DataType> getDataTypeByIdRoute = (request, response) ->
-                service.getDataTypeById(parseLong(request.params("id")));
+                dataTypeService.getDataTypeById(parseLong(request.params("id")));
 
         DatumRoute<DataType> getDataTypeByCodeRoute = (request, response) ->
-                service.getDataTypeByCode(request.params("code"));
+                dataTypeService.getDataTypeByCode(request.params("code"));
 
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res) ->
-                service.findSuggestedByEntityRef(getEntityReference(req));
+                dataTypeService.findSuggestedByEntityRef(getEntityReference(req));
 
         ListRoute<DataType> findByParentIdRoute = (req, res) ->
-                service.findByParentId(getId(req));
+                dataTypeService.findByParentId(getId(req));
 
+        DatumRoute<DataTypeMigrationResult> migrateRoute = (request, response) -> {
+            ensureUserHasMigrateAdminRights(request);
+            long sourceDataTypeId = getLong(request, "sourceDataTypeId");
+            long targetDataTypeId = getLong(request, "targetDataTypeId");
+            boolean removeSource = Boolean.parseBoolean(request.queryParams("removeSource"));
+            return dataTypeService.migrate(sourceDataTypeId, targetDataTypeId, removeSource);
+        };
 
-        getForList(BASE_URL, (request, response) -> service.findAll());
+        getForList(BASE_URL, (request, response) -> dataTypeService.findAll());
         postForList(searchPath, searchRoute);
         getForDatum(getDataTypeByIdPath, getDataTypeByIdRoute);
         getForDatum(getDataTypeByCodePath, getDataTypeByCodeRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         getForList(findByParentIdPath, findByParentIdRoute);
+        postForDatum(migratePath, migrateRoute);
+    }
+
+    // -- HELPERS ---
+
+    private void ensureUserHasMigrateAdminRights(Request request) {
+        requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 

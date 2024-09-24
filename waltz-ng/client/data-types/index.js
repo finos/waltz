@@ -31,6 +31,7 @@ import RelatedDataTypesSection from './components/related-data-types-section/rel
 import DataTypesDecoratorSection from './components/data-type-decorator-section/data-type-decorator-section';
 import Routes from './routes';
 import DataTypeViewData from './services/data-type-view-data';
+import DataTypeMaintain from './pages/maintain/data-type-maintain';
 
 export default () => {
     const module = angular.module('waltz.data.types', []);
@@ -47,7 +48,8 @@ export default () => {
         DataTypeUsageSelector,
         DataTypeUsageTree,
         RelatedDataTypesSection,
-        DataTypesDecoratorSection
+        DataTypesDecoratorSection,
+        DataTypeMaintain
     ]);
 
     module
