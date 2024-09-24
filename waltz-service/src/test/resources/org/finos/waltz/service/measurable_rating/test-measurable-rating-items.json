@@ -1,0 +1,23 @@
+[
+  {
+    "assetCode": "109-1",
+    "taxonomyExternalId": "CT-001",
+    "ratingCode": "A",
+    "isPrimary": "TRUE",
+    "comment": "comment"
+  },
+  {
+    "assetCode": "109-1",
+    "taxonomyExternalId": "CT-001",
+    "ratingCode": "A",
+    "isPrimary": "FALSE",
+    "comment": "comment"
+  },
+  {
+    "assetCode": "324-1",
+    "taxonomyExternalId": "CT-003",
+    "ratingCode": "A",
+    "isPrimary": "FALSE",
+    "comment": "comment"
+  }
+]

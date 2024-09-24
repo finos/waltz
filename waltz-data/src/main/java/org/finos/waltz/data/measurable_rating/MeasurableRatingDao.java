@@ -40,8 +40,6 @@ import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.EntityHierarchy;
-import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
@@ -812,7 +810,7 @@ public class MeasurableRatingDao {
                                   long measurableId,
                                   String ratingCode,
                                   String username) {
-        return MeasurableRatingHelper.saveRatingItem(
+        return MeasurableRatingUtilities.saveRatingItem(
                 dsl,
                 entityRef,
                 measurableId,
@@ -822,7 +820,7 @@ public class MeasurableRatingDao {
 
 
     public boolean saveRatingIsPrimary(EntityReference entityRef, long measurableId, boolean isPrimary, String username) {
-        return dsl.transactionResult(ctx -> MeasurableRatingHelper.saveRatingIsPrimary(
+        return dsl.transactionResult(ctx -> MeasurableRatingUtilities.saveRatingIsPrimary(
                 ctx.dsl(),
                 entityRef,
                 measurableId,
@@ -832,7 +830,7 @@ public class MeasurableRatingDao {
 
 
     public boolean saveRatingDescription(EntityReference entityRef, long measurableId, String description, String username) {
-        return dsl.transactionResult(ctx -> MeasurableRatingHelper.saveRatingDescription(
+        return dsl.transactionResult(ctx -> MeasurableRatingUtilities.saveRatingDescription(
                 ctx.dsl(),
                 entityRef,
                 measurableId,
@@ -844,7 +842,7 @@ public class MeasurableRatingDao {
     public MeasurableRatingChangeSummary resolveLoggingContextForRatingChange(EntityReference entityRef,
                                                                               long measurableId,
                                                                               String desiredRatingCode) {
-        return MeasurableRatingHelper.resolveLoggingContextForRatingChange(dsl, entityRef, measurableId, desiredRatingCode);
+        return MeasurableRatingUtilities.resolveLoggingContextForRatingChange(dsl, entityRef, measurableId, desiredRatingCode);
     }
 
     /*

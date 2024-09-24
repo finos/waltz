@@ -28,7 +28,7 @@ import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
-public class MeasurableRatingHelper {
+public class MeasurableRatingUtilities {
 
     /**
      * Updates the given measurable rating to be set as primary.
