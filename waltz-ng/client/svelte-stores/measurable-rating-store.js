@@ -41,12 +41,26 @@ export function mkMeasurableRelationshipStore() {
             null,
             {force});
 
+    const bulkRatingPreviewByCategory = (categoryId, data) => remote
+        .execute(
+            "POST",
+            `api/measurable-rating/bulk/preview/MEASURABLE_CATEGORY/${categoryId}`,
+            data);
+
+    const bulkRatingApplyByCategory = (categoryId, data) => remote
+        .execute(
+            "POST",
+            `api/measurable-rating/bulk/apply/MEASURABLE_CATEGORY/${categoryId}`,
+            data);
+
     return {
         findByApplicationSelector,
         getById,
         getViewById,
         getViewByCategoryAndSelector,
-        getPrimaryRatingsViewBySelector
+        getPrimaryRatingsViewBySelector,
+        bulkRatingPreviewByCategory,
+        bulkRatingApplyByCategory
     };
 }
 
