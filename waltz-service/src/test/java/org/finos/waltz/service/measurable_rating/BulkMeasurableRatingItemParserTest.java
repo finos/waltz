@@ -3,15 +3,16 @@ package org.finos.waltz.service.measurable_rating;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.bulk_upload.measurable_rating.BulkMeasurableRatingItem;
 import org.finos.waltz.model.bulk_upload.measurable_rating.BulkMeasurableRatingParseResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
-import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.IOUtilities.readAsString;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BulkMeasurableRatingItemParserTest {
 
@@ -22,7 +23,7 @@ public class BulkMeasurableRatingItemParserTest {
         BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items.tsv"), BulkMeasurableItemParser.InputFormat.TSV);
         assertNull(result.error());
         assertEquals(3, result.parsedItems().size());
-        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+        assertNarIds(result.parsedItems(), "109-1", "109-1", "324-1");
     }
 
     @Test
@@ -30,7 +31,7 @@ public class BulkMeasurableRatingItemParserTest {
         BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items.csv"), BulkMeasurableItemParser.InputFormat.CSV);
         assertNull(result.error());
         assertEquals(3, result.parsedItems().size());
-        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+        assertNarIds(result.parsedItems(), "109-1", "109-1", "324-1");
     }
 
     @Test
@@ -38,7 +39,7 @@ public class BulkMeasurableRatingItemParserTest {
         BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items.json"), BulkMeasurableItemParser.InputFormat.JSON);
         assertNull(result.error());
         assertEquals(3, result.parsedItems().size());
-        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+        assertNarIds(result.parsedItems(), "109-1", "109-1", "324-1");
     }
 
     private void assertNarIds(List<BulkMeasurableRatingItem> parsedItems, String... resultNarIds) {
@@ -73,14 +74,14 @@ public class BulkMeasurableRatingItemParserTest {
     void parseIgnoresEmptyLines() {
         BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items-with-blanks.tsv"), BulkMeasurableItemParser.InputFormat.TSV);
         assertEquals(3, result.parsedItems().size());
-        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+        assertNarIds(result.parsedItems(), "109-1", "109-1", "324-1");
     }
 
     @Test
     void parseIgnoresCommentedLines() {
         BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items-with-commented-lines.csv"), BulkMeasurableItemParser.InputFormat.CSV);
         assertEquals(2, result.parsedItems().size());
-        assertNarIds(result.parsedItems(), "109235-1", "324234-1");
+        assertNarIds(result.parsedItems(), "109-1", "324-1");
     }
 
     private void expectEmptyError(BulkMeasurableRatingParseResult result) {
