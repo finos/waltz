@@ -1,5 +1,7 @@
 package org.finos.waltz.data.assessment_rating;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.settings.SettingsDao;
@@ -7,6 +9,9 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.PairDiffResult;
+import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
+import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobStep;
+import org.finos.waltz.model.assessment_definition.ImmutableAssessmentRipplerJobConfiguration;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Actor;
 import org.finos.waltz.schema.tables.Application;
@@ -41,12 +46,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.StringUtilities.safeEq;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -82,14 +90,49 @@ public class AssessmentRatingRippler {
     }
 
 
+    public static AssessmentRipplerJobConfiguration parseConfig(String name,
+                                                                String value) throws JsonProcessingException {
+        ObjectMapper jsonMapper = getJsonMapper();
+        AssessmentRipplerJobStep[] steps = jsonMapper.readValue(value, AssessmentRipplerJobStep[].class);
+
+        return ImmutableAssessmentRipplerJobConfiguration
+                .builder()
+                .name(name)
+                .steps(asList(steps))
+                .build();
+    }
+
+
     public final void rippleAssessments() {
-        Map<String, String> requiredRipples = settingsDao.indexByPrefix("job.RIPPLE_ASSESSMENTS.");
-        requiredRipples.forEach((key, toExtId) -> {
+        Map<String, String> configEntries = settingsDao
+                .indexByPrefix("job.RIPPLE_ASSESSMENTS.");
 
-            String fromExtId = key.replaceAll("^job.RIPPLE_ASSESSMENTS.", "");
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+            configEntries
+                    .entrySet()
+                    .stream()
+                    .flatMap(kv -> {
+                        String key = kv.getKey();
+                        String value = kv.getValue();
 
-            LOG.debug("Start ripple from: {} , to: {}", fromExtId, toExtId);
-            rippleAssessment(dsl, "waltz", "waltz-assessment-rippler", fromExtId, toExtId);
+                        String rippleName = key.replaceAll("^job.RIPPLE_ASSESSMENTS.", "");
+                        LOG.debug("Parsing config ripple : {} , json: {}", rippleName, value);
+
+                        try {
+                            AssessmentRipplerJobConfiguration config = parseConfig(rippleName, value);
+                            return config.steps().stream();
+                        } catch (JsonProcessingException e) {
+                            LOG.error("Could not process assessment rippler job: " + rippleName, e);
+                            return Stream.empty();
+                        }
+                    })
+                    .forEach(step -> rippleAssessment(
+                            tx,
+                            "waltz",
+                            "waltz-assessment-rippler",
+                            step.fromDef(),
+                            step.toDef()));
         });
     }
 

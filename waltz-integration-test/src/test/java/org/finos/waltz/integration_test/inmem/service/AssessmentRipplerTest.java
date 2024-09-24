@@ -1,10 +1,16 @@
 package org.finos.waltz.integration_test.inmem.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingRippler;
+import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobStep;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.assessment_definition.ImmutableAssessmentRipplerJobStep;
+import org.finos.waltz.model.settings.ImmutableSetting;
+import org.finos.waltz.model.settings.Setting;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.AssessmentHelper;
@@ -13,6 +19,8 @@ import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
@@ -36,8 +44,14 @@ public class AssessmentRipplerTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private RatingSchemeHelper ratingSchemeHelper;
 
+    @Autowired
+    private SettingsDao settingsDao;
+
+    @Autowired
+    private AssessmentRatingRippler assessmentRatingRippler;
 
     private final String stem = "ripple";
+
 
     @Test
     public void cannotRippleBetweenAssessmentsWithDifferingRatingSchemes() {
@@ -59,12 +73,57 @@ public class AssessmentRipplerTest extends BaseInMemoryIntegrationTest {
                         "rippler_test",
                         assmtA_extId,
                         assmtB_extId));
-
     }
 
 
     @Test
-    public void canRippleBetweenAssessmentsWithSameRatingSchemes() {
+    public void canRippleBetweenAssessmentsWithSameRatingSchemes() throws JsonProcessingException {
+        // setup app, measurable, and rating
+        EntityReference appRef = appHelper.createNewApp(mkName(stem, "ripple_app"), ouIds.root);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName(stem, "ripple_mc"));
+        long measurableId = measurableHelper.createMeasurable(mkName(stem, "ripple_m"), categoryId);
+
+        // link app to measurable
+        measurableHelper.createRating(appRef, measurableId);
+
+        // create schemes, rating items and assessments
+        long scheme = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "good_ripple_scheme"));
+        Long rsiId = ratingSchemeHelper.saveRatingItem(scheme, mkName(stem, "ripple_rsi"), 0, "pink", "P");
+        long assmtA = assessmentHelper.createDefinition(scheme, mkName(stem, "ripple assmt A"), null, AssessmentVisibility.SECONDARY, stem, EntityKind.MEASURABLE, mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId));
+        long assmtB = assessmentHelper.createDefinition(scheme, mkName(stem, "ripple assmt B"), null, AssessmentVisibility.SECONDARY, stem, EntityKind.APPLICATION, null);
+        String assmtA_extId = mkName(stem, "ASSMT_A");
+        String assmtB_extId = mkName(stem, "ASSMT_B");
+        assessmentHelper.setDefExtId(assmtA, assmtA_extId);
+        assessmentHelper.setDefExtId(assmtB, assmtB_extId);
+
+        // link assessment rating to measurable
+        assessmentHelper.createAssessment(assmtA, mkRef(EntityKind.MEASURABLE, measurableId), rsiId);
+
+        AssessmentRipplerJobStep rippleStep = ImmutableAssessmentRipplerJobStep
+                .builder()
+                .fromDef(assmtA_extId)
+                .toDef(assmtB_extId)
+                .build();
+        Setting rippleSetting = ImmutableSetting
+                .builder()
+                .name("job.RIPPLE_ASSESSMENTS."+mkName(stem, "rippleConfig"))
+                .value(getJsonMapper().writeValueAsString(asList(rippleStep)))
+                .build();
+        settingsDao.create(rippleSetting);
+
+        // ripple
+        assessmentRatingRippler.rippleAssessments();
+
+        // verify
+        assertEquals(
+                rsiId,
+                fetchAssessmentRatingItemId(appRef, assmtB),
+                "Rating will have rippled from measurable to application");
+    }
+
+
+    @Test
+    public void canRippleUsingTheSettingsTableDefinitions() {
         // setup app, measurable, and rating
         EntityReference appRef = appHelper.createNewApp(mkName(stem, "ripple_app"), ouIds.root);
         EntityReference unrelatedRef = appHelper.createNewApp(mkName(stem, "ripple_unrelated_app"), ouIds.root);
