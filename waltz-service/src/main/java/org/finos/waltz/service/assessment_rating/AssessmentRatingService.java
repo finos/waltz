@@ -37,6 +37,7 @@ import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.application.ImmutableAssessmentsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_rating.AssessmentDefinitionRatingOperations;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.assessment_rating.AssessmentRatingSummaryCounts;
@@ -51,7 +52,6 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -79,6 +79,7 @@ public class AssessmentRatingService {
     private final ChangeLogService changeLogService;
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final AssessmentRatingRippler rippler;
 
 
     @Autowired
@@ -87,19 +88,22 @@ public class AssessmentRatingService {
             AssessmentDefinitionDao assessmentDefinitionDao,
             RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService,
-            AssessmentRatingPermissionChecker assessmentRatingPermissionChecker) {
+            AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
+            AssessmentRatingRippler rippler) {
 
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
         checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(rippler, "rippler cannot be null");
 
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.changeLogService = changeLogService;
+        this.rippler = rippler;
 
     }
 
@@ -498,4 +502,11 @@ public class AssessmentRatingService {
                 .build();
     }
 
+    public Long rippleAll() {
+        return rippler.rippleAssessments();
+    }
+
+    public Set<AssessmentRipplerJobConfiguration> findRippleConfig() {
+        return rippler.findRippleConfig();
+    }
 }

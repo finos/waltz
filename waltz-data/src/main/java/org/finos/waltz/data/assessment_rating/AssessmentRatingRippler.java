@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
@@ -17,6 +18,9 @@ import org.finos.waltz.schema.tables.Actor;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.AssessmentDefinition;
 import org.finos.waltz.schema.tables.AssessmentRating;
+import org.finos.waltz.schema.tables.ChangeInitiative;
+import org.finos.waltz.schema.tables.EndUserApplication;
+import org.finos.waltz.schema.tables.EntityRelationship;
 import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.MeasurableRating;
@@ -44,9 +48,9 @@ import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
@@ -78,6 +82,10 @@ public class AssessmentRatingRippler {
     private static final RatingScheme rs = Tables.RATING_SCHEME;
     private static final MeasurableRating mr = Tables.MEASURABLE_RATING;
     private static final Measurable m = Tables.MEASURABLE;
+    private static final EntityRelationship er = Tables.ENTITY_RELATIONSHIP;
+    private static final ChangeInitiative ci = Tables.CHANGE_INITIATIVE;
+    private static final EndUserApplication euda = Tables.END_USER_APPLICATION;
+    private static final Set<EntityKind> flowNodeEntities = SetUtilities.asSet(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION);
 
     private final DSLContext dsl;
     private final SettingsDao settingsDao;
@@ -103,36 +111,29 @@ public class AssessmentRatingRippler {
     }
 
 
-    public final void rippleAssessments() {
-        Map<String, String> configEntries = settingsDao
-                .indexByPrefix("job.RIPPLE_ASSESSMENTS.");
+    /**
+     * Ripple all assessments configured in the settings table
+     *
+     * @return  the number of steps taken, where a step is a source assessment def and a target assessment def
+     */
+    public final Long rippleAssessments() {
+        Set<AssessmentRipplerJobConfiguration> rippleConfig = findRippleConfig();
 
-        dsl.transaction(ctx -> {
+        return dsl.transactionResult(ctx -> {
             DSLContext tx = ctx.dsl();
-            configEntries
-                    .entrySet()
+            return rippleConfig
                     .stream()
-                    .flatMap(kv -> {
-                        String key = kv.getKey();
-                        String value = kv.getValue();
-
-                        String rippleName = key.replaceAll("^job.RIPPLE_ASSESSMENTS.", "");
-                        LOG.debug("Parsing config ripple : {} , json: {}", rippleName, value);
-
-                        try {
-                            AssessmentRipplerJobConfiguration config = parseConfig(rippleName, value);
-                            return config.steps().stream();
-                        } catch (JsonProcessingException e) {
-                            LOG.error("Could not process assessment rippler job: " + rippleName, e);
-                            return Stream.empty();
-                        }
+                    .flatMap(config -> config.steps().stream())
+                    .map(step -> {
+                        rippleAssessment(
+                                tx,
+                                "waltz",
+                                "waltz-assessment-rippler",
+                                step.fromDef(),
+                                step.toDef());
+                        return 1;
                     })
-                    .forEach(step -> rippleAssessment(
-                            tx,
-                            "waltz",
-                            "waltz-assessment-rippler",
-                            step.fromDef(),
-                            step.toDef()));
+                    .count();
         });
     }
 
@@ -202,20 +203,24 @@ public class AssessmentRatingRippler {
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
                                     .and(pf.IS_REMOVED.isFalse())
                                     .and(pf.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))));
-        } else if (kinds.v1 == EntityKind.LOGICAL_DATA_FLOW && (kinds.v2 == EntityKind.APPLICATION || kinds.v2 == EntityKind.ACTOR)) {
-            // LOGICAL -> APP | ACTOR
+        } else if (kinds.v1 == EntityKind.LOGICAL_DATA_FLOW && (flowNodeEntities.contains(kinds.v2))) {
+            // LOGICAL -> APP | ACTOR | END_USER_APP
             Condition lfIsActiveCondition = lf.IS_REMOVED.isFalse()
                     .and(lf.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()));
             Actor sourceActor = act.as("source_actor");
             Actor targetActor = act.as("target_actor");
+            EndUserApplication sourceEuda = euda.as("source_euda");
+            EndUserApplication targetEuda = euda.as("target_euda");
             Application sourceApp = app.as("source_app");
             Application targetApp = app.as("target_app");
             Condition sourceActorJoinCondition = lf.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()).and(sourceActor.ID.eq(lf.SOURCE_ENTITY_ID));
             Condition targetActorJoinCondition = lf.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()).and(targetActor.ID.eq(lf.TARGET_ENTITY_ID));
             Condition sourceAppJoinCondition = lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(sourceApp.ID.eq(lf.SOURCE_ENTITY_ID));
             Condition targetAppJoinCondition = lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(targetApp.ID.eq(lf.TARGET_ENTITY_ID));
-            Field<String> sourceName = DSL.coalesce(sourceApp.NAME, sourceActor.NAME, DSL.value("??"));
-            Field<String> targetName = DSL.coalesce(targetApp.NAME, targetActor.NAME, DSL.value("??"));
+            Condition sourceEudaJoinCondition = lf.SOURCE_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()).and(sourceApp.ID.eq(lf.SOURCE_ENTITY_ID));
+            Condition targetEudaJoinCondition = lf.TARGET_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()).and(targetApp.ID.eq(lf.TARGET_ENTITY_ID));
+            Field<String> sourceName = DSL.coalesce(sourceApp.NAME, sourceActor.NAME, sourceEuda.NAME, DSL.value("??"));
+            Field<String> targetName = DSL.coalesce(targetApp.NAME, targetActor.NAME, targetEuda.NAME, DSL.value("??"));
             Field<String> flowDesc = DSL.concat(
                     DSL.value("Flow: "),
                     sourceName,
@@ -234,6 +239,8 @@ public class AssessmentRatingRippler {
                             .leftJoin(targetApp).on(targetAppJoinCondition)
                             .leftJoin(sourceActor).on(sourceActorJoinCondition)
                             .leftJoin(targetActor).on(targetActorJoinCondition)
+                            .leftJoin(sourceEuda).on(sourceEudaJoinCondition)
+                            .leftJoin(targetEuda).on(targetEudaJoinCondition)
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
                                     .and(lf.SOURCE_ENTITY_KIND.eq(kinds.v2.name()))
                                     .and(lfIsActiveCondition))
@@ -245,11 +252,13 @@ public class AssessmentRatingRippler {
                                     .leftJoin(targetApp).on(targetAppJoinCondition)
                                     .leftJoin(sourceActor).on(sourceActorJoinCondition)
                                     .leftJoin(targetActor).on(targetActorJoinCondition)
+                                    .leftJoin(sourceEuda).on(sourceEudaJoinCondition)
+                                    .leftJoin(targetEuda).on(targetEudaJoinCondition)
                                     .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
                                             .and(lf.TARGET_ENTITY_KIND.eq(kinds.v2.name()))
                                             .and(lfIsActiveCondition))));
         } else if (kinds.v1 == EntityKind.MEASURABLE && kinds.v2 == EntityKind.APPLICATION) {
-            // MEASURABLE -> APPLICTION
+            // MEASURABLE -> APPLICATION
             rippleAssessments(
                     tx,
                     userId,
@@ -276,6 +285,20 @@ public class AssessmentRatingRippler {
                             .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))
                             .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+        } else if (kinds.v1 == EntityKind.CHANGE_INITIATIVE && kinds.v2 == EntityKind.APPLICATION) {
+            // CHANGE_INITIATIVE -> APPLICATION
+            rippleAssessments(
+                    tx,
+                    userId,
+                    provenance,
+                    from,
+                    to,
+                    tx.select(er.ID_B, ar.RATING_ID, ci.ID, ci.NAME)
+                            .from(er)
+                            .innerJoin(ci).on(ci.ID.eq(er.ID_A).and(er.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                            .innerJoin(ar).on(ar.ENTITY_ID.eq(ci.ID)
+                                    .and(ar.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                                    .and(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))));
         } else {
             throw new UnsupportedOperationException(format(
                     "Cannot ripple assessment from kind: %s to kind: %s",
@@ -417,4 +440,27 @@ public class AssessmentRatingRippler {
         }
     }
 
+
+    public Set<AssessmentRipplerJobConfiguration> findRippleConfig() {
+        Map<String, String> configEntries = settingsDao
+                .indexByPrefix("job.RIPPLE_ASSESSMENTS.");
+
+        return configEntries
+                .entrySet()
+                .stream()
+                .map(kv -> {
+                    String key = kv.getKey();
+                    String value = kv.getValue();
+                    String rippleName = key.replaceAll("^job.RIPPLE_ASSESSMENTS.", "");
+                    LOG.debug("Parsing config ripple : {} , json: {}", rippleName, value);
+
+                    try {
+                        return parseConfig(rippleName, value);
+                    } catch (JsonProcessingException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(toSet());
+    }
 }

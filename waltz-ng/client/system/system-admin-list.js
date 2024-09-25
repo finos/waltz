@@ -191,7 +191,7 @@ const maintenanceOptions= [
     },  {
         name: "Recalculate Derived Fields",
         role: "ADMIN",
-        description: "Recompute: Data Type Usages, Flow Authoritative Source Ratings",
+        description: "Recompute: Data Type Usages, Flow Authoritative Source Ratings, Ripple Assessments",
         state: "main.system.recalculate",
         icon: "calculator"
     },  {

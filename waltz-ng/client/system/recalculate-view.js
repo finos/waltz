@@ -19,10 +19,37 @@
 import template from "./recalculate-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import toasts from "../svelte-stores/toast-store";
+import {initialiseData} from "../common";
+
+const initialState = {
+    assessmentRippleConfig: []
+};
 
 
-function controller(serviceBroker) {
-    const vm = this;
+function controller($q, serviceBroker) {
+    const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        const configPromise = serviceBroker
+            .loadViewData(CORE_API.AssessmentRatingStore.findRippleConfig);
+
+        const defsPromise = serviceBroker
+            .loadViewData(CORE_API.AssessmentDefinitionStore.findAll);
+
+        $q.all([configPromise, defsPromise])
+            .then(([cr, dr]) => {
+                const defsByExtId = _.keyBy(dr.data, d => d.externalId);
+                vm.assessmentRippleConfig = _
+                    .chain(cr.data)
+                    .map(d => {
+                        const steps = _.map(d.steps, s => ({from: defsByExtId[s.fromDef], to: defsByExtId[s.toDef]}));
+                        return Object.assign({}, d, {steps});
+                    })
+                    .value();
+
+                console.log({assessmentRippleConfig: vm.assessmentRippleConfig})
+            });
+    };
 
     vm.recalcFlowRatings = () => {
         toasts.info("Flow Ratings recalculation requested");
@@ -38,10 +65,17 @@ function controller(serviceBroker) {
             .then(() => toasts.success("Data Type Usage recalculated"));
     };
 
+    vm.rippleAssessments = () => {
+        toasts.info("Assessment Ripple requested");
+        serviceBroker
+            .execute(CORE_API.AssessmentRatingStore.ripple)
+            .then(r => toasts.success(`Assessment Ripple finished. Completed ${r.data} step/s`));
+    };
 }
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
@@ -49,7 +83,7 @@ controller.$inject = [
 const page = {
     template,
     controller,
-    controllerAs: "ctrl"
+    controllerAs: "$ctrl"
 };
 
 
