@@ -20,6 +20,7 @@ import template from "./recalculate-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import toasts from "../svelte-stores/toast-store";
 import {initialiseData} from "../common";
+import _ from "lodash";
 
 const initialState = {
     assessmentRippleConfig: []
@@ -37,17 +38,20 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.AssessmentDefinitionStore.findAll);
 
         $q.all([configPromise, defsPromise])
-            .then(([cr, dr]) => {
-                const defsByExtId = _.keyBy(dr.data, d => d.externalId);
+            .then(([configResponse, defsResponse]) => {
+                const defsByExtId = _.keyBy(
+                    defsResponse.data,
+                    d => d.externalId);
+
                 vm.assessmentRippleConfig = _
-                    .chain(cr.data)
+                    .chain(configResponse.data)
                     .map(d => {
-                        const steps = _.map(d.steps, s => ({from: defsByExtId[s.fromDef], to: defsByExtId[s.toDef]}));
+                        const steps = _.map(
+                            d.steps,
+                            s => ({from: defsByExtId[s.fromDef], to: defsByExtId[s.toDef]}));
                         return Object.assign({}, d, {steps});
                     })
                     .value();
-
-                console.log({assessmentRippleConfig: vm.assessmentRippleConfig})
             });
     };
 
