@@ -2,6 +2,7 @@
     import {buildHierarchies} from "../../../common/hierarchy-utils";
     import {mkChunks} from "../../../common/list-utils";
     import _ from "lodash";
+    import ColorPicker from "../ratings-schemes/ColorPicker.svelte";
 
     export let taxonomy = [];
     export let link = "";
@@ -13,51 +14,41 @@
 
     const orderBySize = {
         name: "Size",
-        fn: x => _.size(x.children) * -1
+        fn: d => _.size(d.children) * -1
     };
 
     const orderNaturally = {
         name: "Natural",
-        fn: x => x
+        fn: d => d
+    };
+
+    const orderByPosition = {
+        name: "By Position (then name)",
+        fn: d => d.position + d.name
     };
 
     const OrderModes = [
         orderAlphabetically,
         orderBySize,
-        orderNaturally
+        orderNaturally,
+        orderByPosition
     ];
 
-    let orderMode = orderBySize;
+    let orderMode = orderByPosition;
+    let defaultHeaderColor = "#eeeeee";
+    let defaultListColor = "#fafafa";
+    let headerColor = "#eee";
+    let listColor = "#fafafa";
 
     $: roots = _
         .chain(taxonomy)
         .reject(d => d.deprecated)
         .reject(d => d.name.startsWith("_REMOVED_"))
+        .reject(d => _.includes(_.toLower(d.name), "deprecated"))
         .reject(d => d.unknown)
         .thru(buildHierarchies)
         //.reject(d => _.isEmpty(d.children))
         .orderBy(orderMode.fn)
-        .value();
-
-    $: nodesPerRow = 6;
-    $: itemHeight = 14;
-    $: headerHeight = 30;
-
-    $: nodeWidth = 900 / nodesPerRow;
-
-    $: chunked = mkChunks(roots, nodesPerRow);
-
-    $: rowHeights = _
-        .chain(chunked)
-        .map(nodes => _.max(_.map(nodes, n => _.size(n.children))))
-        .reduce((acc, h, idx) => {
-                acc.values.push({height: h, start: acc.start});
-                return Object.assign(
-                    acc,
-                    {start: acc.start + h, end: acc.start + h});
-            },
-            {values: [], start: 0, end: 0})
-        .thru(d => d.values)
         .value();
 
     function simplifyName(name) {
@@ -68,35 +59,23 @@
             .replace(/(I|i)nformation/, "Info")
     }
 
-    function calcRowOffset(rowIdx, itemHeight, headerHeight) {
-        if (rowIdx === 0) {
-            return 0;
-        } else {
-            const start = rowHeights[rowIdx].start;
-            return start * itemHeight + rowIdx * headerHeight;
-        }
-    }
 </script>
 
-<label>
-    Nodes per row ({nodesPerRow}
-    <input type="range" min="1" max="8" bind:value={nodesPerRow}>
-</label>
+<div>
+    <b>Header Color ({headerColor}):</b>
+    <ColorPicker startColor={defaultHeaderColor}
+                 on:select={c => headerColor = c.detail}/>
+</div>
 
-<label>
-    Item Height ({itemHeight})
-    <input type="range" min="0" max="20" bind:value={itemHeight}>
-</label>
+<div>
+    <b>List Color ({listColor}):</b>
+    <ColorPicker startColor={defaultListColor}
+                 on:select={c => listColor = c.detail}/>
+</div>
 
-<label>
-    Header Height ({headerHeight})
-    <input type="range" min="0" max="60" bind:value={headerHeight}>
-</label>
-
-<label>
-    Ordering
-    <select id="orderMode"
-            bind:value={orderMode}>
+<div>
+    <b style="display: block">Ordering:</b>
+    <select bind:value={orderMode}>
 
         {#each OrderModes as m}
             <option value={m}>
@@ -104,50 +83,59 @@
             </option>
         {/each}
     </select>
-</label>
-<svg width="100%"
-     viewBox="0 0 1000 800">
+</div>
 
+<hr>
 
+<h3>Output</h3>
+<div class="help-block">
+    Inspect the diagram below using your browser tools, then cut n' paste into the appropriate
+    <span style="font-family: monospace">svg_diagram</span> row.  The diagram element has the
+    <span style="font-family: monospace">rendered-navaid</span> class associated with it.
+</div>
+
+<div class="rendered-navaid">
+    <!-- Header Color: {headerColor},  List Color: {listColor} -->
     <style>
-        .group-title {
-            padding: 0.1em;
-            font-size: 10px;
-            border-bottom: 1px solid #eee;
-            background-color: #f3f3f3;
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .group {
+            width: 10em;
+            border: 1px solid #ddd;
+            margin: 0.5em;
         }
 
-        .l2-list {
+        .group-name {
+            padding: 0.2em;
+        }
+
+        .l2-list-item {
             padding-top: 0.3em;
             padding-left: 0.6em;
             font-size: 8px;
-            list-style: disc outside;
+            list-style: none;
         }
     </style>
 
-    <g>
-        {#each chunked as nodes, i}
-            {#each nodes as node, j}
-                <g transform={`translate(${j * (nodeWidth + 10)}, ${calcRowOffset(i, itemHeight, headerHeight)})`}>
-                    <rect width={nodeWidth}
-                          height={rowHeights[i].height * itemHeight + (i > 0 ? headerHeight : 0)}
-                          fill="#fafafa"/>
-                    <foreignObject width={nodeWidth}
-                                   height="100%">
-                        <div class="group-title">
-                            <a href="data-types/{node.id}">{simplifyName(node.name)}</a>
-                        </div>
-                        <ul class="l2-list">
-                            {#each _.orderBy(node.children, c => c.name) as child}
-                                <li>
-                                    <a href="{link}/{child.id}">{simplifyName(child.name)}</a>
-                                </li>
-                            {/each}
-                        </ul>
-                    </foreignObject>
-
-                </g>
-            {/each}
+    <div class="container">
+        {#each roots as root}
+            <div class="group" style={`background-color: ${listColor}`}>
+                <div class="group-name" style={`background-color: ${headerColor}`}>
+                    <a href="{link}/{root.id}" title={root.description}>{simplifyName(root.name)}</a>
+                </div>
+                <ul class="l2-list-item">
+                    {#each _.orderBy(root.children, c => c.name) as child}
+                        <li title={root.description}>
+                            <a href="{link}/{child.id}">{simplifyName(child.name)}</a>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
         {/each}
-    </g>
-</svg>
+    </div>
+</div>
+
