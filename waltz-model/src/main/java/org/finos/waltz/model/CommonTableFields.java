@@ -43,4 +43,11 @@ public interface CommonTableFields<T extends Record> {
     default Condition isActiveCondition() {
         return DSL.trueCondition();
     }
+
+    @Nullable
+    Field<String> qualifierKindField();
+
+    @Nullable
+    Field<Long> qualifierIdField();
+
 }
