@@ -31,10 +31,15 @@ public class InvolvementHelper {
 
 
     public long mkInvolvementKind(String name) {
+        return mkInvolvementKind(name, name);
+    }
+
+
+    public long mkInvolvementKind(String name, String externalId) {
         InvolvementKindCreateCommand cmd = ImmutableInvolvementKindCreateCommand.builder()
                 .description(name)
                 .name(name)
-                .externalId(name)
+                .externalId(externalId)
                 .subjectKind(EntityKind.APPLICATION)
                 .build();
         return involvementKindService.create(cmd, NameHelper.mkUserId("involvementHelper"));
