@@ -12,6 +12,7 @@ import org.finos.waltz.schema.tables.ApplicationGroup;
 import org.finos.waltz.schema.tables.AssessmentDefinition;
 import org.finos.waltz.schema.tables.ChangeInitiative;
 import org.finos.waltz.schema.tables.ChangeSet;
+import org.finos.waltz.schema.tables.ChangeUnit;
 import org.finos.waltz.schema.tables.ComplexityKind;
 import org.finos.waltz.schema.tables.CostKind;
 import org.finos.waltz.schema.tables.DataType;
@@ -83,6 +84,8 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(app.DESCRIPTION)
                         .externalIdField(app.ASSET_CODE)
                         .lifecycleField(app.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(app.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())
+                                .and(app.IS_REMOVED.isFalse()))
                         .build();
             case APP_GROUP:
                 ApplicationGroup ag = alias == null ? Tables.APPLICATION_GROUP : Tables.APPLICATION_GROUP.as(alias);
@@ -95,6 +98,7 @@ public class CommonTableFieldsRegistry {
                         .nameField(ag.NAME)
                         .descriptionField(ag.DESCRIPTION)
                         .externalIdField(ag.EXTERNAL_ID)
+                        .isActiveCondition(ag.IS_REMOVED.isFalse())
                         .build();
             case ASSESSMENT_DEFINITION:
                 AssessmentDefinition ad = alias == null ? Tables.ASSESSMENT_DEFINITION : Tables.ASSESSMENT_DEFINITION.as("alias");
@@ -107,6 +111,8 @@ public class CommonTableFieldsRegistry {
                         .nameField(ad.NAME)
                         .descriptionField(ad.DESCRIPTION)
                         .externalIdField(ad.EXTERNAL_ID)
+                        .qualifierKindField(ad.QUALIFIER_KIND)
+                        .qualifierIdField(ad.QUALIFIER_ID)
                         .build();
             case CHANGE_INITIATIVE:
                 ChangeInitiative ci = alias == null ? Tables.CHANGE_INITIATIVE : Tables.CHANGE_INITIATIVE.as(alias);
@@ -131,6 +137,18 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(cs.DESCRIPTION)
                         .externalIdField(cs.EXTERNAL_ID)
                         .lifecycleField(cs.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(cs.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                        .build();
+            case CHANGE_UNIT:
+                ChangeUnit cu = alias == null ? Tables.CHANGE_UNIT : Tables.CHANGE_UNIT.as(alias);
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.CHANGE_UNIT)
+                        .table(cu)
+                        .idField(cu.ID)
+                        .nameField(cu.NAME)
+                        .descriptionField(cu.DESCRIPTION)
+                        .externalIdField(cu.EXTERNAL_ID)
                         .build();
             case COMPLEXITY_KIND:
                 ComplexityKind cxk = alias == null ? Tables.COMPLEXITY_KIND : Tables.COMPLEXITY_KIND.as(alias);
@@ -201,6 +219,7 @@ public class CommonTableFieldsRegistry {
                         .nameField(esd.NAME)
                         .descriptionField(esd.DESCRIPTION)
                         .externalIdField(esd.EXTERNAL_ID)
+                        .isActiveCondition(esd.ACTIVE.isTrue())
                         .build();
             case FLOW_CLASSIFICATION_RULE:
                 FlowClassificationRule fcr = alias == null ? Tables.FLOW_CLASSIFICATION_RULE : Tables.FLOW_CLASSIFICATION_RULE.as(alias);
@@ -237,6 +256,7 @@ public class CommonTableFieldsRegistry {
                         .nameField(fd.NAME)
                         .descriptionField(fd.DESCRIPTION)
                         .externalIdField(CommonTableFields.NA_FIELD_VAL)
+                        .isActiveCondition(fd.IS_REMOVED.isFalse())
                         .build();
             case INVOLVEMENT_KIND:
                 InvolvementKind ik = alias == null ? Tables.INVOLVEMENT_KIND : Tables.INVOLVEMENT_KIND.as(alias);
@@ -249,6 +269,7 @@ public class CommonTableFieldsRegistry {
                         .nameField(ik.NAME)
                         .descriptionField(ik.DESCRIPTION)
                         .externalIdField(ik.EXTERNAL_ID)
+                        .qualifierKindField(ik.SUBJECT_KIND)
                         .build();
             case LEGAL_ENTITY:
                 LegalEntity le = alias == null ? Tables.LEGAL_ENTITY : Tables.LEGAL_ENTITY.as(alias);
@@ -295,6 +316,7 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(lde.DESCRIPTION)
                         .externalIdField(lde.EXTERNAL_ID)
                         .lifecycleField(lde.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(lde.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                         .build();
             case LOGICAL_DATA_FLOW:
                 LogicalFlow lf = alias == null ? Tables.LOGICAL_FLOW : Tables.LOGICAL_FLOW.as(alias);
@@ -307,6 +329,7 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(CommonTableFields.NA_FIELD_VAL)
                         .externalIdField(lf.EXTERNAL_ID)
                         .lifecycleField(lf.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                         .build();
             case MEASURABLE:
                 Measurable m = alias == null ? Tables.MEASURABLE : Tables.MEASURABLE.as(alias);
@@ -320,6 +343,9 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(m.DESCRIPTION)
                         .externalIdField(m.EXTERNAL_ID)
                         .lifecycleField(m.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(m.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                        .qualifierKindField(DSL.val(EntityKind.MEASURABLE_CATEGORY.name()))
+                        .qualifierIdField(m.MEASURABLE_CATEGORY_ID)
                         .build();
             case MEASURABLE_CATEGORY:
                 MeasurableCategory mc = alias == null ? Tables.MEASURABLE_CATEGORY : Tables.MEASURABLE_CATEGORY.as(alias);
@@ -369,6 +395,7 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(p.EMAIL)
                         .externalIdField(p.EMPLOYEE_ID)
                         .lifecycleField(DSL.when(p.IS_REMOVED.isTrue(), EntityLifecycleStatus.REMOVED.name()).otherwise(EntityLifecycleStatus.ACTIVE.name()))
+                        .isActiveCondition(p.IS_REMOVED.isFalse())
                         .build();
             case PHYSICAL_FLOW:
                 PhysicalFlow pf = alias == null ? Tables.PHYSICAL_FLOW : Tables.PHYSICAL_FLOW.as(alias);
@@ -382,6 +409,7 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(pf.DESCRIPTION)
                         .externalIdField(pf.EXTERNAL_ID)
                         .lifecycleField(pf.ENTITY_LIFECYCLE_STATUS)
+                        .isActiveCondition(pf.IS_REMOVED.isFalse().and(pf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
                         .build();
             case PHYSICAL_SPECIFICATION:
                 PhysicalSpecification ps = alias == null ? Tables.PHYSICAL_SPECIFICATION : Tables.PHYSICAL_SPECIFICATION.as(alias);
@@ -395,6 +423,7 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(ps.DESCRIPTION)
                         .externalIdField(ps.EXTERNAL_ID)
                         .lifecycleField(DSL.when(ps.IS_REMOVED.isTrue(), EntityLifecycleStatus.REMOVED.name()).otherwise(EntityLifecycleStatus.ACTIVE.name()))
+                        .isActiveCondition(ps.IS_REMOVED.isFalse())
                         .build();
             case ROLE:
                 Role role = alias == null ? Tables.ROLE : Tables.ROLE.as(alias);
