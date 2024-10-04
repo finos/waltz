@@ -84,7 +84,7 @@ public class EntityAliasPopulator {
     }
 
     private Map<String, Long> fetchMeasurableAliasToIdMap(Set<String> identifiers) {
-        return resolveSimpleAliases(identifiers, MEASURABLE,MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
+        return resolveSimpleAliases(identifiers, MEASURABLE, MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
 
