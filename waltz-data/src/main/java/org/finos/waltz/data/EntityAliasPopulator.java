@@ -43,6 +43,7 @@ import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
 import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
 import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -75,9 +76,15 @@ public class EntityAliasPopulator {
                 return fetchChangeInitiativeAliasToIdMap(identifiers);
             case ORG_UNIT:
                 return fetchOrgUnitAliasToIdMap(identifiers);
+            case MEASURABLE:
+                return fetchMeasurableAliasToIdMap(identifiers);
             default:
                 throw new IllegalArgumentException(format("Cannot find lookup map for id for entity kind: %s", entityKind));
         }
+    }
+
+    private Map<String, Long> fetchMeasurableAliasToIdMap(Set<String> identifiers) {
+        return resolveSimpleAliases(identifiers, MEASURABLE,MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
 
