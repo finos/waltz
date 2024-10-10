@@ -133,10 +133,6 @@
             path: () => `system/static-diagrams/${ctx.id}`,
             title: ""
         },
-        "main.system.static-diagram.create": {
-            path: ctx => `system/static-diagram/create`,
-            title: "Static Diagram Create"
-        },
         "main.survey.instance.view": {
             path: ctx => `survey/instance/${ctx.id}/response/view`,
             title: "Survey View"
