@@ -32,9 +32,7 @@ import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readBody;
 import static org.finos.waltz.web.WebUtilities.requireRole;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -57,6 +55,7 @@ public class SvgDiagramEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllPath = mkPath(BASE_URL);
+        String getById = mkPath(BASE_URL, ":id");
         String removePath = mkPath(BASE_URL, ":id");
         String savePath = mkPath(BASE_URL, "save");
         String findByGroupsPath = mkPath(BASE_URL, "group");
@@ -66,6 +65,10 @@ public class SvgDiagramEndpoint implements Endpoint {
 
         ListRoute<SvgDiagram> findAllRoute = (request, response) ->
                 svgDiagramService.findAll();
+
+        DatumRoute<SvgDiagram> getByIdRoute = (request, response) -> {
+            return svgDiagramService.getById(getId(request));
+        };
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
             requireRole(userRoleService, request, SystemRole.ADMIN);
@@ -79,6 +82,7 @@ public class SvgDiagramEndpoint implements Endpoint {
 
         getForList(findByGroupsPath, findByGroupsRoute);
         getForList(findAllPath, findAllRoute);
+        getForDatum(getById, getByIdRoute);
         deleteForDatum(removePath, removeRoute);
         postForDatum(savePath, saveRoute);
     }

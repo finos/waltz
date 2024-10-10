@@ -10,6 +10,13 @@ export function mkSvgDiagramStore() {
             [],
             {force});
 
+    const getById = (diagramId, force) => remote
+        .fetchAppList(
+            "GET",
+            `api/svg-diagram/${diagramId}`,
+            [],
+            {force});
+
     const save = (diagram) => remote
         .execute(
             "POST",
@@ -23,6 +30,7 @@ export function mkSvgDiagramStore() {
 
     return {
         findAll,
+        getById,
         save,
         remove
     };
