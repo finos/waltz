@@ -5,6 +5,8 @@ import org.finos.waltz.service.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
+
 @Service
 public class ActorHelper {
 
@@ -16,6 +18,7 @@ public class ActorHelper {
                 ImmutableActorCreateCommand
                         .builder()
                         .name(nameStem)
+                        .externalId(mkName(nameStem))
                         .description(nameStem + " Desc")
                         .isExternal(true)
                         .build(),

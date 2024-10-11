@@ -50,7 +50,6 @@ const initialState = {
     ]
 };
 
-const bulkEditableKinds = ["APPLICATION"];
 
 function controller($q,
                     $stateParams,
@@ -69,7 +68,7 @@ function controller($q,
             .loadViewData(CORE_API.AssessmentDefinitionStore.getById, [definitionId])
             .then(r => {
                 vm.definition = r.data;
-                vm.allowBulkEditing = _.includes(bulkEditableKinds, vm.definition.entityKind);
+                vm.allowBulkEditing = true;
             });
 
         const ratingSchemePromise = serviceBroker

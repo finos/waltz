@@ -58,7 +58,7 @@
                     </message>
                 </waltz-no-data>
             </div>
-            <div class="col-md-6"
+            <!-- <div class="col-md-6"
                  ng-if="ctrl.definition.entityKind === 'APPLICATION'">
                 <p class="waltz-paragraph help-block"
                    style="padding-top: 1em;">
@@ -74,6 +74,14 @@
                                                            rating-items="ctrl.ratingItems"
                                                            on-save="ctrl.saveRatings">
                     </waltz-bulk-assessment-rating-selector>
+                </div>
+            </div> -->
+            <div class="col-md-6">
+                <div style="padding-top: 1em">
+                    <waltz-svelte-component 
+                        component="ctrl.BulkAssessmentRatingSelector"
+                        primary-entity-ref="ctrl.definition">
+                    </waltz-svelte-component>
                 </div>
             </div>
         </div>
