@@ -87,7 +87,6 @@ public class AssessmentHelper {
 
 
     public void createAssessment(Long defId, EntityReference ref, Long ratingId) {
-
         AssessmentRatingRecord record = dsl.newRecord(ASSESSMENT_RATING);
         record.setAssessmentDefinitionId(defId);
         record.setEntityId(ref.id());
@@ -106,6 +105,7 @@ public class AssessmentHelper {
                 .execute();
     }
 
+
     public void updateDefinitionReadOnly(long defnId) {
         dsl
                 .update(ASSESSMENT_DEFINITION)
@@ -113,6 +113,7 @@ public class AssessmentHelper {
                 .where(ASSESSMENT_DEFINITION.ID.eq(defnId))
                 .execute();
     }
+
 
     public void updateRatingReadOnly(EntityReference ref, long defnId) {
         dsl
@@ -124,4 +125,12 @@ public class AssessmentHelper {
                 .execute();
     }
 
+
+    public void setDefExtId(long assessmentDefinitionId,
+                            String externalId) {
+        dsl.update(ASSESSMENT_DEFINITION)
+                .set(ASSESSMENT_DEFINITION.EXTERNAL_ID, externalId)
+                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
+                .execute();
+    }
 }

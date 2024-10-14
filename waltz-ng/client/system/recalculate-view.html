@@ -42,7 +42,7 @@
 
                 <div>
                     <hr>
-                    <h4>Rated Flows</h4>
+                    <h3>Rated Flows</h3>
                     <p class="small text-muted">
                         Logical flows are decorated with data types which may in
                         turn be rated against Authoritative Sources.  Use the link
@@ -50,14 +50,15 @@
                     </p>
 
                     <button class="btn btn-primary"
-                            ng-click="ctrl.recalcFlowRatings()">
+                            ng-click="$ctrl.recalcFlowRatings()">
                         Recalculate Flow Ratings
                     </button>
                 </div>
 
+
                 <div>
                     <hr>
-                    <h4>Data Type Usages</h4>
+                    <h3>Data Type Usages</h3>
                     <p class="small text-muted">
                         Applications track what data types they use and how
                         they get used.  Use the link below to recalculate all
@@ -65,8 +66,137 @@
                     </p>
 
                     <button class="btn btn-primary"
-                            ng-click="ctrl.recalcDataTypeUsages()">
+                            ng-click="$ctrl.recalcDataTypeUsages()">
                         Recalculate Data Type Usages
+                    </button>
+                </div>
+
+
+                <div>
+                    <hr>
+                    <h3>Assessment Rippler</h3>
+                    <p class="small text-muted">
+                        The assessment rippler can copy assessment ratings between different definitions
+                        providing they share the same rating scheme.  For example, you may have a critical process
+                        assessment on a measurable and want an equivalent criticality flag to be reflected on
+                        all applications which are aligned to that measurable.
+                    </p>
+                    <details>
+                        <summary>Configuration <waltz-icon name="wrench"></waltz-icon></summary>
+
+                        <h4>Active Configuration</h4>
+                        <details ng-repeat="flow in $ctrl.assessmentRippleConfig">
+                            <summary ng-bind="flow.name"></summary>
+                            <p class="help-block">
+                                Each row in the table below represents a step in the flow, rippling assessments
+                                between a source (<i>From</i>) and a target (<i>To</i>).
+                                If there are multiple steps they are applied in the sequence shown below.
+                            </p>
+                            <table style="margin-left: 1.4em"
+                                   class="table table-condensed small">
+                                <thead>
+                                <tr>
+                                    <th>From Assessment</th>
+                                    <th>From Entity Kind</th>
+                                    <th></th>
+                                    <th>To Assessment</th>
+                                    <th>To Entity Kind</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="step in flow.steps">
+                                    <td>
+                                        <span ng-bind="step.from.name"></span>
+                                        (<span ng-bind="step.from.externalId"></span>)
+                                    </td>
+                                    <td>
+                                        <span ng-bind="step.from.entityKind"></span>
+                                    </td>
+                                    <td>
+                                        &raquo;
+                                    </td>
+                                    <td>
+                                        <span ng-bind="step.to.name"></span>
+                                        (<span ng-bind="step.to.externalId"></span>)
+                                    </td>
+                                    <td>
+                                        <span ng-bind="step.to.entityKind"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </details>
+
+                        <hr>
+
+                        <h4>Setup</h4>
+                        <p class="small text-muted">
+                            To configure the assessment rippler you need to create an entry in the
+                            <span style="font-family: monospace">settings</span>
+                            table for each 'ripple-flow'.  For example:
+                        </p>
+                        <table class="table table-condensed small">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Setting key</td>
+                                <td>
+                                    The key must be of the form:
+                                    <span style="font-family: monospace">job.RIPPLE_ASSESSMENTS.???</span>
+                                    , the <span style="font-family: monospace">???</span>
+                                    should be a unique name to identify the ripple flow
+                                </td>
+                                <td>
+                                    <span style="font-family: monospace">job.RIPPLE_ASSESSMENTS.nice_name</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Setting value</td>
+                                <td>
+                                    A list of json objects, each object represents the 'from' and 'to'
+                                    external id's of the assessments to be rippled
+                                </td>
+                                <td>
+                                    <span style="font-family: monospace">[{"from": "def1_ext_id", "to": "def2_ext_id"}]</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <p class="help-block">
+                            To <em>trigger</em> this action (i.e. from a scheduled job), you can add/udpate an
+                            entry in the settings table:
+
+                        </p>
+                        <table class="table table-condensed small">
+                            <thead>
+                            <tr>
+                                <th>Setting Key</th>
+                                <th>Setting Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <span style="font-family: monospace">RIPPLE_ASSESSMENTS</span>
+                                </td>
+                                <td>
+                                    <span style="font-family: monospace">RUNNABLE</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </details>
+
+                    <button class="btn btn-primary"
+                            ng-click="$ctrl.rippleAssessments()">
+                        Ripple Assessments
                     </button>
                 </div>
 
