@@ -129,6 +129,12 @@ const referenceDataOptions= [
         state: "main.system.relationship-kinds",
         icon: "link"
     }, {
+        name: "Static Diagrams",
+        role: "ADMIN",
+        description: "View and edit static diagrams",
+        state: "main.system.static-diagrams",
+        icon: "picture-o"
+    }, {
         name: "Static Panels",
         role: "ADMIN",
         description: "View and edit static panels",

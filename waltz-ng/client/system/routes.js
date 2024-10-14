@@ -27,6 +27,8 @@ import RecalculateView from "./recalculate-view";
 import ActorsView from "./actors-view";
 import EntityNamedNoteTypesView from "./entity-named-node-types-view";
 import StaticPanelsView from "./static-panels-view";
+import StaticDiagramsView from "./static-diagrams-view";
+import StaticDiagramView from "./static-diagram-view";
 import AssessmentDefinitionsView from "./assessment-defintions-view";
 import RatingSchemesView from "./rating-schemes-view";
 import EudaListView from "./euda-list-view";
@@ -102,6 +104,15 @@ const staticPanelsState = {
     views: {"content@": StaticPanelsView}
 };
 
+const staticDiagramsState = {
+    url: "/static-diagrams",
+    views: {"content@": StaticDiagramsView}
+}
+
+const staticDiagramState = {
+    url: "/static-diagrams/{id:int}",
+    views: {"content@": StaticDiagramView}
+}
 
 const assessmentDefintionsState = {
     url: "/assessment-definitions",
@@ -214,6 +225,8 @@ function setupRoutes($stateProvider) {
         .state("main.system.recalculate", recalculateState)
         .state("main.system.relationship-kinds", relationshipKindsState)
         .state("main.system.settings", settingsState)
+        .state("main.system.static-diagrams", staticDiagramsState)
+        .state("main.system.static-diagram", staticDiagramState)
         .state("main.system.static-panels", staticPanelsState)
         .state("main.system.version-info", versionInfoState);
 }
