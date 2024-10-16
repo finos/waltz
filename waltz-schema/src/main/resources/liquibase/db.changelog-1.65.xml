@@ -1,0 +1,124 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.65.xml">
+
+    <changeSet id="v1-64-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.64"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20241009-7162-1"
+               author="jejuabh">
+        <comment>7162: Add description to table data_type</comment>
+        <setTableRemarks  remarks="EDM Data Types which describe Data Flows"
+                          tableName="data_type"/>
+    </changeSet>
+    <changeSet id="20241009-7162-2"
+               author="jejuabh">
+        <comment>7162: Add description to table aggregate_overlay_diagram_callout</comment>
+        <setTableRemarks  remarks="Aggregate diagrams allow for individual cells to have callout annotations.This table holds a diagram ref, a cell ref., and the callout text"
+                          tableName="aggregate_overlay_diagram_callout"/>
+    </changeSet>
+    <changeSet id="20241009-7162-3"
+               author="jejuabh">
+        <comment>7162: Add description to table aggregate_overlay_diagram_preset</comment>
+        <setTableRemarks  remarks="Aggregate diagrams allow for individual cells to have callout annotations.This table holds a diagram ref, a cell ref., and the callout text"
+                          tableName="aggregate_overlay_diagram_preset"/>
+    </changeSet>
+    <changeSet id="20241009-7162-4"
+               author="jejuabh">
+        <comment>7162: Add description to table thumbnail</comment>
+        <setTableRemarks  remarks="Intended to store thumbnail images of various Waltz diagram, currently unused"
+                          tableName="thumbnail"/>
+    </changeSet>
+    <changeSet id="20241009-7162-5"
+               author="jejuabh">
+        <comment>7162: Add description to table user_agent_info</comment>
+        <setTableRemarks  remarks="Tracks user browser info, primarily used to help determine when target newer browser features and drop support for older browsers"
+                          tableName="user_agent_info"/>
+    </changeSet>
+    <changeSet id="20241009-7162-6"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_triggers</comment>
+        <setTableRemarks  remarks="is where general information of a trigger is saved"
+                          tableName="qrtz_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-7"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_simprop_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_simprop_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-8"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_simple_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_simple_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-9"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_scheduler_state</comment>
+        <setTableRemarks  remarks="is for capturing the node state so that if in any case one node gets down or failed to execute one of the job then the other instance running in clustering mode can pick the misfired job"
+                          tableName="qrtz_scheduler_state"/>
+    </changeSet>
+    <changeSet id="20241009-7162-10"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_paused_trigger_grps</comment>
+        <setTableRemarks  remarks="is to save the information about triggers which are not active"
+                          tableName="qrtz_paused_trigger_grps"/>
+    </changeSet>
+    <changeSet id="20241009-7162-11"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_locks</comment>
+        <setTableRemarks  remarks="stores the value of the instance name executing the job, to avoid the sceanario of multiple nodes executing the same job"
+                          tableName="qrtz_locks"/>
+    </changeSet>
+    <changeSet id="20241009-7162-12"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_job_details</comment>
+        <setTableRemarks  remarks="the task to be executed."
+                          tableName="qrtz_job_details"/>
+    </changeSet>
+    <changeSet id="20241009-7162-13"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_fired_triggers</comment>
+        <setTableRemarks  remarks="is a log of all the triggers that were fired."
+                          tableName="qrtz_fired_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-14"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_cron_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_cron_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-15"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_calendars</comment>
+        <setTableRemarks  remarks="for excluding blocks of time from the the trigger’s firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business’s holidays"
+                          tableName="qrtz_calendars"/>
+    </changeSet>
+    <changeSet id="20241009-7162-16"
+               author="jejuabh">
+        <comment>7162: Add description to table qrtz_blob_triggers</comment>
+        <setTableRemarks  remarks="for excluding blocks of time from the the trigger’s firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business’s holidays"
+                          tableName="qrtz_blob_triggers"/>
+    </changeSet>
+</databaseChangeLog>
