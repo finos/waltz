@@ -63,7 +63,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
         String name = mkName(stem, "previewApp");
         String kindExternalId = mkName(stem, "previewAppCode");
         Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "SchemeApp");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 10, "green", "Y");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 0, "green", "Y");
         appHelper.createNewApp(
                 mkName(stem, "previewUpdatesApp"),
                 ouIds.root,
@@ -79,27 +79,6 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(result1, "Expected a result");
         assertNoErrors(result1);
         assertExternalIdsMatch(result1, asList(kindExternalId));
-
-        /**
-         * Entity Kind: ACTOR
-         * Need work as it is failing. external id is coming as null
-         */
-//        String actorName = mkName(stem, "previewActor");
-//        String actorExternalId = mkName(stem, "previewActorCode");
-//        Long actorSchemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "SchemeActor");
-//        ratingSchemeHelper.saveRatingItem(actorSchemeId, "Yes", 10, "green", "Z");
-//        actorHelper.createActor(actorName);
-//        AssessmentDefinition def2 = assessmentDefinitionService.getById(getAssessmentDefinition(EntityKind.ACTOR, actorSchemeId, actorName));
-//
-//        AssessmentRatingValidationResult result2 = bulkAssessmentRatingService.bulkPreview(
-//                mkRef(def2.entityKind(), def2.id().get()),
-//                mkGoodTsv(actorExternalId),
-//                BulkAssessmentRatingItemParser.InputFormat.TSV,
-//                BulkUpdateMode.ADD_ONLY);
-//
-//        assertNotNull(result2, "Expected a result");
-//        assertNoErrors(result2);
-//        assertExternalIdsMatch(result2, asList(actorExternalId));
     }
 
     private long getAssessmentDefinition(EntityKind kind, Long schemeId, String name) {

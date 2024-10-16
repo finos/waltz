@@ -19,16 +19,10 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.EnumUtilities;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
-import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
-import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
-import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingItemParser;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -44,10 +38,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
 public class AssessmentDefinitionEndpoint implements Endpoint {
@@ -55,14 +46,11 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "assessment-definition");
 
     private final AssessmentDefinitionService assessmentDefinitionService;
-
-    private final BulkAssessmentRatingService bulkAssessmentRatingService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AssessmentDefinitionEndpoint(AssessmentDefinitionService assessmentDefinitionService, BulkAssessmentRatingService bulkAssessmentRatingService, UserRoleService userRoleService) {
-        this.bulkAssessmentRatingService = bulkAssessmentRatingService;
+    public AssessmentDefinitionEndpoint(AssessmentDefinitionService assessmentDefinitionService, UserRoleService userRoleService) {
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
 
         this.assessmentDefinitionService = assessmentDefinitionService;
@@ -81,10 +69,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         String findByRefPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind", "id", ":id");
         String removeByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
 
-        String bulkAssessmentDefinitionPreviewPath = mkPath(BASE_URL, "bulk", "preview", "ASSESSMENT_DEFINITION", ":id");
-        String bulkAssessmentDefinitionApplyPath = mkPath(BASE_URL, "bulk", "apply", "ASSESSMENT_DEFINITION", ":id");
 
-        registerPreviewAssessmentDefinitionChanges(bulkAssessmentDefinitionPreviewPath);
         DatumRoute<AssessmentDefinition> getByIdRoute = (request, response) -> assessmentDefinitionService.getById(WebUtilities.getId(request));
         ListRoute<AssessmentDefinition> findAllRoute = (request, response) -> assessmentDefinitionService.findAll();
         ListRoute<AssessmentDefinition> findByKindRoute = (request, response) -> assessmentDefinitionService.findByEntityKind(WebUtilities.getKind(request));
@@ -101,19 +86,6 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         EndpointUtilities.putForList(favouriteByIdPath, this::addFavourite);
         EndpointUtilities.deleteForList(favouriteByIdPath, this::removeFavourite);
     }
-
-    private void registerPreviewAssessmentDefinitionChanges(String path) {
-        postForDatum(path, (req, resp) -> {
-            EntityReference entityReference = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
-            String modeStr = req.queryParams("mode");
-            String formatStr = req.queryParams("format");
-            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
-            BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
-            String body = req.body();
-            return bulkAssessmentRatingService.bulkPreview(entityReference, body, format, mode);
-        });
-    }
-
 
     private Set<AssessmentDefinition> findFavouritesForUser(Request request, Response response) {
         return assessmentDefinitionService.findFavouritesForUser(getUsername(request));

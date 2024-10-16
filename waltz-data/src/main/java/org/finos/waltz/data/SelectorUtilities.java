@@ -24,7 +24,11 @@ import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.schema.tables.Application;
 import org.jooq.Condition;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -70,6 +74,36 @@ public class SelectorUtilities {
             return cond.and(appTable.KIND.in(applicationKinds));
         }
 
+    }
+
+    /**
+     * get all distinct records based on some property
+     * @param keyExtractor
+     * @return
+     * @param <T>
+     */
+    public static <T> Predicate<T> getAllDistinctByKeyWith(Function<? super T, Object> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    /**
+     * get all distinct records based on some property with excluded records
+     * @param keyExtractor
+     * @return
+     * @param <T>
+     */
+    public static <T> Predicate<T> getAllDistinctByKeyWithExclusion(Function<? super T, Object> keyExtractor, List<T> excludedRecords) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> {
+            Object key = keyExtractor.apply(t);
+            if(seen.add(key)) {
+                return true;
+            } else {
+                excludedRecords.add(t);
+                return false;
+            }
+        };
     }
 
 }

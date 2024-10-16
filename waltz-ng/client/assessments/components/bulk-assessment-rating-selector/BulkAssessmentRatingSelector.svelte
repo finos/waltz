@@ -5,6 +5,8 @@
   import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
   import {truncateMiddle} from "../../../common/string-utils";
   import Icon from "../../../common/svelte/Icon.svelte";
+  import Tooltip from "../../../common/svelte/Tooltip.svelte";
+  import DataCellErrorTooltip from "./DataCellErrorTooltip.svelte";
 
   export let primaryEntityRef;
   const Modes = {
@@ -47,7 +49,10 @@
               canApply = _.isNil(previewData.error) && _.every(previewData.validatedItems, d => _.isEmpty(d.errors));
               switchMode(Modes.PREVIEW);
           })
-          .catch(e => displayError("Could not preview assessment rating changes", e));
+          .catch(e => {
+            displayError("Could not preview assessment rating changes", e);
+            switchMode(Modes.PREVIEW);
+          });
   }
 
   function onApplyBulkChanges() {
@@ -58,7 +63,10 @@
               applyData = r.data;
               switchMode(Modes.APPLY);
           })
-          .catch(e => displayError("Could not apply assessment rating changes", e));
+          .catch(e => {
+            displayError("Could not apply assessment rating changes", e);
+            switchMode(Modes.PREVIEW);
+          });
   }
 
 
@@ -186,8 +194,8 @@ INV0737	L	TRUE	description
                       class:cell-update={_.includes(item.changedFields, "ENTITY_KIND") && !_.includes(item.errors, "ENTITY_NOT_FOUND")}>
                       {item.parsedItem.externalId}
                   </td>
-                  <td class:cell-error={_.includes(item.errors, "RATING_NOT_FOUND")}
-                      class:cell-update={_.includes(item.changedFields, "RATING") && !_.includes(item.errors, "RATING_NOT_FOUND")}>
+                  <td class:cell-error={_.includes(item.errors, "RATING_NOT_FOUND", "RATING_NOT_USER_SELECTABLE")}
+                      class:cell-update={_.includes(item.changedFields, "RATING") && !_.includes(item.errors, "RATING_NOT_FOUND", "RATING_NOT_USER_SELECTABLE")}>
                       {item.parsedItem.ratingCode}
                   </td>
                   <td class:cell-update={_.includes(item.changedFields, "READ_ONLY")}>
@@ -197,7 +205,14 @@ INV0737	L	TRUE	description
                       {item.parsedItem.comment}
                   </td>
                   <td>
-                      {item.errors}
+                    {#if item.errors.length > 0}
+                        <Tooltip content={DataCellErrorTooltip}
+                                    props={{errors: item.errors}}>
+                            <svelte:fragment slot="target">
+                                <Icon name="exclamation-triangle" class="error-cell"/>
+                            </svelte:fragment>
+                        </Tooltip>
+                    {/if}
                   </td>
               </tr>
               {/each}
@@ -239,9 +254,9 @@ INV0737	L	TRUE	description
           </td>
       </tr>
       <tr>
-          <td>Restored Records</td>
-          <td class:positive-result={applyData.recordsRestored > 0}>
-              {applyData.recordsRestored}
+          <td>Skipped Records</td>
+          <td class:positive-result={applyData.skippedRows > 0}>
+              {applyData.skippedRows}
           </td>
       </tr>
       </tbody>
@@ -300,5 +315,9 @@ INV0737	L	TRUE	description
 
   .positive-result {
       background-color: #caf8ca;
+  }
+
+  .error-cell {
+    color: red;
   }
 </style>

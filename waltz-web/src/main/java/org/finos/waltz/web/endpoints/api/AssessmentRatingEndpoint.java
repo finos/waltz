@@ -19,13 +19,19 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
+import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
+import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
+import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingItemParser;
+import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.NotAuthorizedException;
@@ -42,6 +48,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -56,12 +63,13 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final UserRoleService userRoleService;
 
+    private final BulkAssessmentRatingService bulkAssessmentRatingService;
 
     @Autowired
     public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService,
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
-                                    UserRoleService userRoleService) {
+                                    UserRoleService userRoleService, BulkAssessmentRatingService bulkAssessmentRatingService) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
@@ -72,6 +80,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         this.assessmentDefinitionService = assessmentDefinitionService;
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.userRoleService = userRoleService;
+        this.bulkAssessmentRatingService = bulkAssessmentRatingService;
     }
 
 
@@ -92,6 +101,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findRatingPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "permissions");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
         String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
+
+        String bulkAssessmentDefinitionPreviewPath = mkPath(BASE_URL, "bulk", "preview", "ASSESSMENT_DEFINITION", ":id");
+        String bulkAssessmentDefinitionApplyPath = mkPath(BASE_URL, "bulk", "apply", "ASSESSMENT_DEFINITION", ":id");
+
+        registerPreviewBulkAssessmentRatingChanges(bulkAssessmentDefinitionPreviewPath);
+        registerApplyBulkAssessmentRatingChanges(bulkAssessmentDefinitionApplyPath);
 
         getForList(findForEntityPath, this::findForEntityRoute);
         getForList(findByEntityKindPath, this::findByEntityKindRoute);
@@ -260,6 +275,31 @@ public class AssessmentRatingEndpoint implements Endpoint {
         if (def.isReadOnly()) {
             throw new NotAuthorizedException("Assessment is read-only");
         }
+    }
+
+    private void registerPreviewBulkAssessmentRatingChanges(String path) {
+        postForDatum(path, (req, resp) -> {
+            EntityReference assessmentDefRef = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
+            String modeStr = req.queryParams("mode");
+            String formatStr = req.queryParams("format");
+            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
+            BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
+            String body = req.body();
+            return bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body, format, mode);
+        });
+    }
+
+    private void registerApplyBulkAssessmentRatingChanges(String path) {
+        postForDatum(path, (req, resp) -> {
+            EntityReference assessmentDefRef = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
+            String modeStr = req.queryParams("mode");
+            String formatStr = req.queryParams("format");
+            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
+            BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
+            String body = req.body();
+            AssessmentRatingValidationResult preview = bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body, format, mode);
+            return bulkAssessmentRatingService.apply(assessmentDefRef, preview, mode, getUsername(req));
+        });
     }
 
 }
