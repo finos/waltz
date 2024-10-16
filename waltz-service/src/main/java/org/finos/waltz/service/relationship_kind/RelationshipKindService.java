@@ -34,6 +34,10 @@ public class RelationshipKindService {
         return relationshipKindDao.findAll();
     }
 
+    public RelationshipKind getById(long id) {
+        return relationshipKindDao.getById(id);
+    }
+
 
     public boolean create(RelationshipKind relationshipKind) {
         return relationshipKindDao.create(relationshipKind);
