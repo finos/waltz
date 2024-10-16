@@ -26,16 +26,23 @@ public class BulkUploadRelationshipItemParserTest {
         List<BulkUploadRelationshipItem> parsedItems = new ArrayList<BulkUploadRelationshipItem>();
         parsedItems.add(ImmutableBulkUploadRelationshipItem
                 .builder()
-                .sourceExternalId("CT_001")
-                .targetExternalId("10235-1")
-                .comment("Comment")
+                .sourceExternalId("sourceExtA")
+                .targetExternalId("tarExtB")
+                .description("desc changes")
                 .build());
         parsedItems.add(ImmutableBulkUploadRelationshipItem
                 .builder()
-                .sourceExternalId("CT_001")
-                .targetExternalId("109235-1")
+                .sourceExternalId("sourceExtB")
+                .targetExternalId("tarExtB")
+                .description("desc chnages 2")
                 .build());
-        
+        parsedItems.add(ImmutableBulkUploadRelationshipItem
+                .builder()
+                .sourceExternalId("sourceExtC")
+                .targetExternalId("tarExtC")
+                .description("desc changes")
+                .build());
+
         return parsedItems;
     }
 
@@ -50,7 +57,7 @@ public class BulkUploadRelationshipItemParserTest {
         assertEquals(2, result.parsedItems().size());
 
         Set<String> sourceExternalIds = SetUtilities.map(result.parsedItems(), BulkUploadRelationshipItem::sourceExternalId);
-        assertEquals(sourceExternalIds, SetUtilities.asSet("CT_001", "CT_002"));
+        assertEquals(sourceExternalIds, SetUtilities.asSet("sourceExtA", "sourceExtB", "sourceExtC"));
     }
 
     @Test
