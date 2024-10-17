@@ -5,7 +5,6 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.bulk_upload.entity_relationship.*;
-import org.finos.waltz.model.bulk_upload.measurable_rating.ChangeOperation;
 import org.finos.waltz.model.entity_relationship.EntityRelationship;
 import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
@@ -14,7 +13,6 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
-import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.relationship_kind.RelationshipKindService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.DSLContext;
@@ -23,18 +21,14 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.data.JooqUtilities.loadExternalIdToEntityRefMap;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -98,7 +92,9 @@ public class BulkUploadRelationshipService {
             // enrich each row to a tuple
             final Map<String, EntityReference> finalSourceEntityRefMap = sourceEntityRefMap;
             final Map<String, EntityReference> finalTargetEntityRefMap = targetEntityRefMap;
-            final List<Tuple4<BulkUploadRelationshipItem, EntityReference, EntityReference, Set<ValidationError>>> listOfRows = parsedResult.parsedItems().stream()
+            final List<Tuple4<BulkUploadRelationshipItem, EntityReference, EntityReference, Set<ValidationError>>> listOfRows = parsedResult
+                    .parsedItems()
+                    .stream()
                     .map(r -> tuple(
                             r,
                             finalSourceEntityRefMap.get(r.sourceExternalId()),
@@ -120,10 +116,14 @@ public class BulkUploadRelationshipService {
             final Collection<EntityRelationship> relationshipsForRelationshipKind = entityRelationshipService.getEntityRelationshipsByKind(relationshipKind);
             List<EntityRelationship> filteredRelationshipsForKind = relationshipsForRelationshipKind
                     .stream()
-                    .filter(r -> r.relationship().equals(relationshipKind.code()) && r.a().kind().equals(relationshipKind.kindA()) && r.b().kind().equals(relationshipKind.kindB()))
+                    .filter(r -> r.relationship()
+                            .equals(relationshipKind.code())
+                            && r.a().kind().equals(relationshipKind.kindA())
+                            && r.b().kind().equals(relationshipKind.kindB()))
                     .collect(Collectors.toList());
 
-            List<EntityRelationship> requiredRelationship = listOfRows.stream()
+            List<EntityRelationship> requiredRelationship = listOfRows
+                    .stream()
                     .filter(t -> t.v4.isEmpty())
                     .map(t -> ImmutableEntityRelationship
                             .builder()
@@ -176,7 +176,9 @@ public class BulkUploadRelationshipService {
         }
     }
 
-    public BulkUploadRelationshipApplyResult bulkApply(BulkUploadRelationshipValidationResult preview, Long relationshipKindId, String user) {
+    public BulkUploadRelationshipApplyResult bulkApply(BulkUploadRelationshipValidationResult preview,
+                                                       Long relationshipKindId, String user) {
+
         verifyUserHasPermissions(user);
 
         if (preview.parseError() != null) {
@@ -203,7 +205,6 @@ public class BulkUploadRelationshipService {
                     r.setLastUpdatedAt(now);
                     r.setLastUpdatedBy(user);
                     return r;
-
                 })
                 .collect(Collectors.toSet());
 
@@ -254,7 +255,6 @@ public class BulkUploadRelationshipService {
                     DSLContext tx = ctx.dsl();
                     long insertCount = summarizeResults(tx.batchInsert(toInsert).execute());
                     long updateCount = summarizeResults(tx.batch(toUpdate).execute());
-
                     long changeLogCount = summarizeResults(tx.batchInsert(auditLogs).execute());
 
                     LOG.info(
@@ -300,10 +300,4 @@ public class BulkUploadRelationshipService {
             throw new NotAuthorizedException();
         }
     }
-
-//    public static void main(String[] args) {
-//        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-//        DSLContext dsl = ctx.getBean(DSLContext.class);
-//        System.out.println(dsl.select().from(Tables.MEASURABLE).fetch());
-//    }
 }
