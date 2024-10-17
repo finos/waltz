@@ -74,12 +74,6 @@
 		// set mode to given mode
 		mode = givenMode;
 	}
-
-	async function dummyonBulkPreview() {
-		mode = MODES.LOADING;
-		previewResponse = dummy_response;
-		mode = MODES.PREVIEW;
-	}
 </script>
 
 <div style="margin-top: 2rem;">
@@ -116,14 +110,15 @@ sourceExternalId	 targetExternalId	 description
 66723	172452-1313-2424	This is another example
 12233	8242	This is another example</pre>
 				</details>
-				<form autocomplete="off" on:submit|preventDefault={onBulkPreview}>
+				<form autocomplete="off" 
+				on:submit|preventDefault={onBulkPreview}>
 					<textarea 
 					style="width: 100%;" 
 					bind:value={rawText}
 					rows=10></textarea>
 					<button class="btn btn-success" 
-					type="submit" 
-					disabled={!rawText}>Submit</button>
+							type="submit" 
+							disabled={!rawText}>Submit</button>
 				</form>
 				{/if}
 				{#if mode === MODES.LOADING}
@@ -135,7 +130,8 @@ sourceExternalId	 targetExternalId	 description
 							There was a problem generating the preview:
 							<pre>{previewResponse.parseError.message}</pre>
 						</div>
-						<button class="btn btn-danger" on:click|preventDefault={() => onGoBack(MODES.EDIT)}>
+						<button class="btn btn-danger" 
+								on:click|preventDefault={() => onGoBack(MODES.EDIT)}>
 							Back
 						</button>
 					{/if}
@@ -145,7 +141,9 @@ sourceExternalId	 targetExternalId	 description
 					</div>
 					<form autocomplete="off" on:submit={onBulkApply}>
 						<div class="waltz-scroll-region-300">
-							<table id="preview-table" class="table table-condensed table-striped" style="max-width: inherit;">
+							<table id="preview-table" 
+									class="table table-condensed table-striped" 
+									style="max-width: inherit;">
 								<thead>
 									<tr>
 										<th>Source Entity</th>
@@ -181,7 +179,9 @@ sourceExternalId	 targetExternalId	 description
 									disabled={ previewResponse.parseError }
 									type="submit">Apply
 							</button>
-							<button class="btn btn-skinny" on:click|preventDefault={() => onGoBack(MODES.EDIT)}>Back</button>
+							<button class="btn btn-skinny" 
+									on:click|preventDefault={() => onGoBack(MODES.EDIT)}>Back
+							</button>
 						</span>
 					</form>
 					{/if}
@@ -212,7 +212,9 @@ sourceExternalId	 targetExternalId	 description
 						</tr>
 					</tbody>
 				</table>
-				<button class="btn btn-skinny" on:click|preventDefault={() => onGoBack(MODES.EDIT)}>Back To Editor</button>
+				<button class="btn btn-skinny" 
+				on:click|preventDefault={() => onGoBack(MODES.EDIT)}>Back To Editor
+				</button>
 				{/if}
 			</div>
 		</SubSection>
