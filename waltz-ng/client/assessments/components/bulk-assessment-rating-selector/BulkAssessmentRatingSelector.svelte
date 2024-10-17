@@ -209,7 +209,7 @@ INV0737	L	TRUE	description
                         <Tooltip content={DataCellErrorTooltip}
                                     props={{errors: item.errors}}>
                             <svelte:fragment slot="target">
-                                <Icon name="exclamation-triangle" class="error-cell"/>
+                                <Icon name="exclamation-triangle" class="error-cell" color="red"/>
                             </svelte:fragment>
                         </Tooltip>
                     {/if}

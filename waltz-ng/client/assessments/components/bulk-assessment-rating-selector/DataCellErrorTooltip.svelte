@@ -12,5 +12,6 @@
 <style>
 	div {
 		color: red;
+    font-size: 12px;
 	}
 </style>
