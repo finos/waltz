@@ -71,7 +71,6 @@ function controller($q,
             .loadViewData(CORE_API.AssessmentDefinitionStore.getById, [definitionId])
             .then(r => {
                 vm.definition = r.data
-                console.log(r.data);
             });
 
         const ratingSchemePromise = serviceBroker

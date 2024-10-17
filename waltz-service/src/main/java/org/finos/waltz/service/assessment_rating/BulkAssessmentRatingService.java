@@ -10,7 +10,6 @@ import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.assessment_rating.ImmutableAssessmentRating;
 import org.finos.waltz.model.assessment_rating.bulk_upload.*;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
-import org.finos.waltz.model.bulk_upload.measurable_rating.ImmutableBulkMeasurableRatingApplyResult;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.user.SystemRole;
@@ -34,9 +33,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,13 +42,13 @@ import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.StringUtilities.sanitizeCharacters;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
-import static org.finos.waltz.data.SelectorUtilities.getAllDistinctByKeyWithExclusion;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class BulkAssessmentRatingService {
     private static final Logger LOG = LoggerFactory.getLogger(MeasurableRatingService.class);
+
     private static final String PROVENANCE = "bulkAssessmentDefinitionUpdate";
     private static final String DUMMY_USER = "test";
 
@@ -62,7 +58,7 @@ public class BulkAssessmentRatingService {
     
     private final RatingSchemeService ratingSchemeService;
 
-    private UserRoleService userRoleService;
+    private final UserRoleService userRoleService;
 
     private final DSLContext dsl;
 
@@ -95,9 +91,9 @@ public class BulkAssessmentRatingService {
         Set<RatingSchemeItem> ratingSchemeItemsBySchemeIds = ratingSchemeService.findRatingSchemeItemsBySchemeIds(asSet(assessmentDefinition.ratingSchemeId()));
         Map<String, RatingSchemeItem> ratingSchemeItemsByCode = indexBy(ratingSchemeItemsBySchemeIds, RatingSchemeItem::rating);
 
-
         CommonTableFields<?> ctf = CommonTableFieldsRegistry.determineCommonTableFields(assessmentDefinition.entityKind(), "target");
-        Set<ImmutableEntityReference> immutableEntityKinds = dsl.select(ctf.nameField(), ctf.idField(), ctf.externalIdField())
+        Set<EntityReference> targetReferences = dsl
+                .select(ctf.nameField(), ctf.idField(), ctf.externalIdField())
                 .from(ctf.table())
                 .where(ctf.isActiveCondition()
                 .and(ctf.externalIdField().isNotNull()))
@@ -111,17 +107,17 @@ public class BulkAssessmentRatingService {
                         .build())
                 .collect(Collectors.toSet());
 
-
-        Map<String, ImmutableEntityReference> kindsByExternalIds = indexBy(immutableEntityKinds, k -> k.externalId().get());
+        Map<String, EntityReference> targetRefsByExternalId = indexBy(targetReferences, k -> k.externalId().get());
         boolean isCardinalityZeroToOne = assessmentDefinition.cardinality().equals(Cardinality.ZERO_ONE);
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        List<Tuple4<AssessmentRatingParsedItem, ImmutableEntityReference, RatingSchemeItem, Set<ValidationError>>> validatedEntries = result
+        Set<String> seen = new HashSet<>();
+
+        List<Tuple4<AssessmentRatingParsedItem, EntityReference, RatingSchemeItem, Set<ValidationError>>> validatedEntries = result
                 .parsedItems()
                 .stream()
                 .map(d -> {
-                    ImmutableEntityReference immutableEntityReference = kindsByExternalIds.get(d.externalId());
+                    EntityReference entityReference = targetRefsByExternalId.get(d.externalId());
                     RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(String.valueOf(d.ratingCode()));
-                    return tuple(d, immutableEntityReference, ratingSchemeItem);
+                    return tuple(d, entityReference, ratingSchemeItem);
                 })
                 .map(t -> {
                     Set<ValidationError> validationErrors = new HashSet<>();
@@ -223,8 +219,6 @@ public class BulkAssessmentRatingService {
         }
         Timestamp now = DateTimeUtilities.nowUtcTimestamp();
 
-        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(assessmentRef.id());
-
         Set<AssessmentRatingRecord> toAdd = preview
                 .validatedItems()
                 .stream()
@@ -276,40 +270,40 @@ public class BulkAssessmentRatingService {
                 r -> r.id().orElse(0L));
 
         Set<ChangeLogRecord> auditLogs = Stream.concat(
-                        preview
-                                .removals()
-                                .stream()
-                                .map(t -> {
-                                    RatingSchemeItem rsi = ratingItemsById.get(t.v2);
-                                    ChangeLogRecord r = new ChangeLogRecord();
-                                    r.setMessage(format(
-                                            "Bulk Rating Update - Removed assessment rating for: %s/%s (%d)",
-                                            rsi == null ? "?" : rsi.name(),
-                                            rsi == null ? "?" : rsi.externalId().orElse("-"),
-                                            t.v2));
-                                    r.setOperation(Operation.REMOVE.name());
-                                    r.setParentKind(t.v1.kind().name());
-                                    r.setParentId(t.v1.id());
-                                    r.setCreatedAt(now);
-                                    r.setUserId(userId);
-                                    r.setSeverity(Severity.INFORMATION.name());
-                                    return r;
-                                }),
-                        preview
-                                .validatedItems()
-                                .stream()
-                                .filter(d -> d.changeOperation() != ChangeOperation.NONE)
-                                .map(d -> {
-                                    ChangeLogRecord r = new ChangeLogRecord();
-                                    r.setMessage(mkChangeMessage(d.ratingSchemeItem(), d.changeOperation()));
-                                    r.setOperation(toChangeLogOperation(d.changeOperation()).name());
-                                    r.setParentKind(EntityKind.APPLICATION.name());
-                                    r.setParentId(d.entityKindReference().id());
-                                    r.setCreatedAt(now);
-                                    r.setUserId(userId);
-                                    r.setSeverity(Severity.INFORMATION.name());
-                                    return r;
-                                }))
+                preview
+                .removals()
+                .stream()
+                .map(t -> {
+                    RatingSchemeItem rsi = ratingItemsById.get(t.v2);
+                    ChangeLogRecord r = new ChangeLogRecord();
+                    r.setMessage(format(
+                            "Bulk Rating Update - Removed assessment rating for: %s/%s (%d)",
+                            rsi == null ? "?" : rsi.name(),
+                            rsi == null ? "?" : rsi.externalId().orElse("-"),
+                            t.v2));
+                    r.setOperation(Operation.REMOVE.name());
+                    r.setParentKind(t.v1.kind().name());
+                    r.setParentId(t.v1.id());
+                    r.setCreatedAt(now);
+                    r.setUserId(userId);
+                    r.setSeverity(Severity.INFORMATION.name());
+                    return r;
+                }),
+                preview
+                .validatedItems()
+                .stream()
+                .filter(d -> d.changeOperation() != ChangeOperation.NONE)
+                .map(d -> {
+                    ChangeLogRecord r = new ChangeLogRecord();
+                    r.setMessage(mkChangeMessage(d.ratingSchemeItem(), d.changeOperation()));
+                    r.setOperation(toChangeLogOperation(d.changeOperation()).name());
+                    r.setParentKind(EntityKind.APPLICATION.name());
+                    r.setParentId(d.entityKindReference().id());
+                    r.setCreatedAt(now);
+                    r.setUserId(userId);
+                    r.setSeverity(Severity.INFORMATION.name());
+                    return r;
+                }))
                 .collect(Collectors.toSet());
 
         long skipCount = preview
@@ -335,7 +329,6 @@ public class BulkAssessmentRatingService {
                             removalCount,
                             changeLogCount);
 
-//                    throw new RuntimeException("Boooomrahhh!!!");
                     return ImmutableBulkAssessmentRatingApplyResult
                             .builder()
                             .recordsAdded(insertCount)
@@ -375,9 +368,3 @@ public class BulkAssessmentRatingService {
         }
     }
 }
-
-
-/**
- * Preview:
- * Check for user selectable for rating
- */

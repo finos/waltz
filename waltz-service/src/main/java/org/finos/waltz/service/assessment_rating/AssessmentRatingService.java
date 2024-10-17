@@ -160,12 +160,12 @@ public class AssessmentRatingService {
 
     public boolean remove(RemoveAssessmentRatingCommand command, String username) throws InsufficientPrivelegeException {
 
-//        verifyPermission(
-//                Operation.REMOVE,
-//                command.entityReference(),
-//                command.assessmentDefinitionId(),
-//                command.ratingId(),
-//                username);
+        verifyPermission(
+                Operation.REMOVE,
+                command.entityReference(),
+                command.assessmentDefinitionId(),
+                command.ratingId(),
+                username);
 
         String ratingRemovedName = ratingSchemeDAO.findRatingSchemeItemsByIds(asSet(command.ratingId()))
                 .stream()

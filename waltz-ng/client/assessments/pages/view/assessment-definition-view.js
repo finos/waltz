@@ -58,6 +58,7 @@ function controller($q,
 
     const definitionId = $stateParams.id;
     const vm = initialiseData(this, initialState);
+    const bulkEditableKinds = ["ACTOR", "APPLICATION", "CHANGE_INITIATIVE", "CHANGE_UNIT", "LEGAL_ENTITY", "LICENCE"];
 
     userService
         .whoami()
@@ -68,7 +69,7 @@ function controller($q,
             .loadViewData(CORE_API.AssessmentDefinitionStore.getById, [definitionId])
             .then(r => {
                 vm.definition = r.data;
-                vm.allowBulkEditing = true;
+                vm.allowBulkEditing = _.includes(bulkEditableKinds, vm.definition.entityKind);
             });
 
         const ratingSchemePromise = serviceBroker

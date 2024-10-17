@@ -18,7 +18,7 @@ public class ActorHelper {
                 ImmutableActorCreateCommand
                         .builder()
                         .name(nameStem)
-                        .externalId(mkName(nameStem))
+                        .externalId(nameStem)
                         .description(nameStem + " Desc")
                         .isExternal(true)
                         .build(),

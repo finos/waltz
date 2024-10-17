@@ -15,7 +15,7 @@ public interface AssessmentRatingParsedItem {
     @JsonAlias("external_id")
     String externalId();
 
-    char ratingCode();
+    String ratingCode();
 
     @Value.Default
     default boolean isReadOnly() { return false; }

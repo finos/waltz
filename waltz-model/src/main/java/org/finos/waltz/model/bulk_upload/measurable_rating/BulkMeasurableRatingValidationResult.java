@@ -14,7 +14,7 @@ import java.util.Set;
 @JsonSerialize(as= ImmutableBulkMeasurableRatingValidationResult.class)
 public interface BulkMeasurableRatingValidationResult {
 
-        List<BulkMeasurableRatingValidatedItem> validatedItems();
+    List<BulkMeasurableRatingValidatedItem> validatedItems();
 
     @Nullable
     BulkMeasurableRatingParseResult.BulkMeasurableRatingParseError error();

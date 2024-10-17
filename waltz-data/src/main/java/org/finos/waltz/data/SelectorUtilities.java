@@ -75,35 +75,4 @@ public class SelectorUtilities {
         }
 
     }
-
-    /**
-     * get all distinct records based on some property
-     * @param keyExtractor
-     * @return
-     * @param <T>
-     */
-    public static <T> Predicate<T> getAllDistinctByKeyWith(Function<? super T, Object> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
-    /**
-     * get all distinct records based on some property with excluded records
-     * @param keyExtractor
-     * @return
-     * @param <T>
-     */
-    public static <T> Predicate<T> getAllDistinctByKeyWithExclusion(Function<? super T, Object> keyExtractor, List<T> excludedRecords) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> {
-            Object key = keyExtractor.apply(t);
-            if(seen.add(key)) {
-                return true;
-            } else {
-                excludedRecords.add(t);
-                return false;
-            }
-        };
-    }
-
 }
