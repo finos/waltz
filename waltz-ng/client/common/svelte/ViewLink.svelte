@@ -125,6 +125,14 @@
             path: ctx => `server/${ctx.id}`,
             title: "Server View"
         },
+        "main.system.static-diagrams": {
+            path: () => `system/static-diagrams`,
+            title: "Static Diagrams"
+        },
+        "main.system.static-diagram": {
+            path: () => `system/static-diagrams/${ctx.id}`,
+            title: ""
+        },
         "main.survey.instance.view": {
             path: ctx => `survey/instance/${ctx.id}/response/view`,
             title: "Survey View"

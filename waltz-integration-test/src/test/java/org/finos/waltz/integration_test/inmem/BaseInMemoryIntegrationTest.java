@@ -79,7 +79,7 @@ public abstract class BaseInMemoryIntegrationTest {
     }
 
 
-    private DSLContext getDsl() {
+    protected DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
     }
 

@@ -95,6 +95,18 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const ripple = () => {
+        return $http
+            .post(`${BASE}/ripple/all`)
+            .then(d => d.data);
+    };
+
+    const findRippleConfig = () => {
+        return $http
+            .get(`${BASE}/ripple/config`)
+            .then(d => d.data);
+    };
+
     return {
         getRatingPermissions,
         findForEntityReference,
@@ -106,7 +118,9 @@ export function store($http, BaseApiUrl) {
         unlock,
         bulkStore,
         bulkRemove,
-        remove
+        remove,
+        ripple,
+        findRippleConfig
     };
 }
 
@@ -175,6 +189,16 @@ export const AssessmentRatingStore_API = {
         serviceName,
         serviceFnName: "remove",
         description: "remove a rating"
+    },
+    ripple: {
+        serviceName,
+        serviceFnName: "ripple",
+        description: "ripple assessments based on the settings table config"
+    },
+    findRippleConfig: {
+        serviceName,
+        serviceFnName: "findRippleConfig",
+        description: "ripple assessments based on the settings table config"
     }
 };
 

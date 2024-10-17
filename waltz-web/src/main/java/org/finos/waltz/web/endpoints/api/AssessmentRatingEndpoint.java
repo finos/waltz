@@ -25,9 +25,11 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingItemParser;
@@ -102,6 +104,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findRatingPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "permissions");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
         String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
+        String rippleAllPath = mkPath(BASE_URL, "ripple", "all");
+        String rippleConfigPath = mkPath(BASE_URL, "ripple", "config");
 
         String bulkAssessmentDefinitionPreviewPath = mkPath(BASE_URL, "bulk", "preview", "ASSESSMENT_DEFINITION", ":id");
         String bulkAssessmentDefinitionApplyPath = mkPath(BASE_URL, "bulk", "apply", "ASSESSMENT_DEFINITION", ":id");
@@ -124,6 +128,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         putForDatum(lockPath, this::lockRoute);
         putForDatum(unlockPath, this::unlockRoute);
         deleteForDatum(removePath, this::removeRoute);
+        postForDatum(rippleAllPath, this::rippleRoute);
+        getForList(rippleConfigPath, this::rippleConfigRoute);
     }
 
 
@@ -228,6 +234,17 @@ public class AssessmentRatingEndpoint implements Endpoint {
         verifyCanWrite(request, assessmentDefinitionId);
         BulkAssessmentRatingCommand[] commands = readBody(request, BulkAssessmentRatingCommand[].class);
         return assessmentRatingService.bulkDelete(commands, assessmentDefinitionId, getUsername(request));
+    }
+
+
+    private Long rippleRoute(Request request, Response z) {
+        requireRole(userRoleService, request, SystemRole.ADMIN);
+        return assessmentRatingService.rippleAll();
+    }
+
+
+    private Set<AssessmentRipplerJobConfiguration> rippleConfigRoute(Request request, Response z) {
+        return assessmentRatingService.findRippleConfig();
     }
 
 
