@@ -21,6 +21,7 @@
 <div>
     <svg viewBox={`0 0 ${width} ${height}`}
          shape-rendering="crispEdges"
+         width="100%"
          style="background: white">
         <g transform={`translate(${cellPadding} , ${cellPadding})`}>
             {#each rows as row, idx}

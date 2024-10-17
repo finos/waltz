@@ -34,12 +34,12 @@
     }
 
     $: children = $hideEmptyCells && $selectedOverlay
-        ? _.filter(group.children, child => hasData(child, $overlayData))
-        : group.children;
+        ? _.filter(group?.children, child => hasData(child, $overlayData))
+        : group?.children || [];
 
-    $: overlayRequiresTitle = group.data && $selectedOverlay?.showTitle;
+    $: overlayRequiresTitle = group?.data && $selectedOverlay?.showTitle;
 
-    $: cellData = _.get($overlayData, group.id);
+    $: cellData = _.get($overlayData, group?.id);
 
     $: childKinds = _
         .chain(flattenChildren(group))

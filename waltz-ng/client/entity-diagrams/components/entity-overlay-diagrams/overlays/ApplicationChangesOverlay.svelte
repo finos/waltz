@@ -135,6 +135,7 @@
     <div>
         <svg viewBox={`0 0 ${width} ${height}`}
              bind:this={svgElem}
+             width="100%"
              class:focused={renderMode === RenderModes.FOCUSED}
              style="background: white">
             <g class="app-summary">
