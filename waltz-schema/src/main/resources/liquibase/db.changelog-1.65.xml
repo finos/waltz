@@ -28,7 +28,7 @@
     <changeSet id="20241009-7162-1"
                author="jejuabh">
         <comment>7162: Add description to table data_type</comment>
-        <setTableRemarks  remarks="EDM Data Types which describe Data Flows"
+        <setTableRemarks  remarks="Hierarchical Taxonomy of Data Types"
                           tableName="data_type"/>
     </changeSet>
     <changeSet id="20241009-7162-2"
