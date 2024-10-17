@@ -24,7 +24,11 @@ import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.schema.tables.Application;
 import org.jooq.Condition;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -71,5 +75,4 @@ public class SelectorUtilities {
         }
 
     }
-
 }
