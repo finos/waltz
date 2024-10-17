@@ -50,7 +50,6 @@ const initialState = {
     ]
 };
 
-const bulkEditableKinds = ["APPLICATION"];
 
 function controller($q,
                     $stateParams,
@@ -59,6 +58,7 @@ function controller($q,
 
     const definitionId = $stateParams.id;
     const vm = initialiseData(this, initialState);
+    const bulkEditableKinds = ["ACTOR", "APPLICATION", "CHANGE_INITIATIVE", "CHANGE_UNIT", "LEGAL_ENTITY", "LICENCE", "MEASURABLE"];
 
     userService
         .whoami()

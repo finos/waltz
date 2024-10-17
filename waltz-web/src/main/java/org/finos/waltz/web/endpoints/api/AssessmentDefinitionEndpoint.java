@@ -38,8 +38,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.*;
 
 @Service
 public class AssessmentDefinitionEndpoint implements Endpoint {
@@ -69,6 +68,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         String findByKindPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind");
         String findByRefPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind", "id", ":id");
         String removeByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
+
 
         DatumRoute<AssessmentDefinition> getByIdRoute = (request, response) -> assessmentDefinitionService.getById(WebUtilities.getId(request));
         ListRoute<AssessmentDefinition> findAllRoute = (request, response) -> assessmentDefinitionService.findAll();

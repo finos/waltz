@@ -80,6 +80,20 @@ export function mkAssessmentRatingStore() {
                 null,
                 {force});
 
+    const bulkPreview = (entityRef, rawText) =>
+        remote
+            .execute(
+                "POST",
+                `api/assessment-rating/bulk/preview/${entityRef.kind}/${entityRef.id}`,
+                rawText);
+
+    const bulkApply = (entityRef, rawText) =>
+        remote
+            .execute(
+                "POST",
+                `api/assessment-rating/bulk/apply/${entityRef.kind}/${entityRef.id}`,
+                rawText);
+
     return {
         findByDefinitionId,
         findForEntityReference,
@@ -92,7 +106,9 @@ export function mkAssessmentRatingStore() {
         updateComment,
         updateRating,
         findSummaryCounts,
-        hasMultiValuedAssessments
+        hasMultiValuedAssessments,
+        bulkPreview,
+        bulkApply
     };
 }
 
