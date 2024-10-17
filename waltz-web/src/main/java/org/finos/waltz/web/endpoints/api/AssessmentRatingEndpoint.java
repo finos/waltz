@@ -281,7 +281,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private void registerPreviewBulkAssessmentRatingChanges(String path) {
         postForDatum(path, (req, resp) -> {
             EntityReference assessmentDefRef = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
-            String modeStr = req.queryParams("mode");
             String body = req.body();
             return bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body);
         });
@@ -290,10 +289,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private void registerApplyBulkAssessmentRatingChanges(String path) {
         postForDatum(path, (req, resp) -> {
             EntityReference assessmentDefRef = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
-            String modeStr = req.queryParams("mode");
-            String formatStr = req.queryParams("format");
-            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
-            BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
             String body = req.body();
             AssessmentRatingValidationResult preview = bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body);
             return bulkAssessmentRatingService.apply(assessmentDefRef, preview, getUsername(req));
