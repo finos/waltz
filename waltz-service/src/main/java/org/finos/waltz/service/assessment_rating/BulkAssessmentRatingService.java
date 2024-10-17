@@ -75,11 +75,9 @@ public class BulkAssessmentRatingService {
     }
 
     public AssessmentRatingValidationResult bulkPreview(EntityReference assessmentReference,
-                                                        String inputStr,
-                                                        BulkAssessmentRatingItemParser.InputFormat format,
-                                                        BulkUpdateMode mode) {
+                                                        String inputStr) {
 
-        AssessmentRatingParsedResult result = new BulkAssessmentRatingItemParser().parse(inputStr, format);
+        AssessmentRatingParsedResult result = new BulkAssessmentRatingItemParser().parse(inputStr, BulkAssessmentRatingItemParser.InputFormat.TSV);
         if (result.error() != null) {
             return ImmutableAssessmentRatingValidationResult
                     .builder()
@@ -168,8 +166,6 @@ public class BulkAssessmentRatingService {
 
         Set<Tuple2<EntityReference, Long>> toAdd = SetUtilities.map(assessmentRatingDiffResult.otherOnly(), d -> tuple(d.entityReference(), d.ratingId()));
         Set<Tuple2<EntityReference, Long>> toUpdate = SetUtilities.map(assessmentRatingDiffResult.differingIntersection(), d -> tuple(d.entityReference(), d.ratingId()));
-        Set<Tuple2<EntityReference, Long>> toRemove = SetUtilities.map(assessmentRatingDiffResult.waltzOnly(), d -> tuple(d.entityReference(), d.ratingId()));
-
 
         List<AssessmentRatingValidatedItem> validatedItems = validatedEntries
                 .stream()
@@ -201,15 +197,12 @@ public class BulkAssessmentRatingService {
         return ImmutableAssessmentRatingValidationResult
                 .builder()
                 .validatedItems(validatedItems)
-                .removals(mode == BulkUpdateMode.REPLACE
-                        ? toRemove
-                        : emptySet())
+                .removals(emptySet())
                 .build();
     }
 
     public BulkAssessmentRatingApplyResult apply(EntityReference assessmentRef,
                                                  AssessmentRatingValidationResult preview,
-                                                 BulkUpdateMode mode,
                                                  String userId) {
 
         verifyUserHasPermissions(userId);
@@ -317,9 +310,7 @@ public class BulkAssessmentRatingService {
                     DSLContext tx = ctx.dsl();
                     int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
                     int updateCount = summarizeResults(tx.batch(toUpdate).execute());
-                    int removalCount = mode == BulkUpdateMode.REPLACE
-                            ? summarizeResults(tx.batch(toRemove).execute())
-                            : 0;
+                    int removalCount = 0;
                     int changeLogCount = summarizeResults(tx.batchInsert(auditLogs).execute());
 
                     LOG.info(

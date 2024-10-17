@@ -7,10 +7,8 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
 import org.finos.waltz.model.assessment_rating.bulk_upload.ValidationError;
-import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
-import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingItemParser;
 import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
 import org.finos.waltz.test_common.helpers.ActorHelper;
 import org.finos.waltz.test_common.helpers.AppHelper;
@@ -72,9 +70,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
 
         AssessmentRatingValidationResult result1 = bulkAssessmentRatingService.bulkPreview(
                 mkRef(def1.entityKind(), def1.id().get()),
-                mkGoodTsv(kindExternalId),
-                BulkAssessmentRatingItemParser.InputFormat.TSV,
-                BulkUpdateMode.ADD_ONLY);
+                mkGoodTsv(kindExternalId));
 
         assertNotNull(result1, "Expected a result");
         assertNoErrors(result1);
@@ -91,9 +87,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
 
         AssessmentRatingValidationResult result2 = bulkAssessmentRatingService.bulkPreview(
                 mkRef(def2.entityKind(),def2.id().get()),
-                mkGoodTsv(actorName),
-                BulkAssessmentRatingItemParser.InputFormat.TSV,
-                BulkUpdateMode.ADD_ONLY);
+                mkGoodTsv(actorName));
 
         assertNotNull(result2,"Expected a result");
         assertNoErrors(result2);
@@ -103,16 +97,16 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
 
     @Test
     public void previewAddsForCardinalityChecks() {
-        String appName = mkName(stem, "previewApp1");
-        String appExternalId = mkName(stem, "previewAppCode1");
-        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "SchemeApp"));
+        String appName = mkName(stem, "previewApp3");
+        String appExternalId = mkName(stem, "previewAppCode3");
+        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "SchemeApp1"));
         ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 0, "green", "Y");
         ratingSchemeHelper.saveRatingItem(schemeId, "No", 0, "red", "N");
         appHelper.createNewApp(
                 appName,
                 ouIds.root,
                 appExternalId);
-        AssessmentDefinition def = assessmentDefinitionService.getById(getAssessmentDefinition(EntityKind.APPLICATION, schemeId, "Assessment"));
+        AssessmentDefinition def = assessmentDefinitionService.getById(getAssessmentDefinition(EntityKind.APPLICATION, schemeId, "Assessment1"));
 
         /**
          * Zero-One
@@ -121,9 +115,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
         String[] ratingCodes = {"Y", "N"};
         AssessmentRatingValidationResult result = bulkAssessmentRatingService.bulkPreview(
                 mkRef(def.entityKind(), def.id().get()),
-                mkTsvWithForCardinalityCheck(externalIds, ratingCodes),
-                BulkAssessmentRatingItemParser.InputFormat.TSV,
-                BulkUpdateMode.ADD_ONLY);
+                mkTsvWithForCardinalityCheck(externalIds, ratingCodes));
 
         result
                 .validatedItems()
@@ -151,9 +143,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
 
         AssessmentRatingValidationResult result = bulkAssessmentRatingService.bulkPreview(
                 mkRef(def.entityKind(), def.id().get()),
-                mkBadTsv(appExternalId),
-                BulkAssessmentRatingItemParser.InputFormat.TSV,
-                BulkUpdateMode.ADD_ONLY);
+                mkBadTsv(appExternalId));
 
         result
                 .validatedItems()

@@ -69,7 +69,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
     public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService,
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
-                                    UserRoleService userRoleService, BulkAssessmentRatingService bulkAssessmentRatingService) {
+                                    UserRoleService userRoleService,
+                                    BulkAssessmentRatingService bulkAssessmentRatingService) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
@@ -281,11 +282,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         postForDatum(path, (req, resp) -> {
             EntityReference assessmentDefRef = mkRef(EntityKind.ASSESSMENT_DEFINITION, getId(req));
             String modeStr = req.queryParams("mode");
-            String formatStr = req.queryParams("format");
-            BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
-            BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
             String body = req.body();
-            return bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body, format, mode);
+            return bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body);
         });
     }
 
@@ -297,8 +295,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
             BulkUpdateMode mode = EnumUtilities.readEnum(modeStr, BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
             BulkAssessmentRatingItemParser.InputFormat format = EnumUtilities.readEnum(formatStr, BulkAssessmentRatingItemParser.InputFormat.class, s -> BulkAssessmentRatingItemParser.InputFormat.TSV);
             String body = req.body();
-            AssessmentRatingValidationResult preview = bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body, format, mode);
-            return bulkAssessmentRatingService.apply(assessmentDefRef, preview, mode, getUsername(req));
+            AssessmentRatingValidationResult preview = bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body);
+            return bulkAssessmentRatingService.apply(assessmentDefRef, preview, getUsername(req));
         });
     }
 
