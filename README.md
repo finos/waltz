@@ -66,10 +66,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date           | Provisional Change Summary |
-|---------|----------------|----------------------------|
-| 1.64    | Sept 26th 2024 | TBC                        | 
-| 1.65    | Oct 2024       | TBC                        | 
+| Release | Date        | Provisional Change Summary |
+|---------|-------------|----------------------------|
+| 1.65    | 24 Oct 2024 | Bulk loaders               | 
+| 1.66    | Nov 2024    | TBC                        | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
