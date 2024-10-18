@@ -5,6 +5,7 @@
 	import { entityRelationshipStore } from "../../../svelte-stores/entity-relationship-store.js";
 	import _ from "lodash";
 
+	// prop passed onto this component
     export let selectedRelationshipKind;
 
 	const MODES = {
