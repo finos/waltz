@@ -41,8 +41,6 @@ public class BulkUploadRelationshipService {
 
     private final RelationshipKindService relationshipKindService;
 
-    private final  org.finos.waltz.schema.tables.EntityRelationship ENTITY_RELATIONSHIP = Tables.ENTITY_RELATIONSHIP;
-
     private static final String PROVENANCE = "bulkUploadRelationships";
 
     private final EntityRelationshipService entityRelationshipService;
@@ -66,114 +64,114 @@ public class BulkUploadRelationshipService {
 
         RelationshipKind relationshipKind = relationshipKindService.getById(relationshipKindId);
         BulkUploadRelationshipParsedResult parsedResult = new BulkUploadRelationshipItemParser().parse(input, BulkUploadRelationshipItemParser.InputFormat.TSV);
-        Map<String, EntityReference> sourceEntityRefMap = new HashMap<>();
-        Map<String, EntityReference> targetEntityRefMap = new HashMap<>();
+        Map<String, EntityReference> sourceEntityRefMap;
+        Map<String, EntityReference> targetEntityRefMap;
 
         if (parsedResult.error() != null) {
             return ImmutableBulkUploadRelationshipValidationResult
                     .builder()
                     .parseError(parsedResult.error())
                     .build();
-        } else {
-            // load source entity ref map
-            if (relationshipKind.categoryA() != null) {
-                sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryA()));
-            } else {
-                sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA());
-            }
-
-            // load target entity ref map
-            if (relationshipKind.categoryB() != null) {
-                targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryB()));
-            } else {
-                targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB());
-            }
-
-            // enrich each row to a tuple
-            final Map<String, EntityReference> finalSourceEntityRefMap = sourceEntityRefMap;
-            final Map<String, EntityReference> finalTargetEntityRefMap = targetEntityRefMap;
-            final List<Tuple4<BulkUploadRelationshipItem, EntityReference, EntityReference, Set<ValidationError>>> listOfRows = parsedResult
-                    .parsedItems()
-                    .stream()
-                    .map(r -> tuple(
-                            r,
-                            finalSourceEntityRefMap.get(r.sourceExternalId()),
-                            finalTargetEntityRefMap.get(r.targetExternalId())
-                    ))
-                    .map(t -> {
-                        Set<ValidationError> validationErrors = new HashSet<>();
-                        if (t.v2 == null) {
-                            validationErrors.add(ValidationError.SOURCE_NOT_FOUND);
-                        }
-                        if (t.v3 == null) {
-                            validationErrors.add(ValidationError.TARGET_NOT_FOUND);
-                        }
-                        return t.concat(validationErrors);
-                    })
-                    .collect(Collectors.toList());
-
-            // load all entity relationships for the given kind
-            final Collection<EntityRelationship> relationshipsForRelationshipKind = entityRelationshipService.getEntityRelationshipsByKind(relationshipKind);
-            List<EntityRelationship> filteredRelationshipsForKind = relationshipsForRelationshipKind
-                    .stream()
-                    .filter(r -> r.relationship()
-                            .equals(relationshipKind.code())
-                            && r.a().kind().equals(relationshipKind.kindA())
-                            && r.b().kind().equals(relationshipKind.kindB()))
-                    .collect(Collectors.toList());
-
-            List<EntityRelationship> requiredRelationship = listOfRows
-                    .stream()
-                    .filter(t -> t.v4.isEmpty())
-                    .map(t -> ImmutableEntityRelationship
-                            .builder()
-                            .a(t.v2)
-                            .b(t.v3)
-                            .relationship(relationshipKind.code())
-                            .description(t.v1.description())
-                            .lastUpdatedBy("abc.xyz")
-                            .provenance("dummy")
-                            .lastUpdatedAt(LocalDateTime.now())
-                            .build())
-                    .collect(Collectors.toList());
-
-            // create a diff b/w required and existing relationships
-            DiffResult<EntityRelationship> diffResult = DiffResult
-                    .mkDiff(
-                            filteredRelationshipsForKind,
-                            requiredRelationship,
-                            r -> tuple(r.a(), r.b()),
-                            (a, b) -> StringUtilities.safeEq(b.description(), a.description())
-                    );
-
-            Set<Tuple2<EntityReference, EntityReference>> toAdd = SetUtilities.map(diffResult.otherOnly(), d -> tuple(d.a(), d.b()));
-            Set<Tuple2<EntityReference, EntityReference>> toUpdate = SetUtilities.map(diffResult.differingIntersection(), d -> tuple(d.a(), d.b()));
-
-            List<BulkUploadRelationshipValidatedItem> validatedItemsList = listOfRows
-                    .stream()
-                    .map(t -> {
-                        if (toAdd.contains(tuple(t.v2, t.v3))) {
-                            return t.concat(UploadOperation.ADD);
-                        } else if (toUpdate.contains(tuple(t.v2, t.v3))) {
-                            return t.concat(UploadOperation.UPDATE);
-                        }
-                        return t.concat(UploadOperation.NONE);
-                    })
-                    .map(t -> ImmutableBulkUploadRelationshipValidatedItem
-                            .builder()
-                            .parsedItem(t.v1)
-                            .sourceEntityRef(t.v2)
-                            .targetEntityRef(t.v3)
-                            .description(t.v1.description())
-                            .error(t.v4)
-                            .uploadOperation(t.v5)
-                            .build())
-                    .collect(Collectors.toList());
-            return ImmutableBulkUploadRelationshipValidationResult
-                    .builder()
-                    .validatedItems(validatedItemsList)
-                    .build();
         }
+
+        // load source entity ref map
+        if (relationshipKind.categoryA() != null) {
+            sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryA()));
+        } else {
+            sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA());
+        }
+
+        // load target entity ref map
+        if (relationshipKind.categoryB() != null) {
+            targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryB()));
+        } else {
+            targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB());
+        }
+
+        // enrich each row to a tuple
+        final Map<String, EntityReference> finalSourceEntityRefMap = sourceEntityRefMap;
+        final Map<String, EntityReference> finalTargetEntityRefMap = targetEntityRefMap;
+        final List<Tuple4<BulkUploadRelationshipItem, EntityReference, EntityReference, Set<ValidationError>>> listOfRows = parsedResult
+                .parsedItems()
+                .stream()
+                .map(r -> tuple(
+                        r,
+                        finalSourceEntityRefMap.get(r.sourceExternalId()),
+                        finalTargetEntityRefMap.get(r.targetExternalId())
+                ))
+                .map(t -> {
+                    Set<ValidationError> validationErrors = new HashSet<>();
+                    if (t.v2 == null) {
+                        validationErrors.add(ValidationError.SOURCE_NOT_FOUND);
+                    }
+                    if (t.v3 == null) {
+                        validationErrors.add(ValidationError.TARGET_NOT_FOUND);
+                    }
+                    return t.concat(validationErrors);
+                })
+                .collect(Collectors.toList());
+
+        // load all entity relationships for the given kind
+        final Collection<EntityRelationship> relationshipsForRelationshipKind = entityRelationshipService.getEntityRelationshipsByKind(relationshipKind);
+        List<EntityRelationship> filteredRelationshipsForKind = relationshipsForRelationshipKind
+                .stream()
+                .filter(r -> r.relationship()
+                        .equals(relationshipKind.code())
+                        && r.a().kind().equals(relationshipKind.kindA())
+                        && r.b().kind().equals(relationshipKind.kindB()))
+                .collect(Collectors.toList());
+
+        List<EntityRelationship> requiredRelationship = listOfRows
+                .stream()
+                .filter(t -> t.v4.isEmpty())
+                .map(t -> ImmutableEntityRelationship
+                        .builder()
+                        .a(t.v2)
+                        .b(t.v3)
+                        .relationship(relationshipKind.code())
+                        .description(t.v1.description())
+                        .lastUpdatedBy("abc.xyz")
+                        .provenance("dummy")
+                        .lastUpdatedAt(LocalDateTime.now())
+                        .build())
+                .collect(Collectors.toList());
+
+        // create a diff b/w required and existing relationships
+        DiffResult<EntityRelationship> diffResult = DiffResult
+                .mkDiff(
+                        filteredRelationshipsForKind,
+                        requiredRelationship,
+                        r -> tuple(r.a(), r.b()),
+                        (a, b) -> StringUtilities.safeEq(b.description(), a.description())
+                );
+
+        Set<Tuple2<EntityReference, EntityReference>> toAdd = SetUtilities.map(diffResult.otherOnly(), d -> tuple(d.a(), d.b()));
+        Set<Tuple2<EntityReference, EntityReference>> toUpdate = SetUtilities.map(diffResult.differingIntersection(), d -> tuple(d.a(), d.b()));
+
+        List<BulkUploadRelationshipValidatedItem> validatedItemsList = listOfRows
+                .stream()
+                .map(t -> {
+                    if (toAdd.contains(tuple(t.v2, t.v3))) {
+                        return t.concat(UploadOperation.ADD);
+                    } else if (toUpdate.contains(tuple(t.v2, t.v3))) {
+                        return t.concat(UploadOperation.UPDATE);
+                    }
+                    return t.concat(UploadOperation.NONE);
+                })
+                .map(t -> ImmutableBulkUploadRelationshipValidatedItem
+                        .builder()
+                        .parsedItem(t.v1)
+                        .sourceEntityRef(t.v2)
+                        .targetEntityRef(t.v3)
+                        .description(t.v1.description())
+                        .error(t.v4)
+                        .uploadOperation(t.v5)
+                        .build())
+                .collect(Collectors.toList());
+        return ImmutableBulkUploadRelationshipValidationResult
+                .builder()
+                .validatedItems(validatedItemsList)
+                .build();
     }
 
     public BulkUploadRelationshipApplyResult bulkApply(BulkUploadRelationshipValidationResult preview,
@@ -213,15 +211,15 @@ public class BulkUploadRelationshipService {
                 .stream()
                 .filter(d -> d.uploadOperation() == UploadOperation.UPDATE && d.error().isEmpty())
                 .map(d -> DSL
-                        .update(ENTITY_RELATIONSHIP)
-                        .set(ENTITY_RELATIONSHIP.DESCRIPTION, d.description())
-                        .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, now)
-                        .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, user)
-                        .where(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(relationshipKind.code()))
-                            .and(ENTITY_RELATIONSHIP.KIND_A.eq(relationshipKind.kindA().name()))
-                            .and(ENTITY_RELATIONSHIP.KIND_B.eq(relationshipKind.kindB().name()))
-                            .and(ENTITY_RELATIONSHIP.ID_A.eq(d.sourceEntityRef().id()))
-                            .and(ENTITY_RELATIONSHIP.ID_B.eq(d.targetEntityRef().id())))
+                        .update(Tables.ENTITY_RELATIONSHIP)
+                        .set(Tables.ENTITY_RELATIONSHIP.DESCRIPTION, d.description())
+                        .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_AT, now)
+                        .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_BY, user)
+                        .where(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP.eq(relationshipKind.code()))
+                            .and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(relationshipKind.kindA().name()))
+                            .and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(relationshipKind.kindB().name()))
+                            .and(Tables.ENTITY_RELATIONSHIP.ID_A.eq(d.sourceEntityRef().id()))
+                            .and(Tables.ENTITY_RELATIONSHIP.ID_B.eq(d.targetEntityRef().id())))
                 .collect(Collectors.toSet());
 
         final Set<ChangeLogRecord> auditLogs = preview

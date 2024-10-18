@@ -6,7 +6,6 @@
 	import _ from "lodash";
 
     export let selectedRelationshipKind;
-    console.log(selectedRelationshipKind)
 
 	const MODES = {
 		EDIT: "EDIT",
