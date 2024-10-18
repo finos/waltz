@@ -36,6 +36,7 @@
 <div>
     {#if renderMode !== RenderModes.FOCUSED}
         <svg viewBox={`0 0 ${width} ${height}`}
+             width="100%"
              style="background: white">
             <g>
                 {#each counts as r}

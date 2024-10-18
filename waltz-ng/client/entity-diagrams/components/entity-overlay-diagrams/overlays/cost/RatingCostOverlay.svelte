@@ -48,6 +48,7 @@
 <div>
     <svg class="content"
          viewBox="0 0 {width} {height}"
+         width="100%"
          style={`background: ${cellData?.totalCost ? colorScale(cellData?.totalCost) : "#fff"}`}>
         <g>
             <text x={width / 2}
