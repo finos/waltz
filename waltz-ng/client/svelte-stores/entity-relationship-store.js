@@ -81,17 +81,17 @@ export function mkEntityRelationshipStore() {
     };
 
     const bulkUploadRelationshipsPreview = (relationshipKindId, data) => remote
-        .execute(
+            .execute(
             "POST",
             `api/entity-relationship/bulk/preview/${relationshipKindId}`,
             data
         );
 
     const bulkUploadRelationshipsApply = (relationshipKindId, data) => remote
-    .execute(
-        "POST",
-        `api/entity-relationship/bulk/apply/${relationshipKindId}`,
-        data
+            .execute(
+            "POST",
+            `api/entity-relationship/bulk/apply/${relationshipKindId}`,
+            data
     );
 
 

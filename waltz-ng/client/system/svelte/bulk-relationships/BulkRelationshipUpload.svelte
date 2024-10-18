@@ -91,16 +91,16 @@
 					<div class="help-block">
 						<p>The bulk upload format should look like, column order is not important but the headers are:</p>
 						<dl>
-							<dt>Source External Id</dt>
+							<dt>sourceExternalId</dt>
 							<dd>This uniquely identifies the source (from) entity for that relationship.</dd>
 			
-							<dt>Target External Id</dt>
+							<dt>targetExternalId</dt>
 							<dd>This uniquely identifies the target (to) entity for that relationship.</dd>
 			
-							<dt>Description</dt>
+							<dt>description</dt>
 							<dd>This optionally adds a comment to the change.</dd>
 						</dl>
-						For Example:
+						An example input:
 					</div>
 					<pre>
 sourceExternalId	 targetExternalId	 description
