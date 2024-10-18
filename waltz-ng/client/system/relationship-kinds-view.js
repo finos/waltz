@@ -22,6 +22,7 @@ import * as _ from "lodash";
 import {displayError} from "../common/error-utils";
 import {entity} from "../common/services/enums/entity";
 import toasts from "../svelte-stores/toast-store";
+import BulkRelationshipUpload from "./svelte/bulk-relationships/BulkRelationshipUpload.svelte";
 
 const initialState = {
     relationshipKinds: [],
@@ -40,8 +41,10 @@ const initialState = {
     },
     visibility: {
         create: false,
-        edit: false
-    }
+        update: false,
+        bulk: false
+    },
+    BulkRelationshipUpload
 };
 
 
@@ -51,7 +54,7 @@ const columnDefs = [
         displayName: "Name",
         width: "25%",
     },{
-        field: "name",
+        field: "reverseName",
         displayName: "Reverse Name",
         width: "25%",
     }, {
@@ -127,12 +130,14 @@ function controller(serviceBroker, $q) {
         vm.form.position = vm.selectedRelationshipKind.position;
 
         vm.visibility.update = true;
+        vm.visibility.bulk = false;
     };
 
     vm.createRelationshipKind = () => {
         vm.resetForm();
         vm.visibility.create = true;
         vm.visibility.update = false;
+        vm.visibility.bulk = false;
         vm.selectedRelationshipKind = null;
     };
 
@@ -171,6 +176,7 @@ function controller(serviceBroker, $q) {
     vm.onDismiss = () => {
         vm.visibility.create = false;
         vm.visibility.update = false;
+        vm.visibility.bulk = false;
         vm.resetForm();
     };
 
@@ -224,6 +230,11 @@ function controller(serviceBroker, $q) {
                     displayError("Relationship kind could not be removed", e);
                 });
         }
+    }
+
+    vm.bulkUploadRelationships = () => {
+        vm.visibility.bulk = true;
+        vm.visibility.update = false;
     }
 }
 

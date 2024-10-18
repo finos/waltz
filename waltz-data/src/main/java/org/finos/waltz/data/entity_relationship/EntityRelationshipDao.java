@@ -281,6 +281,32 @@ public class EntityRelationshipDao {
         return matchesA.or(matchesB);
     }
 
+    public Collection<EntityRelationship> getEntityRelationshipsByKind(org.finos.waltz.model.rel.RelationshipKind relationshipKind) {
+        return dsl
+                .select(ENTITY_RELATIONSHIP.fields())
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(relationshipKind.code()))
+                .fetch(r -> {
+                    EntityRelationshipRecord record = r.into(ENTITY_RELATIONSHIP);
+                    return ImmutableEntityRelationship.builder()
+                            .id(record.getId())
+                            .a(ImmutableEntityReference.builder()
+                                    .kind(EntityKind.valueOf(record.getKindA()))
+                                    .id(record.getIdA())
+                                    .build())
+                            .b(ImmutableEntityReference.builder()
+                                    .kind(EntityKind.valueOf(record.getKindB()))
+                                    .id(record.getIdB())
+                                    .build())
+                            .provenance(record.getProvenance())
+                            .relationship(record.getRelationship())
+                            .description(record.getDescription())
+                            .lastUpdatedBy(record.getLastUpdatedBy())
+                            .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
+                            .build();
+                });
+    }
+
 
     private Condition mkExactKeyMatchCondition(EntityRelationshipKey key) {
         return ENTITY_RELATIONSHIP.ID_A.eq(key.a().id())

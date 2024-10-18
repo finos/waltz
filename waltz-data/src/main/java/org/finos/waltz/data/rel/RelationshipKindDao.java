@@ -95,6 +95,14 @@ public class RelationshipKindDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
+    public RelationshipKind getById(long id) {
+        return dsl
+                .select()
+                .from(RELATIONSHIP_KIND)
+                .where(RELATIONSHIP_KIND.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
 
     public Set<RelationshipKind> findRelationshipKindsBetweenEntites(EntityReference parent, EntityReference target){
 

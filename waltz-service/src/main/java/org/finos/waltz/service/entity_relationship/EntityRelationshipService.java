@@ -118,4 +118,8 @@ public class EntityRelationshipService {
     public void migrateEntityRelationships(EntityReference sourceReference, EntityReference targetReference, String userId) {
         entityRelationshipDao.migrateEntityRelationships(sourceReference, targetReference, userId);
     }
+
+    public Collection<EntityRelationship> getEntityRelationshipsByKind(org.finos.waltz.model.rel.RelationshipKind relationshipKind) {
+        return entityRelationshipDao.getEntityRelationshipsByKind(relationshipKind);
+    }
 }
