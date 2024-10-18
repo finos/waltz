@@ -182,7 +182,7 @@ export function groupHierarchyByKey(tree = [], keyFn = n => n.id, acc = {}) {
 
 
 export function flattenChildren(node, acc = []) {
-    _.forEach(node.children || [], child => {
+    _.forEach(node?.children || [], child => {
         acc.push(child);
         flattenChildren(child, acc);
     });
