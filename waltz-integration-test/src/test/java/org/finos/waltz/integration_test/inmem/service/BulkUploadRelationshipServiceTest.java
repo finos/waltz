@@ -3,15 +3,13 @@ package org.finos.waltz.integration_test.inmem.service;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.app_group.AppGroupDetail;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.bulk_upload.entity_relationship.BulkUploadRelationshipApplyResult;
 import org.finos.waltz.model.bulk_upload.entity_relationship.BulkUploadRelationshipValidationResult;
-import org.finos.waltz.model.entity_relationship.EntityRelationship;
 import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.rel.ImmutableRelationshipKind;
@@ -29,14 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-// do not run tests individually - run this test class instead
 public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
@@ -55,16 +54,7 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
     AppHelper appHelper;
 
     @Autowired
-    ActorHelper actorHelper;
-
-    @Autowired
     ApplicationService applicationService;
-
-    @Autowired
-    AppGroupHelper appGroupHelper;
-
-    @Autowired
-    AppGroupService appGroupService;
 
     @Autowired
     MeasurableHelper measurableHelper;
@@ -81,12 +71,18 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
 
         List<EntityReference> appList = new ArrayList<EntityReference>();
 
-        appHelper.createNewApp("tApp0", 65L, "t-0");
-        appHelper.createNewApp("tApp1", 63L, "t-1");
-        appHelper.createNewApp("tApp2", 66L, "t-2");
-        appHelper.createNewApp("tApp3", 64L, "t-3");
+        EntityReference app1 = appHelper.createNewApp("tApp0", 65L, "t-0");
+        EntityReference app2 = appHelper.createNewApp("tApp1", 63L, "t-1");
+        EntityReference app3 = appHelper.createNewApp("tApp2", 66L, "t-2");
+        EntityReference app4 = appHelper.createNewApp("tApp3", 64L, "t-3");
 
-        List<Application> allApps = applicationService.findAll();
+        List<Long> appIds = new ArrayList<>();
+        appIds.add(app1.id());
+        appIds.add(app2.id());
+        appIds.add(app3.id());
+        appIds.add(app4.id());
+
+        List<Application> allApps = applicationService.findByIds(appIds);
 
         long cat1 = measurableHelper.createMeasurableCategory("testCat0");
         long msblId1 = measurableHelper.createMeasurable("M_0", "measurable0", cat1);
@@ -112,7 +108,16 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                 .position(1)
                 .build());
 
-        RelationshipKind relationshipKind = relationshipKindService.getById(28L);
+        Collection<RelationshipKind> relationshipKinds = relationshipKindService.findAll();
+
+        RelationshipKind relationshipKind = relationshipKinds
+                .stream()
+                .filter(t -> t.kindA() == EntityKind.APPLICATION
+                        && t.kindB() == EntityKind.MEASURABLE
+                        && t.categoryB() != null
+                        && t.categoryB() == measurable1.categoryId())
+                .collect(Collectors.toList())
+                .get(0);
 
         // inserting relationships in the db to test against
         for(int i = 0; i < appList.size(); i++) {
@@ -132,12 +137,18 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                     .build());
         }
 
-        appHelper.createNewApp("tApp5", 65L, "t-4");
-        appHelper.createNewApp("tApp6", 63L, "t-5");
-        appHelper.createNewApp("tApp7", 66L, "t-6");
-        appHelper.createNewApp("tApp8", 64L, "t-7");
+        EntityReference app5 = appHelper.createNewApp("tApp5", 65L, "t-4");
+        EntityReference app6 = appHelper.createNewApp("tApp6", 63L, "t-5");
+        EntityReference app7 = appHelper.createNewApp("tApp7", 66L, "t-6");
+        EntityReference app8 = appHelper.createNewApp("tApp8", 64L, "t-7");
 
-        allApps = applicationService.findAll();
+        appIds.clear();
+        appIds.add(app5.id());
+        appIds.add(app6.id());
+        appIds.add(app7.id());
+        appIds.add(app8.id());
+
+        allApps = applicationService.findByIds(appIds);
         appList.clear();
 
         appList = allApps.stream().map(
@@ -147,8 +158,6 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                                 t.description(),
                                 t.externalId().orElse("not")))
                 .collect(Collectors.toList());
-
-        appList = appList.subList(4, appList.size());
 
         final EntityReference measurable1ref = EntityReference.mkRef(
                 EntityKind.MEASURABLE,
@@ -163,8 +172,8 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
         testInput = testInput.concat(mkGoodTestRow("t-0222", "M_0", "changed desc"));
         testInput = testInput.concat(mkGoodTestRow("t-1222", "M_0", "changed desc"));
 
-        BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, 28L);
-        BulkUploadRelationshipApplyResult applyResult = bulkUploadRelationshipService.bulkApply(previewResult, 28L, "test_user");
+        BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult applyResult = bulkUploadRelationshipService.bulkApply(previewResult, relationshipKind.id().get(), "test_user");
 
         // expecting 4 relationships to be added
         assertEquals(4l, applyResult.recordsAdded().longValue());
@@ -181,11 +190,24 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
 
         userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
 
-        List<EntityReference> appList = new ArrayList<EntityReference>();
+        long newMeasurableId = measurableHelper.createMeasurable("M_1", measurableHelper.createMeasurableCategory("testCat1"));
 
-        List<Application> allApps = applicationService.findAll();
+        EntityReference app9 = appHelper.createNewApp("tApp9", 65L, "t-9");
+        EntityReference app10 = appHelper.createNewApp("tApp10", 63L, "t-10");
+        EntityReference app11 = appHelper.createNewApp("tApp11", 66L, "t-11");
+        EntityReference app12 = appHelper.createNewApp("tApp12", 64L, "t-12");
 
-        Measurable measurable1 = measurableService.getById(1l);
+        List<Long> appIds = new ArrayList<>();
+        appIds.add(app9.id());
+        appIds.add(app10.id());
+        appIds.add(app11.id());
+        appIds.add(app12.id());
+
+
+        List<EntityReference> appList;
+
+        List<Application> allApps = applicationService.findByIds(appIds);
+        Measurable measurable1 = measurableService.getById(newMeasurableId);
 
         appList = allApps.stream().map(
                         t -> EntityReference.mkRef(t.kind(),
@@ -195,24 +217,31 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                                 t.externalId().orElse("not")))
                 .collect(Collectors.toList());
 
-        appList = appList.subList(0, appList.size() - 4);
-
         relationshipKindService.create(ImmutableRelationshipKind
                 .builder()
                 .kindB(EntityKind.APPLICATION)
                 .kindA(EntityKind.MEASURABLE)
                 .categoryA(measurable1.categoryId())
-                .code("RELATES_TO")
-                .name("Relates to")
-                .reverseName("Is related by")
-                .description("test rk")
+                .code("RELATES_TO_NEW")
+                .name("Relates to new")
+                .reverseName("Is related by new")
+                .description("test rk new")
                 .position(1)
                 .build());
 
-        RelationshipKind relationshipKind = relationshipKindService.getById(29L);
+        Collection<RelationshipKind> relationshipKinds = relationshipKindService.findAll();
 
-        // inserting relationships in the db to test against
-        for(int i = 0; i < appList.size(); i++) {
+        RelationshipKind relationshipKind = relationshipKinds
+                .stream()
+                .filter(t -> t.kindA() == EntityKind.MEASURABLE
+                        && t.kindB() == EntityKind.APPLICATION
+                        && t.categoryA() != null
+                        && t.categoryA() == measurable1.categoryId())
+                .collect(Collectors.toList())
+                .get(0);
+
+        // inserting two relationships in the db to test against
+        for(int i = 0; i < appList.size() - 2; i++) {
             EntityReference t = appList.get(i);
             entityRelationshipService.createRelationship(
                     ImmutableEntityRelationship
@@ -229,18 +258,7 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                             .build());
         }
 
-        allApps = applicationService.findAll();
-        appList.clear();
-
-        appList = allApps.stream().map(
-                        t -> EntityReference.mkRef(t.kind(),
-                                t.id().get(),
-                                t.name(),
-                                t.description(),
-                                t.externalId().orElse("not")))
-                .collect(Collectors.toList());
-
-        appList = appList.subList(4, appList.size());
+        appList = appList.subList(2, appList.size());
 
         final EntityReference measurable1ref = EntityReference.mkRef(
                 EntityKind.MEASURABLE,
@@ -250,22 +268,182 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
                 measurable1.externalId().get());
 
         String testInput = mkGoodTestInput(measurable1ref, appList, "testDesc");
-        testInput = testInput.concat(mkGoodTestRow("M_0", "t-0", "changed desc"));
-        testInput = testInput.concat(mkGoodTestRow("M_0", "t-1", "changed desc"));
+        testInput = testInput.concat(mkGoodTestRow("M_1", "t-9", "changed desc"));
+        testInput = testInput.concat(mkGoodTestRow("M_1", "t-10", "changed desc"));
         testInput = testInput.concat(mkGoodTestRow("M_12", "t-0", "changed desc"));
         testInput = testInput.concat(mkGoodTestRow("M_1222", "t-0", "changed desc"));
 
-        BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, 29L);
-        BulkUploadRelationshipApplyResult applyResult = bulkUploadRelationshipService.bulkApply(previewResult, 29L, "test_user");
+        BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult applyResult = bulkUploadRelationshipService.bulkApply(previewResult, relationshipKind.id().get(), "test_user");
 
         // expecting 4 relationships to be added
-        assertEquals(4l, applyResult.recordsAdded().longValue());
+        assertEquals(2l, applyResult.recordsAdded().longValue());
 
         // expecting 2 records to be updated
         assertEquals(2l, applyResult.recordsUpdated().longValue());
 
         // expecting 2 rows to be skipped as these 2 are rows with errors
         assertEquals(2l, applyResult.skippedRows().longValue());
+    }
+
+    @Test
+    public void testBulkUploadWithSourceAndTargetCategory() {
+
+        userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
+
+        long measurableId = measurableHelper.createMeasurable("M_2", measurableHelper.createMeasurableCategory("testCat2"));
+        final Measurable measurable = measurableService.getById(measurableId);
+
+        long measurableId1 = measurableHelper.createMeasurable("M_3", measurableHelper.createMeasurableCategory("testCat3"));
+        final Measurable measurable1 = measurableService.getById(measurableId1);
+
+        relationshipKindService.create(ImmutableRelationshipKind
+                .builder()
+                .name("Measures")
+                .reverseName("Is measured by")
+                .kindA(EntityKind.MEASURABLE)
+                .kindB(EntityKind.MEASURABLE)
+                .position(3)
+                .code("MEASURED_BY")
+                .categoryA(measurable.categoryId())
+                .categoryB(measurable1.categoryId())
+                .description("description")
+                .build());
+
+        List<RelationshipKind> relationshipKindList = relationshipKindService.findAll().stream().collect(Collectors.toList());
+        RelationshipKind relationshipKind = null;
+
+        for(int i = 0; i < relationshipKindList.size(); i++) {
+            RelationshipKind rk = relationshipKindList.get(i);
+            if(rk.kindA() == EntityKind.MEASURABLE
+                && rk.kindB() == EntityKind.MEASURABLE
+                && (rk.categoryA() != null && rk.categoryA().longValue() == measurable.categoryId())
+                && (rk.categoryA() != null && rk.categoryB().longValue() == measurable1.categoryId())){
+                relationshipKind = rk;
+                break;
+            }
+        }
+
+        String header = "source_external_id\ttarget_external_id\tdescription\n";
+        String addInput = header + mkGoodTestRow(measurable.externalId().get(),
+                measurable1.externalId().get(),
+                "new relation");
+
+        String updateInput = header + mkGoodTestRow(measurable.externalId().get(),
+                measurable1.externalId().get(),
+                "description");
+
+        String noneInput = updateInput + "M_2\tM_9\tdesc\n";
+
+        BulkUploadRelationshipValidationResult preview = bulkUploadRelationshipService.bulkPreview(addInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult addApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        preview = bulkUploadRelationshipService.bulkPreview(updateInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult updateApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        preview = bulkUploadRelationshipService.bulkPreview(noneInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult noneApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        assertEquals(1l, addApply.recordsAdded().longValue());
+        assertEquals(1l, updateApply.recordsUpdated().longValue());
+        assertEquals(2l, noneApply.skippedRows().longValue());
+    }
+
+    @Test
+    public void testbulkUploadWithoutCategory() {
+
+        userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
+
+        EntityReference app9 = appHelper.createNewApp("tApp13", 65L, "t-13");
+        EntityReference app10 = appHelper.createNewApp("tApp14", 63L, "t-14");
+        EntityReference app11 = appHelper.createNewApp("tApp15", 66L, "t-15");
+        EntityReference app12 = appHelper.createNewApp("tApp16", 64L, "t-16");
+
+        List<Long> appIds = new ArrayList<>();
+        appIds.add(app9.id());
+        appIds.add(app10.id());
+        appIds.add(app11.id());
+        appIds.add(app12.id());
+
+        List<Application> apps = applicationService.findByIds(appIds);
+
+        List<EntityReference> apprefs = apps
+                .stream()
+                .map(t -> {
+                    return EntityReference.mkRef(EntityKind.APPLICATION,
+                            t.id().get(),
+                            t.name(),
+                            t.description(),
+                            t.externalId().get());
+                })
+                .collect(Collectors.toList());
+
+        relationshipKindService.create(ImmutableRelationshipKind.builder()
+                .position(4)
+                .kindA(EntityKind.APPLICATION)
+                .kindB(EntityKind.APPLICATION)
+                .name("Services")
+                .reverseName("Serviced by")
+                .code("SERVICE_TEST_2024")
+                .description("description")
+                .build());
+
+        RelationshipKind relationshipKind = relationshipKindService.findAll()
+                .stream()
+                .filter(t -> StringUtilities.safeEq(t.code(), "SERVICE_TEST_2024"))
+                .collect(Collectors.toList())
+                .get(0);
+
+        EntityReference app1 = apprefs.get(0);
+
+        // create new relationships with 1 app
+        for(int i = 1; i < apprefs.size() - 2; i++) {
+            entityRelationshipService.createRelationship(ImmutableEntityRelationship
+                    .builder()
+                    .a(app1)
+                    .b(apprefs.get(i))
+                    .relationship(relationshipKind.code())
+                    .lastUpdatedAt(LocalDateTime.now())
+                    .lastUpdatedBy("test_user")
+                    .description("testDesc")
+                    .provenance("testProv")
+                    .build()
+            );
+        }
+
+        String addInput = mkGoodTestInput(app1, apprefs.subList(apprefs.size() - 2, apprefs.size()), "testDesc");
+        String updateInput = mkGoodTestInput(app1, apprefs.subList(1, apprefs.size()), "changed desc");
+
+        BulkUploadRelationshipValidationResult preview = bulkUploadRelationshipService.bulkPreview(addInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult addApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        preview = bulkUploadRelationshipService.bulkPreview(updateInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult updateApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        preview = bulkUploadRelationshipService.bulkPreview(updateInput, relationshipKind.id().get());
+        BulkUploadRelationshipApplyResult noneApply = bulkUploadRelationshipService.bulkApply(preview, relationshipKind.id().get(), "test_user");
+
+        assertEquals(2l, addApply.recordsAdded().longValue());
+        assertEquals(3l, updateApply.recordsUpdated().longValue());
+        assertEquals(3l, noneApply.skippedRows().longValue());
+    }
+
+    @Test
+    public void testUnauthorized() {
+
+        userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
+
+        String header = "source_external_id\ttarget_external_id\tdescription\n";
+        String testInput = header + mkGoodTestRow("asfsfee", "", "");
+        testInput = testInput.concat(mkGoodTestRow("jde", "ere", "eerer"));
+
+        BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, 13L);
+
+        try {
+            bulkUploadRelationshipService.bulkApply(previewResult, 13L, "error_test_user");
+        } catch (Exception e) {
+            assertNotNull(e);
+        }
     }
 
     @Test
@@ -277,11 +455,10 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
         testInput = testInput.concat(mkGoodTestRow("jde", "ere", "eerer"));
 
         BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(testInput, 13L);
-
         assertNotNull(previewResult.parseError());
-        BulkUploadRelationshipApplyResult applyResult = null;
+
         try {
-            applyResult = bulkUploadRelationshipService.bulkApply(previewResult, 13L, "test_user");
+            bulkUploadRelationshipService.bulkApply(previewResult, 13L, "test_user");
         } catch (Exception e) {
             assertNotNull(e);
         }

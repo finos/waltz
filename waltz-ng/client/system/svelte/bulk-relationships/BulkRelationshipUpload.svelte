@@ -2,7 +2,7 @@
     import { displayError } from "../../../common/error-utils";
 	import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
 	import SubSection from "../../../common/svelte/SubSection.svelte";
-	import {entityRelationshipStore} from "../../../svelte-stores/entity-relationship-store.js";
+	import { entityRelationshipStore } from "../../../svelte-stores/entity-relationship-store.js";
 	import _ from "lodash";
 
     export let selectedRelationshipKind;
