@@ -18,7 +18,14 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.EnumUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
+import org.finos.waltz.model.bulk_upload.entity_relationship.BulkUploadRelationshipApplyResult;
+import org.finos.waltz.model.bulk_upload.entity_relationship.BulkUploadRelationshipValidationResult;
+import org.finos.waltz.service.entity_relationship.BulkUploadRelationshipService;
 import org.finos.waltz.service.entity_relationship.EntityRelationshipService;
+import org.finos.waltz.service.measurable_rating.BulkMeasurableItemParser;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -29,10 +36,12 @@ import org.finos.waltz.model.entity_relationship.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
+import spark.Response;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -45,11 +54,16 @@ public class EntityRelationshipEndpoint implements Endpoint {
 
     private final EntityRelationshipService entityRelationshipService;
 
+    private final BulkUploadRelationshipService bulkUploadRelationshipService;
+
     @Autowired
-    public EntityRelationshipEndpoint(EntityRelationshipService entityRelationshipService) {
+    public EntityRelationshipEndpoint(EntityRelationshipService entityRelationshipService,
+                                      BulkUploadRelationshipService bulkUploadRelationshipService) {
         checkNotNull(entityRelationshipService, "entityRelationshipService cannot be null");
+        checkNotNull(bulkUploadRelationshipService, "bulkUploadRelationshipService cannot be null");
 
         this.entityRelationshipService = entityRelationshipService;
+        this.bulkUploadRelationshipService = bulkUploadRelationshipService;
     }
 
 
@@ -57,7 +71,12 @@ public class EntityRelationshipEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String bulkPreview = mkPath(BASE_URL, "bulk", "preview", ":id");
+        String bulkApply = mkPath(BASE_URL, "bulk", "apply", ":id");
         String exactMatchPath = mkPath(BASE_URL, "relationship", ":aKind", ":aId", ":bKind", ":bId", ":relationshipKind");
+
+        registerPreviewBulkUploadRelationship(bulkPreview);
+        registerApplyBulkUploadRelationship(bulkApply);
 
         DatumRoute<Boolean> removeRelationshipRoute = (req, resp) -> {
             EntityRelationshipKey entityRelationshipKey = ImmutableEntityRelationshipKey
@@ -124,5 +143,24 @@ public class EntityRelationshipEndpoint implements Endpoint {
                 .map(p -> readEnum(p, RelationshipKind.class, (s) -> null))
                 .filter(rk -> rk != null)
                 .collect(Collectors.toList());
+    }
+
+    private void registerPreviewBulkUploadRelationship(String path) {
+        postForDatum(path, (req, resp) -> {
+            Long relationshipKindId = Long.parseLong(req.params("id"));
+            String body = req.body();
+            return bulkUploadRelationshipService.bulkPreview(body, relationshipKindId);
+        });
+    }
+
+    private void registerApplyBulkUploadRelationship(String path) {
+        postForDatum(path, (req, resp) -> {
+            Long relationshipKindId = Long.parseLong(req.params("id"));
+            String body = req.body();
+            String user = getUsername(req);
+            BulkUploadRelationshipValidationResult previewResult = bulkUploadRelationshipService.bulkPreview(body, relationshipKindId);
+            BulkUploadRelationshipApplyResult applyResult = bulkUploadRelationshipService.bulkApply(previewResult, relationshipKindId, user);
+            return applyResult;
+        });
     }
 }

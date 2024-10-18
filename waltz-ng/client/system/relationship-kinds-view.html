@@ -165,6 +165,11 @@
                                        class="clickable">
                                         Remove
                                     </a>
+                                    |
+                                    <a ng-click="$ctrl.bulkUploadRelationships()"
+                                        class="clickable">
+                                        Bulk Upload Relationships
+                                    </a>
                                 </span>
                             </div>
                         </div>
@@ -174,6 +179,11 @@
         </div>
 
         <hr>
+
+        <div ng-if="$ctrl.visibility.bulk" class="col-sm-12">
+            <waltz-svelte-component component="$ctrl.BulkRelationshipUpload" selected-relationship-kind="$ctrl.selectedRelationshipKind">
+            </waltz-svelte-component>
+        </div>
 
         <div ng-if="$ctrl.visibility.update" class="col-sm-12">
             <hr>
