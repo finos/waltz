@@ -39,9 +39,11 @@ public class BulkUploadRelationshipService {
 
     private static final Logger LOG = LoggerFactory.getLogger(BulkUploadRelationshipService.class);
 
-    private final RelationshipKindService relationshipKindService;
-
     private static final String PROVENANCE = "bulkUploadRelationships";
+
+    private static final org.finos.waltz.schema.tables.EntityRelationship er = Tables.ENTITY_RELATIONSHIP;
+
+    private final RelationshipKindService relationshipKindService;
 
     private final EntityRelationshipService entityRelationshipService;
 
@@ -64,8 +66,6 @@ public class BulkUploadRelationshipService {
 
         RelationshipKind relationshipKind = relationshipKindService.getById(relationshipKindId);
         BulkUploadRelationshipParsedResult parsedResult = new BulkUploadRelationshipItemParser().parse(input, BulkUploadRelationshipItemParser.InputFormat.TSV);
-        Map<String, EntityReference> sourceEntityRefMap;
-        Map<String, EntityReference> targetEntityRefMap;
 
         if (parsedResult.error() != null) {
             return ImmutableBulkUploadRelationshipValidationResult
@@ -75,18 +75,10 @@ public class BulkUploadRelationshipService {
         }
 
         // load source entity ref map
-        if (relationshipKind.categoryA() != null) {
-            sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryA()));
-        } else {
-            sourceEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindA());
-        }
+        Map<String, EntityReference> sourceEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindA(), Optional.ofNullable(relationshipKind.categoryA()));
 
         // load target entity ref map
-        if (relationshipKind.categoryB() != null) {
-            targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB(), mkRef(EntityKind.MEASURABLE_CATEGORY, relationshipKind.categoryB()));
-        } else {
-            targetEntityRefMap = loadExternalIdToEntityRefMap(dsl, relationshipKind.kindB());
-        }
+        Map<String, EntityReference> targetEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindB(), Optional.ofNullable(relationshipKind.categoryB()));
 
         // enrich each row to a tuple
         final Map<String, EntityReference> finalSourceEntityRefMap = sourceEntityRefMap;
@@ -211,15 +203,15 @@ public class BulkUploadRelationshipService {
                 .stream()
                 .filter(d -> d.uploadOperation() == UploadOperation.UPDATE && d.error().isEmpty())
                 .map(d -> DSL
-                        .update(Tables.ENTITY_RELATIONSHIP)
-                        .set(Tables.ENTITY_RELATIONSHIP.DESCRIPTION, d.description())
-                        .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_AT, now)
-                        .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_BY, user)
-                        .where(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP.eq(relationshipKind.code()))
-                            .and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(relationshipKind.kindA().name()))
-                            .and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(relationshipKind.kindB().name()))
-                            .and(Tables.ENTITY_RELATIONSHIP.ID_A.eq(d.sourceEntityRef().id()))
-                            .and(Tables.ENTITY_RELATIONSHIP.ID_B.eq(d.targetEntityRef().id())))
+                        .update(er)
+                        .set(er.DESCRIPTION, d.description())
+                        .set(er.LAST_UPDATED_AT, now)
+                        .set(er.LAST_UPDATED_BY, user)
+                        .where(er.RELATIONSHIP.eq(relationshipKind.code()))
+                            .and(er.KIND_A.eq(relationshipKind.kindA().name()))
+                            .and(er.KIND_B.eq(relationshipKind.kindB().name()))
+                            .and(er.ID_A.eq(d.sourceEntityRef().id()))
+                            .and(er.ID_B.eq(d.targetEntityRef().id())))
                 .collect(Collectors.toSet());
 
         final Set<ChangeLogRecord> auditLogs = preview
@@ -271,6 +263,14 @@ public class BulkUploadRelationshipService {
                 });
     }
 
+    private Map<String, EntityReference> loadExternalIdMap(DSLContext dsl,
+                              EntityKind entityKind, Optional<Long> category) {
+        if(!category.isPresent()) {
+            return loadExternalIdToEntityRefMap(dsl, entityKind);
+        }   else  {
+            return loadExternalIdToEntityRefMap(dsl, entityKind, mkRef(EntityKind.MEASURABLE_CATEGORY, category.get()));
+        }
+    }
     private String mkChangeMessage(EntityReference sourceRef, EntityReference targetRef, RelationshipKind relationshipKind, UploadOperation uploadOperation) {
         return format(
                 "Bulk Relationships Update - Operation %s, Relationship b/w %s -> %s, Relationship Kind %s. %s",
