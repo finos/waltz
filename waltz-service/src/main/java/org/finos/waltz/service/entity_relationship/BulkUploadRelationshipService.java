@@ -75,14 +75,12 @@ public class BulkUploadRelationshipService {
         }
 
         // load source entity ref map
-        Map<String, EntityReference> sourceEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindA(), Optional.ofNullable(relationshipKind.categoryA()));
+        final Map<String, EntityReference> sourceEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindA(), Optional.ofNullable(relationshipKind.categoryA()));
 
         // load target entity ref map
-        Map<String, EntityReference> targetEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindB(), Optional.ofNullable(relationshipKind.categoryB()));
+        final Map<String, EntityReference> targetEntityRefMap = loadExternalIdMap(dsl, relationshipKind.kindB(), Optional.ofNullable(relationshipKind.categoryB()));
 
         // enrich each row to a tuple
-        final Map<String, EntityReference> finalSourceEntityRefMap = sourceEntityRefMap;
-        final Map<String, EntityReference> finalTargetEntityRefMap = targetEntityRefMap;
         final List<Tuple4<BulkUploadRelationshipItem, EntityReference, EntityReference, Set<ValidationError>>> listOfRows = parsedResult
                 .parsedItems()
                 .stream()
