@@ -1,7 +1,7 @@
 package org.finos.waltz.integration_test.inmem.service;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -15,7 +15,6 @@ import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.rel.ImmutableRelationshipKind;
 import org.finos.waltz.model.rel.RelationshipKind;
 import org.finos.waltz.model.user.SystemRole;
-import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.entity_relationship.BulkUploadRelationshipService;
 import org.finos.waltz.service.entity_relationship.EntityRelationshipService;
@@ -29,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
