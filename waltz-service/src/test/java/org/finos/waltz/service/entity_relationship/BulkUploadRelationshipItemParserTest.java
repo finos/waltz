@@ -54,7 +54,7 @@ public class BulkUploadRelationshipItemParserTest {
          */
         BulkUploadRelationshipParsedResult result = parser.parse(readTestFile("test-relationship-item.tsv"), BulkUploadRelationshipItemParser.InputFormat.TSV);
         assertEquals(null, result.error());
-        assertEquals(2, result.parsedItems().size());
+        assertEquals(3, result.parsedItems().size());
 
         Set<String> sourceExternalIds = SetUtilities.map(result.parsedItems(), BulkUploadRelationshipItem::sourceExternalId);
         assertEquals(sourceExternalIds, SetUtilities.asSet("sourceExtA", "sourceExtB", "sourceExtC"));
