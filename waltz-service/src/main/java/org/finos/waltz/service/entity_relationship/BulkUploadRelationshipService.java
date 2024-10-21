@@ -86,8 +86,8 @@ public class BulkUploadRelationshipService {
                 .stream()
                 .map(r -> tuple(
                         r,
-                        finalSourceEntityRefMap.get(r.sourceExternalId()),
-                        finalTargetEntityRefMap.get(r.targetExternalId())
+                        sourceEntityRefMap.get(r.sourceExternalId()),
+                        targetEntityRefMap.get(r.targetExternalId())
                 ))
                 .map(t -> {
                     Set<ValidationError> validationErrors = new HashSet<>();
