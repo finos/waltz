@@ -1,6 +1,6 @@
 {
     "name": "waltz-ng",
-    "version": "1.65.0",
+    "version": "1.66.0",
     "description": "To start test server run: `npm run dev-server` and ensure java backend is running on 8443",
     "main": "client/main.js",
     "browserslist": [
