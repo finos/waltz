@@ -22,6 +22,7 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.schema.tables.FlowClassification;
 import org.finos.waltz.web.WebUtilities;
@@ -170,9 +171,11 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                 .on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .innerJoin(sourceClassification)
-                .on(sourceClassification.CODE.eq(LOGICAL_FLOW_DECORATOR.RATING))
+                .on(sourceClassification.CODE.eq(LOGICAL_FLOW_DECORATOR.RATING)
+                        .and(sourceClassification.DIRECTION.eq(FlowDirection.OUTBOUND.name())))
                 .innerJoin(targetClassification)
-                .on(targetClassification.CODE.eq(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING))
+                .on(targetClassification.CODE.eq(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING)
+                        .and(targetClassification.DIRECTION.eq(FlowDirection.INBOUND.name())))
                 .where(dsl.renderInlined(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
                 .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
                 .and(conditionForDataType)
