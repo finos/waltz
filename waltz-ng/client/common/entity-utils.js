@@ -97,6 +97,8 @@ function determineLoadByIdCall(kind) {
             return CORE_API.MeasurableStore.getById;
         case "APP_GROUP":
             return CORE_API.AppGroupStore.getById;
+        case "END_USER_APPLICATION":
+            return CORE_API.EndUserAppStore.getById;
         default:
             throw "Unsupported kind for loadById: " + kind;
     }
