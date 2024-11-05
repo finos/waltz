@@ -430,4 +430,29 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals(3, allUpstreams.size(), "Returns all upstreams but not downstreams");
     }
 
+    @Test
+    public void updateReadOnlyTest() {
+        helper.clearAllFlows();
+
+        EntityReference a = appHelper.createNewApp("xyz-app", ouIds.a);
+        EntityReference b = appHelper.createNewApp("xyz-app-2", ouIds.a);
+
+        LogicalFlow logicalFlow = helper.createLogicalFlow(a, b);
+
+        LogicalFlow updatedFlow = lfSvc.updateReadOnly(logicalFlow.id().get(), true, "updateTestUser");
+        assertTrue(updatedFlow.isReadOnly());
+
+        updatedFlow = lfSvc.updateReadOnly(logicalFlow.id().get(), false, "updateTestUser");
+        assertFalse(updatedFlow.isReadOnly());
+
+        updatedFlow = lfSvc.updateReadOnly(122, true, "updateTestUser");
+        assertNull(updatedFlow);
+
+        try{
+            updatedFlow = lfSvc.updateReadOnly(logicalFlow.id().get(), false, "updateTestUser");
+        }   catch (Exception e) {
+            assertNotNull(e);
+        }
+    }
+
 }

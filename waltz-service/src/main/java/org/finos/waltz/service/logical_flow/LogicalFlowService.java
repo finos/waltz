@@ -31,13 +31,7 @@ import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.HierarchyQueryScope;
-import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.changelog.ChangeLog;
@@ -314,6 +308,11 @@ public class LogicalFlowService {
         if (sameKind && sameId) {
             throw new IllegalArgumentException("Cannot have a flow with same source and target");
         }
+    }
+
+    public LogicalFlow updateReadOnly(long flowId, boolean isReadOnly, String user) {
+
+        return null;
     }
 
 
