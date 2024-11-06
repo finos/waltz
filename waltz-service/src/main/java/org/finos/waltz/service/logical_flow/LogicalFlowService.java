@@ -222,6 +222,7 @@ public class LogicalFlowService {
      *     <li>DATA_TYPE</li>
      *     <li>APPLICATION</li>
      * </ul>
+     *
      * @param options given to logical flow selector factory to determine in-scope flows
      * @return a list of logical flows matching the given options
      */
@@ -233,10 +234,10 @@ public class LogicalFlowService {
     /**
      * Creates a logical flow and creates a default, 'UNKNOWN' data type decoration
      * if possible.
-     *
+     * <p>
      * If the flow already exists, but is inactive, the flow will be re-activated.
      *
-     * @param addCmd Command object containing flow details
+     * @param addCmd   Command object containing flow details
      * @param username who is creating the flow
      * @return the newly created logical flow
      * @throws IllegalArgumentException if a flow already exists
@@ -317,7 +318,33 @@ public class LogicalFlowService {
     }
 
     public LogicalFlow updateReadOnly(long flowId, boolean isReadOnly, String user) {
+        LogicalFlow logicalFlow = getById(flowId);
+        LocalDateTime now = nowUtc();
 
+        // if the flow exists
+        if (logicalFlow != null) {
+            // if the flag is being set to what it already was -> should not happen but just in case
+            if (isReadOnly == logicalFlow.isReadOnly()) {
+                throw new IllegalArgumentException(format("isReadOnly already set to %s", isReadOnly));
+            } else {
+                // update the read only flag to what you want
+                logicalFlowDao.updateReadOnly(flowId, isReadOnly, user);
+                LogicalFlow updatedFlow = getById(logicalFlow.id().get());
+
+                ChangeLog changeLog = ImmutableChangeLog
+                        .builder()
+                        .parentReference(EntityReference.mkRef(LOGICAL_DATA_FLOW, logicalFlow.id().get()))
+                        .operation(Operation.UPDATE)
+                        .createdAt(now)
+                        .userId(user)
+                        .message(format("Updated the readOnlyFlag and set it to: %s", isReadOnly))
+                        .build();
+                changeLogService.write(changeLog);
+                return updatedFlow;
+            }
+        }
+
+        // return null if the flow was not found
         return null;
     }
 
@@ -325,18 +352,18 @@ public class LogicalFlowService {
     /**
      * Removes the given logical flow and creates an audit log entry.
      * The removal is a soft removal. After the removal usage stats are recalculated
-     *
+     * <p>
      * todo: #WALTZ-1894 for cleanupOrphans task
      *
-     * @param flowId  identifier of flow to be removed
-     * @param username  who initiated the removal
+     * @param flowId   identifier of flow to be removed
+     * @param username who initiated the removal
      * @return number of flows removed
      */
     public int removeFlow(Long flowId, String username) {
 
         LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(flowId);
 
-        if(logicalFlow == null){
+        if (logicalFlow == null) {
             LOG.warn("Logical flow cannot be found, no flows will be updated");
             throw new IllegalArgumentException(format("Cannot find flow with id: %d, no logical flow removed", flowId));
         } else {
@@ -357,6 +384,7 @@ public class LogicalFlowService {
 
     /**
      * Calculate Stats by selector
+     *
      * @param options determines which flows are in-scope for this calculation
      * @return statistics about the in-scope flows
      */
@@ -372,7 +400,7 @@ public class LogicalFlowService {
             case DATA_TYPE:
                 return calculateStatsForAppIdSelector(options);
             default:
-                throw new UnsupportedOperationException("Cannot calculate stats for selector kind: "+ options.entityReference().kind());
+                throw new UnsupportedOperationException("Cannot calculate stats for selector kind: " + options.entityReference().kind());
         }
     }
 
@@ -530,12 +558,12 @@ public class LogicalFlowService {
         Set<AssessmentRating> physicalSpecAssessmentRatings = filter(psRatings, d -> toIds(physicalSpecAssessmentDefs).contains(d.assessmentDefinitionId()));
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(
-            map(
-                union(
-                    logicalFlowAssessmentRatings,
-                    physicalFlowAssessmentRatings,
-                    physicalSpecAssessmentRatings),
-                AssessmentRating::ratingId));
+                map(
+                        union(
+                                logicalFlowAssessmentRatings,
+                                physicalFlowAssessmentRatings,
+                                physicalSpecAssessmentRatings),
+                        AssessmentRating::ratingId));
 
         List<DataTypeDecorator> specDecorators = physicalSpecDecoratorDao.findByEntityIdSelector(physSpecSelector, Optional.empty());
 
