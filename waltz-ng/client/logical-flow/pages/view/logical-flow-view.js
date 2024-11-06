@@ -35,16 +35,20 @@ const initialState = {
     canEdit: false,
     canRestore: false,
     canRemove: false,
+    isAdmin: false,
+    updateCommand: {
+        readOnly: false,
+    },
     AlignedDataTypesList
 };
-
 
 function controller($q,
                     $state,
                     $stateParams,
                     $window,
                     serviceBroker,
-                    historyStore)
+                    historyStore,
+                    userService)
 {
     const vm = initialiseData(this, initialState);
 
@@ -54,6 +58,12 @@ function controller($q,
             id: flowId,
             kind: "LOGICAL_DATA_FLOW"
         };
+
+        userService
+            .whoami(true)
+            .then(usr => {
+                vm.isAdmin = _.includes(usr.roles, "ADMIN");
+            });
 
         // -- LOAD ---
 
@@ -90,6 +100,22 @@ function controller($q,
         });
 
     };
+
+    const onToggleReadOnly = () => {
+        const changedField = !vm.logicalFlow.isReadOnly;
+        vm.updateCommand.readOnly = changedField;
+        return serviceBroker
+            .execute(CORE_API.LogicalFlowStore.updateReadOnly, [vm.updateCommand, vm.logicalFlow.id])
+            .then(() => {
+                toasts.success("Successfully made the flow " + (changedField ? `read only` : `editable`) + '.');
+                setTimeout(() => {
+                    $window.location.reload();
+                }, 600);
+            })
+            .catch(e => {
+                toasts.error(e.data.message);
+            });
+    }
 
     const removeLogicalFlow = () => {
         return serviceBroker
@@ -134,6 +160,10 @@ function controller($q,
         }
     };
 
+    vm.onToggleReadOnly = () => {
+        onToggleReadOnly();
+    }
+
     vm.restoreFlow = () => {
         if (confirm("Are you sure you want to restore this flow ?")) {
             console.log("restoring", vm.logicalFlow);
@@ -156,7 +186,8 @@ controller.$inject = [
     "$stateParams",
     "$window",
     "ServiceBroker",
-    "HistoryStore"
+    "HistoryStore",
+    "UserService"
 ];
 
 

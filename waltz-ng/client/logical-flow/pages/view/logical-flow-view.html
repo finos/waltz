@@ -128,6 +128,18 @@
                             </waltz-svelte-component>
                         </div>
                     </div>
+                    <div class="row"
+                         ng-if="ctrl.isAdmin">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Toggle Read Only
+                        </div>
+                        <div class="col-sm-8">
+                            <waltz-toggle state="ctrl.isReadOnly"
+                                          label-on="Read Only"
+                                          label-off="Editable"
+                                          on-toggle="ctrl.onToggleReadOnly()"></waltz-toggle>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
