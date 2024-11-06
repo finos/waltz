@@ -337,7 +337,9 @@ public class LogicalFlowService {
                         .operation(Operation.UPDATE)
                         .createdAt(now)
                         .userId(user)
-                        .message(format("Updated the readOnlyFlag and set it to: %s", isReadOnly))
+                        .message(isReadOnly
+                                ? format("Set to read only by waltz_support<%s>", user)
+                                : format("Set to editable by waltz_support<%s>", user))
                         .build();
                 changeLogService.write(changeLog);
                 return updatedFlow;
