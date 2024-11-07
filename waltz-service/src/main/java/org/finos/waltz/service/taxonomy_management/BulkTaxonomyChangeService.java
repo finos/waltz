@@ -48,6 +48,7 @@ import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
 import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.jooq.UpdateSetStep;
 import org.jooq.impl.DSL;
@@ -280,6 +281,17 @@ public class BulkTaxonomyChangeService {
                 })
                 .collect(Collectors.toSet());
 
+        Set<UpdateConditionStep<MeasurableRecord>> toRemove = bulkRequest
+                .plannedRemovals()
+                .stream()
+                .map(r -> {
+                    UpdateSetStep<MeasurableRecord> updRemove = DSL.update(org.finos.waltz.schema.tables.Measurable.MEASURABLE);
+                    return updRemove
+                            .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.REMOVED.name())
+                            .where(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ID.eq(r.id().get()));
+                })
+                .collect(Collectors.toSet());
+
 
         boolean requiresRebuild = requiresHierarchyRebuild(bulkRequest.validatedItems());
 
@@ -289,6 +301,7 @@ public class BulkTaxonomyChangeService {
                 int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
                 int restoreCount = summarizeResults(tx.batch(toRestore).execute());
                 int updateCount = summarizeResults(tx.batch(toUpdate).execute());
+                int removalCount = summarizeResults(tx.batch(toRemove).execute());
 
                 Set<TaxonomyChangeRecord> changeRecords = mkTaxonomyChangeRecords(tx, taxonomyRef, bulkRequest, userId);
 
@@ -306,7 +319,7 @@ public class BulkTaxonomyChangeService {
                         .recordsAdded(insertCount)
                         .recordsUpdated(updateCount)
                         .recordsRestored(restoreCount)
-                        .recordsRemoved(0)//TODO: add removeCount
+                        .recordsRemoved(removalCount)
                         .hierarchyRebuilt(requiresRebuild)
                         .build();
             });
