@@ -338,8 +338,8 @@ public class LogicalFlowService {
                         .createdAt(now)
                         .userId(user)
                         .message(isReadOnly
-                                ? format("Set to read only by waltz_support<%s>", user)
-                                : format("Set to editable by waltz_support<%s>", user))
+                                ? format("Set to read only by waltz_support.")
+                                : format("Set to editable by waltz_support."))
                         .build();
                 changeLogService.write(changeLog);
                 return updatedFlow;
