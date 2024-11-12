@@ -448,11 +448,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         updatedFlow = lfSvc.updateReadOnly(122, true, "updateTestUser");
         assertNull(updatedFlow);
 
-        try{
-            updatedFlow = lfSvc.updateReadOnly(logicalFlow.id().get(), false, "updateTestUser");
-        }   catch (Exception e) {
-            assertNotNull(e);
-        }
+
+        updatedFlow = lfSvc.updateReadOnly(logicalFlow.id().get(), false, "updateTestUser");
+        assertFalse(updatedFlow.isReadOnly());
     }
 
 }
