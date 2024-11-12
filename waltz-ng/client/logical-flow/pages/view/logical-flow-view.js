@@ -46,8 +46,7 @@ function controller($q,
                     $stateParams,
                     $window,
                     serviceBroker,
-                    historyStore,
-                    userService)
+                    historyStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -179,8 +178,7 @@ controller.$inject = [
     "$stateParams",
     "$window",
     "ServiceBroker",
-    "HistoryStore",
-    "UserService"
+    "HistoryStore"
 ];
 
 
