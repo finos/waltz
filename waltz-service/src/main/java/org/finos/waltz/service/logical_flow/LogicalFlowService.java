@@ -321,11 +321,10 @@ public class LogicalFlowService {
         LogicalFlow logicalFlow = getById(flowId);
         LocalDateTime now = nowUtc();
 
-        // if the flow exists
         if (logicalFlow != null) {
             // if the flag is being set to what it already was -> should not happen but just in case
             if (isReadOnly == logicalFlow.isReadOnly()) {
-                throw new IllegalArgumentException(format("isReadOnly already set to %s", isReadOnly));
+                return logicalFlow;
             } else {
                 // update the read only flag to what you want
                 logicalFlowDao.updateReadOnly(flowId, isReadOnly, user);
@@ -560,12 +559,12 @@ public class LogicalFlowService {
         Set<AssessmentRating> physicalSpecAssessmentRatings = filter(psRatings, d -> toIds(physicalSpecAssessmentDefs).contains(d.assessmentDefinitionId()));
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(
-                map(
-                        union(
-                                logicalFlowAssessmentRatings,
-                                physicalFlowAssessmentRatings,
-                                physicalSpecAssessmentRatings),
-                        AssessmentRating::ratingId));
+            map(
+                union(
+                    logicalFlowAssessmentRatings,
+                    physicalFlowAssessmentRatings,
+                    physicalSpecAssessmentRatings),
+                AssessmentRating::ratingId));
 
         List<DataTypeDecorator> specDecorators = physicalSpecDecoratorDao.findByEntityIdSelector(physSpecSelector, Optional.empty());
 

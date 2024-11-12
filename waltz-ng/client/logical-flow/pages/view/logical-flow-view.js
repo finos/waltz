@@ -35,7 +35,6 @@ const initialState = {
     canEdit: false,
     canRestore: false,
     canRemove: false,
-    isAdmin: false,
     updateCommand: {
         readOnly: false,
     },
@@ -58,12 +57,6 @@ function controller($q,
             id: flowId,
             kind: "LOGICAL_DATA_FLOW"
         };
-
-        userService
-            .whoami(true)
-            .then(usr => {
-                vm.isAdmin = _.includes(usr.roles, "ADMIN");
-            });
 
         // -- LOAD ---
 
