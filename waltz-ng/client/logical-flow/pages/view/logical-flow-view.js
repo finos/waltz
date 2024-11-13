@@ -35,9 +35,11 @@ const initialState = {
     canEdit: false,
     canRestore: false,
     canRemove: false,
+    updateCommand: {
+        readOnly: false,
+    },
     AlignedDataTypesList
 };
-
 
 function controller($q,
                     $state,
@@ -91,6 +93,22 @@ function controller($q,
 
     };
 
+    const onToggleReadOnly = () => {
+        const changedField = !vm.logicalFlow.isReadOnly;
+        vm.updateCommand.readOnly = changedField;
+        return serviceBroker
+            .execute(CORE_API.LogicalFlowStore.updateReadOnly, [vm.updateCommand, vm.logicalFlow.id])
+            .then(() => {
+                toasts.success("Successfully made the flow " + (changedField ? `read only` : `editable`) + '.');
+                setTimeout(() => {
+                    $window.location.reload();
+                }, 600);
+            })
+            .catch(e => {
+                toasts.error(e.data.message);
+            });
+    }
+
     const removeLogicalFlow = () => {
         return serviceBroker
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.logicalFlow.id])
@@ -133,6 +151,10 @@ function controller($q,
                 .then(r => handleRemoveFlowResponse(r.data));
         }
     };
+
+    vm.onToggleReadOnly = () => {
+        onToggleReadOnly();
+    }
 
     vm.restoreFlow = () => {
         if (confirm("Are you sure you want to restore this flow ?")) {

@@ -346,6 +346,16 @@ public class LogicalFlowDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+    public long updateReadOnly(long flowId, boolean isReadOnly, String user) {
+        return dsl
+            .update(LOGICAL_FLOW)
+            .set(LOGICAL_FLOW.IS_READONLY, isReadOnly)
+            .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, user)
+            .where(LOGICAL_FLOW.ID.eq(flowId))
+            .execute();
+    }
+
 
     public List<LogicalFlow> findAllActive() {
         return baseQuery()
