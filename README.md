@@ -66,10 +66,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date        | Provisional Change Summary |
-|---------|-------------|----------------------------|
-| 1.65    | 24 Oct 2024 | Bulk loaders               | 
-| 1.66    | Nov 2024    | TBC                        | 
+| Release | Date     | Provisional Change Summary   |
+|---------|----------|------------------------------|
+| 1.66    | Nov 2024   | AGF Survey Changes and Fixes | 
+| 1.67    | Dec 2024 | TBC                          | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
