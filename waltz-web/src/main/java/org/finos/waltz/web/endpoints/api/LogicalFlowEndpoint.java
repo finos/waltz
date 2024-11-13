@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.eclipse.jetty.util.IO;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -35,6 +36,7 @@ import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import org.finos.waltz.model.logical_flow.LogicalFlowStatistics;
+import org.finos.waltz.model.logical_flow.UpdateReadOnlyCommand;
 import org.finos.waltz.model.user.SystemRole;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -108,6 +110,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String addFlowsPath = mkPath(BASE_URL, "list");
         String getFlowGraphSummaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "data-type", ":dtId", "graph-summary");
         String getFlowViewPath = mkPath(BASE_URL, "view");
+        String updateReadOnlyPath = mkPath(BASE_URL, "update", "read-only", ":id");
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
@@ -177,6 +180,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         postForList(addFlowsPath, this::addFlowsRoute);
         putForDatum(restoreFlowPath, this::restoreFlowRoute);
         postForDatum(getFlowViewPath, getFlowViewRoute);
+        postForDatum(updateReadOnlyPath, this::updateReadOnly);
     }
 
 
@@ -285,5 +289,19 @@ public class LogicalFlowEndpoint implements Endpoint {
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.ADMIN);
+    }
+
+    private LogicalFlow updateReadOnly(Request request, Response response) throws IOException {
+        long flowId = getId(request);
+        String user = getUsername(request);
+        UpdateReadOnlyCommand cmd = readBody(request, UpdateReadOnlyCommand.class);
+
+        ensureUserHasAdminRights(request);
+        LogicalFlow resp = logicalFlowService.updateReadOnly(flowId, cmd.readOnly(), user);
+        if(resp == null) {
+            throw new IllegalArgumentException("No such Logical Flow exists");
+        }
+
+        return resp;
     }
 }

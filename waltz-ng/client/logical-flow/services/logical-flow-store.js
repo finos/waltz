@@ -126,6 +126,10 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/cleanup-self-references`)
         .then(r => r.data);
 
+    const updateReadOnly = (updateReadOnlyCmd, id) => $http
+        .post(`${BASE}/update/read-only/${id}`, updateReadOnlyCmd)
+        .then(r => r.data);
+
     return {
         findBySelector,
         findByIds,
@@ -144,7 +148,8 @@ export function store($http, BaseApiUrl) {
         findPermissionsForParentRef,
         findPermissionsForFlow,
         cleanupOrphans,
-        cleanupSelfReferences
+        cleanupSelfReferences,
+        updateReadOnly
     };
 }
 
@@ -251,6 +256,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "cleanupSelfReferences",
         description: "mark flows as removed where the flow source and target are the same"
+    },
+    updateReadOnly: {
+        serviceName,
+        serviceFnName: "updateReadOnly",
+        description: "update whether a logical flow is read only or editable"
     },
 };
 
