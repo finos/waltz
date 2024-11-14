@@ -24,4 +24,19 @@
                author="patidev">
         <tagDatabase tag="v1.65"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <changeSet id="20241114-7189-1"
+               author="patidev">
+        <delete tableName="QRTZ_CRON_TRIGGERS">
+            <where>trigger_name='Waltz - Discovery Survey Job_trigger'</where>
+        </delete>
+
+        <delete tableName="QRTZ_TRIGGERS">
+            <where>trigger_name='Waltz - Discovery Survey Job_trigger'</where>
+        </delete>
+
+        <delete tableName="QRTZ_JOB_DETAILS">
+            <where>JOB_CLASS_NAME = 'com.db.ct.cto.waltz.jobs.importers.DiscoverySurveyJob'</where>
+        </delete>
+    </changeSet>
 </databaseChangeLog>
