@@ -18,10 +18,10 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-                   logicalFilePath="db.changelog-1.67.xml">
+                   logicalFilePath="db.changelog-1.66.xml">
 
-    <changeSet id="v1-66-tag"
+    <changeSet id="v1-65-tag"
                author="patidev">
-        <tagDatabase tag="v1.66"/> <!-- tag the current db version, i.e. the last  -->
+        <tagDatabase tag="v1.65"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 </databaseChangeLog>
