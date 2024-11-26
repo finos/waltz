@@ -65,7 +65,7 @@ public class FlowDiagramFromMeasurableGenerator {
             createLinkedEntities(tx, diagramId, measurableSelector);
             createOverlayGroup(tx, diagramId, measurableId, measurableSelector, measurableName);
 
-            System.out.printf("https://int1.waltz.intranet.db.com/waltz-dev2/flow-diagram/%d\n", diagramId);
+            System.out.printf("Created diagram .../flow-diagram/%d\n", diagramId);
         });
 
         // layout ?
