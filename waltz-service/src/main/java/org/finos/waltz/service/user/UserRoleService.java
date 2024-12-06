@@ -34,6 +34,7 @@ import org.finos.waltz.model.role.Role;
 import org.finos.waltz.model.user.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.person.PersonService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -71,31 +72,35 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class UserRoleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserRoleService.class);
+    private static final String FOUR_EYE_CHECK_SETTINGS_KEY = "feature.user-roles.four-eye-check";
 
     private final UserRoleDao userRoleDao;
     private final RoleDao roleDao;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
-
     private final PersonService personService;
+    private final SettingsService settingsService;
 
 
     @Autowired
     public UserRoleService(UserRoleDao userRoleDao,
                            RoleDao roleDao,
                            PersonDao personDao, ChangeLogService changeLogService,
-                           PersonService personService) {
+                           PersonService personService,
+                           SettingsService settingsService) {
         checkNotNull(personDao, "personDao must not be null");
         checkNotNull(userRoleDao, "userRoleDao must not be null");
         checkNotNull(roleDao, "roleDao must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(personService, "personService must not be null");
+        checkNotNull(settingsService, "settingsService must not be null");
 
         this.userRoleDao = userRoleDao;
         this.roleDao = roleDao;
         this.changeLogService = changeLogService;
         this.personService = personService;
         this.personDao = personDao;
+        this.settingsService = settingsService;
     }
 
 
@@ -144,13 +149,28 @@ public class UserRoleService {
     }
 
 
-    public int updateRoles(String userName, String targetUserName, UpdateRolesCommand command) {
+    public int updateRoles(String userName, String targetUserName, UpdateRolesCommand command) throws IllegalArgumentException{
         LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, command.roles());
 
         Person person = personService.getPersonByUserId(targetUserName);
         if(person == null) {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
+            Boolean hasSetting = settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
+            Boolean hasFourEyeCheck = false; // by default administrators can modify their own roles
+
+            if(hasSetting) {
+                hasFourEyeCheck = Boolean.valueOf(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY)
+                        .value()
+                        .orElse("false"));
+            }
+
+            Boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
+
+            if(hasFourEyeCheck && currentUserIsTargetUser) {
+                throw new IllegalArgumentException("Cannot modify own roles.");
+            }
+
             ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
                     .parentReference(mkRef(EntityKind.PERSON, person.id().get()))
                     .severity(Severity.INFORMATION)
