@@ -5,18 +5,18 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.settings.ImmutableSetting;
-import org.finos.waltz.model.user.BulkUserOperationRowPreview;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.user.User;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.finos.waltz.test_common.helpers.UserHelper;
+import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -40,6 +40,8 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private PersonHelper personHelper;
+
+    private static final String FOUR_EYE_CHECK_SETTINGS_KEY = "feature.user-roles.four-eye-check";
 
 
 
@@ -146,6 +148,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void adminCannotChangeOwnRolesIndividuallyIfFECEnabled() {
+        deleteFECSetting();
         // FEC = Four Eye Check
         String stem = "adminCannotChangeOwnRolesIfFECEnabled";
         String username = mkName(stem + "_user");
@@ -163,7 +166,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name("feature.user-roles.four-eye-check")
+                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
                 .description("desc")
                 .value("true")
                 .restricted(false)
@@ -182,6 +185,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void adminCannotChangeOwnRolesButCanOthersRolesInBulkIfFECEnabled() {
+        deleteFECSetting();
         // FEC = Four Eye Check
         String stem = "adminCannotChangeOwnRolesButCanOthersRolesInBulkIfFECEnabled";
         String username = mkName(stem + "_user");
@@ -208,7 +212,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name("feature.user-roles.four-eye-check")
+                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
                 .description("desc")
                 .value("true")
                 .restricted(false)
@@ -218,6 +222,148 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
         svc.bulkUpload(BulkUploadMode.ADD_ONLY, ListUtilities.asList(lines), username);
         assertFalse(svc.hasRole(username, randomRole));
         assertTrue(svc.hasRole(username + "2", randomRole));
+    }
+
+    @Test
+    public void adminCanChangeOwnRolesIndividuallyIfFECDisabled() {
+        deleteFECSetting();
+        // FEC = Four Eye Check
+        String stem = "adminCanChangeOwnRolesIndividuallyIfFECDisabled";
+        String username = mkName(stem + "_user");
+        String randomRole = mkName(stem + "_random_role");
+
+        helper.createUser(username);
+        personHelper.createPerson(username);
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(SystemRole.ADMIN.name())
+                .comment("cmnt")
+                .build());
+
+        helper.createRole(randomRole);
+
+        // creating the four-eye-check setting with true as value
+        settingsService.create(ImmutableSetting.builder()
+                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .description("desc")
+                .value("false")
+                .restricted(false)
+                .build());
+
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(randomRole)
+                .comment("should_not_add")
+                .build());
+
+        svc.hasRole(username, randomRole);
+    }
+
+    @Test
+    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfFECDisabled() {
+        deleteFECSetting();
+        // FEC = Four Eye Check
+        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfFECDisabled";
+        String username = mkName(stem + "_user");
+        String randomRole = mkName(stem + "_random_role");
+
+        String bulkUploadString = format("username, role, comment\n" +
+                        "%s, %s, comment\n" +
+                        "%s, %s, comment2",
+                username, randomRole, username + "2", randomRole);
+
+        String[] lines = bulkUploadString.split("\\R");
+
+        helper.createUser(username);
+        personHelper.createPerson(username);
+        helper.createUser(username + "2");
+        personHelper.createPerson(username + "2");
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(SystemRole.ADMIN.name())
+                .comment("cmnt")
+                .build());
+
+        helper.createRole(randomRole);
+
+        // creating the four-eye-check setting with true as value
+        settingsService.create(ImmutableSetting.builder()
+                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .description("desc")
+                .value("false")
+                .restricted(false)
+                .build());
+
+
+        svc.bulkUpload(BulkUploadMode.ADD_ONLY, ListUtilities.asList(lines), username);
+        assertTrue(svc.hasRole(username, randomRole));
+        assertTrue(svc.hasRole(username + "2", randomRole));
+    }
+
+    @Test
+    public void adminCanChangeOwnRolesIndividuallyIfNoFECSetting() {
+        deleteFECSetting();
+        // FEC = Four Eye Check
+        String stem = "adminCanChangeOwnRolesIndividuallyIfNoFECSetting";
+        String username = mkName(stem + "_user");
+        String randomRole = mkName(stem + "_random_role");
+
+        helper.createUser(username);
+        personHelper.createPerson(username);
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(SystemRole.ADMIN.name())
+                .comment("cmnt")
+                .build());
+
+        helper.createRole(randomRole);
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(randomRole)
+                .comment("should_not_add")
+                .build());
+
+        svc.hasRole(username, randomRole);
+    }
+
+    @Test
+    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfNoFECSetting() {
+        deleteFECSetting();
+        // FEC = Four Eye Check
+        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfNoFECSetting";
+        String username = mkName(stem + "_user");
+        String randomRole = mkName(stem + "_random_role");
+
+        String bulkUploadString = format("username, role, comment\n" +
+                        "%s, %s, comment\n" +
+                        "%s, %s, comment2",
+                username, randomRole, username + "2", randomRole);
+
+        String[] lines = bulkUploadString.split("\\R");
+
+        helper.createUser(username);
+        personHelper.createPerson(username);
+        helper.createUser(username + "2");
+        personHelper.createPerson(username + "2");
+
+        svc.updateRoles(username, username, ImmutableUpdateRolesCommand.builder()
+                .addRoles(SystemRole.ADMIN.name())
+                .comment("cmnt")
+                .build());
+
+        helper.createRole(randomRole);
+
+        svc.bulkUpload(BulkUploadMode.ADD_ONLY, ListUtilities.asList(lines), username);
+        assertTrue(svc.hasRole(username, randomRole));
+        assertTrue(svc.hasRole(username + "2", randomRole));
+    }
+
+    private void deleteFECSetting() {
+        if(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null) {
+            this.getDsl().deleteFrom(Tables.SETTINGS)
+                    .where(Tables.SETTINGS.NAME.eq(FOUR_EYE_CHECK_SETTINGS_KEY))
+                    .execute();
+        }
     }
 
 }

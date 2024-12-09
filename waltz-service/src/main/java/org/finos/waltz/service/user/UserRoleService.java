@@ -266,12 +266,11 @@ public class UserRoleService {
         List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
-        Boolean hasSetting = settingsService.getValue(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
+        Boolean hasSetting = settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
         Boolean hasFourEyeCheck = false;
 
         if(hasSetting) {
-            hasFourEyeCheck = Boolean.valueOf(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY)
-                    .value()
+            hasFourEyeCheck = Boolean.valueOf(settingsService.getValue(FOUR_EYE_CHECK_SETTINGS_KEY)
                     .orElse("false"));
         }
 
