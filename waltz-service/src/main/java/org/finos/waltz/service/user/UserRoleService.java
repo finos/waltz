@@ -202,7 +202,7 @@ public class UserRoleService {
             return Collections.emptyList();
         }
 
-        return mkBulkOperationPreviews(lines);
+        return mkBulkOperationPreviews(lines, username);
     }
 
 
@@ -214,13 +214,13 @@ public class UserRoleService {
             return 0;
         }
 
-        Set<Tuple3<String, String,String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines)
+        Set<Tuple3<String, String,String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines, username)
                 .stream()
                 .filter(p -> p.status() == BulkUserOperationRowPreview.ResolutionStatus.OK)
                 .map(d -> tuple(d.resolvedUser(), d.resolvedRole(),d.resolvedComment()))
                 .collect(toSet());
 
-        handleBulkChangelog(usersAndRolesToUpdate,username);
+        handleBulkChangelog(usersAndRolesToUpdate, username);
         
         Set<Tuple2<String, String>> usernamesAndRoles = usersAndRolesToUpdate.stream().map(t -> tuple(t.v1, t.v2)).collect(toSet());
 
@@ -262,10 +262,20 @@ public class UserRoleService {
 
 
 
-    private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines) {
+    private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines, String username) {
         List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
+        Boolean hasSetting = settingsService.getValue(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
+        Boolean hasFourEyeCheck = false;
+
+        if(hasSetting) {
+            hasFourEyeCheck = Boolean.valueOf(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY)
+                    .value()
+                    .orElse("false"));
+        }
+
+        final Boolean finalFourEyesCheck = hasFourEyeCheck;
 
         //Checks for person.emails
         Set<String> unknownPeople = minus(
@@ -285,7 +295,9 @@ public class UserRoleService {
                         .givenUser(t.v1)
                         .givenRole(t.v2)
                         .givenComment(t.v3)
-                        .resolvedUser(unknownPeople.contains(t.v1) ? null : t.v1)
+                        .resolvedUser(unknownPeople.contains(t.v1) ?
+                                null : (finalFourEyesCheck && StringUtilities.safeEq(username, t.v1) ?
+                                null : t.v1))
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
                         .resolvedComment(t.v3)
                         .build())
