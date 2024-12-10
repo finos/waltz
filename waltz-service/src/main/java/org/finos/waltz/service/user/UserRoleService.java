@@ -72,7 +72,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class UserRoleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserRoleService.class);
-    private static final String FOUR_EYE_CHECK_SETTINGS_KEY = "feature.user-roles.four-eye-check";
+    private static final String DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY = "feature.user-roles.disable-self-role-mgmt";
 
     private final UserRoleDao userRoleDao;
     private final RoleDao roleDao;
@@ -156,18 +156,18 @@ public class UserRoleService {
         if(person == null) {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
-            Boolean hasSetting = settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
-            Boolean hasFourEyeCheck = false; // by default administrators can modify their own roles
+            Boolean hasSetting = settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY) != null;
+            Boolean hasDisabledSelfRoleMgmt = false; // by default administrators can modify their own roles
 
             if(hasSetting) {
-                hasFourEyeCheck = Boolean.valueOf(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY)
+                hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                         .value()
                         .orElse("false"));
             }
 
             Boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
 
-            if(hasFourEyeCheck && currentUserIsTargetUser) {
+            if(hasDisabledSelfRoleMgmt && currentUserIsTargetUser) {
                 throw new IllegalArgumentException("Cannot modify own roles.");
             }
 
@@ -266,15 +266,15 @@ public class UserRoleService {
         List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
-        Boolean hasSetting = settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null;
-        Boolean hasFourEyeCheck = false;
+        Boolean hasSetting = settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY) != null;
+        Boolean hasDisabledSelfRoleMgmt = false;
 
         if(hasSetting) {
-            hasFourEyeCheck = Boolean.valueOf(settingsService.getValue(FOUR_EYE_CHECK_SETTINGS_KEY)
+            hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                     .orElse("false"));
         }
 
-        final Boolean finalFourEyesCheck = hasFourEyeCheck;
+        final Boolean finalHasDisabledSelfRoleMgmt = hasDisabledSelfRoleMgmt;
 
         //Checks for person.emails
         Set<String> unknownPeople = minus(
@@ -295,7 +295,7 @@ public class UserRoleService {
                         .givenRole(t.v2)
                         .givenComment(t.v3)
                         .resolvedUser(unknownPeople.contains(t.v1) ?
-                                null : (finalFourEyesCheck && StringUtilities.safeEq(username, t.v1) ?
+                                null : (finalHasDisabledSelfRoleMgmt && StringUtilities.safeEq(username, t.v1) ?
                                 null : t.v1))
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
                         .resolvedComment(t.v3)

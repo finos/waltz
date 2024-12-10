@@ -41,7 +41,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private PersonHelper personHelper;
 
-    private static final String FOUR_EYE_CHECK_SETTINGS_KEY = "feature.user-roles.four-eye-check";
+    private static final String DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY = "feature.user-roles.disable-self-role-mgmt";
 
 
 
@@ -147,10 +147,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCannotChangeOwnRolesIndividuallyIfFECEnabled() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCannotChangeOwnRolesIfFECEnabled";
+    public void adminCannotChangeOwnRolesIndividuallyIfDSRMEnabled() {
+        deleteDSRMSetting();
+        // DSRM = Disable Self Role Management
+        String stem = "adminCannotChangeOwnRolesIfDSRMEnabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -166,7 +166,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .name(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                 .description("desc")
                 .value("true")
                 .restricted(false)
@@ -184,10 +184,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCannotChangeOwnRolesButCanOthersRolesInBulkIfFECEnabled() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCannotChangeOwnRolesButCanOthersRolesInBulkIfFECEnabled";
+    public void adminCannotChangeOwnRolesButCanOthersRolesInBulkIfDSRMEnabled() {
+        deleteDSRMSetting();
+
+        String stem = "adminCannotChangeOwnRolesButCanOthersRolesInBulkIfDSRMEnabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -212,7 +212,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .name(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                 .description("desc")
                 .value("true")
                 .restricted(false)
@@ -225,10 +225,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesIndividuallyIfFECDisabled() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCanChangeOwnRolesIndividuallyIfFECDisabled";
+    public void adminCanChangeOwnRolesIndividuallyIfDSRMDisabled() {
+        deleteDSRMSetting();
+
+        String stem = "adminCanChangeOwnRolesIndividuallyIfDSRMDisabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -244,7 +244,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .name(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                 .description("desc")
                 .value("false")
                 .restricted(false)
@@ -260,10 +260,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfFECDisabled() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfFECDisabled";
+    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfDSRMDisabled() {
+        deleteDSRMSetting();
+
+        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfDSRMDisabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -288,7 +288,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
         // creating the four-eye-check setting with true as value
         settingsService.create(ImmutableSetting.builder()
-                .name(FOUR_EYE_CHECK_SETTINGS_KEY)
+                .name(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                 .description("desc")
                 .value("false")
                 .restricted(false)
@@ -301,10 +301,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesIndividuallyIfNoFECSetting() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCanChangeOwnRolesIndividuallyIfNoFECSetting";
+    public void adminCanChangeOwnRolesIndividuallyIfNoDSRMSetting() {
+        deleteDSRMSetting();
+
+        String stem = "adminCanChangeOwnRolesIndividuallyIfNoDSRMSetting";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -327,10 +327,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfNoFECSetting() {
-        deleteFECSetting();
-        // FEC = Four Eye Check
-        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfNoFECSetting";
+    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfNoDSRMSetting() {
+        deleteDSRMSetting();
+
+        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfNoDSRMSetting";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -358,10 +358,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
         assertTrue(svc.hasRole(username + "2", randomRole));
     }
 
-    private void deleteFECSetting() {
-        if(settingsService.getByName(FOUR_EYE_CHECK_SETTINGS_KEY) != null) {
+    private void deleteDSRMSetting() {
+        if(settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY) != null) {
             this.getDsl().deleteFrom(Tables.SETTINGS)
-                    .where(Tables.SETTINGS.NAME.eq(FOUR_EYE_CHECK_SETTINGS_KEY))
+                    .where(Tables.SETTINGS.NAME.eq(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY))
                     .execute();
         }
     }
