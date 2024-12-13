@@ -156,15 +156,7 @@ public class UserRoleService {
         if(person == null) {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
-            Boolean hasSetting = settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY) != null;
-            Boolean hasDisabledSelfRoleMgmt = false; // by default administrators can modify their own roles
-
-            if(hasSetting) {
-                hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
-                        .value()
-                        .orElse("false"));
-            }
-
+            Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
             Boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
 
             if(hasDisabledSelfRoleMgmt && currentUserIsTargetUser) {
@@ -266,15 +258,8 @@ public class UserRoleService {
         List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
-        Boolean hasSetting = settingsService.getByName(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY) != null;
-        Boolean hasDisabledSelfRoleMgmt = false;
 
-        if(hasSetting) {
-            hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
-                    .orElse("false"));
-        }
-
-        final Boolean finalHasDisabledSelfRoleMgmt = hasDisabledSelfRoleMgmt;
+        final Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
 
         //Checks for person.emails
         Set<String> unknownPeople = minus(
@@ -294,9 +279,7 @@ public class UserRoleService {
                         .givenUser(t.v1)
                         .givenRole(t.v2)
                         .givenComment(t.v3)
-                        .resolvedUser(unknownPeople.contains(t.v1) ?
-                                null : (finalHasDisabledSelfRoleMgmt && StringUtilities.safeEq(username, t.v1) ?
-                                null : t.v1))
+                        .resolvedUser(getResolvedUser(hasDisabledSelfRoleMgmt, unknownPeople, username, t.v1))
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
                         .resolvedComment(t.v3)
                         .build())
@@ -322,6 +305,24 @@ public class UserRoleService {
                 .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2) && "comment".equalsIgnoreCase(t.v3))) // remove header
                 .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2) && StringUtilities.isEmpty(t.v3))) // remove empty lines
                 .collect(toList());
+    }
+
+    private String getResolvedUser(Boolean hasDisabledSelfRoleMgmt, Set<String> unkownPeople, String username,
+                                   String resolvedUser) {
+        if(unkownPeople.contains(resolvedUser)) {
+            return null;
+        } else if (hasDisabledSelfRoleMgmt && StringUtilities.safeEq(username, resolvedUser)) {
+            return null;
+        } else {
+            return resolvedUser;
+        }
+    }
+
+    private Boolean getHasDisabledSelfRoleManagement() {
+        Boolean hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
+                    .orElse("false"));
+
+        return hasDisabledSelfRoleMgmt;
     }
 
 }
