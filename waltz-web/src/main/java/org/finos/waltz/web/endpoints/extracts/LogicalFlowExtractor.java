@@ -92,7 +92,11 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
             "Flow External Id",
             "Data Type",
             "Source Outbound Rating",
-            "Target Inbound Rating");
+            "Target Inbound Rating",
+            "Created At",
+            "Created By",
+            "Last Updated At",
+            "Last Updated By");
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
@@ -163,6 +167,10 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                 .select(DATA_TYPE.NAME.as("Data Type"))
                 .select(sourceClassification.NAME.as("Source Outbound Rating"))
                 .select(targetClassification.NAME.as("Target Inbound Rating"))
+                .select(LOGICAL_FLOW.CREATED_AT.as("Created At"))
+                .select(LOGICAL_FLOW.CREATED_BY.as("Created By"))
+                .select(LOGICAL_FLOW.LAST_UPDATED_AT.as("Last Updated At"))
+                .select(LOGICAL_FLOW.LAST_UPDATED_BY.as("Last Updated By"))
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR)
                 .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID)
