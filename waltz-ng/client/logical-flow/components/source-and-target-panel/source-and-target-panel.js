@@ -397,6 +397,10 @@ function controller($element,
             "Source code",
             "Target",
             "Target code",
+            "Created At",
+            "Created By",
+            "Last Updated At",
+            "Last Updated By",
             "Data Types",
             "Tags"
         ];
@@ -456,6 +460,10 @@ function controller($element,
                         resolveCode(f.source),
                         f.target.name,
                         resolveCode(f.target),
+                        f.created.at,
+                        f.created.by,
+                        f.lastUpdatedAt,
+                        f.lastUpdatedBy,
                         calcDataTypes(f.id),
                         calcTags(f.id)
                     ]

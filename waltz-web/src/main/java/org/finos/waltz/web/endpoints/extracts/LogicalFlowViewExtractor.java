@@ -22,6 +22,7 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -106,6 +108,10 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Target Entity Name",
                 "Target Entity External Id",
                 "Flow External Id",
+                "Created At",
+                "Created By",
+                "Last Updated At",
+                "Last Updated By",
                 "Data Types",
                 "Physical Flow Count");
 
@@ -150,6 +156,10 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     reportRow.add(row.target().name());
                     reportRow.add(row.target().externalId());
                     reportRow.add(row.externalId().orElse(""));
+                    reportRow.add(Timestamp.valueOf(row.created().map(UserTimestamp::at).get()));
+                    reportRow.add(row.created().map(UserTimestamp::by));
+                    reportRow.add(Timestamp.valueOf(row.lastUpdatedAt()));
+                    reportRow.add(row.lastUpdatedBy());
                     reportRow.add(dataTypeString);
                     reportRow.add(physicals.size());
 
