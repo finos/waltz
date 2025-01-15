@@ -260,10 +260,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfDSRMDisabled() {
+    public void DSRMDisabled() {
         deleteDSRMSetting();
 
-        String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfDSRMDisabled";
+        String stem = "DSRMDisabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
