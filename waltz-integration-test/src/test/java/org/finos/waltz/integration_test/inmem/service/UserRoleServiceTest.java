@@ -147,10 +147,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCannotChangeOwnRolesIndividuallyIfDSRMEnabled() {
+    public void cannotEditOwnRolesIfDSRMEnabled() {
         deleteDSRMSetting();
         // DSRM = Disable Self Role Management
-        String stem = "adminCannotChangeOwnRolesIfDSRMEnabled";
+        String stem = "cannotEditOwnRolesIfDSRMEnabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -184,10 +184,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCannotChangeOwnRolesButCanOthersRolesInBulkIfDSRMEnabled() {
+    public void cannotBulkEditOwnRolesIfDSRMEnabled() {
         deleteDSRMSetting();
 
-        String stem = "adminCannotChangeOwnRolesButCanOthersRolesInBulkIfDSRMEnabled";
+        String stem = "cannotBulkEditOwnRolesIfDSRMEnabled";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -225,10 +225,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesIndividuallyIfDSRMDisabled() {
+    public void canEditWithDSRMFlagOff() {
         deleteDSRMSetting();
 
-        String stem = "adminCanChangeOwnRolesIndividuallyIfDSRMDisabled";
+        String stem = "canEditWithDSRMFlagOff";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -260,10 +260,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void DSRMDisabled() {
+    public void canBulkEditWithDSRMFlagOff() {
         deleteDSRMSetting();
 
-        String stem = "DSRMDisabled";
+        String stem = "canBulkEditWithDSRMFlagOff";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -301,10 +301,10 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesIndividuallyIfNoDSRMSetting() {
+    public void canEditWithNoDSRMFlag() {
         deleteDSRMSetting();
 
-        String stem = "adminCanChangeOwnRolesIndividuallyIfNoDSRMSetting";
+        String stem = "canEditWithDSRMFlagOff";
         String username = mkName(stem + "_user");
         String randomRole = mkName(stem + "_random_role");
 
@@ -327,7 +327,7 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void adminCanChangeOwnRolesAndOthersRolesInBulkIfNoDSRMSetting() {
+    public void canBulkEditWithNoDSRMFlag() {
         deleteDSRMSetting();
 
         String stem = "adminCanChangeOwnRolesAndOthersRolesInBulkIfNoDSRMSetting";
