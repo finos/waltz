@@ -397,12 +397,12 @@ function controller($element,
             "Source code",
             "Target",
             "Target code",
+            "Data Types",
+            "Tags",
             "Created At",
             "Created By",
             "Last Updated At",
-            "Last Updated By",
-            "Data Types",
-            "Tags"
+            "Last Updated By"
         ];
 
         const dataTypesByFlowId = _
