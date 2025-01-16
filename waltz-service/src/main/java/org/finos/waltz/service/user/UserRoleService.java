@@ -319,7 +319,8 @@ public class UserRoleService {
     }
 
     private boolean getHasDisabledSelfRoleManagement() {
-        boolean hasDisabledSelfRoleMgmt = settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
+        boolean hasDisabledSelfRoleMgmt = settingsService
+                .getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
                 .map(Boolean::valueOf)
                 .orElse(false);
 
