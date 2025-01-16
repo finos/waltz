@@ -34,6 +34,7 @@ import org.finos.waltz.model.role.Role;
 import org.finos.waltz.model.user.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.person.PersonService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -71,31 +72,35 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class UserRoleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserRoleService.class);
+    private static final String DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY = "feature.user-roles.disable-self-role-mgmt";
 
     private final UserRoleDao userRoleDao;
     private final RoleDao roleDao;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
-
     private final PersonService personService;
+    private final SettingsService settingsService;
 
 
     @Autowired
     public UserRoleService(UserRoleDao userRoleDao,
                            RoleDao roleDao,
                            PersonDao personDao, ChangeLogService changeLogService,
-                           PersonService personService) {
+                           PersonService personService,
+                           SettingsService settingsService) {
         checkNotNull(personDao, "personDao must not be null");
         checkNotNull(userRoleDao, "userRoleDao must not be null");
         checkNotNull(roleDao, "roleDao must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(personService, "personService must not be null");
+        checkNotNull(settingsService, "settingsService must not be null");
 
         this.userRoleDao = userRoleDao;
         this.roleDao = roleDao;
         this.changeLogService = changeLogService;
         this.personService = personService;
         this.personDao = personDao;
+        this.settingsService = settingsService;
     }
 
 
@@ -144,13 +149,20 @@ public class UserRoleService {
     }
 
 
-    public int updateRoles(String userName, String targetUserName, UpdateRolesCommand command) {
+    public int updateRoles(String userName, String targetUserName, UpdateRolesCommand command) throws IllegalArgumentException{
         LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, command.roles());
 
         Person person = personService.getPersonByUserId(targetUserName);
         if(person == null) {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
+            Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
+            Boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
+
+            if(hasDisabledSelfRoleMgmt && currentUserIsTargetUser) {
+                throw new IllegalArgumentException("Cannot modify own roles.");
+            }
+
             ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
                     .parentReference(mkRef(EntityKind.PERSON, person.id().get()))
                     .severity(Severity.INFORMATION)
@@ -182,7 +194,7 @@ public class UserRoleService {
             return Collections.emptyList();
         }
 
-        return mkBulkOperationPreviews(lines);
+        return mkBulkOperationPreviews(lines, username);
     }
 
 
@@ -194,13 +206,13 @@ public class UserRoleService {
             return 0;
         }
 
-        Set<Tuple3<String, String,String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines)
+        Set<Tuple3<String, String,String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines, username)
                 .stream()
                 .filter(p -> p.status() == BulkUserOperationRowPreview.ResolutionStatus.OK)
                 .map(d -> tuple(d.resolvedUser(), d.resolvedRole(),d.resolvedComment()))
                 .collect(toSet());
 
-        handleBulkChangelog(usersAndRolesToUpdate,username);
+        handleBulkChangelog(usersAndRolesToUpdate, username);
         
         Set<Tuple2<String, String>> usernamesAndRoles = usersAndRolesToUpdate.stream().map(t -> tuple(t.v1, t.v2)).collect(toSet());
 
@@ -242,10 +254,12 @@ public class UserRoleService {
 
 
 
-    private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines) {
+    private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines, String username) {
         List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
+
+        final Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
 
         //Checks for person.emails
         Set<String> unknownPeople = minus(
@@ -265,7 +279,7 @@ public class UserRoleService {
                         .givenUser(t.v1)
                         .givenRole(t.v2)
                         .givenComment(t.v3)
-                        .resolvedUser(unknownPeople.contains(t.v1) ? null : t.v1)
+                        .resolvedUser(getResolvedUser(hasDisabledSelfRoleMgmt, unknownPeople, username, t.v1))
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
                         .resolvedComment(t.v3)
                         .build())
@@ -291,6 +305,24 @@ public class UserRoleService {
                 .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2) && "comment".equalsIgnoreCase(t.v3))) // remove header
                 .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2) && StringUtilities.isEmpty(t.v3))) // remove empty lines
                 .collect(toList());
+    }
+
+    private String getResolvedUser(Boolean hasDisabledSelfRoleMgmt, Set<String> unkownPeople, String username,
+                                   String resolvedUser) {
+        if(unkownPeople.contains(resolvedUser)) {
+            return null;
+        } else if (hasDisabledSelfRoleMgmt && StringUtilities.safeEq(username, resolvedUser)) {
+            return null;
+        } else {
+            return resolvedUser;
+        }
+    }
+
+    private Boolean getHasDisabledSelfRoleManagement() {
+        Boolean hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
+                    .orElse("false"));
+
+        return hasDisabledSelfRoleMgmt;
     }
 
 }
