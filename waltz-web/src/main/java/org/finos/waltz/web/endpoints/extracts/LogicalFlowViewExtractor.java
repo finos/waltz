@@ -108,12 +108,12 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Target Entity Name",
                 "Target Entity External Id",
                 "Flow External Id",
+                "Data Types",
+                "Physical Flow Count",
                 "Created At",
                 "Created By",
                 "Last Updated At",
-                "Last Updated By",
-                "Data Types",
-                "Physical Flow Count");
+                "Last Updated By");
 
         List<String> assessmentHeaders = flowView.logicalFlowAssessmentDefinitions()
                 .stream()
