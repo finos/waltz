@@ -156,8 +156,8 @@ public class UserRoleService {
         if(person == null) {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
-            Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
-            Boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
+            boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
+            boolean currentUserIsTargetUser = StringUtilities.safeEq(userName, targetUserName);
 
             if(hasDisabledSelfRoleMgmt && currentUserIsTargetUser) {
                 throw new IllegalArgumentException("Cannot modify own roles.");
@@ -259,7 +259,7 @@ public class UserRoleService {
         Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
         Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
 
-        final Boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
+        final boolean hasDisabledSelfRoleMgmt = getHasDisabledSelfRoleManagement();
 
         //Checks for person.emails
         Set<String> unknownPeople = minus(
@@ -307,7 +307,7 @@ public class UserRoleService {
                 .collect(toList());
     }
 
-    private String getResolvedUser(Boolean hasDisabledSelfRoleMgmt, Set<String> unkownPeople, String username,
+    private String getResolvedUser(boolean hasDisabledSelfRoleMgmt, Set<String> unkownPeople, String username,
                                    String resolvedUser) {
         if(unkownPeople.contains(resolvedUser)) {
             return null;
@@ -318,9 +318,11 @@ public class UserRoleService {
         }
     }
 
-    private Boolean getHasDisabledSelfRoleManagement() {
-        Boolean hasDisabledSelfRoleMgmt = Boolean.valueOf(settingsService.getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
-                    .orElse("false"));
+    private boolean getHasDisabledSelfRoleManagement() {
+        boolean hasDisabledSelfRoleMgmt = settingsService
+                .getValue(DISABLE_SELF_ROLE_MANAGEMENT_SETTINGS_KEY)
+                .map(Boolean::valueOf)
+                .orElse(false);
 
         return hasDisabledSelfRoleMgmt;
     }
