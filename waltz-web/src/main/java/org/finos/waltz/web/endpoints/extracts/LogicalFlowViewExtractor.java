@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,6 +48,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlTimestamp;
 import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
@@ -108,12 +108,12 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Target Entity Name",
                 "Target Entity External Id",
                 "Flow External Id",
+                "Data Types",
+                "Physical Flow Count",
                 "Created At",
                 "Created By",
                 "Last Updated At",
-                "Last Updated By",
-                "Data Types",
-                "Physical Flow Count");
+                "Last Updated By");
 
         List<String> assessmentHeaders = flowView.logicalFlowAssessmentDefinitions()
                 .stream()
@@ -156,12 +156,12 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     reportRow.add(row.target().name());
                     reportRow.add(row.target().externalId());
                     reportRow.add(row.externalId().orElse(""));
-                    reportRow.add(Timestamp.valueOf(row.created().map(UserTimestamp::at).get()));
-                    reportRow.add(row.created().map(UserTimestamp::by));
-                    reportRow.add(Timestamp.valueOf(row.lastUpdatedAt()));
-                    reportRow.add(row.lastUpdatedBy());
                     reportRow.add(dataTypeString);
                     reportRow.add(physicals.size());
+                    reportRow.add(row.created().map(UserTimestamp::atTimestamp).get());
+                    reportRow.add(row.created().map(UserTimestamp::by));
+                    reportRow.add(toSqlTimestamp(row.lastUpdatedAt()));
+                    reportRow.add(row.lastUpdatedBy());
 
                     viewData.logicalFlowAssessmentDefinitions()
                             .stream()
