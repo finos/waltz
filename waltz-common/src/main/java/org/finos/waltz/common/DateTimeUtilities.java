@@ -55,6 +55,14 @@ public class DateTimeUtilities {
         return java.sql.Date.valueOf(localDate);
     }
 
+    public static java.sql.Timestamp toSqlTimestamp(LocalDateTime localDateTime) {
+        if(localDateTime == null) {
+            return null;
+        }
+
+        return Timestamp.valueOf(localDateTime);
+    }
+
 
     public static LocalDate toLocalDate(Date date) {
         if (date == null) {

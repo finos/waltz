@@ -398,7 +398,11 @@ function controller($element,
             "Target",
             "Target code",
             "Data Types",
-            "Tags"
+            "Tags",
+            "Created At",
+            "Created By",
+            "Last Updated At",
+            "Last Updated By"
         ];
 
         const dataTypesByFlowId = _
@@ -457,7 +461,11 @@ function controller($element,
                         f.target.name,
                         resolveCode(f.target),
                         calcDataTypes(f.id),
-                        calcTags(f.id)
+                        calcTags(f.id),
+                        f.created.at,
+                        f.created.by,
+                        f.lastUpdatedAt,
+                        f.lastUpdatedBy
                     ]
                 });
 

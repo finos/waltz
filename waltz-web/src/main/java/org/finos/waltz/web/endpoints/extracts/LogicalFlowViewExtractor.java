@@ -22,6 +22,7 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -47,6 +48,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlTimestamp;
 import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
@@ -107,7 +109,11 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Target Entity External Id",
                 "Flow External Id",
                 "Data Types",
-                "Physical Flow Count");
+                "Physical Flow Count",
+                "Created At",
+                "Created By",
+                "Last Updated At",
+                "Last Updated By");
 
         List<String> assessmentHeaders = flowView.logicalFlowAssessmentDefinitions()
                 .stream()
@@ -152,6 +158,10 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     reportRow.add(row.externalId().orElse(""));
                     reportRow.add(dataTypeString);
                     reportRow.add(physicals.size());
+                    reportRow.add(row.created().map(UserTimestamp::atTimestamp).get());
+                    reportRow.add(row.created().map(UserTimestamp::by));
+                    reportRow.add(toSqlTimestamp(row.lastUpdatedAt()));
+                    reportRow.add(row.lastUpdatedBy());
 
                     viewData.logicalFlowAssessmentDefinitions()
                             .stream()
