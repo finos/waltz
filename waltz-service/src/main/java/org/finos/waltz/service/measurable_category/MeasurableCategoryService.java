@@ -32,6 +32,7 @@ import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_category.MeasurableCategoryView;
 import org.finos.waltz.model.settings.Setting;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.settings.SettingsService;
@@ -57,6 +58,9 @@ public class MeasurableCategoryService {
     private final MeasurableService measurableService;
     private final SettingsService settingsService;
 
+    private final String DEPRECATED_MEASURABLE_CATEGORY = "DEPRECATED_MEASURABLE_CATEGORY";
+
+
     @Autowired
     public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao,
                                      UserRoleService userRoleService,
@@ -76,12 +80,12 @@ public class MeasurableCategoryService {
     }
 
     public Collection<MeasurableCategory> removeDeprecatedMeasurableCategory(Collection<MeasurableCategory> measurableCategoryCollection){
-        Setting setting = settingsService.getByName("DEPRECATED_MEASURABLE_CATEGORY");
+        Setting setting = settingsService.getByName(DEPRECATED_MEASURABLE_CATEGORY);
         measurableCategoryCollection.removeIf(measurableCategory -> {
             if(setting != null && setting.value().isPresent()) {
-                List<String> list = StringUtilities.tokenise(setting.value().get(),",");
+                List<String> deprecatedMeasurableCategoryList = StringUtilities.tokenise(setting.value().get(),",");
                 if(measurableCategory.externalId().isPresent()){
-                    return list.contains(measurableCategory.externalId().get());
+                    return deprecatedMeasurableCategoryList.contains(measurableCategory.externalId().get());
                 }else{
                     return false;
                 }
@@ -109,8 +113,7 @@ public class MeasurableCategoryService {
 
 
     public List<MeasurableCategoryView> findPopulatedCategoriesForRef(EntityReference ref) {
-        Collection<MeasurableCategory> allCategories = measurableCategoryDao.findAll();
-        removeDeprecatedMeasurableCategory(allCategories);
+        Collection<MeasurableCategory> allCategories = findAll();
 
         Map<Long, Long> ratingCountsByCategoryId = measurableCategoryDao
                 .findRatingCountsByCategoryId(ref);
