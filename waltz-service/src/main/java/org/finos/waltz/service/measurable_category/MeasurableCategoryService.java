@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.measurable_category;
 
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -29,9 +30,11 @@ import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategoryView;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_category.MeasurableCategoryView;
+import org.finos.waltz.model.settings.Setting;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,21 +55,41 @@ public class MeasurableCategoryService {
     private final UserRoleService userRoleService;
     private final ChangeLogService changeLogService;
     private final MeasurableService measurableService;
+    private final SettingsService settingsService;
 
     @Autowired
     public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao,
                                      UserRoleService userRoleService,
                                      ChangeLogService changeLogService,
-                                     MeasurableService measurableService) {
+                                     MeasurableService measurableService,
+                                     SettingsService settingsService) {
         this.measurableCategoryDao = measurableCategoryDao;
         this.userRoleService = userRoleService;
         this.changeLogService = changeLogService;
         this.measurableService = measurableService;
-    }
+        this.settingsService = settingsService;    }
 
 
     public Collection<MeasurableCategory> findAll() {
-        return measurableCategoryDao.findAll();
+        Collection<MeasurableCategory> measurableCategoryCollection = measurableCategoryDao.findAll();
+        return removeDeprecatedMeasurableCategory(measurableCategoryCollection);
+    }
+
+    public Collection<MeasurableCategory> removeDeprecatedMeasurableCategory(Collection<MeasurableCategory> measurableCategoryCollection){
+        Setting setting = settingsService.getByName("DEPRECATED_MEASURABLE_CATEGORY");
+        measurableCategoryCollection.removeIf(measurableCategory -> {
+            if(setting != null && setting.value().isPresent()) {
+                List<String> list = StringUtilities.tokenise(setting.value().get(),",");
+                if(measurableCategory.externalId().isPresent()){
+                    return list.contains(measurableCategory.externalId().get());
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        });
+        return measurableCategoryCollection;
     }
 
 
@@ -87,6 +110,7 @@ public class MeasurableCategoryService {
 
     public List<MeasurableCategoryView> findPopulatedCategoriesForRef(EntityReference ref) {
         Collection<MeasurableCategory> allCategories = measurableCategoryDao.findAll();
+        removeDeprecatedMeasurableCategory(allCategories);
 
         Map<Long, Long> ratingCountsByCategoryId = measurableCategoryDao
                 .findRatingCountsByCategoryId(ref);
