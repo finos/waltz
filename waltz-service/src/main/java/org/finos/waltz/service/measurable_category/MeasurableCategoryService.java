@@ -58,7 +58,7 @@ public class MeasurableCategoryService {
     private final MeasurableService measurableService;
     private final SettingsService settingsService;
 
-    private final String DEPRECATED_MEASURABLE_CATEGORY = "DEPRECATED_MEASURABLE_CATEGORY";
+    private static final String DEPRECATED_MEASURABLE_CATEGORY = "DEPRECATED_MEASURABLE_CATEGORY";
 
 
     @Autowired
