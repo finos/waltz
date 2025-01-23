@@ -75,26 +75,10 @@ public class MeasurableCategoryService {
 
 
     public Collection<MeasurableCategory> findAll() {
-        Collection<MeasurableCategory> measurableCategoryCollection = measurableCategoryDao.findAll();
-        return removeDeprecatedMeasurableCategory(measurableCategoryCollection);
+        return measurableCategoryDao.findAll();
     }
 
-    public Collection<MeasurableCategory> removeDeprecatedMeasurableCategory(Collection<MeasurableCategory> measurableCategoryCollection){
-        Setting setting = settingsService.getByName(DEPRECATED_MEASURABLE_CATEGORY);
-        measurableCategoryCollection.removeIf(measurableCategory -> {
-            if(setting != null && setting.value().isPresent()) {
-                List<String> deprecatedMeasurableCategoryList = StringUtilities.tokenise(setting.value().get(),",");
-                if(measurableCategory.externalId().isPresent()){
-                    return deprecatedMeasurableCategoryList.contains(measurableCategory.externalId().get());
-                }else{
-                    return false;
-                }
-            }else{
-                return false;
-            }
-        });
-        return measurableCategoryCollection;
-    }
+    
 
 
     public MeasurableCategory getById(long id) {
@@ -113,7 +97,7 @@ public class MeasurableCategoryService {
 
 
     public List<MeasurableCategoryView> findPopulatedCategoriesForRef(EntityReference ref) {
-        Collection<MeasurableCategory> allCategories = findAll();
+        Collection<MeasurableCategory> allCategories = measurableCategoryDao.findAll();
 
         Map<Long, Long> ratingCountsByCategoryId = measurableCategoryDao
                 .findRatingCountsByCategoryId(ref);

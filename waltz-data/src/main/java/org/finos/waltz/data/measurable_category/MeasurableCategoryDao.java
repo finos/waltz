@@ -87,6 +87,7 @@ public class MeasurableCategoryDao {
         return dsl
                 .select(MEASURABLE_CATEGORY.fields())
                 .from(MEASURABLE_CATEGORY)
+                .where(MEASURABLE_CATEGORY.IS_DEPRECATED.eq(false))
                 .orderBy(MEASURABLE_CATEGORY.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
