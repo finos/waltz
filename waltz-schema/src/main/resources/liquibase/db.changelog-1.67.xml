@@ -24,4 +24,26 @@
                author="patidev">
         <tagDatabase tag="v1.66"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <changeSet id="20250123"
+               author="jindkul">
+        <comment>3434: adding is_deprecated to measurable_category</comment>
+        <addColumn tableName="measurable_category">
+            <column name="is_deprecated"
+                    defaultValueBoolean="false"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20250123-2"
+               author="jindkul">
+        <update tableName="measurable_category">
+            <column name="is_deprecated"
+                    value="true"/>
+            <where>external_id in ('SERVICE','BUSINESS','VRM')</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

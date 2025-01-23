@@ -71,6 +71,11 @@ public abstract class MeasurableCategory implements
         return false;
     }
 
+    @Value.Default
+    public boolean isDeprecated() {
+        return false;
+    }
+
 
     /**
      * @return role required for editing measurable ratings against this category
