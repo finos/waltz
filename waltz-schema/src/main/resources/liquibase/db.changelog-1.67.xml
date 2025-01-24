@@ -27,7 +27,7 @@
 
     <changeSet id="20250123-7200-1"
                author="jindkul">
-        <comment>3434: adding is_deprecated to measurable_category</comment>
+        <comment>3434: adding is_deprecated column to measurable_category</comment>
         <addColumn tableName="measurable_category">
             <column name="is_deprecated"
                     defaultValueBoolean="false"
