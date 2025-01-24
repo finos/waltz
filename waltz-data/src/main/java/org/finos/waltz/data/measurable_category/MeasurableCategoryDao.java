@@ -70,6 +70,7 @@ public class MeasurableCategoryDao {
                 .icon(r.getIconName())
                 .position(r.getPosition())
                 .allowPrimaryRatings(r.getAllowPrimaryRatings())
+                .isDeprecated(r.getIsDeprecated())
                 .build();
     };
 
