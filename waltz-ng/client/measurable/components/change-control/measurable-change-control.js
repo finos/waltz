@@ -252,7 +252,7 @@ function controller($scope,
                 },
                 onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
                 onChange: () => {
-                    const required = [vm.commandParams.name];
+                    const required = [vm.commandParams.name, vm.commandParams.externalId];
                     vm.submitDisabled = _.some(required, _.isEmpty);
                 }
             }, {
@@ -266,7 +266,7 @@ function controller($scope,
                 },
                 onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
                 onChange: () => {
-                    const required = [vm.commandParams.name];
+                    const required = [vm.commandParams.name, vm.commandParams.externalId];
                     vm.submitDisabled = _.some(required, _.isEmpty);
                 }
             }

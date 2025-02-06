@@ -26,16 +26,7 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyApplyResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidationResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.ChangedFieldType;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyApplyResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatedItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidationResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
+import org.finos.waltz.model.bulk_upload.taxonomy.*;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
@@ -150,6 +141,19 @@ public class BulkTaxonomyChangeService {
             return ImmutableBulkTaxonomyValidationResult
                     .builder()
                     .error(result.error())
+                    .build();
+        }
+
+        boolean flag = result.parsedItems().stream().anyMatch(data ->
+                data.externalId().isEmpty());
+
+        if(flag){
+            return ImmutableBulkTaxonomyValidationResult
+                    .builder()
+                    .error(ImmutableBulkTaxonomyParseError
+                            .builder()
+                            .message("External Id can not be empty for any taxonomy while bulk upload...!")
+                            .build())
                     .build();
         }
 
