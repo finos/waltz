@@ -173,7 +173,9 @@ function controller($scope,
                     calcPreview();
                 },
                 onChange: () => {
-                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
+                    const required = [vm.commandParams.externalId];
+                    const flag = _.some(required, _.isEmpty);
+                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId || flag ;
                 },
                 paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.externalId})
             }, {
