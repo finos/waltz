@@ -275,7 +275,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void testIsExternalIdEmpty() {
+    public void ValidateIsExternalIdEmpty() {
         EntityReference category = setupCategory();
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
@@ -284,9 +284,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
 
-        assertTrue(!result.error().message().isEmpty());
-        assertTrue(result.error().message().equalsIgnoreCase("External Id can not be empty for any taxonomy while bulk upload...!"));
-
+        assertTrue(all(result.validatedItems(), d -> !isEmpty(d.errors())),"it contain errors");
     }
 
     // --- HELPERS -----

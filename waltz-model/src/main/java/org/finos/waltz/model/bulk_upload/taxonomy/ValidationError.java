@@ -3,5 +3,6 @@ package org.finos.waltz.model.bulk_upload.taxonomy;
 public enum ValidationError {
     PARENT_NOT_FOUND,
     DUPLICATE_EXT_ID,
-    CYCLE_DETECTED
+    CYCLE_DETECTED,
+    EMPTY_EXTERNAL_ID_FOUND
 }

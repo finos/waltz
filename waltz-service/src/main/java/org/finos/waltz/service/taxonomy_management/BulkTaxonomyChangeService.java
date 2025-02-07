@@ -36,7 +36,6 @@ import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyApplyResu
 import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatedItem;
 import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidationResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyParseError;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
@@ -154,19 +153,6 @@ public class BulkTaxonomyChangeService {
                     .build();
         }
 
-        boolean flag = result.parsedItems().stream().anyMatch(data ->
-                data.externalId().isEmpty());
-
-        if(flag){
-            return ImmutableBulkTaxonomyValidationResult
-                    .builder()
-                    .error(ImmutableBulkTaxonomyParseError
-                            .builder()
-                            .message("External Id can not be empty for any taxonomy while bulk upload...!")
-                            .build())
-                    .build();
-        }
-
         Map<String, BulkTaxonomyItem> givenByExtId = indexBy(result.parsedItems(), BulkTaxonomyItem::externalId);
         Set<String> allExtIds = union(existingByExtId.keySet(), givenByExtId.keySet());
 
@@ -198,6 +184,7 @@ public class BulkTaxonomyChangeService {
                     boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId())
                             || allExtIds.contains(t.v1.parentExternalId());
                     boolean isCyclical = hasCycle;
+                    boolean isExternalIdEmpty = t.v1.externalId().isEmpty();
                     return ImmutableBulkTaxonomyValidatedItem
                             .builder()
                             .parsedItem(t.v1)
@@ -209,7 +196,8 @@ public class BulkTaxonomyChangeService {
                             .errors(compact(
                                     isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
                                     parentExists ? null : ValidationError.PARENT_NOT_FOUND,
-                                    isCyclical ? ValidationError.CYCLE_DETECTED : null))
+                                    isCyclical ? ValidationError.CYCLE_DETECTED : null,
+                                    isExternalIdEmpty ? ValidationError.EMPTY_EXTERNAL_ID_FOUND : null))
                             .build();
                 })
                 .collect(Collectors.toList());
