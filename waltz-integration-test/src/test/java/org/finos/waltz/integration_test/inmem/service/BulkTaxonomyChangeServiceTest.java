@@ -284,6 +284,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
 
+        assertTrue(!result.error().message().isEmpty());
         assertTrue(result.error().message().equalsIgnoreCase("External Id can not be empty for any taxonomy while bulk upload...!"));
 
     }
