@@ -1,0 +1,115 @@
+Table change_initiative {
+    id integer [primary key, not null]
+    parent_id integer
+    name varchar [not null]
+    description timestamp
+    kind ChangeInitiativeKind [not null]
+    lifecycle_phase LifecyclePhase [not null]
+    start_date date [null]
+    end_date date [niull]
+    external_id varchar
+    organisational_unit_id id  [not null]
+}
+
+Table organisational_unit {
+    id integer [primary key, note: 'hello world']
+    parent_id integer
+    name varchar
+}
+
+Table entity_relationship {
+    kind_a enum 
+    id_a varchar
+    kind_b enum
+    id_b varchar
+}
+
+Table application_group {
+    id integer [primary_key]
+    name varchar
+}
+
+Table application {
+    id integer [primary_key]
+    name varchar
+}
+
+Table measurable {
+    id integer [primary_key]
+    name varchar
+}
+
+Table data_type {
+    id integer [primary_key]
+    name varchar
+}
+
+Table bookmark {
+    id integer [primary_key]
+    parent_kind enum 
+    parent_id integer
+}
+
+Table assessment_rating {
+    id integer [primary_key]
+    entity_kind enum 
+    entity_id integer
+}
+
+Table involvement {
+    id integer [primary_key]
+    entity_kind enum 
+    entity_id integer
+    employee_id varchar
+}
+
+Table person {
+    id integer [primary_key]
+    employee_id varchar
+    display_name varchar
+    email varchar
+}
+
+Table entity_named_note {
+    id integer [primary_key]
+    named_note_type_id integer
+    note_text varchar
+    entity_id integer
+    entity_kind enum
+}
+
+Table entity_named_note_type {
+    id integer [primary_key]
+    name varchar
+    applicable_entity_kinds list_of_enums
+}
+
+
+Ref: change_initiative.parent_id > change_initiative.id 
+Ref: change_initiative.organisational_unit_id > organisational_unit.id
+Ref: change_initiative.id > entity_relationship.id_a
+Ref: entity_relationship.id_b > application_group.id
+Ref: entity_relationship.id_b > application.id
+Ref: entity_relationship.id_b > measurable.id
+Ref: entity_relationship.id_b > data_type.id
+Ref: bookmark.parent_id > change_initiative.id
+Ref: assessment_rating.entity_id > change_initiative.id
+Ref: involvement.employee_id > person.employee_id
+Ref: involvement.entity_id > change_initiative.id
+Ref: entity_named_note.named_note_type_id > entity_named_note_type.id
+Ref: entity_named_note.entity_id > change_initiative.id
+
+
+enum LifecyclePhase {
+    PRODUCTION
+    DEVELOPMENT
+    CONCEPTUAL
+    RETIRED
+}
+
+
+enum ChangeInitiativeKind {
+    INITIATIVE
+    PROGRAMME
+    PROJECT
+}
