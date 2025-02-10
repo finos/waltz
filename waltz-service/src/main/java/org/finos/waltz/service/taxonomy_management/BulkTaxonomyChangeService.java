@@ -184,6 +184,7 @@ public class BulkTaxonomyChangeService {
                     boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId())
                             || allExtIds.contains(t.v1.parentExternalId());
                     boolean isCyclical = hasCycle;
+                    boolean isExternalIdEmpty = t.v1.externalId().isEmpty();
                     return ImmutableBulkTaxonomyValidatedItem
                             .builder()
                             .parsedItem(t.v1)
@@ -195,7 +196,8 @@ public class BulkTaxonomyChangeService {
                             .errors(compact(
                                     isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
                                     parentExists ? null : ValidationError.PARENT_NOT_FOUND,
-                                    isCyclical ? ValidationError.CYCLE_DETECTED : null))
+                                    isCyclical ? ValidationError.CYCLE_DETECTED : null,
+                                    isExternalIdEmpty ? ValidationError.EMPTY_EXTERNAL_ID_FOUND : null))
                             .build();
                 })
                 .collect(Collectors.toList());

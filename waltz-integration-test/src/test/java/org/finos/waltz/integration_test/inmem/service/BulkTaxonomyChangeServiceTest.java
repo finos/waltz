@@ -274,6 +274,23 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
                 "z1 should be missing");
     }
 
+    @Test
+    public void ValidateIsExternalIdEmpty() {
+        EntityReference category = setupCategory();
+
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
+                category,
+                mkExternalIdEmpty(),
+                BulkTaxonomyItemParser.InputFormat.CSV,
+                BulkUpdateMode.ADD_ONLY);
+
+        assertTrue(
+                all(
+                        result.validatedItems(),
+                        d -> !isEmpty(d.errors())),
+                "expected validation failure because externalId is empty");
+    }
+
     // --- HELPERS -----
 
     private EntityReference setupCategory() {
@@ -347,6 +364,13 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
     private String mkSimpleTsv() {
         return "externalId, parentExternalId, name, description, concrete\n" +
                 "a1,, A1, Root node, false\n" +
+                "a1.1, a1, A1_1, First child, true\n" +
+                "a1.2, a1, A1_2, Second child, true\n";
+    }
+
+    private String mkExternalIdEmpty() {
+        return "externalId, parentExternalId, name, description, concrete\n" +
+                " , A1, Root node, false\n" +
                 "a1.1, a1, A1_1, First child, true\n" +
                 "a1.2, a1, A1_2, Second child, true\n";
     }

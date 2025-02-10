@@ -173,7 +173,9 @@ function controller($scope,
                     calcPreview();
                 },
                 onChange: () => {
-                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
+                    const required = [vm.commandParams.externalId];
+                    const hasEmptyRequiredFields = _.some(required, _.isEmpty);
+                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId || hasEmptyRequiredFields ;
                 },
                 paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.externalId})
             }, {
@@ -252,7 +254,7 @@ function controller($scope,
                 },
                 onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
                 onChange: () => {
-                    const required = [vm.commandParams.name];
+                    const required = [vm.commandParams.name, vm.commandParams.externalId];
                     vm.submitDisabled = _.some(required, _.isEmpty);
                 }
             }, {
@@ -266,7 +268,7 @@ function controller($scope,
                 },
                 onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
                 onChange: () => {
-                    const required = [vm.commandParams.name];
+                    const required = [vm.commandParams.name, vm.commandParams.externalId];
                     vm.submitDisabled = _.some(required, _.isEmpty);
                 }
             }
