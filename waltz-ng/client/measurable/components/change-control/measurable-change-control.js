@@ -174,8 +174,8 @@ function controller($scope,
                 },
                 onChange: () => {
                     const required = [vm.commandParams.externalId];
-                    const flag = _.some(required, _.isEmpty);
-                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId || flag ;
+                    const hasEmptyRequiredFields = _.some(required, _.isEmpty);
+                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId || hasEmptyRequiredFields ;
                 },
                 paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.externalId})
             }, {

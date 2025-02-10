@@ -284,7 +284,11 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
 
-        assertTrue(all(result.validatedItems(), d -> !isEmpty(d.errors())),"it contain errors");
+        assertTrue(
+                all(
+                        result.validatedItems(),
+                        d -> !isEmpty(d.errors())),
+                "expected validation failure because externalId is empty");
     }
 
     // --- HELPERS -----
