@@ -7,17 +7,18 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentRipplerJobStep;
-import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.assessment_rating.ImmutableRemoveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.settings.ImmutableSetting;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
@@ -118,6 +119,79 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
     @Test
     public void assessmentRemoveRipples() {
         userHelper.createUserWithSystemRoles("test", SetUtilities.asSet(SystemRole.ADMIN));
+        OneOffRipplerTestConfig cfg = mkWorld("assessmentAddRipples");
+
+        cfg.ratingItemIds().stream()
+                .forEach(t -> {
+                    SaveAssessmentRatingCommand cmd = ImmutableSaveAssessmentRatingCommand.builder()
+                            .entityReference(cfg.fromRef())
+                            .assessmentDefinitionId(cfg.fromAssessmentDefn().id().get())
+                            .ratingId(t)
+                            .lastUpdatedBy("test")
+                            .build();
+                    try {
+                        assessmentRatingService.store(cmd, "test");
+                        oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
+                    } catch (InsufficientPrivelegeException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        long addCounts = assessmentRatingService
+                .findByDefinitionId(cfg.targetAssessmentDefn().id().get())
+                .stream()
+                .count();
+
+        Long singleRating = cfg.ratingItemIds().stream().findFirst().get();
+
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser("test");
+        RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
+                .entityReference(cfg.fromRef())
+                .assessmentDefinitionId(cfg.fromAssessmentDefn().id().get())
+                .ratingId(singleRating)
+                .lastUpdatedAt(lastUpdate.at())
+                .lastUpdatedBy(lastUpdate.by())
+                .build();
+        try {
+            assessmentRatingService.remove(command, "test");
+            oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
+        } catch (InsufficientPrivelegeException e) {
+            e.printStackTrace();
+        }
+
+        long updatedCounts = assessmentRatingService
+                .findByDefinitionId(cfg.targetAssessmentDefn().id().get())
+                .stream()
+                .count();
+
+        // verify that one record has been flushed
+        assertEquals(addCounts - 1, updatedCounts);
+
+        cfg.ratingItemIds()
+                .stream()
+                .filter(t -> t.longValue() != singleRating.longValue())
+                .forEach(t -> {
+                    RemoveAssessmentRatingCommand command1 = ImmutableRemoveAssessmentRatingCommand.builder()
+                            .entityReference(cfg.fromRef())
+                            .assessmentDefinitionId(cfg.fromAssessmentDefn().id().get())
+                            .ratingId(t)
+                            .lastUpdatedAt(lastUpdate.at())
+                            .lastUpdatedBy(lastUpdate.by())
+                            .build();
+                    try {
+                        assessmentRatingService.remove(command1, "test");
+                        oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
+                    } catch (InsufficientPrivelegeException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        long finalCounts = assessmentRatingService
+                .findByDefinitionId(cfg.targetAssessmentDefn().id().get())
+                .stream()
+                .count();
+
+        assertEquals(0, finalCounts);
     }
 
     private OneOffRipplerTestConfig mkWorld(String stem) {
