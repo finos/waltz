@@ -126,16 +126,16 @@ public class InvolvementService {
     public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference entityReference, String username) {
         checkNotNull(entityReference, "entityReference cannot be empty");
         checkNotEmpty(username, "username cannot be empty");
-        if(StringUtilities.safeEq(entityReference.kind().name(), "LOGICAL_DATA_FLOW")) {
+        if(entityReference.kind().equals(EntityKind.LOGICAL_DATA_FLOW)) {
             return findSourceAndTargetInvolvementKinds(entityReference.id(), username);
-        } else if(StringUtilities.safeEq(entityReference.kind().name(), "PHYSICAL_FLOW")) {
+        } else if(entityReference.kind().equals(EntityKind.PHYSICAL_FLOW)) {
             PhysicalFlow physicalFlow = physicalFlowDao.getById(entityReference.id());
             return findSourceAndTargetInvolvementKinds(physicalFlow.logicalFlowId(), username);
         }
         return involvementDao.findExistingInvolvementKindIdsForUser(entityReference, username);
     }
 
-    public Set<Long> findSourceAndTargetInvolvementKinds(long logicalFlowId, String username) {
+    private Set<Long> findSourceAndTargetInvolvementKinds(long logicalFlowId, String username) {
         LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(logicalFlowId);
         Set<Long> sourceInvolvements = involvementDao.findExistingInvolvementKindIdsForUser(logicalFlow.source(), username);
         Set<Long> targetInvolvements = involvementDao.findExistingInvolvementKindIdsForUser(logicalFlow.target(), username);
