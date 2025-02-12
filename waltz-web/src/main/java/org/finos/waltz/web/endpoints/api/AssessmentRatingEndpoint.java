@@ -21,18 +21,27 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingOperations;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingSummaryCounts;
+import org.finos.waltz.model.assessment_rating.BulkAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.ImmutableRemoveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.SummaryCountRequest;
+import org.finos.waltz.model.assessment_rating.UpdateRatingCommand;
+import org.finos.waltz.service.assessment_rating.OneOffRippler;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
-import org.finos.waltz.model.assessment_rating.*;
+
 import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
-import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
-import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingItemParser;
 import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
@@ -63,6 +72,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private final AssessmentRatingService assessmentRatingService;
     private final AssessmentDefinitionService assessmentDefinitionService;
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
+    private final OneOffRippler oneOffRippler;
     private final UserRoleService userRoleService;
 
     private final BulkAssessmentRatingService bulkAssessmentRatingService;
@@ -72,18 +82,21 @@ public class AssessmentRatingEndpoint implements Endpoint {
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
                                     UserRoleService userRoleService,
-                                    BulkAssessmentRatingService bulkAssessmentRatingService) {
+                                    BulkAssessmentRatingService bulkAssessmentRatingService,
+                                    OneOffRippler oneOffRippler) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
+        checkNotNull(oneOffRippler, "oneOffRippler cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
         this.assessmentDefinitionService = assessmentDefinitionService;
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.userRoleService = userRoleService;
         this.bulkAssessmentRatingService = bulkAssessmentRatingService;
+        this.oneOffRippler = oneOffRippler;
     }
 
 
@@ -204,7 +217,14 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private boolean storeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveAssessmentRatingCommand command = mkCommand(request);
-        return assessmentRatingService.store(command, getUsername(request));
+        EntityReference parentEntityRef = getEntityReference(request);
+        String username = getUsername(request);
+
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(command.assessmentDefinitionId());
+        boolean resp = assessmentRatingService.store(command, username);
+        oneOffRippler.rippleAssessments(assessmentDefinition, parentEntityRef);
+
+        return resp;
     }
 
 
@@ -251,15 +271,23 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private boolean removeRoute(Request request, Response z) throws InsufficientPrivelegeException {
         String username = getUsername(request);
         UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
+        EntityReference parentEntityRef = getEntityReference(request);
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        long ratingId = getLong(request, "ratingId");
+
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(assessmentDefinitionId);
+
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
-                .entityReference(getEntityReference(request))
-                .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
-                .ratingId(getLong(request, "ratingId"))
+                .entityReference(parentEntityRef)
+                .assessmentDefinitionId(assessmentDefinitionId)
+                .ratingId(ratingId)
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
 
-        return assessmentRatingService.remove(command, getUsername(request));
+        boolean resp = assessmentRatingService.remove(command, username);
+        oneOffRippler.rippleAssessments(assessmentDefinition, parentEntityRef);
+        return resp;
     }
 
 
