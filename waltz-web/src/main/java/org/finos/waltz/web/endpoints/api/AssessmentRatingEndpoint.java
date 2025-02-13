@@ -19,7 +19,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.assessment_rating.AssessmentRatingOperations;
@@ -31,7 +30,6 @@ import org.finos.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.SummaryCountRequest;
 import org.finos.waltz.model.assessment_rating.UpdateRatingCommand;
-import org.finos.waltz.service.assessment_rating.OneOffRippler;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
@@ -72,7 +70,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private final AssessmentRatingService assessmentRatingService;
     private final AssessmentDefinitionService assessmentDefinitionService;
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
-    private final OneOffRippler oneOffRippler;
     private final UserRoleService userRoleService;
 
     private final BulkAssessmentRatingService bulkAssessmentRatingService;
@@ -82,21 +79,18 @@ public class AssessmentRatingEndpoint implements Endpoint {
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
                                     UserRoleService userRoleService,
-                                    BulkAssessmentRatingService bulkAssessmentRatingService,
-                                    OneOffRippler oneOffRippler) {
+                                    BulkAssessmentRatingService bulkAssessmentRatingService) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
-        checkNotNull(oneOffRippler, "oneOffRippler cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
         this.assessmentDefinitionService = assessmentDefinitionService;
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.userRoleService = userRoleService;
         this.bulkAssessmentRatingService = bulkAssessmentRatingService;
-        this.oneOffRippler = oneOffRippler;
     }
 
 

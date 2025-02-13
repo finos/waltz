@@ -72,9 +72,6 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private SettingsService settingsService;
 
-    @Autowired
-    private OneOffRippler oneOffRippler;
-
     @Value.Immutable
     interface OneOffRipplerTestConfig {
         EntityReference fromRef();
