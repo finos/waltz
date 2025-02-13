@@ -1,6 +1,5 @@
 package org.finos.waltz.integration_test.inmem.service;
 
-import liquibase.pro.packaged.A;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -85,6 +84,7 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
         AssessmentDefinition targetAssessmentDefn();
 
         Set<Long> ratingItemIds();
+
     }
 
     @Test
@@ -102,7 +102,6 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
                             .build();
                     try {
                         assessmentRatingService.store(cmd, "test");
-                        oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
                     } catch (InsufficientPrivelegeException e) {
                         e.printStackTrace();
                     }
@@ -131,7 +130,6 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
                             .build();
                     try {
                         assessmentRatingService.store(cmd, "test");
-                        oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
                     } catch (InsufficientPrivelegeException e) {
                         e.printStackTrace();
                     }
@@ -154,7 +152,6 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
                 .build();
         try {
             assessmentRatingService.remove(command, "test");
-            oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
         } catch (InsufficientPrivelegeException e) {
             e.printStackTrace();
         }
@@ -180,7 +177,6 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
                             .build();
                     try {
                         assessmentRatingService.remove(command1, "test");
-                        oneOffRippler.rippleAssessments(cfg.fromAssessmentDefn(), cfg.fromRef());
                     } catch (InsufficientPrivelegeException e) {
                         e.printStackTrace();
                     }

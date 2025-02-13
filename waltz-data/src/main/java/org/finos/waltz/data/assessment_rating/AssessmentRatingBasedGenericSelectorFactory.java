@@ -3,6 +3,7 @@ package org.finos.waltz.data.assessment_rating;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -44,12 +45,14 @@ public class AssessmentRatingBasedGenericSelectorFactory {
 
     private static Select<Record1<Long>> mkAssessmentRatingSelector(AssessmentBasedSelectionFilter params,
                                                                     EntityKind targetKind) {
+
+        Condition ratingIdCondition = !params.ratingIds().isEmpty() ? DSL.trueCondition() : ASSESSMENT_RATING.RATING_ID.in(params.ratingIds());
         return DSL
                 .select(ASSESSMENT_RATING.ENTITY_ID)
                 .from(ASSESSMENT_RATING)
                 .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(params.definitionId())
-                        .and(ASSESSMENT_RATING.RATING_ID.in(params.ratingIds())
-                                .and(ASSESSMENT_RATING.ENTITY_KIND.eq(targetKind.name()))));
+                        .and(ratingIdCondition)
+                        .and(ASSESSMENT_RATING.ENTITY_KIND.eq(targetKind.name())));
     }
 
 }

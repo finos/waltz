@@ -19,6 +19,8 @@ import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -72,7 +74,8 @@ public class AssessmentRipplerTest extends BaseInMemoryIntegrationTest {
                         "admin",
                         "rippler_test",
                         assmtA_extId,
-                        assmtB_extId));
+                        assmtB_extId,
+                        Optional.empty()));
     }
 
 
@@ -152,7 +155,8 @@ public class AssessmentRipplerTest extends BaseInMemoryIntegrationTest {
                 "admin",
                 "rippler_test",
                 assmtA_extId,
-                assmtB_extId);
+                assmtB_extId,
+                Optional.empty());
 
         // verify
         assertEquals(

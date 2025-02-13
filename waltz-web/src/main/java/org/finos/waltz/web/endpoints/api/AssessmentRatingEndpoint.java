@@ -217,14 +217,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private boolean storeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveAssessmentRatingCommand command = mkCommand(request);
-        EntityReference parentEntityRef = getEntityReference(request);
-        String username = getUsername(request);
-
-        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(command.assessmentDefinitionId());
-        boolean resp = assessmentRatingService.store(command, username);
-        oneOffRippler.rippleAssessments(assessmentDefinition, parentEntityRef);
-
-        return resp;
+        return assessmentRatingService.store(command, getUsername(request));
     }
 
 
@@ -275,8 +268,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
         long ratingId = getLong(request, "ratingId");
 
-        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(assessmentDefinitionId);
-
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
                 .entityReference(parentEntityRef)
                 .assessmentDefinitionId(assessmentDefinitionId)
@@ -285,9 +276,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
 
-        boolean resp = assessmentRatingService.remove(command, username);
-        oneOffRippler.rippleAssessments(assessmentDefinition, parentEntityRef);
-        return resp;
+        return assessmentRatingService.remove(command, username);
     }
 
 

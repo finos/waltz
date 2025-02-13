@@ -7,6 +7,7 @@ import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.PairDiffResult;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobStep;
@@ -59,7 +60,7 @@ public class OneOffRippler {
 
     @Autowired
     public OneOffRippler(DSLContext dsl,
-                                   SettingsDao settingsDao) {
+                        SettingsDao settingsDao) {
         this.dsl = dsl;
         this.settingsDao = settingsDao;
     }
@@ -83,12 +84,12 @@ public class OneOffRippler {
      * Currently only supports assessment rippling from Physical Flows to Logical Flows
      * @return  the number of steps taken, where a step is a source assessment def and a target assessment def
      */
-    public final Long rippleAssessments(org.finos.waltz.model.assessment_definition.AssessmentDefinition assessmentDefinition, EntityReference parentEntityRef) {
+    public final Long rippleAssessments(org.finos.waltz.model.assessment_definition.AssessmentDefinition assessmentDefinition, IdSelectionOptions scope) {
 
         // make sure that the assessment is being modified from the correct parent
         // (i.e. an application assessment is not being modified by a flow)
-        checkTrue(assessmentDefinition.entityKind().equals(parentEntityRef.kind()),
-                "Assessment not related to kind: %s", parentEntityRef.kind());
+        checkTrue(assessmentDefinition.entityKind().equals(scope.entityReference().kind()),
+                "Assessment not related to kind: %s", scope.entityReference().kind());
 
         // the ripplerConfig selected should only be the one where the 'from' entity is the parent
         Set<AssessmentRipplerJobStep> rippleConfig = findRippleConfig()
@@ -109,7 +110,7 @@ public class OneOffRippler {
                                     "waltz-assessment-rippler",
                                     step.fromDef(),
                                     step.toDef(),
-                                    parentEntityRef);
+                                    scope);
                             return 1;
                         })
                         .count();
@@ -124,7 +125,7 @@ public class OneOffRippler {
                                         String provenance,
                                         String from,
                                         String to,
-                                        EntityReference parentEntityRef) {
+                                        IdSelectionOptions scope) {
 
         Map<String, AssessmentDefinitionRecord> defs = tx
                 .selectFrom(ad)
@@ -135,7 +136,7 @@ public class OneOffRippler {
         Checks.checkNotNull(fromDef, "Cannot ripple assessment as definition: %s not found", from);
         AssessmentDefinitionRecord toDef = defs.get(to);
         Checks.checkNotNull(toDef, "Cannot ripple assessment as definition: %s not found", toDef);
-        rippleAssessment(tx, userId, provenance, fromDef, toDef, parentEntityRef);
+        rippleAssessment(tx, userId, provenance, fromDef, toDef, scope);
     }
 
 
@@ -144,7 +145,7 @@ public class OneOffRippler {
                                          String provenance,
                                          AssessmentDefinitionRecord from,
                                          AssessmentDefinitionRecord to,
-                                         EntityReference parentEntityRef) {
+                                         IdSelectionOptions scope) {
         checkTrue(
                 from.getRatingSchemeId().equals(to.getRatingSchemeId()),
                 "Assessments must share a rating scheme when rippling (%s -> %s)",
@@ -161,7 +162,7 @@ public class OneOffRippler {
                 provenance,
                 from,
                 to,
-                getTargetAndRatingProvider(tx, kinds, from, parentEntityRef)
+                getTargetAndRatingProvider(tx, kinds, from, scope)
         );
     }
 

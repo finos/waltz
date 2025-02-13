@@ -1,8 +1,14 @@
 package org.finos.waltz.service.assessment_rating;
 
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.finos.waltz.schema.tables.LogicalFlow;
@@ -24,21 +30,22 @@ public class RipplerUtils {
     private static final AssessmentRating ar = Tables.ASSESSMENT_RATING;
     private static final LogicalFlow lf = Tables.LOGICAL_FLOW;
 
-    public static Select<Record4<Long, Long, Long, String>> getTargetAndRatingProvider(DSLContext tx, Tuple2<EntityKind, EntityKind> kinds, AssessmentDefinitionRecord from, EntityReference parentEntitytRef) {
+    public static Select<Record4<Long, Long, Long, String>> getTargetAndRatingProvider(DSLContext tx, Tuple2<EntityKind, EntityKind> kinds, AssessmentDefinitionRecord from, IdSelectionOptions scope) {
         if (kinds.equals(tuple(EntityKind.PHYSICAL_FLOW, EntityKind.LOGICAL_DATA_FLOW))) {
             // PHYSICAL_FLOW -> LOGICAL
-            SelectConditionStep<Record1<Long>> logicalFlowIds = tx.select(pf.LOGICAL_FLOW_ID)
-                    .from(pf)
-                    .where(pf.ID.eq(parentEntitytRef.id()));
+            GenericSelector logicalFlowSelector = new GenericSelectorFactory()
+                    .applyForKind(kinds.v2, scope);
 
-            SelectConditionStep<Record1<Long>> physicalFlowIds = tx.select(pf.ID)
+            Select physicalFlowSelector = tx.select(pf.ID)
                     .from(pf)
-                    .where(pf.LOGICAL_FLOW_ID.in(logicalFlowIds));
+                    .innerJoin(lf)
+                        .on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
+                        .and(lf.ID.in(logicalFlowSelector.selector()));
 
             return tx.select(lf.ID, ar.RATING_ID, pf.ID, pf.NAME)
                             .from(pf)
                             .innerJoin(lf).on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
-                                .and(pf.ID.in(physicalFlowIds))
+                                .and(pf.ID.in(physicalFlowSelector))
                             .leftJoin(ar).on(ar.ENTITY_ID.eq(pf.ID))
                                 .and(ar.ENTITY_KIND.eq(from.getEntityKind()))
                                 .and(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))
