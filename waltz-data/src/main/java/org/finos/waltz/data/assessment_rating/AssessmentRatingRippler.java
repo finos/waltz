@@ -37,6 +37,7 @@ import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record1;
 import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -240,7 +241,7 @@ public class AssessmentRatingRippler {
             IdSelectionOptions defaultOptions = IdSelectionOptions.mkOpts(mkRef(kinds.v1, -1));
 
             GenericSelector logicalFlowSelector = new GenericSelectorFactory()
-                    .applyForKind(kinds.v2, scope.isPresent() ? scope.get() : defaultOptions);
+                    .applyForKind(kinds.v2, scope.orElse(defaultOptions));
 
             Select physicalFlowSelector = tx.select(pf.ID)
                     .from(pf)
@@ -248,10 +249,12 @@ public class AssessmentRatingRippler {
                     .on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
                     .and(lf.ID.in(logicalFlowSelector.selector()));
 
-            Condition physicalFlowSelectorCondition = scope.isPresent() ? pf.ID.in(physicalFlowSelector) : DSL.trueCondition();
-            Optional<Select> targetScopeSelector = scope.isPresent() ?
-                    Optional.ofNullable(logicalFlowSelector.selector())
-                    : Optional.empty();
+            Condition physicalFlowSelectorCondition = scope
+                    .map(k -> pf.ID.in(physicalFlowSelector))
+                    .orElse(DSL.trueCondition());
+
+            Optional<Select> targetScopeSelector = scope
+                    .map(k -> logicalFlowSelector.selector());
 
             rippleAssessments(
                     tx,
