@@ -249,9 +249,7 @@ public class AssessmentRatingRippler {
                     .on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
                     .and(lf.ID.in(logicalFlowSelector.selector()));
 
-            Condition physicalFlowSelectorCondition = scope
-                    .map(k -> pf.ID.in(physicalFlowSelector))
-                    .orElse(DSL.trueCondition());
+            Condition physicalFlowSelectorCondition = scope.isPresent() ? pf.ID.in(physicalFlowSelector) : DSL.trueCondition();
 
             Optional<Select> targetScopeSelector = scope
                     .map(k -> logicalFlowSelector.selector());

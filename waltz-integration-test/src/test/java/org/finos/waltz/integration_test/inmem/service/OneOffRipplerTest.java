@@ -22,7 +22,6 @@ import org.finos.waltz.model.settings.ImmutableSetting;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
-import org.finos.waltz.service.assessment_rating.OneOffRippler;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
@@ -43,7 +42,7 @@ import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.Assert.assertEquals;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
+public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private AssessmentDefinitionService assessmentDefinitionService;
@@ -158,7 +157,7 @@ public class OneOffRipplerTest extends BaseInMemoryIntegrationTest {
                 .stream()
                 .count();
 
-        // verify that one record has been flushed
+        // verify that one record has been removed
         assertEquals(addCounts - 1, updatedCounts);
 
         cfg.ratingItemIds()
