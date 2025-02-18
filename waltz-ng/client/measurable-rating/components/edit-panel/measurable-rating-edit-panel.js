@@ -348,6 +348,9 @@ function controller($q,
                 })
                 .finally(() => {
                     deselectMeasurable();
+                    if(vm.selected.measurable.categoryId === 33){
+                        alert('Please make sure to create the selected measurable as primary or non-primary..!');
+                    }
                 });
     };
 
