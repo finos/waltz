@@ -38,7 +38,7 @@
             rating = {
                 ratingId: $selectedRating?.rating.ratingId,
                 comment: $selectedRating?.rating.comment,
-                user_selectable: $selectedRating?.ratingItem.userSelectable
+                userSelectable: $selectedRating?.ratingItem.userSelectable
             }
         }
     }
@@ -106,8 +106,8 @@
 
     $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
 
-    $: canEdit = rating.user_selectable && _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
-    $: canRemove = rating.user_selectable && _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
+    $: canEdit = rating.userSelectable && _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
+    $: canRemove = rating.userSelectable && _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
     $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
     $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
 
@@ -115,7 +115,7 @@
     $: isMultiValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_MANY.key
     $: {
           if (!canEdit) {
-              if(rating.user_selectable) {
+              if(rating.userSelectable) {
                   ratingDisablementReason = "You do not have permissions to edit this rating, though you may be able to remove it";
               } else {
                   ratingDisablementReason = "You do not have permissions to edit this rating."
@@ -157,7 +157,7 @@
         </div>
     </div>
 
-    {#if $selectedRating?.rating.isReadOnly || !rating.user_selectable}
+    {#if $selectedRating?.rating.isReadOnly || !rating.userSelectable}
         <div class="help-block">
             <span style="color: orange">
                 <Icon name="lock"/>
