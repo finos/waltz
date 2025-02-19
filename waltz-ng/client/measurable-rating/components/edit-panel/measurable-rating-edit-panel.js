@@ -349,9 +349,9 @@ function controller($q,
                 .finally(() => {
                     deselectMeasurable();
                     if(vm.selected.measurable.categoryId === 33){
-                        alert('a.\tClick on the Level 3 Capability to view the selection button ‘Primary’.\n' +
-                            'b.\tIf it is a key capability for the application, click on ‘Primary’ button.\n' +
-                            'c.\tNote: Atleast 1 capability should be mapped as ‘Primary’ for the application.\n');
+                        alert('a.   Click on the Level 3 Capability to view the selection button ‘Primary’.\n' +
+                            'b.   If it is a key capability for the application, click on ‘Primary’ button.\n' +
+                            'c.   Note: Atleast 1 capability should be mapped as ‘Primary’ for the application.\n');
                     }
                 });
     };
