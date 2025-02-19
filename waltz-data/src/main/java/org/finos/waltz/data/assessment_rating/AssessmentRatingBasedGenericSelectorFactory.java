@@ -46,7 +46,7 @@ public class AssessmentRatingBasedGenericSelectorFactory {
     private static Select<Record1<Long>> mkAssessmentRatingSelector(AssessmentBasedSelectionFilter params,
                                                                     EntityKind targetKind) {
 
-        Condition ratingIdCondition = !params.ratingIds().isEmpty() ? ASSESSMENT_RATING.RATING_ID.in(params.ratingIds()) : DSL.trueCondition();
+        Condition ratingIdCondition = params.ratingIds().isEmpty() ? DSL.trueCondition() : ASSESSMENT_RATING.RATING_ID.in(params.ratingIds());
 
         return DSL
                 .select(ASSESSMENT_RATING.ENTITY_ID)
