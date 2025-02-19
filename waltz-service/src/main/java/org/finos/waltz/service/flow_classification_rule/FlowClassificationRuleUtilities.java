@@ -230,7 +230,11 @@ public class FlowClassificationRuleUtilities {
                                              EntityReference scopeEntity,
                                              Long scopeEntityOuId) {
         if (rvp.vantagePoint().kind() == EntityKind.ORG_UNIT) {
-            return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
+            if (scopeEntity.kind() == EntityKind.ACTOR) {
+                return null == scopeEntityOuId;
+            } else {
+                return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
+            }
         } else {
             // point-to-point flows e.g. ACTOR or APPLICATION
             return scopeEntity.equals(rvp.vantagePoint());
