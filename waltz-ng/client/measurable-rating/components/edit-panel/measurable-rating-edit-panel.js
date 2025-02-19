@@ -348,11 +348,11 @@ function controller($q,
                 })
                 .finally(() => {
                     deselectMeasurable();
-                    if(vm.selected.category.category.name === 'Capability'){
-                        alert('Primary Vs Non-Primary flag tagging for Application to Capability mapping\n' +
-                            'a. Click on the Level 3 Capability to view the selection button ‘Primary’.\n' +
-                            'b. If it is a key capability for the application, click on ‘Primary’ button.\n' +
-                            'c. Note: Atleast 1 capability should be mapped as ‘Primary’ for the application.');
+                    if(vm.selected.category.category.allowPrimaryRatings){
+                        alert('Primary Vs Non-Primary flag tagging for Application to measurable mapping\n' +
+                            'a. Click again on Level 3 to view the selection button ‘Primary’.\n' +
+                            'b. If it is a key measurable for the application, click on ‘Primary’ button.\n' +
+                            'c. Note: Atleast 1 measurable should be mapped as ‘Primary’ for the application.');
                     }
                 });
     };
