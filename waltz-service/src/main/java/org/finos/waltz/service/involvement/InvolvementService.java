@@ -20,11 +20,14 @@ package org.finos.waltz.service.involvement;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.EntityReferenceUtilities;
@@ -36,7 +39,9 @@ import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
@@ -66,6 +71,8 @@ public class InvolvementService {
 
     private final ChangeLogService changeLogService;
     private final InvolvementDao involvementDao;
+    private final LogicalFlowDao logicalFlowDao;
+    private final PhysicalFlowDao physicalFlowDao;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final InvolvementKindService involvementKindService;
     private final PersonDao personDao;
@@ -78,12 +85,16 @@ public class InvolvementService {
     @Autowired
     public InvolvementService(ChangeLogService changeLogService,
                               InvolvementDao dao,
+                              LogicalFlowDao logicalFlowDao,
+                              PhysicalFlowDao physicalFlowDao,
                               EntityReferenceNameResolver entityReferenceNameResolver,
                               InvolvementKindService involvementKindService,
                               PersonDao personDao,
                               UserRoleService userRoleService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "involvementDao must not be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
+        checkNotNull(physicalFlowDao, "physicalFlowDao must not be null");
         checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
         checkNotNull(involvementKindService, "involvementKindService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
@@ -91,6 +102,8 @@ public class InvolvementService {
 
         this.changeLogService = changeLogService;
         this.involvementDao = dao;
+        this.logicalFlowDao = logicalFlowDao;
+        this.physicalFlowDao = physicalFlowDao;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.involvementKindService = involvementKindService;
         this.userRoleService = userRoleService;
@@ -113,7 +126,21 @@ public class InvolvementService {
     public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference entityReference, String username) {
         checkNotNull(entityReference, "entityReference cannot be empty");
         checkNotEmpty(username, "username cannot be empty");
+        if(entityReference.kind().equals(EntityKind.LOGICAL_DATA_FLOW)) {
+            return findSourceAndTargetInvolvementKinds(entityReference.id(), username);
+        } else if(entityReference.kind().equals(EntityKind.PHYSICAL_FLOW)) {
+            PhysicalFlow physicalFlow = physicalFlowDao.getById(entityReference.id());
+            return findSourceAndTargetInvolvementKinds(physicalFlow.logicalFlowId(), username);
+        }
         return involvementDao.findExistingInvolvementKindIdsForUser(entityReference, username);
+    }
+
+    private Set<Long> findSourceAndTargetInvolvementKinds(long logicalFlowId, String username) {
+        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(logicalFlowId);
+        Set<Long> sourceInvolvements = involvementDao.findExistingInvolvementKindIdsForUser(logicalFlow.source(), username);
+        Set<Long> targetInvolvements = involvementDao.findExistingInvolvementKindIdsForUser(logicalFlow.target(), username);
+        sourceInvolvements.addAll(targetInvolvements);
+        return sourceInvolvements;
     }
 
 

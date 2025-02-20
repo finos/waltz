@@ -37,7 +37,8 @@
 
             rating = {
                 ratingId: $selectedRating?.rating.ratingId,
-                comment: $selectedRating?.rating.comment
+                comment: $selectedRating?.rating.comment,
+                userSelectable: $selectedRating?.ratingItem.userSelectable
             }
         }
     }
@@ -105,16 +106,20 @@
 
     $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
 
-    $: canEdit = _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
-    $: canRemove = _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
+    $: canEdit = rating.userSelectable && _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
+    $: canRemove = rating.userSelectable && _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
     $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
     $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
 
 
     $: isMultiValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_MANY.key
     $: {
-          if (! canEdit) {
-              ratingDisablementReason = "You do not have permissions to edit this rating, though you may be able to remove it";
+          if (!canEdit) {
+              if(rating.userSelectable) {
+                  ratingDisablementReason = "You do not have permissions to edit this rating, though you may be able to remove it";
+              } else {
+                  ratingDisablementReason = "You do not have permissions to edit this rating."
+              }
           } else if (isMultiValuedAssessment) {
               ratingDisablementReason = "Multi-valued ratings cannot be editied, please remove and then add the new rating";
           } else {
@@ -152,7 +157,7 @@
         </div>
     </div>
 
-    {#if $selectedRating?.rating.isReadOnly}
+    {#if $selectedRating?.rating.isReadOnly || !rating.userSelectable}
         <div class="help-block">
             <span style="color: orange">
                 <Icon name="lock"/>

@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.PairDiffResult;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobStep;
@@ -34,6 +37,7 @@ import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record1;
 import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -49,6 +53,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -130,11 +135,51 @@ public class AssessmentRatingRippler {
                                 "waltz",
                                 "waltz-assessment-rippler",
                                 step.fromDef(),
-                                step.toDef());
+                                step.toDef(),
+                                Optional.empty());
                         return 1;
                     })
                     .count();
         });
+    }
+
+    /**
+     * Ripple all assessments configured in the settings table for a particular scope
+     *
+     * @return  the number of steps taken, where a step is a source assessment def and a target assessment def
+     */
+    public final Long rippleAssessments(org.finos.waltz.model.assessment_definition.AssessmentDefinition assessmentDefinition, IdSelectionOptions scope) {
+        // make sure that the assessment is being modified from the correct parent
+        // (i.e. an application assessment is not being modified by a flow)
+        checkTrue(assessmentDefinition.entityKind().equals(scope.entityReference().kind()),
+                "Assessment not related to kind: %s", scope.entityReference().kind());
+
+        // the ripplerConfig selected should only be the one where the 'from' entity is the parent
+        Set<AssessmentRipplerJobStep> rippleConfig = findRippleConfig()
+                .stream()
+                .flatMap(config -> config.steps().stream())
+                .filter(step -> safeEq(step.fromDef(), assessmentDefinition.externalId().get()))
+                .collect(toSet());
+
+        if(!rippleConfig.isEmpty()) {
+            return dsl.transactionResult(ctx -> {
+                DSLContext tx = ctx.dsl();
+                return rippleConfig
+                        .stream()
+                        .map(step -> {
+                            rippleAssessment(
+                                    tx,
+                                    "waltz",
+                                    "waltz-assessment-rippler",
+                                    step.fromDef(),
+                                    step.toDef(),
+                                    Optional.ofNullable(scope));
+                            return 1;
+                        })
+                        .count();
+            });
+        }
+        return 0L;
     }
 
 
@@ -142,7 +187,8 @@ public class AssessmentRatingRippler {
                                         String userId,
                                         String provenance,
                                         String from,
-                                        String to) {
+                                        String to,
+                                        Optional<IdSelectionOptions> scope) {
 
         Map<String, AssessmentDefinitionRecord> defs = tx
                 .selectFrom(ad)
@@ -153,7 +199,7 @@ public class AssessmentRatingRippler {
         Checks.checkNotNull(fromDef, "Cannot ripple assessment as definition: %s not found", from);
         AssessmentDefinitionRecord toDef = defs.get(to);
         Checks.checkNotNull(toDef, "Cannot ripple assessment as definition: %s not found", toDef);
-        rippleAssessment(tx, userId, provenance, fromDef, toDef);
+        rippleAssessment(tx, userId, provenance, fromDef, toDef, scope);
     }
 
 
@@ -161,7 +207,8 @@ public class AssessmentRatingRippler {
                                          String userId,
                                          String provenance,
                                          AssessmentDefinitionRecord from,
-                                         AssessmentDefinitionRecord to) {
+                                         AssessmentDefinitionRecord to,
+                                         Optional<IdSelectionOptions> scope) {
         checkTrue(
                 from.getRatingSchemeId().equals(to.getRatingSchemeId()),
                 "Assessments must share a rating scheme when rippling (%s -> %s)",
@@ -187,9 +234,30 @@ public class AssessmentRatingRippler {
                             .innerJoin(pf)
                             .on(pf.SPECIFICATION_ID.eq(ps.ID))
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
-                                    .and(ps.IS_REMOVED.isFalse())));
+                                    .and(ps.IS_REMOVED.isFalse())),
+                    Optional.empty());
         } else if (kinds.equals(tuple(EntityKind.PHYSICAL_FLOW, EntityKind.LOGICAL_DATA_FLOW))) {
             // PHYSICAL_FLOW -> LOGICAL
+            IdSelectionOptions defaultOptions = IdSelectionOptions.mkOpts(mkRef(kinds.v1, -1));
+
+            GenericSelector logicalFlowSelector = new GenericSelectorFactory()
+                    .applyForKind(kinds.v2, scope.orElse(defaultOptions));
+
+            Select physicalFlowSelector = tx.select(pf.ID)
+                    .from(pf)
+                    .innerJoin(lf)
+                    .on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
+                    .and(lf.ID.in(logicalFlowSelector.selector()));
+
+            Condition physicalFlowInSelector = pf.ID.in(physicalFlowSelector);
+
+            Condition physicalFlowSelectorCondition = scope
+                    .map(s -> physicalFlowInSelector)
+                    .orElse(DSL.trueCondition());
+
+            Optional<Select> targetScopeSelector = scope
+                    .map(k -> logicalFlowSelector.selector());
+
             rippleAssessments(
                     tx,
                     userId,
@@ -202,7 +270,9 @@ public class AssessmentRatingRippler {
                             .innerJoin(lf).on(lf.ID.eq(pf.LOGICAL_FLOW_ID))
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
                                     .and(pf.IS_REMOVED.isFalse())
-                                    .and(pf.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))));
+                                    .and(pf.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                                    .and(physicalFlowSelectorCondition)),
+                    targetScopeSelector);
         } else if (kinds.v1 == EntityKind.LOGICAL_DATA_FLOW && (flowNodeEntities.contains(kinds.v2))) {
             // LOGICAL -> APP | ACTOR | END_USER_APP
             Condition lfIsActiveCondition = lf.IS_REMOVED.isFalse()
@@ -256,7 +326,8 @@ public class AssessmentRatingRippler {
                                     .leftJoin(targetEuda).on(targetEudaJoinCondition)
                                     .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId())
                                             .and(lf.TARGET_ENTITY_KIND.eq(kinds.v2.name()))
-                                            .and(lfIsActiveCondition))));
+                                            .and(lfIsActiveCondition))),
+                    Optional.empty());
         } else if (kinds.v1 == EntityKind.MEASURABLE && kinds.v2 == EntityKind.APPLICATION) {
             // MEASURABLE -> APPLICATION
             rippleAssessments(
@@ -270,7 +341,8 @@ public class AssessmentRatingRippler {
                             .innerJoin(mr).on(mr.MEASURABLE_ID.eq(ar.ENTITY_ID))
                             .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))
-                            .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                            .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())),
+                    Optional.empty());
         } else if (kinds.v1 == EntityKind.MEASURABLE && kinds.v2 == EntityKind.MEASURABLE_RATING) {
             // MEASURABLE -> MEASURABLE_RATING
             rippleAssessments(
@@ -284,7 +356,8 @@ public class AssessmentRatingRippler {
                             .innerJoin(mr).on(mr.MEASURABLE_ID.eq(ar.ENTITY_ID))
                             .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
                             .where(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))
-                            .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                            .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())),
+                    Optional.empty());
         } else if (kinds.v1 == EntityKind.CHANGE_INITIATIVE && kinds.v2 == EntityKind.APPLICATION) {
             // CHANGE_INITIATIVE -> APPLICATION
             rippleAssessments(
@@ -298,7 +371,8 @@ public class AssessmentRatingRippler {
                             .innerJoin(ci).on(ci.ID.eq(er.ID_A).and(er.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
                             .innerJoin(ar).on(ar.ENTITY_ID.eq(ci.ID)
                                     .and(ar.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                                    .and(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))));
+                                    .and(ar.ASSESSMENT_DEFINITION_ID.eq(from.getId()))),
+                    Optional.empty());
         } else {
             throw new UnsupportedOperationException(format(
                     "Cannot ripple assessment from kind: %s to kind: %s",
@@ -313,7 +387,8 @@ public class AssessmentRatingRippler {
                                           String provenance,
                                           AssessmentDefinitionRecord from,
                                           AssessmentDefinitionRecord to,
-                                          Select<Record4<Long, Long, Long, String>> targetAndRatingProvider) {
+                                          Select<Record4<Long, Long, Long, String>> targetAndRatingProvider,
+                                          Optional<Select> selector) {
         Timestamp now = nowUtcTimestamp();
         Set<AssessmentRatingRecord> required = MapUtilities
                 .groupAndThen(
@@ -345,9 +420,12 @@ public class AssessmentRatingRippler {
                 })
                 .collect(toSet());
 
+        Condition selectorCondition = selector.isPresent() ? ar.ENTITY_ID.in(selector.get()) : DSL.trueCondition();
+
         Result<AssessmentRatingRecord> existing = tx
                 .selectFrom(ar)
                 .where(ar.ASSESSMENT_DEFINITION_ID.eq(to.getId()))
+                .and(selectorCondition)
                 .fetch();
 
         PairDiffResult<AssessmentRatingRecord, AssessmentRatingRecord> diff = mkPairDiff(
