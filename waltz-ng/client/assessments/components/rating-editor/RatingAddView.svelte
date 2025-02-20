@@ -18,9 +18,9 @@
     let assessmentRatingCall;
 
     function onSave() {
-        const seletedDefnId = $selectedAssessment.definition.id;
+        const selectedDefnId = $selectedAssessment.definition.id;
         assessmentRatingStore
-            .store($primaryEntityReference, seletedDefnId, newRating)
+            .store($primaryEntityReference, selectedDefnId, newRating)
             .then(() => {
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 return $assessmentRatings = $assessmentRatingCall?.data;
@@ -67,17 +67,21 @@
                 bind:value={newRating.ratingId}>
             {#if dropdownConfig.style === 'simple'}
                 {#each dropdownConfig.options as entry}
-                    <option value={entry.id}>
-                        {entry.name}
-                    </option>
+                    {#if entry.userSelectable === true}
+                        <option value={entry.id}>
+                            {entry.name}
+                        </option>
+                    {/if}
                 {/each}
             {:else if dropdownConfig.style === 'grouped'}
                 {#each dropdownConfig.groups as g}
                     <optgroup label={g.groupName}>
                         {#each g.options as entry}
-                            <option value={entry.id}>
-                                {entry.name}
-                            </option>
+                            {#if entry.userSelectable === true}
+                                <option value={entry.id}>
+                                    {entry.name}
+                                </option>
+                            {/if}
                         {/each}
                     </optgroup>
                 {/each}

@@ -98,6 +98,7 @@ public class AssessmentRatingService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(rippler, "rippler cannot be null");
 
+
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
@@ -150,7 +151,9 @@ public class AssessmentRatingService {
         boolean isUpdate = assessmentRatingDao.isUpdate(command);
         createChangeLogEntryForSave(command, username, assessmentDefinition, isUpdate ? Operation.UPDATE : Operation.ADD);
 
-        return assessmentRatingDao.store(command);
+        boolean response = assessmentRatingDao.store(command);
+        rippler.rippleAssessments(assessmentDefinition, IdSelectionOptions.mkOpts(command.entityReference()));
+        return response;
     }
 
 
@@ -196,10 +199,12 @@ public class AssessmentRatingService {
                 .map(d -> d.name())
                 .collect(Collectors.joining(", "));
 
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
+
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
                         "Removed assessment: %s, rating: %s",
-                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name(),
+                        assessmentDefinition.name(),
                         ratingRemovedName))
                 .parentReference(mkRef(
                         command.entityReference().kind(),
@@ -213,7 +218,9 @@ public class AssessmentRatingService {
 
         changeLogService.write(logEntry);
 
-        return assessmentRatingDao.bulkRemove(command);
+        boolean response = assessmentRatingDao.bulkRemove(command);
+        rippler.rippleAssessments(assessmentDefinition, IdSelectionOptions.mkOpts(command.entityReference()));
+        return response;
     }
 
 
