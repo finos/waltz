@@ -358,6 +358,12 @@
         </tr>
         </tbody>
     </table>
+
+    <div ng-if="$ctrl.selected.rating && $ctrl.activeTab.category.allowPrimaryRatings">
+        <waltz-static-panels group-key='MEASURABLE_PRIMARY_NOTIFICATION'
+                             render-mode="minimal-border">
+        </waltz-static-panels>
+    </div>
 </script>
 
 
