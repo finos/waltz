@@ -77,9 +77,9 @@ _Permission Groups_ can be used to define subsets of entities involvement groups
 These two groups are linked to specific permission rules in the `PERMISSION_GROUP_INVOLVEMENT` table. The table defines:
 
 - the subject kind, the entity being permissioned
-  - e.g. Logical Data Flow
+  - e.g. _Logical Data Flow_
 - optionally, a qualifier entity to refine the subject
-  - e.g. if the subject was Assessment Ratings then the qualifier would be the Assessment Definition
+  - e.g. if the subject was _Assessment Ratings_ then the qualifier would be the _Assessment Definition_
 - the parent kind, defines which entity holds the involvements
   - e.g. when controlling flow permissions the parent would be application as that has the involvements unlike the flows which tend not to have involements associated to them
 - the operation, defines what kind of user operation the permission covers
