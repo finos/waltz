@@ -64,7 +64,7 @@
             <artifactId>waltz-service</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <!-- Excluded commons-io as it contained vulnerability with high severity -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
