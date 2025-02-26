@@ -24,16 +24,15 @@
                author="jainshrk">
         <tagDatabase tag="v1.67"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
-    <changeSet id="20252502-3636-1" author="mudesmi">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*) FROM role WHERE [key]='OSS_ADMIN';
-            </sqlCheck>
-        </preConditions>
-        <sql>
-            INSERT INTO role
-            ([key], is_custom, name, description, user_selectable)
-            VALUES('OSS_ADMIN', 0, 'OSS Admin', 'Allow users to manage licences in WALTZ admin section', 1);
-        </sql>
+    <changeSet id="20252502-3636-1"
+               author="mudesmi"
+               failOnError="false">
+        <insert tableName="role">
+            <column name="key" value="LICENCE_ADMIN" />
+            <column name="is_custom" valueBoolean="false" />
+            <column name="name" value="Licence Admin" />
+            <column name="description" value="Allow users to manage licences in WALTZ admin section" />
+            <column name="user_selectable" valueBoolean="true" />
+        </insert>
     </changeSet>
 </databaseChangeLog>

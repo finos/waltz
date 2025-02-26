@@ -100,7 +100,7 @@ const referenceDataOptions= [
         icon: "id-badge"
     }, {
         name: "Licences",
-        role: "OSS_ADMIN",
+        role: "LICENCE_ADMIN",
         description: "View and edit licences",
         state: "main.system.licences",
         icon: "id-card-o"
