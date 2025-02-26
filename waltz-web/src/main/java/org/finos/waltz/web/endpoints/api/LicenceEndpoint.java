@@ -116,7 +116,7 @@ public class LicenceEndpoint implements Endpoint {
 
     private void checkHasEditPermissions(String username) {
         checkTrue(
-                userRoleService.hasRole(username, SystemRole.ADMIN),
+                userRoleService.hasRole(username, SystemRole.LICENCE_ADMIN),
                 "User does not have the required permissions to edit licences");
     }
 }

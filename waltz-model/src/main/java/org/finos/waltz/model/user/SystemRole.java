@@ -53,7 +53,8 @@ public enum SystemRole {
     SURVEY_ADMIN,
     SURVEY_TEMPLATE_ADMIN,
     TAXONOMY_EDITOR,
-    USER_ADMIN;
+    USER_ADMIN,
+    LICENCE_ADMIN;
 
 
     public static Set<String> allNames() {
