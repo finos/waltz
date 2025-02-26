@@ -28,9 +28,9 @@
                author="mudesmi"
                failOnError="false">
         <insert tableName="role">
-            <column name="key" value="OSS_ADMIN" />
+            <column name="key" value="LICENCE_ADMIN" />
             <column name="is_custom" valueBoolean="false" />
-            <column name="name" value="OSS Admin" />
+            <column name="name" value="Licence Admin" />
             <column name="description" value="Allow users to manage licences in WALTZ admin section" />
             <column name="user_selectable" valueBoolean="true" />
         </insert>
