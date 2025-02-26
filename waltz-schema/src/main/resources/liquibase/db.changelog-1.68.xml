@@ -33,7 +33,7 @@
         <sql>
             INSERT INTO role
             ([key], is_custom, name, description, user_selectable)
-            VALUES('OSS_ADMIN', 0, 'OSS Admin', 'Allow users to manage licences in WALTZ admin section', 1);
+            VALUES('OSS_ADMIN', ${false.value}, 'OSS Admin', 'Allow users to manage licences in WALTZ admin section', ${true.value});
         </sql>
     </changeSet>
 </databaseChangeLog>
