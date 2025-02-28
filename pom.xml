@@ -105,6 +105,7 @@
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
         <commons-jexl3.version>3.2.1</commons-jexl3.version>  <!-- 3.3.0 causes evaluation issues -->
+        <commons-io.version>2.14.0</commons-io.version> <!-- 2.9.0 contained high severity vulnerability -->
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <playwright.skip>true</playwright.skip>
@@ -302,6 +303,13 @@
                 <groupId>net.sf.supercsv</groupId>
                 <artifactId>super-csv</artifactId>
                 <version>${super-csv.version}</version>
+            </dependency>
+
+            <!-- commons-io 2.9.0 contains a high severity CVE -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
