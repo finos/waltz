@@ -87,7 +87,8 @@ function controller($interval,
         .whoami(true) // force
         .then(user => vm.user = user)
         .then(() => vm.showSysAdminMenuItem = userService.hasRole(vm.user, roles.ADMIN)
-                                                || userService.hasRole(vm.user, roles.USER_ADMIN));
+                                                || userService.hasRole(vm.user, roles.USER_ADMIN)
+                                                || userService.hasRole(vm.user, roles.LICENCE_ADMIN));
 
     const notificationCacheRefreshListener = (e) => {
         if (e.eventType === "REFRESH"
