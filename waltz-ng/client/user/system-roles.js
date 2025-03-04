@@ -126,5 +126,10 @@ export default {
         key: "USER_ADMIN",
         name: "User Admin",
         description: "Can modify user roles and permissions"
+    },
+    "LICENCE_ADMIN" : {
+        key: "LICENCE_ADMIN",
+        name: "Licence Admin",
+        description: "Can manage licences"
     }
 }
