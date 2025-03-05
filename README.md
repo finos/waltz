@@ -66,10 +66,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date     | Provisional Change Summary                               |
-|---------|----------|----------------------------------------------------------|
-| 1.67    | Jan 2024 | Deprecation of measurables from the UI, and other fixes. | 
-| 1.68    | Feb 2024 | TBC                                                      | 
+| Release | Date       | Provisional Change Summary                                                              |
+|---------|------------|-----------------------------------------------------------------------------------------|
+| 1.68    | Feb 2024   | Licence admin role to only manage licenses, support for one off assessment ripple, etc. | 
+| 1.68.1  | March 2024 | TBC                                                                                     | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
