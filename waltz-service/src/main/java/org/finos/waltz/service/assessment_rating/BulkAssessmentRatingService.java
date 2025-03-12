@@ -171,8 +171,7 @@ public class BulkAssessmentRatingService {
                             existingAssessmentRatings,
                             requiredAssessmentRatings,
                             d -> tuple(d.entityReference(), d.assessmentDefinitionId(), d.ratingId()),
-                            (a, b) -> StringUtilities.safeEq(a.comment(), b.comment())
-                                    && a.ratingId() == b.ratingId());
+                            (a, b) -> StringUtilities.safeEq(a.comment(), b.comment()));
         }
 
         Set<Tuple2<EntityReference, Long>> toAdd = SetUtilities.map(assessmentRatingDiffResult.otherOnly(), d -> tuple(d.entityReference(), d.ratingId()));
