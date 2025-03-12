@@ -156,13 +156,23 @@ public class BulkAssessmentRatingService {
 
         List<AssessmentRating> existingAssessmentRatings = assessmentRatingService.findByDefinitionId(assessmentReference.id());
 
-        DiffResult<AssessmentRating> assessmentRatingDiffResult = DiffResult
-                .mkDiff(
-                        existingAssessmentRatings,
-                        requiredAssessmentRatings,
-                        d -> tuple(d.entityReference(), d.assessmentDefinitionId()),
-                        (a, b) -> StringUtilities.safeEq(a.comment(), b.comment())
-                                && a.ratingId() == b.ratingId());
+        DiffResult<AssessmentRating> assessmentRatingDiffResult;
+        if (isCardinalityZeroToOne) {
+            assessmentRatingDiffResult = DiffResult
+                    .mkDiff(
+                            existingAssessmentRatings,
+                            requiredAssessmentRatings,
+                            d -> tuple(d.entityReference(), d.assessmentDefinitionId()),
+                            (a, b) -> StringUtilities.safeEq(a.comment(), b.comment())
+                                    && a.ratingId() == b.ratingId());
+        } else {
+            assessmentRatingDiffResult = DiffResult
+                    .mkDiff(
+                            existingAssessmentRatings,
+                            requiredAssessmentRatings,
+                            d -> tuple(d.entityReference(), d.assessmentDefinitionId(), d.ratingId()),
+                            (a, b) -> StringUtilities.safeEq(a.comment(), b.comment()));
+        }
 
         Set<Tuple2<EntityReference, Long>> toAdd = SetUtilities.map(assessmentRatingDiffResult.otherOnly(), d -> tuple(d.entityReference(), d.ratingId()));
         Set<Tuple2<EntityReference, Long>> toUpdate = SetUtilities.map(assessmentRatingDiffResult.differingIntersection(), d -> tuple(d.entityReference(), d.ratingId()));
@@ -212,6 +222,9 @@ public class BulkAssessmentRatingService {
         }
         Timestamp now = DateTimeUtilities.nowUtcTimestamp();
 
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionService.getById(assessmentRef.id());
+        boolean isCardinalityZeroToOne = assessmentDefinition.cardinality().equals(Cardinality.ZERO_ONE);
+
         Set<AssessmentRatingRecord> toAdd = preview
                 .validatedItems()
                 .stream()
@@ -231,20 +244,37 @@ public class BulkAssessmentRatingService {
                 })
                 .collect(Collectors.toSet());
 
-        Set<UpdateConditionStep<AssessmentRatingRecord>> toUpdate = preview
+
+        Set<UpdateConditionStep<AssessmentRatingRecord>> toUpdate;
+        if (isCardinalityZeroToOne) {
+            toUpdate = preview
                     .validatedItems()
                     .stream()
                     .filter(d -> d.changeOperation() == ChangeOperation.UPDATE && d.errors().isEmpty())
                     .map(d ->
                             DSL
-                            .update(ar)
-                            .set(ar.RATING_ID, d.ratingSchemeItem().id().get())
-                            .set(ar.DESCRIPTION, sanitizeCharacters(d.parsedItem().comment()))
-                            .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentRef.id())
-                                    .and(ar.ENTITY_KIND.eq(d.entityKindReference().kind().name())
-                                            .and(ar.ENTITY_ID.eq(d.entityKindReference().id()))
-                                            .and(ar.RATING_ID.eq(d.ratingSchemeItem().id().get())))))
+                                    .update(ar)
+                                    .set(ar.RATING_ID, d.ratingSchemeItem().id().get())
+                                    .set(ar.DESCRIPTION, sanitizeCharacters(d.parsedItem().comment()))
+                                    .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentRef.id())
+                                            .and(ar.ENTITY_KIND.eq(d.entityKindReference().kind().name())
+                                                    .and(ar.ENTITY_ID.eq(d.entityKindReference().id())))))
                     .collect(Collectors.toSet());
+        } else {
+            toUpdate = preview
+                    .validatedItems()
+                    .stream()
+                    .filter(d -> d.changeOperation() == ChangeOperation.UPDATE && d.errors().isEmpty())
+                    .map(d ->
+                            DSL
+                                    .update(ar)
+                                    .set(ar.DESCRIPTION, sanitizeCharacters(d.parsedItem().comment()))
+                                    .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentRef.id())
+                                            .and(ar.ENTITY_KIND.eq(d.entityKindReference().kind().name())
+                                                    .and(ar.ENTITY_ID.eq(d.entityKindReference().id()))
+                                                    .and(ar.RATING_ID.eq(d.ratingSchemeItem().id().get())))))
+                    .collect(Collectors.toSet());
+        }
 
         Set<DeleteConditionStep<AssessmentRatingRecord>> toRemove = preview
                 .removals()

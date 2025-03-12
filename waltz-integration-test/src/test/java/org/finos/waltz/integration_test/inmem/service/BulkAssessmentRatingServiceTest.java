@@ -195,4 +195,64 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
                 + externalId + "\tbadRatingCode\ttrue\tcomment\n";
     }
 
+    @Test
+    public void bulkPreviewForCardinalityZeroToMany() {
+        String appName = mkName(stem, "previewApp");
+        String appExternalId = mkName(stem, "previewAppCode");
+        String appName1 = mkName(stem, "previewApp1");
+        String appExternalId1 = mkName(stem, "previewAppCode1");
+        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "SchemeApp1"));
+        ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 0, "green", "Y");
+        ratingSchemeHelper.saveRatingItem(schemeId, "No", 0, "red", "N");
+        appHelper.createNewApp(
+                appName,
+                ouIds.root,
+                appExternalId);
+        appHelper.createNewApp(
+                appName1,
+                ouIds.root,
+                appExternalId1);
+        long defId = assessmentHelper.createDefinition(schemeId, "Assessment_DefinitionA", "", AssessmentVisibility.PRIMARY, "Test",
+                EntityKind.LEGAL_ENTITY_RELATIONSHIP, Cardinality.ZERO_MANY, Optional.ofNullable(null));
+        AssessmentDefinition def = assessmentDefinitionService.getById(defId);
+        String[] externalIds = {appExternalId,appExternalId1};
+        String[] ratingCodes = {"Y","N"};
+        AssessmentRatingValidationResult result = bulkAssessmentRatingService.bulkPreview(
+                mkRef(def.entityKind(), def.id().get()),
+                mkTsvWithForCardinalityCheck(externalIds, ratingCodes));
+
+        assertEquals(2, result.validatedItems().size(), "Expected 2 items");
+    }
+
+    @Test
+    public void bulkUpdateForCardinalityZeroToMany() {
+        String name = mkName(stem, "previewApp1");
+        String kindExternalId = mkName(stem, "previewAppExtId");
+        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "SchemeApp1");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 0, "green", "Y");
+        appHelper.createNewApp(
+                mkName(stem, "previewUpdatesApp1"),
+                ouIds.root,
+                kindExternalId);
+        long defId = assessmentHelper.createDefinition(schemeId, "Assessment_Definition1", "", AssessmentVisibility.PRIMARY, "Test",
+                EntityKind.APPLICATION, Cardinality.ZERO_MANY, Optional.ofNullable(null));
+        AssessmentDefinition def1 = assessmentDefinitionService.getById(defId);
+        EntityReference cfg = mkRef(EntityKind.APPLICATION, defId);
+        SaveAssessmentRatingCommand cmd = ImmutableSaveAssessmentRatingCommand.builder()
+                .entityReference(cfg)
+                .assessmentDefinitionId(defId)
+                .ratingId(26)
+                .lastUpdatedBy("test")
+                .build();
+        try {
+            assessmentRatingService.store(cmd, "test");
+        } catch (InsufficientPrivelegeException e) {
+            e.printStackTrace();
+        }
+        AssessmentRatingValidationResult result1 = bulkAssessmentRatingService.bulkPreview(
+                mkRef(def1.entityKind(), def1.id().get()),
+                mkGoodTsv(kindExternalId));
+
+        assertNotNull(result1.validatedItems().get(0).changeOperation(), ChangeOperation.UPDATE.name());
+    }
 }
