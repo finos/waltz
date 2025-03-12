@@ -66,6 +66,10 @@ public class RatingSchemeService {
         return ratingSchemeDAO.findRatingSchemeItemsByIds(ids);
     }
 
+    public RatingSchemeItem findRatingSchemeItemById(Long id) {
+        return ratingSchemeDAO.findRatingSchemeItemById(id);
+    }
+
 
     public Boolean save(RatingScheme scheme) {
         return ratingSchemeDAO.save(scheme);

@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.assessment_rating.AssessmentRatingOperations;
@@ -37,11 +38,14 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentRipplerJobConfiguration;
 
 import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
+import org.finos.waltz.model.rating.RatingScheme;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.NotAuthorizedException;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -54,6 +58,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
@@ -71,26 +76,29 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private final AssessmentDefinitionService assessmentDefinitionService;
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final UserRoleService userRoleService;
-
     private final BulkAssessmentRatingService bulkAssessmentRatingService;
+    private final RatingSchemeService ratingSchemeService;
 
     @Autowired
     public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService,
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
                                     UserRoleService userRoleService,
-                                    BulkAssessmentRatingService bulkAssessmentRatingService) {
+                                    BulkAssessmentRatingService bulkAssessmentRatingService,
+                                    RatingSchemeService ratingSchemeService) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
         this.assessmentDefinitionService = assessmentDefinitionService;
         this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.userRoleService = userRoleService;
         this.bulkAssessmentRatingService = bulkAssessmentRatingService;
+        this.ratingSchemeService = ratingSchemeService;
     }
 
 
@@ -211,6 +219,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private boolean storeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveAssessmentRatingCommand command = mkCommand(request);
+        ratingItemUserSelectableOrThrow(command.ratingId());
         return assessmentRatingService.store(command, getUsername(request));
     }
 
@@ -224,6 +233,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private boolean updateRatingRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         UpdateRatingCommand updateRatingCommand = readBody(request, UpdateRatingCommand.class);
         long assessmentRatingId = getId(request);
+        ratingItemUserSelectableOrThrow(updateRatingCommand.newRatingId());
         return assessmentRatingService.updateRating(assessmentRatingId, updateRatingCommand, getUsername(request));
     }
 
@@ -321,6 +331,13 @@ public class AssessmentRatingEndpoint implements Endpoint {
             AssessmentRatingValidationResult preview = bulkAssessmentRatingService.bulkPreview(assessmentDefRef, body);
             return bulkAssessmentRatingService.apply(assessmentDefRef, preview, getUsername(req));
         });
+    }
+
+    private void ratingItemUserSelectableOrThrow(Long itemId) {
+        RatingSchemeItem ratingSchemeItem = ratingSchemeService.findRatingSchemeItemById(itemId);
+        if(!ratingSchemeItem.userSelectable()){
+            throw new IllegalArgumentException("Rating not user selectable");
+        }
     }
 
 }

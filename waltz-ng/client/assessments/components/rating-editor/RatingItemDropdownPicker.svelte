@@ -43,17 +43,21 @@
         bind:value={ratingId}>
     {#if dropdownConfig.style === 'simple'}
         {#each dropdownConfig.options as entry}
-            <option value={entry.id}>
-                {entry.name}
-            </option>
+            {#if entry.userSelectable === true}
+                <option value={entry.id}>
+                    {entry.name}
+                </option>
+            {/if}
         {/each}
     {:else if dropdownConfig.style === 'grouped'}
         {#each dropdownConfig.groups as g}
             <optgroup label={g.groupName}>
                 {#each g.options as entry}
-                    <option value={entry.id}>
-                        {entry.name}
-                    </option>
+                    {#if entry.userSelectable === true}
+                        <option value={entry.id}>
+                            {entry.name}
+                        </option>
+                    {/if}
                 {/each}
             </optgroup>
         {/each}
