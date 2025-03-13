@@ -209,6 +209,14 @@ public class RatingSchemeDAO {
                 .fetchSet(TO_ITEM_MAPPER);
     }
 
+    public RatingSchemeItem findRatingSchemeItemById(Long id) {
+        checkNotNull(id, "id cannot be null");
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.eq(id))
+                .fetchOne(TO_ITEM_MAPPER);
+    }
+
 
     public Set<RatingSchemeItem> findRatingSchemeItemsForSchemeIds(Set<Long> schemeIds) {
         return dsl
