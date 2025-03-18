@@ -29,7 +29,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.schema.Tables.ALLOCATION;
 import static org.finos.waltz.schema.tables.AllocationScheme.ALLOCATION_SCHEME;
 import static java.util.Optional.ofNullable;
 
@@ -68,8 +67,8 @@ public class AllocationSchemeDao {
     public AllocationScheme getByExternalId(String externalId) {
         return dsl
                 .select(ALLOCATION_SCHEME.fields())
-                .from(ALLOCATION)
-                .where(ALLOCATION.EXTERNAL_ID.eq(externalId))
+                .from(ALLOCATION_SCHEME)
+                .where(ALLOCATION_SCHEME.EXTERNAL_ID.eq(externalId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
