@@ -209,7 +209,7 @@ public class RatingSchemeDAO {
                 .fetchSet(TO_ITEM_MAPPER);
     }
 
-    public RatingSchemeItem findRatingSchemeItemById(Long id) {
+    public RatingSchemeItem getRatingSchemeItemById(Long id) {
         checkNotNull(id, "id cannot be null");
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)

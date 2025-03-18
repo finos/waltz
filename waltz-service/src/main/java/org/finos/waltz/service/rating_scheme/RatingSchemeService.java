@@ -66,8 +66,8 @@ public class RatingSchemeService {
         return ratingSchemeDAO.findRatingSchemeItemsByIds(ids);
     }
 
-    public RatingSchemeItem findRatingSchemeItemById(Long id) {
-        return ratingSchemeDAO.findRatingSchemeItemById(id);
+    public RatingSchemeItem getRatingSchemeItemById(Long id) {
+        return ratingSchemeDAO.getRatingSchemeItemById(id);
     }
 
 
