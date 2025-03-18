@@ -26,4 +26,7 @@ public interface BulkMeasurableRatingItem {
 
     @Nullable
     String comment();
+
+    @Nullable
+    Integer allocation();
 }

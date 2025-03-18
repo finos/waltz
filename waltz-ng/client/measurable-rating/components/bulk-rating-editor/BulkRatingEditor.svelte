@@ -4,8 +4,12 @@
     import { displayError } from "../../../common/error-utils";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import Tooltip from "../../../common/svelte/Tooltip.svelte";
+    import DataCellErrorTooltip from "./DataCellErrorTooltip.svelte";
+
 
     export let primaryEntityRef;
+    let canApply = false;
 
     const multipleIncludes = (err = [], arr = []) => {
         for(let i = 0; i < arr.length; i++) {
@@ -39,6 +43,7 @@
         RATING_NOT_FOUND: "RATING_NOT_FOUND",
         MEASURABLE_NOT_CONCRETE: "MEASURABLE_NOT_CONCRETE",
         RATING_NOT_USER_SELECTABLE: "RATING_NOT_USER_SELECTABLE",
+        ALLOCATION_EXCEEDING: "ALLOCATION_EXCEEDING",
     };
 
     const CHANGE_FIELD_TYPE = {
@@ -60,6 +65,7 @@
             .bulkRatingPreviewByCategory(primaryEntityRef.id, uploadData)
             .then((res) => {
                 previewResponse = res.data;
+                canApply = _.isNil(previewResponse.error) && _.every(previewResponse.validatedItems, d => _.isEmpty(d.errors));
                 mode = MODES.PREVIEW;
             })
             .catch((e) => {
@@ -86,6 +92,42 @@
         mode = MODES.EDIT;
     }
 
+    function mkItemClass(item) {
+      if (! _.isEmpty(item.errors)) {
+          return "op-error";
+      }
+      switch (item.changeOperation) {
+          case "ADD":
+              return "op-add";
+          case "UPDATE":
+              return "op-update";
+          case "NONE":
+              return "op-none";
+          case "RESTORE":
+              return "op-restore";
+          default:
+              return "op-error";
+      }
+  }
+
+    function mkOpLabel(item) {
+      if (! _.isEmpty(item.errors)) {
+          return "Error";
+      }
+      switch (item.changeOperation) {
+          case "ADD":
+              return "Add";
+          case "UPDATE":
+              return "Update";
+          case "NONE":
+              return "None";
+          case "RESTORE":
+              return "Restore";
+          default:
+              return "??" + item.changeOperation + "??";
+      }
+  }
+
 </script>
 
 <div class="container-lg">
@@ -99,15 +141,15 @@
         <details>
             <summary>Help <Icon name="circle-question"/></summary>
             <div class="help-block" style="margin-top: 0px;">
-                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, and comment
+                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, allocation and comment
                 combination. For example:
             </div>
 
             <pre>
-assetCode	taxonomyExternalId	ratingCode	isPrimary	comment
-EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
-99999	99999	?	TRUE	This is another example
-#99999	99999	X	TRUE	Lines prefixed by a '#' will be ignored</pre>
+assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	comment
+EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
+99999	99999	I	TRUE	100	This is another example
+#99999	99999	X	TRUE	100	Lines prefixed by a '#' will be ignored</pre>
         </details>
         <form autocomplete="off" on:submit|preventDefault={onPreviewRows}>
             <fieldset>
@@ -115,7 +157,7 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
                     <div>
                         <textarea
                             bind:value={uploadData}
-                            placeholder="assetCode  taxonomyExternalId  ratingCode  isPrimary   comment"
+                            placeholder="assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	comment"
                             rows="10"
                             cols="70"
                         ></textarea>
@@ -146,10 +188,12 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
                 <table id="preview-table" class="table table-condensed small" style="max-width: inherit;">
                     <thead>
                         <tr>
+                            <th>Action</th>
                             <th>Asset</th>
                             <th>Measurable</th>
                             <th>Rating</th>
                             <th>Primary</th>
+                            <th>Allocation</th>
                             <th>Comment</th>
                             <th>Error</th>
                         </tr>
@@ -157,6 +201,9 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
                     <tbody>
                         {#each previewResponse.validatedItems as obj}
                                 <tr style="max-width: inherit;">
+                                    <td class={mkItemClass(obj)}>
+                                        {mkOpLabel(obj)}
+                                    </td>
                                     <td
                                         class:cell-error={_.includes(
                                             obj.errors,
@@ -187,20 +234,36 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
                                             [VALIDATION_ERROR.RATING_NOT_FOUND, VALIDATION_ERROR.RATING_NOT_USER_SELECTABLE],
                                         )}
                                     >
-                                    { obj.ratingSchemeItem ? obj.ratingSchemeItem.name : obj.parsedItem.ratingCode }</td>
+                                        { obj.ratingSchemeItem ? obj.ratingSchemeItem.name : obj.parsedItem.ratingCode }
+                                    </td>
                                     <td>
                                         {obj.parsedItem.isPrimary}
+                                    </td>
+                                    <td
+                                        class:cell-error={_.includes(
+                                            obj.errors,
+                                            VALIDATION_ERROR.ALLOCATION_EXCEEDING,
+                                        )}
+                                        class:positive-result={!_.includes(
+                                            obj.errors,
+                                            VALIDATION_ERROR.ALLOCATION_EXCEEDING
+                                        )}
+                                    >
+                                        { obj.parsedItem.allocation }
                                     </td>
                                     <td>
                                         {obj.parsedItem.comment}
                                     </td>
-                                    <td class:cell-error={obj.errors.length != 0}>
-                                        <span>
-                                            {#each obj.errors as err}
-                                                {err}{" "}
-                                            {/each}
-                                        </span>
-                                    </td>
+                                    <td>
+                                        {#if obj.errors.length > 0}
+                                            <Tooltip content={DataCellErrorTooltip}
+                                                        props={{errors: obj.errors}}>
+                                                <svelte:fragment slot="target">
+                                                    <Icon name="exclamation-triangle" class="error-cell" color="red"/>
+                                                </svelte:fragment>
+                                            </Tooltip>
+                                        {/if}
+                                      </td>
                                 </tr>
                         {/each}
                         </tbody>
@@ -209,7 +272,7 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
         {/if}
         <form autocomplete="off" on:submit|preventDefault={onBulkApply}>
             <button class="btn btn-success"
-                    disabled={ previewResponse.error }
+                    disabled={!canApply}
                     type="submit">
                 Apply
             </button>
@@ -229,6 +292,25 @@ EXAMPLE_CODE	EXAMPLE_ID	X	TRUE	This is an example
 </div>
 
 <style>
+    .op-add {
+      background-color: #caf8ca;
+    }
+
+    .op-update {
+        background-color: #fdfdbd;
+    }
+
+    .op-none {
+        background-color: #f3f3f3;
+    }
+
+    .op-restore {
+        background-color: #dcf7fc;
+    }
+
+    .op-error {
+        background-color: #ffccd7;
+    }
     .cell-error {
         background-color: #ffccd7;
     }
