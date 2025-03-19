@@ -334,7 +334,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
     private void ratingItemUserSelectableOrThrow(Long itemId) {
-        RatingSchemeItem ratingSchemeItem = ratingSchemeService.findRatingSchemeItemById(itemId);
+        RatingSchemeItem ratingSchemeItem = ratingSchemeService.getRatingSchemeItemById(itemId);
         if(!ratingSchemeItem.userSelectable()){
             throw new IllegalArgumentException("Rating not user selectable");
         }
