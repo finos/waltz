@@ -96,37 +96,15 @@
       if (! _.isEmpty(item.errors)) {
           return "op-error";
       }
-      switch (item.changeOperation) {
-          case "ADD":
-              return "op-add";
-          case "UPDATE":
-              return "op-update";
-          case "NONE":
-              return "op-none";
-          case "RESTORE":
-              return "op-restore";
-          default:
-              return "op-error";
-      }
-  }
+      return "op-none";
+    }
 
     function mkOpLabel(item) {
       if (! _.isEmpty(item.errors)) {
           return "Error";
       }
-      switch (item.changeOperation) {
-          case "ADD":
-              return "Add";
-          case "UPDATE":
-              return "Update";
-          case "NONE":
-              return "None";
-          case "RESTORE":
-              return "Restore";
-          default:
-              return "??" + item.changeOperation + "??";
-      }
-  }
+      return "";
+    }
 
 </script>
 
@@ -150,6 +128,12 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	comment
 EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
 99999	99999	I	TRUE	100	This is another example
 #99999	99999	X	TRUE	100	Lines prefixed by a '#' will be ignored</pre>
+            <div class="help-note">
+                <strong>Please Note:</strong>
+                To enable validation of allocations across the whole application, 
+                all existing measuarables/taxonomies for a single application 
+                should to be included in the bulk load.
+            </div>
         </details>
         <form autocomplete="off" on:submit|preventDefault={onPreviewRows}>
             <fieldset>
@@ -281,17 +265,34 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
     {/if}
     {#if mode === MODES.RESULT}
         <div class="alert alert-success">
-            <p>Bulk Upload Successful!</p>
+            <p class="title">Bulk Upload Successful!</p>
+            <p class="section-title">Measurable Rating Results</p>
             <p>Records Added: {applyResponse.recordsAdded}</p>
             <p>Records Updated: {applyResponse.recordsUpdated}</p>
             <p>Records Removed: {applyResponse.recordsRemoved}</p>
             <p>Skipped Rows: {applyResponse.skippedRows}</p>
+            <p class="section-title">Measurable Allocation Results</p>
+            <p>Allocations Added: {applyResponse.allocationsAdded}</p>
         </div>
         <button class="btn btn-skinny" on:click={onGoBack}>Back To Editor</button>
     {/if}
 </div>
 
 <style>
+    .help-note {
+        color: #737373;
+    }
+    .title {
+        color: #337ab7;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+
+    .section-title {
+        color: #337ab7;
+        margin-bottom: 0.5em;
+    }
+
     .op-add {
       background-color: #caf8ca;
     }

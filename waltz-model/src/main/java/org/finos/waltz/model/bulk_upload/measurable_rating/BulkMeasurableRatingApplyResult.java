@@ -10,7 +10,7 @@ public interface BulkMeasurableRatingApplyResult {
     int recordsAdded();
     int recordsUpdated();
     int recordsRemoved();
-
     int skippedRows();
+    int allocationsAdded();
 
 }
