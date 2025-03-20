@@ -152,6 +152,9 @@ public class BulkMeasurableRatingService {
                 .filter(t -> t.v1 != null && t.v2 != null )
                 .collect(Collectors.groupingBy(t -> t.v1.id(), Collectors.mapping(t -> t.v2.id(), Collectors.toList())));
 
+        Set<Tuple2<Application, Measurable>> seen = new HashSet<>();
+        Map<Application, Boolean> appPrimaryMap = new HashMap<>();
+
         List<Tuple5<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, Set<ValidationError>>> validatedEntries = parsedResult
                 .stream()
                 .map(d -> {
@@ -182,6 +185,21 @@ public class BulkMeasurableRatingService {
                     }
                     if(t.v2 != null && allocationMap.get(t.v2.assetCode()) > 100) {
                         validationErrors.add(ValidationError.ALLOCATION_EXCEEDING);
+                    }
+
+                    Tuple2<Application, Measurable> appMeasurablePair = tuple(t.v2, t.v3);
+                    if(!seen.contains(appMeasurablePair)) {
+                        seen.add(appMeasurablePair);
+                    } else {
+                        validationErrors.add(ValidationError.DUPLICATE);
+                    }
+
+                    if(t.v1.isPrimary()) {
+                        if(appPrimaryMap.containsKey(t.v2)) {
+                            validationErrors.add(ValidationError.MULTIPLE_PRIMARY_FOUND);
+                        } else {
+                            appPrimaryMap.put(t.v2, true);
+                        }
                     }
 
                     List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id().get(), Collections.emptyList());
@@ -471,6 +489,7 @@ public class BulkMeasurableRatingService {
                     return null;
                 })
                 .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toList());
 
         if(!allocationsToRemove.isEmpty()) {
