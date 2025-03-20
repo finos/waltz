@@ -88,7 +88,7 @@
     <div style="padding-top: 1em">
         <button class="btn btn-default"
                 title="saves any changes to licence info"
-                disabled={_.isEmpty(working.name)}
+                disabled={_.isEmpty(working.name) || _.isEmpty(working.externalId)}
                 on:click|preventDefault={save}>
             Save
         </button>

@@ -1,14 +1,21 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.bulk_upload.AssessmentRatingValidationResult;
+import org.finos.waltz.model.assessment_rating.bulk_upload.ChangeOperation;
 import org.finos.waltz.model.assessment_rating.bulk_upload.ValidationError;
 import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.assessment_rating.BulkAssessmentRatingService;
 import org.finos.waltz.test_common.helpers.ActorHelper;
 import org.finos.waltz.test_common.helpers.AppHelper;
@@ -20,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.all;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
@@ -41,6 +49,9 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
 
     @Autowired
     private BulkAssessmentRatingService bulkAssessmentRatingService;
+
+    @Autowired
+    private AssessmentRatingService assessmentRatingService;
 
     @Autowired
     private AppHelper appHelper;
