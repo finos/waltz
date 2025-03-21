@@ -142,7 +142,7 @@ public class BulkMeasurableRatingService {
                 }).collect(Collectors.toList());
 
         Map<Long, List<Long>> existingAppToMeasurablesMap = getExistingAppToMeasurablesMap(dsl, categoryRef.id());
-        Map<Optional<Long>, List<Optional<Long>>> appToMeasurablesMap = parsedResult
+        Map<Long, List<Long>> appToMeasurablesMap = parsedResult
                 .stream()
                 .map(d -> {
                     Application application = allApplicationsByAssetCode.get(d.assetCode().toLowerCase());
@@ -150,7 +150,7 @@ public class BulkMeasurableRatingService {
                     return tuple(application, measurable);
                 })
                 .filter(t -> t.v1 != null && t.v2 != null )
-                .collect(Collectors.groupingBy(t -> t.v1.id(), Collectors.mapping(t -> t.v2.id(), Collectors.toList())));
+                .collect(Collectors.groupingBy(t -> t.v1.id().get(), Collectors.mapping(t -> t.v2.id().get(), Collectors.toList())));
 
         Set<Tuple2<Application, Measurable>> seen = new HashSet<>();
         Map<Application, Boolean> appPrimaryMap = new HashMap<>();
@@ -202,28 +202,24 @@ public class BulkMeasurableRatingService {
                         }
                     }
 
-                    List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id().get(), Collections.emptyList());
-                    List<Long> newMeasurableIds = Optional.ofNullable(appToMeasurablesMap
-                                    .get(t.v2.id()))
-                            .orElse(Collections.emptyList())
-                            .stream()
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList());
+                    if(mode == BulkUpdateMode.ADD_ONLY) {
+                        List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id().get(), Collections.emptyList());
+                        List<Long> newMeasurableIds = new ArrayList<>(Optional.ofNullable(appToMeasurablesMap
+                                        .get(t.v2.id()))
+                                .orElse(Collections.emptyList()));
 
-                    Set<Long> existingMeasurableSet = new HashSet<>(existingMeasurableIds);
-                    Set<Long> newMeasurableSet = new HashSet<>(newMeasurableIds);
+                        Set<Long> existingMeasurableSet = new HashSet<>(existingMeasurableIds);
+                        Set<Long> newMeasurableSet = new HashSet<>(newMeasurableIds);
 
-                    //We need to show mismatch only when existing measurables are not part of new set.
-                    boolean isMismatch = !newMeasurableSet.containsAll(existingMeasurableSet);
-                    if (isMismatch) {
-                        validationErrors.add(ValidationError.MEASURABLES_MISMATCH);
+                        //We need to show mismatch only when existing measurables are not part of new set.
+                        boolean isMismatch = !newMeasurableSet.containsAll(existingMeasurableSet);
+                        if (isMismatch) {
+                            validationErrors.add(ValidationError.MEASURABLES_MISMATCH);
+                        }
                     }
                     return t.concat(validationErrors);
                 })
                 .collect(Collectors.toList());
-
-        Collection<MeasurableRating> existingRatings = measurableRatingDao.findByCategory(category.id().get());
 
         List<MeasurableRating> requiredRatings = validatedEntries
                 .stream()
@@ -240,9 +236,15 @@ public class BulkMeasurableRatingService {
                         .build())
                 .collect(Collectors.toList());
 
+        Collection<MeasurableRating> existingRatingsForCategory = measurableRatingDao.findByCategory(category.id().get());
+        List<MeasurableRating> existingRatingsForApplicationsInBulkOp = existingRatingsForCategory
+                .stream()
+                .filter(t -> appToMeasurablesMap.containsKey(t.entityReference().id()))
+                .collect(Collectors.toList());
+
         DiffResult<MeasurableRating> diff = DiffResult
                 .mkDiff(
-                        existingRatings,
+                        existingRatingsForApplicationsInBulkOp,
                         requiredRatings,
                         d -> tuple(d.entityReference(), d.measurableId()),
                         (a, b) -> a.isPrimary() == b.isPrimary()
@@ -545,9 +547,9 @@ public class BulkMeasurableRatingService {
                                                  Collection<MeasurableRating> existingMeasurableRatings) {
         return existingMeasurableRatings
                 .stream()
-                .filter(mr -> mr.entityReference().id() == validatedItem.application().id().orElse(-1L))
-                .filter(mr -> mr.measurableId() == validatedItem.measurable().id().orElse(-1L))
-                .filter(mr -> mr.entityReference().kind().name().equals(EntityKind.APPLICATION.name()))
+                .filter(mr -> mr.entityReference().id() == validatedItem.application().id().orElse(-1L)
+                                && mr.measurableId() == validatedItem.measurable().id().orElse(-1L)
+                                && mr.entityReference().kind().name().equals(EntityKind.APPLICATION.name()))
                 .findFirst()
                 .orElse(null);
     }

@@ -28,6 +28,11 @@
         WAITING: "WAITING"
     };
 
+    const UploadModes = {
+      ADD_ONLY: "ADD_ONLY",
+      REPLACE: "REPLACE"
+  };
+
     // Not required as of now
     const CHANGE_OPERATION = {
         ADD: "ADD",
@@ -44,6 +49,8 @@
         MEASURABLE_NOT_CONCRETE: "MEASURABLE_NOT_CONCRETE",
         RATING_NOT_USER_SELECTABLE: "RATING_NOT_USER_SELECTABLE",
         ALLOCATION_EXCEEDING: "ALLOCATION_EXCEEDING",
+        ALLOCATION_NOT_VALID: "ALLOCATION_NOT_VALID",
+        MULTIPLE_PRIMARY_FOUND: "MULTIPLE_PRIMARY_FOUND"
     };
 
     const CHANGE_FIELD_TYPE = {
@@ -55,6 +62,7 @@
     let mode = MODES.EDIT;
 
     let uploadData = "";
+    let uploadMode = UploadModes.REPLACE;
 
     let previewResponse = null;
     let applyResponse = null;
@@ -62,7 +70,7 @@
     function onPreviewRows() {
         mode = MODES.WAITING;
         measurableRatingStore
-            .bulkRatingPreviewByCategory(primaryEntityRef.id, uploadData)
+            .bulkRatingPreviewByCategory(primaryEntityRef.id, uploadMode, uploadData)
             .then((res) => {
                 previewResponse = res.data;
                 canApply = _.isNil(previewResponse.error) && _.every(previewResponse.validatedItems, d => _.isEmpty(d.errors));
@@ -76,7 +84,7 @@
     function onBulkApply() {
         mode = MODES.WAITING;
         measurableRatingStore
-            .bulkRatingApplyByCategory(primaryEntityRef.id, uploadData)
+            .bulkRatingApplyByCategory(primaryEntityRef.id, uploadMode, uploadData)
             .then((res) => {
                 applyResponse = res.data;
                 mode = MODES.RESULT;
@@ -96,14 +104,36 @@
       if (! _.isEmpty(item.errors)) {
           return "op-error";
       }
-      return "op-none";
+      switch (item.changeOperation) {
+            case "ADD":
+                return "op-add";
+            case "UPDATE":
+                return "op-update";
+            case "NONE":
+                return "op-none";
+            case "RESTORE":
+                return "op-restore";
+            default:
+                return "op-error";
+        }
     }
 
     function mkOpLabel(item) {
       if (! _.isEmpty(item.errors)) {
           return "Error";
       }
-      return "";
+      switch (item.changeOperation) {
+          case "ADD":
+              return "Add";
+          case "UPDATE":
+              return "Update";
+          case "NONE":
+              return "None";
+          case "RESTORE":
+              return "Restore";
+          default:
+              return "??" + item.changeOperation + "??";
+      }
     }
 
 </script>
@@ -130,8 +160,8 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
 #99999	99999	X	TRUE	100	Lines prefixed by a '#' will be ignored</pre>
             <div class="help-note">
                 <strong>Please Note:</strong>
-                To enable validation of allocations across the whole application, 
-                all existing measuarables/taxonomies for a single application 
+                To enable validation of allocations across the whole application,
+                all existing measurables/taxonomies for a single application
                 should to be included in the bulk load.
             </div>
         </details>
@@ -148,6 +178,28 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                     </div>
                 </div>
             </fieldset>
+            <div class="form-group">
+                <label>
+                    <input style="display: 
+                        inline-block;"
+                        type="radio"
+                        bind:group={uploadMode}
+                        name="uploadMode"
+                        value={UploadModes.ADD_ONLY}>
+                    Add Only
+                </label>
+                <span class="text-muted"> - This will only add or update values for relationships and assessments specified in the input</span>
+                <br>
+                <label>
+                    <input type="radio" 
+                        style="display: inline-block;"
+                        bind:group={uploadMode}
+                        name="uploadMode"
+                        value={UploadModes.REPLACE}>
+                    Replace
+                    <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
+                </label>
+            </div>
             <button
                 type="submit"
                 class="btn btn-success"
@@ -196,8 +248,9 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                                         class:positive-result={!_.includes(
                                             obj.errors,
                                             VALIDATION_ERROR.APPLICATION_NOT_FOUND
-                                        )}>{ obj.application ? obj.application.name : obj.parsedItem.assetCode }</td
-                                    >
+                                        )}>
+                                        { obj.application ? obj.application.name : obj.parsedItem.assetCode }
+                                    </td>
                                     <td
                                         class:cell-error={multipleIncludes(
                                             obj.errors,
@@ -220,17 +273,27 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                                     >
                                         { obj.ratingSchemeItem ? obj.ratingSchemeItem.name : obj.parsedItem.ratingCode }
                                     </td>
-                                    <td>
-                                        {obj.parsedItem.isPrimary}
-                                    </td>
                                     <td
                                         class:cell-error={_.includes(
                                             obj.errors,
-                                            VALIDATION_ERROR.ALLOCATION_EXCEEDING,
+                                            VALIDATION_ERROR.MULTIPLE_PRIMARY_FOUND,
                                         )}
                                         class:positive-result={!_.includes(
                                             obj.errors,
-                                            VALIDATION_ERROR.ALLOCATION_EXCEEDING
+                                            VALIDATION_ERROR.MULTIPLE_PRIMARY_FOUND
+                                        )}>
+                                        { obj.parsedItem.isPrimary }
+                                    </td>
+                                    <td
+                                        class:cell-error={multipleIncludes(
+                                            obj.errors,
+                                            [VALIDATION_ERROR.ALLOCATION_EXCEEDING,
+                                            VALIDATION_ERROR.ALLOCATION_NOT_VALID]
+                                        )}
+                                        class:positive-result={!multipleIncludes(
+                                            obj.errors,
+                                            [VALIDATION_ERROR.ALLOCATION_EXCEEDING,
+                                            VALIDATION_ERROR.ALLOCATION_NOT_VALID]
                                         )}
                                     >
                                         { obj.parsedItem.allocation }
@@ -255,6 +318,31 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
             </div>
         {/if}
         <form autocomplete="off" on:submit|preventDefault={onBulkApply}>
+            <div class="form-group">
+                <label>
+                    <input 
+                        type="radio"
+                        style="display: inline-block;"
+                        disabled="true"
+                        bind:group={uploadMode}
+                        name="uploadMode"
+                        value={UploadModes.ADD_ONLY}>
+                    Add Only
+                </label>
+                <span class="text-muted"> - This will only add or update values for relationships and assessments specified in the input</span>
+                <br>
+                <label>
+                    <input
+                        type="radio"
+                        style="display: inline-block;"
+                        disabled="true"
+                        bind:group={uploadMode}
+                        name="uploadMode"
+                        value={UploadModes.REPLACE}>
+                    Replace
+                    <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
+                </label>
+            </div>
             <button class="btn btn-success"
                     disabled={!canApply}
                     type="submit">
