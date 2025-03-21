@@ -50,7 +50,8 @@
         RATING_NOT_USER_SELECTABLE: "RATING_NOT_USER_SELECTABLE",
         ALLOCATION_EXCEEDING: "ALLOCATION_EXCEEDING",
         ALLOCATION_NOT_VALID: "ALLOCATION_NOT_VALID",
-        MULTIPLE_PRIMARY_FOUND: "MULTIPLE_PRIMARY_FOUND"
+        MULTIPLE_PRIMARY_FOUND: "MULTIPLE_PRIMARY_FOUND",
+        ALLOCATION_SCHEME_NOT_FOUND: "ALLOCATION_SCHEME_NOT_FOUND"
     };
 
     const CHANGE_FIELD_TYPE = {
@@ -149,15 +150,15 @@
         <details>
             <summary>Help <Icon name="circle-question"/></summary>
             <div class="help-block" style="margin-top: 0px;">
-                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, allocation and comment
+                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, allocation, scheme and comment
                 combination. For example:
             </div>
 
             <pre>
-assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	comment
-EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
-99999	99999	I	TRUE	100	This is another example
-#99999	99999	X	TRUE	100	Lines prefixed by a '#' will be ignored</pre>
+assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
+99999-1	99999	G	TRUE	50	scheme	EXAMPLE_CODE
+#99999-1	99999	X	TRUE	50	scheme	Lines prefixed by a '#' will be ignored
+</pre>
             <div class="help-note">
                 <strong>Please Note:</strong>
                 To enable validation of allocations across the whole application,
@@ -171,7 +172,7 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                     <div>
                         <textarea
                             bind:value={uploadData}
-                            placeholder="assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	comment"
+                            placeholder="assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment"
                             rows="10"
                             cols="70"
                         ></textarea>
@@ -230,6 +231,7 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                             <th>Rating</th>
                             <th>Primary</th>
                             <th>Allocation</th>
+                            <th>Scheme</th>
                             <th>Comment</th>
                             <th>Error</th>
                         </tr>
@@ -297,6 +299,17 @@ EXAMPLE_CODE	EXAMPLE_ID	I	TRUE	100	This is an EXAMPLE_CODE
                                         )}
                                     >
                                         { obj.parsedItem.allocation }
+                                    </td>
+                                    <td
+                                        class:cell-error={_.includes(
+                                            obj.errors,
+                                            VALIDATION_ERROR.ALLOCATION_SCHEME_NOT_FOUND,
+                                        )}
+                                        class:positive-result={!_.includes(
+                                            obj.errors,
+                                            VALIDATION_ERROR.ALLOCATION_SCHEME_NOT_FOUND
+                                        )}>
+                                        { obj.parsedItem.scheme }
                                     </td>
                                     <td>
                                         {obj.parsedItem.comment}

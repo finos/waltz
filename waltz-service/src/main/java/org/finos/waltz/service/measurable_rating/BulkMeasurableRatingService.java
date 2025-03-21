@@ -38,7 +38,7 @@ import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple5;
+import org.jooq.lambda.tuple.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +74,6 @@ public class BulkMeasurableRatingService {
     private static final Logger LOG = LoggerFactory.getLogger(BulkMeasurableRatingService.class);
     private static final String PROVENANCE = "bulkMeasurableRatingUpdate";
     private static final String DUMMY_USER = "test";
-
-    private static final String ALLOCATION_SCHEME_EXT_ID = "CAPABILITY_ALLOC";
-
     private final UserRoleService userRoleService;
     private final MeasurableRatingDao measurableRatingDao;
     private final RatingSchemeService ratingSchemeService;
@@ -84,7 +81,6 @@ public class BulkMeasurableRatingService {
     private final ChangeLogService changeLogService;
     private final MeasurableCategoryService measurableCategoryService;
     private final ApplicationDao applicationDao;
-
     private final AllocationSchemeDao allocationSchemeDao;
     private final DSLContext dsl;
 
@@ -127,6 +123,8 @@ public class BulkMeasurableRatingService {
         Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
 
         List<Application> allApplications = applicationDao.findAll();
+        List<AllocationScheme> allAllocationSchemes = allocationSchemeDao.findAll();
+        Map<String, AllocationScheme> allAllocationSchemesByExtId = indexBy(allAllocationSchemes, t -> t.externalId().get());
 
         Map<String, Application> allApplicationsByAssetCode = indexBy(allApplications, a -> a.assetCode()
                 .map(ExternalIdValue::value)
@@ -164,13 +162,14 @@ public class BulkMeasurableRatingService {
         Set<Tuple2<Application, Measurable>> seen = new HashSet<>();
         Map<Application, Boolean> appPrimaryMap = new HashMap<>();
 
-        List<Tuple5<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, Set<ValidationError>>> validatedEntries = parsedResult
+        List<Tuple6<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, AllocationScheme, Set<ValidationError>>> validatedEntries = parsedResult
                 .stream()
                 .map(d -> {
                     Application application = allApplicationsByAssetCode.get(d.assetCode().toLowerCase());
                     Measurable measurable = existingByExtId.get(d.taxonomyExternalId());
                     RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(String.valueOf(d.ratingCode()));
-                    return tuple(d, application, measurable, ratingSchemeItem);
+                    AllocationScheme allocationScheme = allAllocationSchemesByExtId.get(d.scheme());
+                    return tuple(d, application, measurable, ratingSchemeItem, allocationScheme);
                 })
                 .map(t -> {
                     Set<ValidationError> validationErrors = new HashSet<>();
@@ -189,30 +188,34 @@ public class BulkMeasurableRatingService {
                     if (t.v4 != null && !t.v4.userSelectable()) {
                         validationErrors.add(ValidationError.RATING_NOT_USER_SELECTABLE);
                     }
-                    if(parseInteger(t.v1.allocation().toString(), -1) < 0) {
+                    if (t.v5 == null) {
+                        validationErrors.add(ValidationError.ALLOCATION_SCHEME_NOT_FOUND);
+                    }
+
+                    if (parseInteger(t.v1.allocation().toString(), -1) < 0) {
                         validationErrors.add(ValidationError.ALLOCATION_NOT_VALID);
                     }
-                    if(t.v2 != null && allocationMap.get(t.v2.assetCode()) > 100) {
+                    if (t.v2 != null && allocationMap.get(t.v2.assetCode()) > 100) {
                         validationErrors.add(ValidationError.ALLOCATION_EXCEEDING);
                     }
 
                     Tuple2<Application, Measurable> appMeasurablePair = tuple(t.v2, t.v3);
-                    if(!seen.contains(appMeasurablePair)) {
+                    if (!seen.contains(appMeasurablePair)) {
                         seen.add(appMeasurablePair);
                     } else {
                         validationErrors.add(ValidationError.DUPLICATE);
                     }
 
-                    if(t.v1.isPrimary()) {
-                        if(appPrimaryMap.containsKey(t.v2)) {
+                    if (t.v1.isPrimary()) {
+                        if (appPrimaryMap.containsKey(t.v2)) {
                             validationErrors.add(ValidationError.MULTIPLE_PRIMARY_FOUND);
                         } else {
                             appPrimaryMap.put(t.v2, true);
                         }
                     }
 
-                    if(mode == BulkUpdateMode.ADD_ONLY) {
-                        List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id().get(), Collections.emptyList());
+                    if (t.v2 != null && mode == BulkUpdateMode.ADD_ONLY) {
+                        List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id(), Collections.emptyList());
                         List<Long> newMeasurableIds = new ArrayList<>(Optional.ofNullable(appToMeasurablesMap
                                         .get(t.v2.id()))
                                 .orElse(Collections.emptyList()));
@@ -265,7 +268,7 @@ public class BulkMeasurableRatingService {
         Set<Tuple2<EntityReference, Long>> toRemove = SetUtilities.map(diff.waltzOnly(), d -> tuple(d.entityReference(), d.measurableId()));
 
         //group similar applications together
-        Map<String, List<Tuple5<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, Set<ValidationError>>>> groupedValidatedEntries = validatedEntries
+        Map<String, List<Tuple6<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, AllocationScheme, Set<ValidationError>>>> groupedValidatedEntries = validatedEntries
                 .stream()
                 .collect(Collectors.groupingBy(t -> t.v1.assetCode()));
 
@@ -291,11 +294,12 @@ public class BulkMeasurableRatingService {
             })
             .map(t -> ImmutableBulkMeasurableRatingValidatedItem
                     .builder()
-                    .changeOperation(t.v6)
-                    .errors(t.v5)
+                    .changeOperation(t.v7)
+                    .errors(t.v6)
                     .application(t.v2)
                     .measurable(t.v3)
                     .ratingSchemeItem(t.v4)
+                    .allocationScheme(t.v5)
                     .parsedItem(t.v1)
                     .build())
             .collect(Collectors.toList());
@@ -459,10 +463,10 @@ public class BulkMeasurableRatingService {
      */
     private void updateAllocation(DSLContext dsl,
                                   EntityReference categoryRef,
-                                  BulkMeasurableRatingValidationResult ratings, String userId) {
+                                  BulkMeasurableRatingValidationResult ratings,
+                                  String userId) {
 
         LOG.info("Initiating updating allocations");
-        AllocationScheme allocationScheme = allocationSchemeDao.getByExternalId(ALLOCATION_SCHEME_EXT_ID);
         Collection<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryRef.id());
         Map<Long, Measurable> existingById = indexBy(existingMeasurables, m -> m.id().get());
 
@@ -470,17 +474,17 @@ public class BulkMeasurableRatingService {
         Collection<MeasurableRating> existingMeasurableRatings = measurableRatingDao.findByCategory(categoryRef.id());
 
         //Remove all existing allocations
-        Map<Optional<Long>, List<BulkMeasurableRatingValidatedItem>> appToRatingsMap = ratings
+        Map<Tuple2<Long, Long>, List<BulkMeasurableRatingValidatedItem>> appToRatingsMap = ratings
                 .validatedItems()
                 .stream()
-                .collect(Collectors.groupingBy(t -> t.application().id()));
+                .collect(Collectors.groupingBy(t -> tuple(t.application().id().get(), t.allocationScheme().id().get())));
 
         List<DeleteConditionStep<AllocationRecord>> allocationsToRemove = appToRatingsMap
                 .keySet()
                 .stream()
-                .map(entityId -> mkExistingMeasurableAllocationRemovals(dsl,
-                        allocationScheme.id().get(),
-                        entityId.orElse(-1L)))
+                .map(key -> mkExistingMeasurableAllocationRemovals(dsl,
+                        key.v2,
+                        key.v1))
                 .collect(Collectors.toList());
 
 
@@ -492,7 +496,7 @@ public class BulkMeasurableRatingService {
                     MeasurableRating measurableRating = getMeasurableRating(d, existingMeasurableRatings);
                     if(measurableRating != null) {
                         return mkMeasurableRatingAllocationRecordsToAdd(dsl,
-                                allocationScheme.id().get(),
+                                d.allocationScheme().id().get(),
                                 measurableRating.id().get(),
                                 d.parsedItem().allocation(),
                                 userId);
@@ -507,7 +511,7 @@ public class BulkMeasurableRatingService {
             List<Long> allocationRemovedForMeasurables = appToRatingsMap
                     .keySet()
                     .stream()
-                    .map(entityId -> getExistingMeasurables(dsl, entityId.orElse(-1L)))
+                    .map(key -> getExistingMeasurables(dsl, key.v1))
                     .flatMap(Set::stream)
                     .collect(Collectors.toList());
 
