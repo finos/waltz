@@ -18,6 +18,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.MeasurableHelper;
 import org.finos.waltz.test_common.helpers.MeasurableRatingHelper;
 import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
+import org.finos.waltz.test_common.helpers.AllocationSchemeHelper;
 import org.finos.waltz.test_common.helpers.UserHelper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -59,6 +60,9 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
     private RatingSchemeHelper ratingSchemeHelper;
 
     @Autowired
+    private AllocationSchemeHelper allocationSchemeHelper;
+
+    @Autowired
     private MeasurableService measurableService;
 
     @Autowired
@@ -78,6 +82,8 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
                 app1AssetCode);
 
         ratingSchemeHelper.saveRatingItem(category.ratingSchemeId(), mkName(stem, "Rating1"), 0, "#111", "R", mkName(stem, "R"));
+        allocationSchemeHelper.createAllocationScheme("desc", category.id().get(), mkName(stem, "previewAddsScheme"), "scheme");
+
         BulkMeasurableRatingValidationResult result = bulkMeasurableRatingService.bulkPreview(
                 category.entityReference(),
                 mkGoodTsv(app1AssetCode),
@@ -104,6 +110,8 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
 
         LOG.info("Create an existing rating for the app");
         measurableRatingHelper.saveRatingItem(appRef, measurableId, "R", "user");
+
+        allocationSchemeHelper.createAllocationScheme("desc", category.id().get(), mkName(stem, "previewUpdatesScheme"), "scheme");
 
         BulkMeasurableRatingValidationResult result = bulkMeasurableRatingService.bulkPreview(
                 category.entityReference(),
@@ -137,6 +145,7 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
 
         LOG.info("Create an existing rating for the app");
         measurableRatingHelper.saveRatingItem(appRef, measurable1Id, "R", "user");
+        allocationSchemeHelper.createAllocationScheme("desc", category.id().get(), mkName(stem, "previewUpdatesScheme"), "scheme");
 
         BulkMeasurableRatingValidationResult result = bulkMeasurableRatingService.bulkPreview(
                 category.entityReference(),
@@ -147,10 +156,10 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(result, "Expected a result");
         assertEquals(3, result.validatedItems().size(), "Only one parsed row expected");
         assertEquals(
-                asList(ChangeOperation.ADD, ChangeOperation.NONE, ChangeOperation.UPDATE),
+                asList(ChangeOperation.ADD, ChangeOperation.UPDATE, ChangeOperation.NONE),
                 map(result.validatedItems(), BulkMeasurableRatingValidatedItem::changeOperation));
         assertEquals(
-                asList(emptySet(), asSet(ValidationError.APPLICATION_NOT_FOUND), emptySet()),
+                asList(emptySet(), asSet(ValidationError.MULTIPLE_PRIMARY_FOUND), asSet(ValidationError.APPLICATION_NOT_FOUND)),
                 map(result.validatedItems(), BulkMeasurableRatingValidatedItem::errors));
     }
 
@@ -166,6 +175,7 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
                 ouIds.root,
                 app1AssetCode);
         ratingSchemeHelper.saveRatingItem(category.ratingSchemeId(), "Rating1", 0, "#111", "R");
+        allocationSchemeHelper.createAllocationScheme("desc", category.id().get(), mkName(stem, "previewUpdatesScheme"), "scheme");
         BulkMeasurableRatingValidationResult result = bulkMeasurableRatingService.bulkPreview(
                 category.entityReference(),
                 mkBadRefsTsv(app1AssetCode, "CT-001", 'R'),
@@ -192,7 +202,35 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
         assertTrue(CollectionUtilities.all(result.validatedItems(), d -> ! d.errors().isEmpty()));
     }
 
+    @Test
+    public void previewAllocationError() {
+        MeasurableCategory category = measurableCategoryDao.getById(setupCategory());
+        measurableHelper.createMeasurable("CT-001", "M1", category.id().get());
+        String app1AssetCode = mkName("assetCode1", "previewUpdates");
+        ratingSchemeHelper.saveRatingItem(category.ratingSchemeId(), "Rating1", 0, "#111", "R");
+        allocationSchemeHelper.createAllocationScheme("desc", category.id().get(), mkName(stem, "previewUpdatesScheme"), "scheme");
+        BulkMeasurableRatingValidationResult result = bulkMeasurableRatingService.bulkPreview(
+                category.entityReference(),
+                mkBadAllocationRefsTsv(app1AssetCode, "CT-001", "scheme", 'R'),
+                BulkMeasurableItemParser.InputFormat.TSV,
+                BulkUpdateMode.ADD_ONLY);
 
+        assertNotNull(result, "Expected a result");
+
+        result
+                .validatedItems()
+                .forEach(d -> {
+                    if (d.parsedItem().assetCode().equals("assetCode1")) {
+                        assertTrue(d.errors().contains(ValidationError.ALLOCATION_EXCEEDING), "Should be complaining about the allocation exceeding");
+                    }
+                    if(d.parsedItem().allocation().equals("bad_scheme")) {
+                        assertTrue(d.errors().contains(ValidationError.ALLOCATION_SCHEME_NOT_FOUND), "Should be complaining about the bad allocation scheme");
+                    }
+                });
+
+        assertEquals(3, result.validatedItems().size(), "Expected 3 items");
+        assertTrue(CollectionUtilities.all(result.validatedItems(), d -> ! d.errors().isEmpty()));
+    }
 
     // --- helpers -------------------
 
@@ -204,8 +242,8 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
 
 
     private String mkGoodTsv(String assetCode) {
-        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tcomment\n"
-                + assetCode + "\tCT-001\tR\ttrue\tcomment\n";
+        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tallocation\tscheme\tcomment\n"
+                + assetCode + "\tCT-001\tR\ttrue\t10\tscheme\tcomment\n";
     }
 
 
@@ -228,21 +266,30 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
     private String mkBadRefsTsv(String goodApp,
                                 String goodMeasurable,
                                 char goodRating) {
-        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tcomment\n" +
-                format("%s\t%s\t%s\ttrue\tcomment\n", goodApp, "badMeasurable", goodRating) +
-                format("%s\t%s\t%s\ttrue\tcomment\n", "badApp", goodMeasurable, goodRating) +
-                format("%s\t%s\t%s\ttrue\tcomment\n", goodApp, goodMeasurable, '_') +
-                format("%s\t%s\t%s\ttrue\tcomment\n", goodApp, "badMeasurable", '_') +
-                format("%s\t%s\t%s\ttrue\tcomment\n", "badApp", "badMeasurable", '_');
+        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tallocation\tscheme\tcomment\n" +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", goodApp, "badMeasurable", goodRating) +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", "badApp", goodMeasurable, goodRating) +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", goodApp, goodMeasurable, '_') +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", goodApp, "badMeasurable", '_') +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", "badApp", "badMeasurable", '_');
     }
 
+    private String mkBadAllocationRefsTsv(String goodApp,
+                                String goodMeasurable,
+                                String goodScheme,
+                                char goodRating) {
+        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tallocation\tscheme\tcomment\n" +
+                format("%s\t%s\t%s\ttrue\t100\t%s\tcomment\n", goodApp, goodMeasurable, goodRating, goodScheme) +
+                format("%s\t%s\t%s\ttrue\t10\t%s\tcomment\n", goodApp, goodMeasurable, goodRating, goodScheme) +
+                format("%s\t%s\t%s\ttrue\t0\t%s\tcomment\n", goodApp, goodMeasurable, goodRating, "bad_scheme");
+    }
 
     private String mkComprehensiveTsv(String goodApp,
                                       String goodMeasurable,
                                       String existingMeasurable) {
-        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tcomment\n" +
-                format("%s\t%s\t%s\ttrue\tcomment\n", goodApp, goodMeasurable, 'R') +  // should be an 'add'
-                format("%s\t%s\t%s\ttrue\tcomment\n", "badApp", goodMeasurable, 'R') +  // should be 'none' (with errors)
-                format("%s\t%s\t%s\ttrue\tcomment\n", goodApp, existingMeasurable, 'R');  // should be 'update'
+        return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tallocation\tscheme\tcomment\n" +
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", goodApp, goodMeasurable, 'R') +  // should be an 'add'
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", "badApp", goodMeasurable, 'R') +  // should be 'none' (with errors)
+                format("%s\t%s\t%s\ttrue\t10\tscheme\tcomment\n", goodApp, existingMeasurable, 'R');  // should be 'update'
     }
 }

@@ -64,6 +64,14 @@ public class AllocationSchemeDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+    public AllocationScheme getByExternalId(String externalId) {
+        return dsl
+                .select(ALLOCATION_SCHEME.fields())
+                .from(ALLOCATION_SCHEME)
+                .where(ALLOCATION_SCHEME.EXTERNAL_ID.eq(externalId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
 
     public List<AllocationScheme> findAll(){
         return dsl
