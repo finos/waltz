@@ -26,4 +26,10 @@ public interface BulkMeasurableRatingItem {
 
     @Nullable
     String comment();
+
+    @Nullable
+    Integer allocation();
+
+    @JsonAlias({"scheme_external_id", "allocation_scheme_external_id", "allocation_scheme"})
+    String scheme();
 }

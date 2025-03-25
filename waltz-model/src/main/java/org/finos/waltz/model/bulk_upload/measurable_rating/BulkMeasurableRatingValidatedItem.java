@@ -2,6 +2,7 @@ package org.finos.waltz.model.bulk_upload.measurable_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -29,4 +30,7 @@ public interface BulkMeasurableRatingValidatedItem {
 
     @Nullable
     RatingSchemeItem ratingSchemeItem();
+
+    @Nullable
+    AllocationScheme allocationScheme();
 }

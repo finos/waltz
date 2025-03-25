@@ -41,16 +41,16 @@ export function mkMeasurableRelationshipStore() {
             null,
             {force});
 
-    const bulkRatingPreviewByCategory = (categoryId, data) => remote
+    const bulkRatingPreviewByCategory = (categoryId, uploadMode, data) => remote
         .execute(
             "POST",
-            `api/measurable-rating/bulk/preview/MEASURABLE_CATEGORY/${categoryId}`,
+            `api/measurable-rating/bulk/preview/MEASURABLE_CATEGORY/${categoryId}?mode=${uploadMode}`,
             data);
 
-    const bulkRatingApplyByCategory = (categoryId, data) => remote
+    const bulkRatingApplyByCategory = (categoryId, uploadMode, data) => remote
         .execute(
             "POST",
-            `api/measurable-rating/bulk/apply/MEASURABLE_CATEGORY/${categoryId}`,
+            `api/measurable-rating/bulk/apply/MEASURABLE_CATEGORY/${categoryId}?mode=${uploadMode}`,
             data);
 
     return {
