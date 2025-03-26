@@ -215,9 +215,9 @@ public class BulkMeasurableRatingService {
                     }
 
                     if (t.v2 != null && mode == BulkUpdateMode.ADD_ONLY) {
-                        List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id(), Collections.emptyList());
+                        List<Long> existingMeasurableIds = existingAppToMeasurablesMap.getOrDefault(t.v2.id().get(), Collections.emptyList());
                         List<Long> newMeasurableIds = new ArrayList<>(Optional.ofNullable(appToMeasurablesMap
-                                        .get(t.v2.id()))
+                                        .get(t.v2.id().get()))
                                 .orElse(Collections.emptyList()));
 
                         Set<Long> existingMeasurableSet = new HashSet<>(existingMeasurableIds);
