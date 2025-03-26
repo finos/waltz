@@ -96,6 +96,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
     public void register() {
         String surveysForEntityPath = WebUtilities.mkPath("data-extract", "surveys", "entity", ":kind", ":id");
         String surveyRunPath = WebUtilities.mkPath("data-extract", "survey-run", ":id");
+        String surveyHistoryRunPath = WebUtilities.mkPath("data-extract", "survey-run", "history", ":id");
         String surveyInstanceResponsesPath = WebUtilities.mkPath("data-extract", "survey-run-response", "instance", ":id");
         String surveyRunResponsesPath = WebUtilities.mkPath("data-extract", "survey-run-response", ":id");
 
@@ -106,6 +107,17 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
             return writeExtract(
                     mkFilename(getSurveyRunNameById(runId)),
                     getSurveyRunInstances(runId),
+                    request,
+                    response);
+        });
+
+        get(surveyHistoryRunPath, (request, response) -> {
+            long runId = WebUtilities.getId(request);
+
+            LOG.info("Survey run history has been exported successfully");
+            return writeExtract(
+                    mkFilename(getSurveyRunNameById(runId)),
+                    getAllSurveyRunInstances(runId),
                     request,
                     response);
         });
@@ -263,6 +275,26 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                 .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull());
     }
 
+
+    private SelectConditionStep<?> getAllSurveyRunInstances(long surveyRunId) {
+        return dsl
+                .select(DSL.coalesce(APPLICATION.NAME, CHANGE_INITIATIVE.NAME).as("Entity Name"),
+                        DSL.coalesce(APPLICATION.ASSET_CODE, CHANGE_INITIATIVE.EXTERNAL_ID).as("Entity Id"),
+                        SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
+                        SURVEY_INSTANCE.STATUS.as("Status"),
+                        SURVEY_INSTANCE.DUE_DATE.as("Due Date"),
+                        SURVEY_INSTANCE.SUBMITTED_BY.as("Submitted By"),
+                        SURVEY_INSTANCE.SUBMITTED_AT.as("Submitted At"),
+                        SURVEY_INSTANCE.APPROVED_BY.as("Approved By"),
+                        SURVEY_INSTANCE.APPROVED_AT.as("Approved At"),
+                        SURVEY_INSTANCE.ISSUED_ON.as("Issued On"))
+                .from(SURVEY_INSTANCE)
+                .leftJoin(APPLICATION).on(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(APPLICATION.ID.eq(SURVEY_INSTANCE.ENTITY_ID)))
+                .leftJoin(CHANGE_INITIATIVE).on(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name())
+                        .and(CHANGE_INITIATIVE.ID.eq(SURVEY_INSTANCE.ENTITY_ID)))
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
+    }
 
     private String mkFilename(String postfix) {
         return "survey-run-instances-" + postfix;

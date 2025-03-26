@@ -46,6 +46,10 @@
 
     <waltz-section name="Instances">
         <waltz-section-actions>
+            <waltz-data-extract-link name="Export Historical Instances"
+                                     styling="button"
+                                     extract="survey-run/history/{{ctrl.surveyRun.id}}">
+            </waltz-data-extract-link>
             <waltz-data-extract-link name="Export Progress"
                                      styling="button"
                                      extract="survey-run/{{ctrl.surveyRun.id}}">
