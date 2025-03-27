@@ -161,9 +161,17 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
 </pre>
             <div class="help-note">
                 <strong>Please Note:</strong>
-                To enable validation of allocations across the whole application,
-                all existing measurables/taxonomies for a single application
-                should to be included in the bulk load.
+                <p>Since allocations are always going to be replaced to enable validation across the each application,</p>
+                <ul>
+                    <li>
+                        Add Only mode, inputs must include all existing measurables to ensure
+                        completeness.
+                    </li>
+                    <li>
+                        Replace mode, all existing measurables, ratings and allocations will be
+                        entirely replaced with the provided inputs. 
+                    </li>
+                </ul>
             </div>
         </details>
         <form autocomplete="off" on:submit|preventDefault={onPreviewRows}>
@@ -189,7 +197,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                         value={UploadModes.ADD_ONLY}>
                     Add Only
                 </label>
-                <span class="text-muted"> - This will only add or update values for relationships and assessments specified in the input</span>
+                <span class="text-muted"> - This will only add or update measurable ratings specified in the input</span>
                 <br>
                 <label>
                     <input type="radio" 
@@ -198,7 +206,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                         name="uploadMode"
                         value={UploadModes.REPLACE}>
                     Replace
-                    <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
+                    <span class="text-muted"> - This will replace any existing measurable ratings with specified ratings in the input</span>
                 </label>
             </div>
             <button
@@ -342,7 +350,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                         value={UploadModes.ADD_ONLY}>
                     Add Only
                 </label>
-                <span class="text-muted"> - This will only add or update values for relationships and assessments specified in the input</span>
+                <span class="text-muted"> - This will only add or update measurable ratings specified in the input</span>
                 <br>
                 <label>
                     <input
@@ -353,7 +361,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                         name="uploadMode"
                         value={UploadModes.REPLACE}>
                     Replace
-                    <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
+                    <span class="text-muted"> - This will replace any existing measurable ratings with specified ratings in the input</span>
                 </label>
             </div>
             <button class="btn btn-success"
