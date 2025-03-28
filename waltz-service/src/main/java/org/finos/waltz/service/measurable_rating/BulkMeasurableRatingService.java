@@ -38,6 +38,7 @@ import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.jooq.lambda.tuple.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -420,13 +421,10 @@ public class BulkMeasurableRatingService {
                 .filter(d -> d.changeOperation() == ChangeOperation.NONE || !d.errors().isEmpty())
                 .count();
 
-        long allocationsInsertCount =  preview.validatedItems().size();
-
-        return dsl
+        Tuple3<Integer, Integer, Integer> transactionResult = dsl
                 .transactionResult(ctx -> {
                     DSLContext tx = ctx.dsl();
 
-                    updateAllocation(tx, categoryRef, preview, userId);
 
                     int insertCount = summarizeResults(tx.batchInsert(toInsert).execute());
                     int updateCount = summarizeResults(tx.batch(toUpdate).execute());
@@ -442,15 +440,19 @@ public class BulkMeasurableRatingService {
                             removalCount,
                             changeLogCount);
 
-                    return ImmutableBulkMeasurableRatingApplyResult
-                            .builder()
-                            .recordsAdded(insertCount)
-                            .recordsUpdated(updateCount)
-                            .recordsRemoved(removalCount)
-                            .skippedRows((int) skipCount)
-                            .allocationsAdded((int) allocationsInsertCount)
-                            .build();
+
+                    return tuple(insertCount, updateCount, removalCount);
                 });
+
+        int allocationsInsertCount = updateAllocation(dsl, categoryRef, preview, userId);
+        return ImmutableBulkMeasurableRatingApplyResult
+                .builder()
+                .recordsAdded(transactionResult.v1)
+                .recordsUpdated(transactionResult.v2)
+                .recordsRemoved(transactionResult.v3)
+                .skippedRows((int) skipCount)
+                .allocationsAdded(allocationsInsertCount)
+                .build();
     }
 
     /**
@@ -460,17 +462,18 @@ public class BulkMeasurableRatingService {
      * @param categoryRef
      * @param ratings
      * @param userId
+     * @return
      */
-    private void updateAllocation(DSLContext dsl,
-                                  EntityReference categoryRef,
-                                  BulkMeasurableRatingValidationResult ratings,
-                                  String userId) {
+    private int updateAllocation(DSLContext dsl,
+                                 EntityReference categoryRef,
+                                 BulkMeasurableRatingValidationResult ratings,
+                                 String userId) {
 
         LOG.info("Initiating updating allocations");
         Collection<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryRef.id());
         Map<Long, Measurable> existingById = indexBy(existingMeasurables, m -> m.id().get());
 
-
+        LOG.info("Fetching existing measurable ratings");
         Collection<MeasurableRating> existingMeasurableRatings = measurableRatingDao.findByCategory(categoryRef.id());
 
         //Remove all existing allocations
@@ -507,53 +510,59 @@ public class BulkMeasurableRatingService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        if(!allocationsToRemove.isEmpty()) {
-            List<Long> allocationRemovedForMeasurables = appToRatingsMap
-                    .keySet()
-                    .stream()
-                    .map(key -> getExistingMeasurables(dsl, key.v1))
-                    .flatMap(Set::stream)
-                    .collect(Collectors.toList());
+        return dsl
+            .transactionResult(ctx -> {
+                DSLContext tx = ctx.dsl();
+                if(!allocationsToRemove.isEmpty()) {
+                    List<Long> allocationRemovedForMeasurables = appToRatingsMap
+                            .keySet()
+                            .stream()
+                            .map(key -> getExistingMeasurables(dsl, key.v1))
+                            .flatMap(Set::stream)
+                            .collect(Collectors.toList());
 
-            int[] removed = dsl.batch(allocationsToRemove).execute();
-            LOG.info(format("Removed %d allocations", removed.length));
+                    int[] removed = dsl.batch(allocationsToRemove).execute();
+                    LOG.info(format("Removed %d allocations", removed.length));
 
-            List<ChangeLog> removalChangeLogs = allocationRemovedForMeasurables
-                    .stream()
-                    .map(ratingId -> {
-                        Measurable measurable = existingById.get(ratingId);
-                        String removalMessage = format(
-                                "Unallocated measurable '%s'",
-                                measurable.name());
-                        return mkBasicLogEntry(measurable.entityReference(), removalMessage, userId);
-                    })
-                    .collect(Collectors.toList());
-            if(removalChangeLogs.size() > 0) {
-                changeLogService.write(removalChangeLogs);
-            }
-        }
+                    List<ChangeLog> removalChangeLogs = allocationRemovedForMeasurables
+                            .stream()
+                            .map(ratingId -> {
+                                Measurable measurable = existingById.get(ratingId);
+                                String removalMessage = format(
+                                        "Unallocated measurable '%s'",
+                                        measurable.name());
+                                return mkBasicLogEntry(measurable.entityReference(), removalMessage, userId);
+                            })
+                            .collect(Collectors.toList());
+                    if(removalChangeLogs.size() > 0) {
+                        changeLogService.write(removalChangeLogs);
+                    }
+                }
 
-        if(!allocationsToAdd.isEmpty()) {
-            List<ChangeLog> insertChangeLogs = ratings
-                    .validatedItems()
-                    .stream()
-                    .map(d -> {
-                        Measurable measurable = d.measurable();
-                        String insertMessage = format(
-                                "Set allocation for measurable '%s' to %d%% ",
-                                measurable.kind().name(),
-                                d.parsedItem().allocation());
-                        return mkBasicLogEntry(measurable.entityReference(), insertMessage, userId);
-                    })
-                    .collect(Collectors.toList());
+                if(!allocationsToAdd.isEmpty()) {
+                    List<ChangeLog> insertChangeLogs = ratings
+                            .validatedItems()
+                            .stream()
+                            .map(d -> {
+                                Measurable measurable = d.measurable();
+                                String insertMessage = format(
+                                        "Set allocation for measurable '%s' to %d%% ",
+                                        measurable.kind().name(),
+                                        d.parsedItem().allocation());
+                                return mkBasicLogEntry(measurable.entityReference(), insertMessage, userId);
+                            })
+                            .collect(Collectors.toList());
 
-            int allocationsInsertCount = summarizeResults(dsl.batchInsert(allocationsToAdd).execute());
-            changeLogService.write(insertChangeLogs);
+                    int allocationsInsertCount = summarizeResults(dsl.batchInsert(allocationsToAdd).execute());
+                    changeLogService.write(insertChangeLogs);
 
-            LOG.info(
-                    "Batch measurable allocations: {} adds",
-                    allocationsInsertCount);
-        }
+                    LOG.info(
+                            "Batch measurable allocations: {} adds",
+                            allocationsInsertCount);
+                }
+
+                return allocationsToAdd.size();
+            });
     }
 
     private MeasurableRating getMeasurableRating(BulkMeasurableRatingValidatedItem validatedItem,
