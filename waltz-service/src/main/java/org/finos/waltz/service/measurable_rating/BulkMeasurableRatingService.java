@@ -521,7 +521,7 @@ public class BulkMeasurableRatingService {
                             .flatMap(Set::stream)
                             .collect(Collectors.toList());
 
-                    int[] removed = dsl.batch(allocationsToRemove).execute();
+                    int[] removed = tx.batch(allocationsToRemove).execute();
                     LOG.info(format("Removed %d allocations", removed.length));
 
                     List<ChangeLog> removalChangeLogs = allocationRemovedForMeasurables
@@ -553,7 +553,7 @@ public class BulkMeasurableRatingService {
                             })
                             .collect(Collectors.toList());
 
-                    int allocationsInsertCount = summarizeResults(dsl.batchInsert(allocationsToAdd).execute());
+                    int allocationsInsertCount = summarizeResults(tx.batchInsert(allocationsToAdd).execute());
                     changeLogService.write(insertChangeLogs);
 
                     LOG.info(
