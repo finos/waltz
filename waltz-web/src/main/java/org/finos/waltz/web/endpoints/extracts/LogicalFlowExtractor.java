@@ -21,6 +21,7 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -99,6 +100,7 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
             "Last Updated By");
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
     private final DSLContext dsl;
@@ -127,7 +129,7 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
 
     private SelectConditionStep<Record> prepareQuery(DSLContext dsl, IdSelectionOptions options) {
 
-        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
+        Select<Record1<Long>> logicalFlowIdSelector = logicalFlowIdSelectorFactory.apply(options);
 
         Condition conditionForDataType = EntityKind.DATA_TYPE.equals(options.entityReference().kind())
                 ? LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelectorFactory.apply(options))
@@ -149,13 +151,13 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        Condition sourceIsApp = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-        Condition targetIsApp = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector).and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition sourceIsApp = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name());
+        Condition targetIsApp = LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name());
 
         FlowClassification sourceClassification = FLOW_CLASSIFICATION.as("sourceClassification");
         FlowClassification targetClassification = FLOW_CLASSIFICATION.as("targetClassification");
 
-        SelectConditionStep<Record> qry = dsl
+        return dsl
                 .select(LOGICAL_FLOW_ID)
                 .select(SOURCE_NAME_FIELD.as("Source"),
                         SOURCE_EXT_ID_FIELD.as("Source Asset Code"),
@@ -184,12 +186,11 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                 .innerJoin(targetClassification)
                 .on(targetClassification.CODE.eq(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING)
                         .and(targetClassification.DIRECTION.eq(FlowDirection.INBOUND.name())))
-                .where(dsl.renderInlined(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
+                .where(LOGICAL_FLOW.ID.in(logicalFlowIdSelector))
+                .and(dsl.renderInlined(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
                 .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
                 .and(conditionForDataType)
                 .and(sourceIsApp.or(targetIsApp))));
-
-        return qry;
     }
 
     private Tuple3<ExtractFormat, String, byte[]> prepareFlows(SelectConditionStep<Record> query,

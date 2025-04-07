@@ -25,9 +25,14 @@ import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.Record1;
+import org.jooq.Record3;
+import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 import static org.finos.waltz.schema.Tables.*;
@@ -60,6 +65,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForTag(options);
             case DATA_TYPE:
                 return mkForDataType(options);
+            case PERSON:
+                 return mkViaLogicalFlowSelectorJoin(options);
             case APPLICATION:
             case ACTOR:
             case APP_GROUP:
@@ -67,12 +74,25 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
             case CHANGE_INITIATIVE:
             case MEASURABLE:
             case ORG_UNIT:
-            case PERSON:
             case SCENARIO:
                 return mkViaLogicalFlowSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
+    }
+
+    private Select<Record1<Long>> mkViaLogicalFlowSelectorJoin(IdSelectionOptions options) {
+        Table<Record1<Long>> logicalFlowSelectorTable = new LogicalFlowIdSelectorFactory()
+                .apply(options)
+                .asTable();
+
+        return DSL
+                .selectDistinct(PHYSICAL_FLOW.ID)
+                .from(logicalFlowSelectorTable)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowSelectorTable.field(LOGICAL_FLOW.ID)))
+                .and(getLifecycleCondition(options));
+
     }
 
 
