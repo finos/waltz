@@ -306,6 +306,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                         .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(involvementsTable.field("app_id", Long.class))))
                     .or(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(involvementsTable.field("entity_kind", String.class))
                         .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(involvementsTable.field("app_id", Long.class)))))
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
                 .and(mkLifecycleStatusCondition(options));
     }
 
