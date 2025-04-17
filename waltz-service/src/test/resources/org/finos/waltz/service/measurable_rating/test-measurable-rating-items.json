@@ -4,6 +4,8 @@
     "taxonomyExternalId": "CT-001",
     "ratingCode": "A",
     "isPrimary": "TRUE",
+    "allocation": 50,
+    "scheme": "CAPABILITY_ALLOC",
     "comment": "comment"
   },
   {
@@ -11,6 +13,8 @@
     "taxonomyExternalId": "CT-001",
     "ratingCode": "A",
     "isPrimary": "FALSE",
+    "allocation": 50,
+    "scheme": "CAPABILITY_ALLOC",
     "comment": "comment"
   },
   {
@@ -18,6 +22,8 @@
     "taxonomyExternalId": "CT-003",
     "ratingCode": "A",
     "isPrimary": "FALSE",
+    "allocation": 50,
+    "scheme": "CAPABILITY_ALLOC",
     "comment": "comment"
   }
 ]
