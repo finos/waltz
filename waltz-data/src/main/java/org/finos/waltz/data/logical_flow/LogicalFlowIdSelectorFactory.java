@@ -19,7 +19,7 @@
 package org.finos.waltz.data.logical_flow;
 
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.schema.Tables;
+
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
@@ -267,10 +267,10 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .from(PERSON)
                 .where(PERSON.ID.eq(options.entityReference().id()));
 
-        Table<Record3<String, String, Long>> involvementsTable = DSL
+        Table<Record3<String, String, Long>> personInvolvementDerivedTable = DSL
                 .select(INVOLVEMENT.ENTITY_KIND.as("entity_kind"),
                         INVOLVEMENT.EMPLOYEE_ID.as("employee_id"),
-                        Tables.APPLICATION.ID.as("app_id"))
+                        APPLICATION.ID.as("app_id"))
                 .from(PERSON)
                 .innerJoin(PERSON_HIERARCHY)
                 .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
@@ -281,31 +281,31 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(INVOLVEMENT_KIND)
                 .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
                 .and(INVOLVEMENT_KIND.TRANSITIVE.isTrue())
-                .innerJoin(Tables.APPLICATION)
+                .innerJoin(APPLICATION)
                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(INVOLVEMENT.ENTITY_ID.eq(Tables.APPLICATION.ID))
+                .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
                 .union(
                         DSL
                                 .select(INVOLVEMENT.ENTITY_KIND,
                                         INVOLVEMENT.EMPLOYEE_ID,
-                                        Tables.APPLICATION.ID)
+                                        APPLICATION.ID)
                                 .from(PERSON)
                                 .innerJoin(INVOLVEMENT)
                                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
-                                .innerJoin(Tables.APPLICATION)
+                                .innerJoin(APPLICATION)
                                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                                .and(INVOLVEMENT.ENTITY_ID.eq(Tables.APPLICATION.ID))
+                                .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
                 )
                 .asTable();
 
         return DSL
                 .selectDistinct(LOGICAL_FLOW.ID)
-                .from(involvementsTable)
+                .from(personInvolvementDerivedTable)
                 .innerJoin(LOGICAL_FLOW)
-                .on((LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(involvementsTable.field("entity_kind", String.class))
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(involvementsTable.field("app_id", Long.class))))
-                    .or(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(involvementsTable.field("entity_kind", String.class))
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(involvementsTable.field("app_id", Long.class)))))
+                .on((LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class))))
+                    .or(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class)))))
                 .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
                 .and(mkLifecycleStatusCondition(options));
     }
