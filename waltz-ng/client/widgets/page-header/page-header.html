@@ -10,7 +10,7 @@
                         fixed="true"></waltz-icon>
 
             <span data-testid="header-name-truncated"
-                  ng-bind="$ctrl.name | truncateMiddle:100">
+                  ng-bind-html="$ctrl.name | truncateMiddle:100">
             </span>
 
             <small data-testid="header-small"
