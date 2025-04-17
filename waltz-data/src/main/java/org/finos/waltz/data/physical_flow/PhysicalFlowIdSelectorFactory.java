@@ -25,13 +25,9 @@ import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.Record1;
-import org.jooq.Record3;
-import org.jooq.Result;
 import org.jooq.Select;
-import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
