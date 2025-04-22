@@ -19,6 +19,7 @@
 package org.finos.waltz.data.logical_flow;
 
 import org.finos.waltz.model.EntityReference;
+
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
@@ -29,10 +30,17 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
+import org.jooq.Record3;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.PERSON_HIERARCHY;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -65,13 +73,14 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             case ACTOR:
             case END_USER_APPLICATION:
                 return mkForSpecificNode(options);
+            case PERSON:
+                return mkViaPersonJoinDerivedTable(options);
             case ALL:
             case APPLICATION:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
             case MEASURABLE:
             case ORG_UNIT:
-            case PERSON:
             case SCENARIO:
                 return wrapAppIdSelector(options);
             case DATA_TYPE:
@@ -250,6 +259,55 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .and(supplierNotRemoved)
                 .and(consumerNotRemoved)
                 .and(appKindFilterConditions);
+    }
+
+    private Select<Record1<Long>> mkViaPersonJoinDerivedTable(IdSelectionOptions options) {
+        SelectConditionStep<Record1<String>> employeeIdForPerson = DSL
+                .select(PERSON.EMPLOYEE_ID)
+                .from(PERSON)
+                .where(PERSON.ID.eq(options.entityReference().id()));
+
+        Table<Record3<String, String, Long>> personInvolvementDerivedTable = DSL
+                .select(INVOLVEMENT.ENTITY_KIND.as("entity_kind"),
+                        INVOLVEMENT.EMPLOYEE_ID.as("employee_id"),
+                        APPLICATION.ID.as("app_id"))
+                .from(PERSON)
+                .innerJoin(PERSON_HIERARCHY)
+                .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeIdForPerson))
+                .and(PERSON.IS_REMOVED.isFalse())
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .innerJoin(INVOLVEMENT_KIND)
+                .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                .and(INVOLVEMENT_KIND.TRANSITIVE.isTrue())
+                .innerJoin(APPLICATION)
+                .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
+                .union(
+                        DSL
+                                .select(INVOLVEMENT.ENTITY_KIND,
+                                        INVOLVEMENT.EMPLOYEE_ID,
+                                        APPLICATION.ID)
+                                .from(PERSON)
+                                .innerJoin(INVOLVEMENT)
+                                .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
+                                .innerJoin(APPLICATION)
+                                .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                                .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
+                )
+                .asTable();
+
+        return DSL
+                .selectDistinct(LOGICAL_FLOW.ID)
+                .from(personInvolvementDerivedTable)
+                .innerJoin(LOGICAL_FLOW)
+                .on((LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class))))
+                    .or(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class)))))
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
+                .and(mkLifecycleStatusCondition(options));
     }
 
 
