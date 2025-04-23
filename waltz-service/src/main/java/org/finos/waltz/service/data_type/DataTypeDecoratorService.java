@@ -291,7 +291,6 @@ public class DataTypeDecoratorService {
             case APPLICATION:
             case APP_GROUP:
             case ORG_UNIT:
-            case PERSON:
             case MEASURABLE:
             case SCENARIO:
             case CHANGE_INITIATIVE:
@@ -307,6 +306,7 @@ public class DataTypeDecoratorService {
             case DATA_TYPE:
                 return dao.findByDataTypeIdSelector(
                         genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());
+            case PERSON:
             case LOGICAL_DATA_FLOW:
                 return dao.findByFlowIdSelector(logicalFlowIdSelectorFactory.apply(options));
             default:
