@@ -1,4 +1,5 @@
-assetCode,	taxonomyExternalId,	ratingCode,	isPrimary,	comment
-109-1,	CT-001,	A,	TRUE,	comment
-109-1,	CT-001,	A,	FALSE,	comment
-324-1,	CT-003,	A,	FALSE,	comment
+assetCode,	taxonomyExternalId,	ratingCode,	isPrimary,	allocation,	scheme,	comment
+109-1,	CT-001,	A,	TRUE,	50,	CAPABILITY_ALLOC,	comment
+109-1,	CT-001,	A,	FALSE,	50,	CAPABILITY_ALLOC,	comment
+324-1,	CT-003,	A,	FALSE,	50,	CAPABILITY_ALLOC,	comment
+
