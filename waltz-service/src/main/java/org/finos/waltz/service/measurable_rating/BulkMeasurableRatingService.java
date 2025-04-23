@@ -2,6 +2,7 @@ package org.finos.waltz.service.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StreamUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.allocation_scheme.AllocationSchemeDao;
 import org.finos.waltz.data.application.ApplicationDao;
@@ -63,6 +64,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.common.StringUtilities.parseInteger;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.schema.Tables.*;
@@ -491,10 +493,13 @@ public class BulkMeasurableRatingService {
                 .collect(Collectors.toList());
 
 
+        StreamUtilities.Siphon<BulkMeasurableRatingValidatedItem> zeroAllocationSiphon = mkSiphon(t -> t.parsedItem().allocation() == 0);
+
         //Add validated allocations
         List<AllocationRecord> allocationsToAdd = ratings
                 .validatedItems()
                 .stream()
+                .filter(zeroAllocationSiphon)
                 .map(d -> {
                     MeasurableRating measurableRating = getMeasurableRating(d, existingMeasurableRatings);
                     if(measurableRating != null) {
