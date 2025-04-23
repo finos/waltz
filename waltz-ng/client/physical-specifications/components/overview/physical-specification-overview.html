@@ -16,7 +16,9 @@
   ~
   -->
 
-<waltz-sub-section name="Detail">
+<waltz-sub-section name="Detail" ng-class="{
+    'ws-inactive' : $ctrl.specification.isRemoved
+ }">
     <content>
 
         <div ng-if="$ctrl.visibility.overviewEditor">
