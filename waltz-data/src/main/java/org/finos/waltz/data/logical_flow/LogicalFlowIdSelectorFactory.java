@@ -53,6 +53,8 @@ import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
 
 
 public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
@@ -63,6 +65,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
     private final static Application CONSUMER_APP = APPLICATION.as("consumer");
     private final static Application SUPPLIER_APP = APPLICATION.as("supplier");
+    private final static Integer APPMAX_FOR_DERIVED_TABLE = 1500;
 
 
 
@@ -267,10 +270,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .from(PERSON)
                 .where(PERSON.ID.eq(options.entityReference().id()));
 
-        Table<Record3<String, String, Long>> personInvolvementDerivedTable = DSL
-                .select(INVOLVEMENT.ENTITY_KIND.as("entity_kind"),
-                        INVOLVEMENT.EMPLOYEE_ID.as("employee_id"),
-                        APPLICATION.ID.as("app_id"))
+        Select<Record1<Long>> appIdSelector = DSL
+                .select(APPLICATION.ID.as("app_id"))
                 .from(PERSON)
                 .innerJoin(PERSON_HIERARCHY)
                 .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
@@ -284,30 +285,32 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(APPLICATION)
                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
+                .and(APPLICATION.IS_REMOVED.isFalse())
+                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
                 .union(
                         DSL
-                                .select(INVOLVEMENT.ENTITY_KIND,
-                                        INVOLVEMENT.EMPLOYEE_ID,
-                                        APPLICATION.ID)
+                                .select(APPLICATION.ID)
                                 .from(PERSON)
                                 .innerJoin(INVOLVEMENT)
                                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
                                 .innerJoin(APPLICATION)
                                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                                 .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
-                )
-                .asTable();
+                                .and(APPLICATION.IS_REMOVED.isFalse())
+                                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                );
+
+        Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         return DSL
-                .selectDistinct(LOGICAL_FLOW.ID)
-                .from(personInvolvementDerivedTable)
-                .innerJoin(LOGICAL_FLOW)
-                .on((LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class))))
-                    .or(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(personInvolvementDerivedTable.field("entity_kind", String.class))
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(personInvolvementDerivedTable.field("app_id", Long.class)))))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
-                .and(mkLifecycleStatusCondition(options));
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(sourceCondition.or(targetCondition))
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 
