@@ -18,13 +18,14 @@
 
 <div class="row waltz-logical-flows-tabgroup">
     <div class="col-md-12">
-        <uib-tabset active="active">
+        <uib-tabset active="$ctrl.currentTabIndex">
 
             <uib-tab index="0"
                      heading="Summary"
                      select="$ctrl.tabSelected('summary', 0)"
                      ng-if="$ctrl.parentEntityRef.kind !== 'DATA_TYPE'">
-                <div class="row">
+
+                <div class="row" ng-if="$ctrl.currentTabIndex === 0">
                     <div class="col-sm-6">
                         <br>
                         <waltz-flow-cloud-diagram stats="$ctrl.stats">

@@ -39,7 +39,8 @@ const initialState = {
         loadingFlows: false,
         loadingStats: false
     },
-    FlowDetailPanel
+    FlowDetailPanel,
+    currentTabIndex: 0
 };
 
 function controller($q,
