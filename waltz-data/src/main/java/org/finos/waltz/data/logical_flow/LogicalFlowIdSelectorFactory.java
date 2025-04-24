@@ -286,7 +286,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
                 .and(APPLICATION.IS_REMOVED.isFalse())
-                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .union(
                         DSL
                                 .select(APPLICATION.ID)
@@ -297,7 +297,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                                 .on(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                                 .and(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID))
                                 .and(APPLICATION.IS_REMOVED.isFalse())
-                                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 );
 
         Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
