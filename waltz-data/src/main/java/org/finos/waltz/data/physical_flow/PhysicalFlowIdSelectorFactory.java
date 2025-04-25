@@ -78,15 +78,12 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
     private Select<Record1<Long>> mkViaLogicalFlowSelectorJoin(IdSelectionOptions options) {
-        Table<Record1<Long>> logicalFlowSelectorTable = new LogicalFlowIdSelectorFactory()
-                .apply(options)
-                .asTable();
-
+        Select<Record1<Long>> logicalFlowSelector = new LogicalFlowIdSelectorFactory()
+                .apply(options);
         return DSL
                 .selectDistinct(PHYSICAL_FLOW.ID)
-                .from(logicalFlowSelectorTable)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowSelectorTable.field(LOGICAL_FLOW.ID)))
+                .from(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.in(logicalFlowSelector))
                 .and(getLifecycleCondition(options));
 
     }
