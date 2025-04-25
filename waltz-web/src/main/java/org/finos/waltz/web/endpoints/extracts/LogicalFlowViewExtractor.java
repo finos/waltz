@@ -20,6 +20,7 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.StreamUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.UserTimestamp;
@@ -34,6 +35,8 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +53,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlTimestamp;
 import static org.finos.waltz.common.ListUtilities.concat;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static spark.Spark.post;
@@ -61,6 +65,10 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
     private final LogicalFlowService logicalFlowService;
 
     private final DSLContext dsl;
+
+    public static final List<PhysicalFlow> skippedRecords = new ArrayList<>();
+
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowViewExtractor.class);
 
     @Autowired
     public LogicalFlowViewExtractor(DSLContext dsl, LogicalFlowService logicalFlowService) {
@@ -233,9 +241,19 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
         Map<Long, LogicalFlow> logicalFlowsById = indexById(viewData.logicalFlows());
         Map<Long, PhysicalSpecification> specsById = indexById(viewData.physicalSpecifications());
 
-        return viewData
+        StreamUtilities.Siphon<PhysicalFlow> inActivePhysicalSpecSiphon = mkSiphon(row -> {
+            PhysicalSpecification specification = specsById.get(row.specificationId());
+            if (specification == null || specification.entityReference() == null) {
+                skippedRecords.add(row);
+                return true;
+            }
+            return false;
+        });
+
+        List<List<Object>> result = viewData
                 .physicalFlows()
                 .stream()
+                .filter(inActivePhysicalSpecSiphon)
                 .map(row -> {
                     ArrayList<Object> reportRow = new ArrayList<>();
 
@@ -299,5 +317,8 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     return reportRow;
                 })
                 .collect(toList());
+
+        LOG.info("Skipped records: " +skippedRecords.size());
+        return result;
     }
 }
