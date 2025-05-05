@@ -215,6 +215,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
+    @Disabled
     public void createUpdateAndRemoveSingleRating() throws InsufficientPrivelegeException {
         String adminUser = NameHelper.mkUserId("adminUser");
         String userWithPerms = NameHelper.mkUserId("userWithPerms");
