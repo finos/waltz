@@ -23,6 +23,8 @@ import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.actor.ActorDao;
+import org.finos.waltz.data.app_group.AppGroupDao;
+import org.finos.waltz.data.app_group.AppGroupEntryDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeDao;
@@ -41,6 +43,7 @@ import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
@@ -72,6 +75,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,7 +114,7 @@ public class FlowClassificationRuleService {
     private final FlowClassificationRuleDao flowClassificationRuleDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final OrganisationalUnitDao organisationalUnitDao;
-
+    private final AppGroupEntryDao appGroupEntryDao;
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -129,7 +133,8 @@ public class FlowClassificationRuleService {
                                          ChangeLogService changeLogService,
                                          EntityHierarchyService entityHierarchyService,
                                          LogicalFlowDecoratorDao logicalFlowDecoratorDao,
-                                         EndUserAppDao endUserAppDao) {
+                                         EndUserAppDao endUserAppDao,
+                                         AppGroupEntryDao appGroupEntryDao) {
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
         checkNotNull(actorDao, "actorDao must not be null");
@@ -141,6 +146,7 @@ public class FlowClassificationRuleService {
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
         checkNotNull(entityHierarchyService, "entityHierarchyService cannot be null");
         checkNotNull(endUserAppDao, "endUserAppDao cannot be null");
+        checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
 
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
@@ -153,6 +159,7 @@ public class FlowClassificationRuleService {
         this.organisationalUnitDao = organisationalUnitDao;
         this.ratingCalculator = ratingCalculator;
         this.endUserAppDao = endUserAppDao;
+        this.appGroupEntryDao = appGroupEntryDao;
     }
 
 
@@ -243,6 +250,21 @@ public class FlowClassificationRuleService {
         List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND, dtHierarchy, population);
         List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND, dtHierarchy, population);
 
+        Map<Long, List<Long>> appGroupToEntriesMap = new HashMap<>();
+        time("loading app group to entries map for app group vantage points",
+                () -> outboundRuleVantagePoints
+                        .stream()
+                        .filter(vps -> vps.vantagePoint().kind().equals(EntityKind.APP_GROUP))
+                        .forEach(vps -> {
+                            long appGroupId = vps.vantagePoint().id();
+                            List<Long> appIdsForGroup = appGroupEntryDao.findEntriesForGroup(appGroupId)
+                                    .stream()
+                                    .map(AppGroupEntry::id)
+                                    .collect(Collectors.toList());
+                            appGroupToEntriesMap.putIfAbsent(appGroupId, appIdsForGroup);
+                        })
+        );
+
         Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
         Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
 
@@ -259,13 +281,15 @@ public class FlowClassificationRuleService {
                 outboundRuleVantagePoints,
                 population,
                 ouHierarchy,
-                dtHierarchy));
+                dtHierarchy,
+                appGroupToEntriesMap));
         Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
                 FlowDirection.INBOUND,
                 inboundRuleVantagePoints,
                 population,
                 ouHierarchy,
-                dtHierarchy));
+                dtHierarchy,
+                appGroupToEntriesMap));
 
         DiffResult<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> decoratorRatingDiff = time(
                 "calculating diff",
