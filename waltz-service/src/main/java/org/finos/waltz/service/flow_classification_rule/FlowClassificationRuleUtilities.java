@@ -57,9 +57,6 @@ public class FlowClassificationRuleUtilities {
 
         Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToRuleAndOutcomeMap = new HashMap<>();
 
-        // to enforce 'first match' in this order
-        EnumMap<EntityKind, Long> kindPriority = getPriorityMapForFCRs();
-
         Set<Long> ruleDataTypes = population
                 .stream()
                 .flatMap(d -> dtHierarchy.findAncestors(d.dtId()).stream())
@@ -74,8 +71,6 @@ public class FlowClassificationRuleUtilities {
 
         bucketedRules
                 .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(f -> kindPriority.getOrDefault(f.getKey().vantagePoint().kind(), Long.MAX_VALUE))) // by default apply the lowest priority
                 .forEach(kv -> {
 
                     BucketKey bucketKey = kv.getKey();
@@ -295,20 +290,6 @@ public class FlowClassificationRuleUtilities {
         } else {
             return MatchOutcome.NOT_APPLICABLE;
         }
-    }
-
-    public static EnumMap<EntityKind, Long> getPriorityMapForFCRs() {
-        EnumMap<EntityKind, Long> priorityMap = new EnumMap<>(EntityKind.class);
-
-        // non overlapping priorities
-        priorityMap.put(EntityKind.APPLICATION, 1L);
-        priorityMap.put(EntityKind.ACTOR, 1L);
-        priorityMap.put(EntityKind.END_USER_APPLICATION, 1L);
-
-        // overlapping priorities
-        priorityMap.put(EntityKind.ORG_UNIT, 2L);
-        priorityMap.put(EntityKind.APP_GROUP, 3L);
-        return priorityMap;
     }
 
 }
