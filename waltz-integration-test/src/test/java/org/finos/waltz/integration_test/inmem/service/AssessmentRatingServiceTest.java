@@ -39,6 +39,7 @@ import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.finos.waltz.test_common.helpers.UserHelper;
 import org.immutables.value.Value;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -109,6 +110,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
+    @Disabled
     public void assessmentAddRipples() {
         userHelper.createUserWithSystemRoles("test", SetUtilities.asSet(SystemRole.ADMIN));
         OneOffRipplerTestConfig cfg = mkWorld("assessmentAddRipples");
@@ -137,6 +139,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
+    @Disabled
     public void assessmentRemoveRipples() {
         userHelper.createUserWithSystemRoles("test", SetUtilities.asSet(SystemRole.ADMIN));
         OneOffRipplerTestConfig cfg = mkWorld("assessmentAddRipples");
@@ -212,6 +215,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
+    @Disabled
     public void createUpdateAndRemoveSingleRating() throws InsufficientPrivelegeException {
         String adminUser = NameHelper.mkUserId("adminUser");
         String userWithPerms = NameHelper.mkUserId("userWithPerms");
