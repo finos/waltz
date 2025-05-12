@@ -120,6 +120,7 @@ public class FlowClassificationRuleService {
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory = new EndUserAppIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final AppGroupDao appGroupDao;
 
 
     @Autowired
@@ -134,7 +135,8 @@ public class FlowClassificationRuleService {
                                          EntityHierarchyService entityHierarchyService,
                                          LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                                          EndUserAppDao endUserAppDao,
-                                         AppGroupEntryDao appGroupEntryDao) {
+                                         AppGroupEntryDao appGroupEntryDao,
+                                         AppGroupDao appGroupDao) {
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
         checkNotNull(actorDao, "actorDao must not be null");
@@ -147,6 +149,7 @@ public class FlowClassificationRuleService {
         checkNotNull(entityHierarchyService, "entityHierarchyService cannot be null");
         checkNotNull(endUserAppDao, "endUserAppDao cannot be null");
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
+        checkNotNull(appGroupDao, "appGroupDap cannot be null");
 
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
@@ -160,6 +163,7 @@ public class FlowClassificationRuleService {
         this.ratingCalculator = ratingCalculator;
         this.endUserAppDao = endUserAppDao;
         this.appGroupEntryDao = appGroupEntryDao;
+        this.appGroupDao = appGroupDao;
     }
 
 
@@ -564,6 +568,8 @@ public class FlowClassificationRuleService {
                 return actorDao.getById(entityReference.id()).name();
             case END_USER_APPLICATION:
                 return endUserAppDao.getById(entityReference.id()).name();
+            case APP_GROUP:
+                return appGroupDao.getGroup(entityReference.id()).name();
             default:
                 throw new IllegalArgumentException(format("Cannot find name for entity kind: %s", entityReference.kind()));
         }
