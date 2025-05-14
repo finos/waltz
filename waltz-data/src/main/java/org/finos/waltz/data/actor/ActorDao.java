@@ -56,8 +56,8 @@ public class ActorDao {
 
         return ImmutableActor.builder()
                 .id(record.getId())
-                .name(record.getName())
-                .description(record.getDescription())
+                .name(record.getName().replaceAll("&amp;","&"))
+                .description(record.getDescription().replaceAll("&amp;","&"))
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isExternal(record.getIsExternal())
