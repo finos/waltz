@@ -45,6 +45,7 @@ import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.StringUtilities.sanitizeCharacters;
 
 @Repository
 public class ActorDao {
@@ -56,8 +57,8 @@ public class ActorDao {
 
         return ImmutableActor.builder()
                 .id(record.getId())
-                .name(record.getName().replaceAll("&amp;","&"))
-                .description(record.getDescription().replaceAll("&amp;","&"))
+                .name(sanitizeCharacters(record.getName()))
+                .description(sanitizeCharacters(record.getDescription()))
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isExternal(record.getIsExternal())
