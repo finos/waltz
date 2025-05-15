@@ -75,7 +75,7 @@ import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-
+import static org.finos.waltz.common.StringUtilities.sanitizeCharacters;
 
 @Repository
 public class LogicalFlowDao {
@@ -113,13 +113,13 @@ public class LogicalFlowDao {
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
-                        .name(ofNullable(r.getValue(SOURCE_NAME_FIELD)))
+                        .name(ofNullable(sanitizeCharacters(r.getValue(SOURCE_NAME_FIELD))))
                         .externalId(ofNullable(r.getValue(SOURCE_EXTERNAL_ID_FIELD)))
                         .build())
                 .target(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getTargetEntityKind()))
                         .id(record.getTargetEntityId())
-                        .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
+                        .name(ofNullable(sanitizeCharacters(r.getValue(TARGET_NAME_FIELD))))
                         .externalId(ofNullable(r.getValue(TARGET_EXTERNAL_ID_FIELD)))
                         .build())
                 .entityLifecycleStatus(readEnum(record.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))

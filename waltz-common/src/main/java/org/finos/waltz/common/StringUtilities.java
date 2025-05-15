@@ -256,7 +256,8 @@ public class StringUtilities {
                     .replaceAll("â€œ", "\"")
                     .replaceAll("â€", "\"")
                     .replaceAll("â€™", "'")
-                    .replaceAll(" ", " ");
+                    .replaceAll(" ", " ")
+                    .replaceAll("&amp;", "&");
         }
     }
 
