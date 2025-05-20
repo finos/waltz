@@ -30,6 +30,7 @@ export const possibleAssessmentKinds = _.orderBy(
         {value: "APPLICATION", name: "Application", qualifierKind: null},
         {value: "CHANGE_INITIATIVE", name: "Change Initiative", qualifierKind: null},
         {value: "CHANGE_SET", name: "Change Set", qualifierKind: null},
+        {value: "DATA_TYPE", name: "Data Type", qualifierKind: null},
         {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship", qualifierKind: null},
         {value: "FLOW_CLASSIFICATION_RULE", name: "Flow Classification Rule", qualifierKind: null},
         {value: "INVOLVEMENT_KIND", name: "Involvement Kind", qualifierKind: null},
