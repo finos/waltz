@@ -119,10 +119,10 @@
             <div id="scope">
                 <EntitySearchSelector on:select={onSelectScope}
                                       placeholder="Search for scope"
-                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION', 'END_USER_APPLICATION']}>
+                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION', 'END_USER_APPLICATION', 'APP_GROUP']}>
                 </EntitySearchSelector>
             </div>
-            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application, edn user application or actor.</p>
+            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, app group, application, end user application or actor.</p>
 
             <label for="datatype">Datatype</label>
             <div id="datatype">

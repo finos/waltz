@@ -111,7 +111,7 @@ public class FlowClassificationRuleDao {
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.PARENT_ID,
             FLOW_CLASSIFICATION_RULE.PARENT_KIND,
-            newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
+            newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION, EntityKind.APP_GROUP));
 
     private static final Field<String> SUBJECT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
