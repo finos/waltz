@@ -14,6 +14,7 @@ import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,8 @@ public class FlowClassificationRuleUtilities {
                                                                               List<FlowClassificationRuleVantagePoint> ruleVantagePoints,
                                                                               Set<FlowDataType> population,
                                                                               EntityHierarchy ouHierarchy,
-                                                                              EntityHierarchy dtHierarchy) {
+                                                                              EntityHierarchy dtHierarchy,
+                                                                              Map<Long, List<Long>> appGroupToEntriesMap) {
 
         Function2<FlowClassificationRuleVantagePoint, FlowDataType, MatchOutcome> matcher = determineMatcherFn(direction);
 
@@ -76,7 +78,7 @@ public class FlowClassificationRuleUtilities {
                     Set<Long> childOUs = ouHierarchy.findChildren(bucketKey.vantagePoint().id());
                     Set<Long> childDTs = dtHierarchy.findChildren(bucketKey.dataTypeId());
 
-                    Predicate<FlowDataType> bucketMatcher = mkBucketMatcher(direction, bucketKey, childOUs, childDTs);
+                    Predicate<FlowDataType> bucketMatcher = mkBucketMatcher(direction, bucketKey, childOUs, childDTs, appGroupToEntriesMap);
 
                     population.forEach(p -> {
 
@@ -112,17 +114,21 @@ public class FlowClassificationRuleUtilities {
         return lfdIdToRuleAndOutcomeMap;
     }
 
-    private static Predicate<FlowDataType> mkBucketMatcher(FlowDirection direction, BucketKey bucketKey, Set<Long> childOUs, Set<Long> childDTs) {
+    private static Predicate<FlowDataType> mkBucketMatcher(FlowDirection direction,
+                                                           BucketKey bucketKey,
+                                                           Set<Long> childOUs,
+                                                           Set<Long> childDTs,
+                                                           Map<Long, List<Long>> appGroupToEntriesMap) {
 
         if (direction.equals(FlowDirection.INBOUND)) {
             return p -> {
                 boolean dtMatches = bucketKey.dataTypeId() == null || childDTs.contains(p.dtId());
-                return dtMatches && checkScopeMatches(bucketKey, childOUs, p.source(), p.sourceOuId());
+                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.source(), p.target(), p.sourceOuId());
             };
         } else {
             return p -> {
                 boolean dtMatches = bucketKey.dataTypeId() == null || childDTs.contains(p.dtId());
-                return dtMatches && checkScopeMatches(bucketKey, childOUs, p.target(), p.targetOuId());
+                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.target(), p.source(), p.targetOuId());
             };
         }
     }
@@ -243,7 +249,9 @@ public class FlowClassificationRuleUtilities {
 
     private static boolean checkScopeMatches(BucketKey bucketKey,
                                              Set<Long> childOUs,
+                                             Map<Long, List<Long>> appGroupToEntriesMap,
                                              EntityReference scopeEntity,
+                                             EntityReference flowSource, // entity from which the flow originates
                                              Long scopeEntityOuId) {
         if (bucketKey.vantagePoint().kind() == EntityKind.ORG_UNIT) {
             if (scopeEntity.kind() == EntityKind.ACTOR) {
@@ -251,10 +259,25 @@ public class FlowClassificationRuleUtilities {
             } else {
                 return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
             }
+        } else if (bucketKey.vantagePoint().kind().equals(EntityKind.APP_GROUP)) {
+            if(scopeEntity.kind().equals(EntityKind.APPLICATION)
+                    && flowSource.kind().equals(EntityKind.APPLICATION)) {
+                return checkAppInAppGroup(appGroupToEntriesMap, bucketKey.vantagePoint().id(), scopeEntity.id())
+                        && checkAppInAppGroup(appGroupToEntriesMap, bucketKey.vantagePoint().id(), flowSource.id());
+            }
+            return false;
         } else {
             // point-to-point flows e.g. ACTOR or APPLICATION
             return scopeEntity.equals(bucketKey.vantagePoint());
         }
+    }
+
+    private static boolean checkAppInAppGroup(Map<Long, List<Long>> appGroupToEntriesMap,
+                                              Long appGroupId,
+                                              Long appId) {
+        return appGroupToEntriesMap
+                .get(appGroupId)
+                .contains(appId);
     }
 
 
