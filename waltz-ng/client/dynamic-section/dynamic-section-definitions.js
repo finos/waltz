@@ -674,6 +674,7 @@ const personSections = [
 
 const dataTypeSections = [
     appsSection,
+    assessmentRatingSection,
     bookmarksSection,
     dataTypeOriginatorsSection,
     entityDiagramsSection,
