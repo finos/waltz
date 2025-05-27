@@ -14,7 +14,6 @@ import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,8 @@ public class FlowClassificationRuleUtilities {
                                                                               Set<FlowDataType> population,
                                                                               EntityHierarchy ouHierarchy,
                                                                               EntityHierarchy dtHierarchy,
-                                                                              Map<Long, List<Long>> appGroupToEntriesMap) {
+                                                                              Map<Long, List<Long>> appGroupToEntriesMap,
+                                                                              Map<String, Long> flowClassificationPriorities) {
 
         Function2<FlowClassificationRuleVantagePoint, FlowDataType, MatchOutcome> matcher = determineMatcherFn(direction);
 
@@ -67,7 +67,7 @@ public class FlowClassificationRuleUtilities {
                 .filter(rvp -> rvp.dataTypeId() == null || ruleDataTypes.contains(rvp.dataTypeId()))
                 .collect(Collectors.toList());
 
-        TreeMap<BucketKey, Collection<FlowClassificationRuleVantagePoint>> bucketedRules = bucketRules(filteredRules);
+        TreeMap<BucketKey, Collection<FlowClassificationRuleVantagePoint>> bucketedRules = bucketRules(filteredRules, flowClassificationPriorities);
 
         bucketedRules
                 .entrySet()
@@ -134,35 +134,39 @@ public class FlowClassificationRuleUtilities {
     }
 
 
-    private static TreeMap<BucketKey, Collection<FlowClassificationRuleVantagePoint>> bucketRules(List<FlowClassificationRuleVantagePoint> targetedPopRules) {
+    private static TreeMap<BucketKey, Collection<FlowClassificationRuleVantagePoint>> bucketRules(List<FlowClassificationRuleVantagePoint> targetedPopRules,
+                                                                                                  Map<String, Long> flowClassificationPriorities) {
 
 
         Comparator<BucketKey> kindComparator = Comparator.comparing(t -> t.vantagePoint().kind().name());
         Comparator<BucketKey> vpRankComparator = Comparator.comparingInt(BucketKey::vantagePointRank);
         Comparator<BucketKey> dtRankComparator = Comparator.comparingInt(BucketKey::dataTypeRank);
+        Comparator<BucketKey> ruleComparator = Comparator.comparing(f -> flowClassificationPriorities.getOrDefault(f.classificationCode(), Long.MAX_VALUE));
 
-        TreeMap<BucketKey, Collection<FlowClassificationRuleVantagePoint>> groups = orderedGroupBy(
+        return orderedGroupBy(
                 targetedPopRules,
                 d -> ImmutableBucketKey.builder()
                         .vantagePoint(d.vantagePoint())
+                        .classificationCode(d.classificationCode())
                         .dataTypeId(d.dataTypeId())
                         .vantagePointRank(d.vantagePointRank())
                         .dataTypeRank(d.dataTypeRank())
                         .build(),
                 d -> d,
-                kindComparator
+                ruleComparator
+                        .thenComparing(kindComparator)
                         .thenComparing(vpRankComparator.reversed())
                         .thenComparing(dtRankComparator.reversed())
                         .thenComparingLong(d -> d.vantagePoint().id())
                         .thenComparingLong(d -> d.dataTypeId() == null ? Long.MAX_VALUE : d.dataTypeId()));
-
-        return groups;
     }
 
     @Value.Immutable
     public interface BucketKey {
 
         EntityReference vantagePoint();
+
+        String classificationCode();
 
         @Nullable
         Long dataTypeId();

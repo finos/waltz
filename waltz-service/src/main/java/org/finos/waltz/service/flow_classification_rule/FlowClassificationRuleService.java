@@ -36,6 +36,7 @@ import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -74,6 +75,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +84,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -102,6 +105,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class FlowClassificationRuleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleService.class);
+    private static final String FCR_PRIORITY_SETTING = "feature.flow-classification-rule-priority";
 
     private final ActorDao actorDao;
     private final ApplicationDao applicationDao;
@@ -121,6 +125,7 @@ public class FlowClassificationRuleService {
     private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory = new EndUserAppIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final AppGroupDao appGroupDao;
+    private final SettingsDao settingsDao;
 
 
     @Autowired
@@ -136,7 +141,8 @@ public class FlowClassificationRuleService {
                                          LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                                          EndUserAppDao endUserAppDao,
                                          AppGroupEntryDao appGroupEntryDao,
-                                         AppGroupDao appGroupDao) {
+                                         AppGroupDao appGroupDao,
+                                         SettingsDao settingsDao) {
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
         checkNotNull(actorDao, "actorDao must not be null");
@@ -150,6 +156,7 @@ public class FlowClassificationRuleService {
         checkNotNull(endUserAppDao, "endUserAppDao cannot be null");
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
         checkNotNull(appGroupDao, "appGroupDap cannot be null");
+        checkNotNull(settingsDao, "settingsDao cannot be null");
 
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
@@ -164,6 +171,7 @@ public class FlowClassificationRuleService {
         this.endUserAppDao = endUserAppDao;
         this.appGroupEntryDao = appGroupEntryDao;
         this.appGroupDao = appGroupDao;
+        this.settingsDao = settingsDao;
     }
 
 
@@ -269,6 +277,28 @@ public class FlowClassificationRuleService {
                         })
         );
 
+        Map<String, Long> flowClassificationPriorities = new HashMap<>();
+        boolean hasPrioritySetting = settingsDao.getByName(FCR_PRIORITY_SETTING) != null;
+        boolean hasPrioritySettingValue = hasPrioritySetting && settingsDao.getByName("feature.auth-source-priority").value().isPresent();
+
+        if(hasPrioritySettingValue) {
+            List<String> prioritiesList = Arrays
+                    .stream(settingsDao.getByName(FCR_PRIORITY_SETTING)
+                    .value()
+                    .get()
+                    .split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
+
+            IntStream.range(0, prioritiesList.size())
+                    .boxed()
+                    .forEach(t ->
+                            // fcId , fcPriority (in order of the setting)
+                            flowClassificationPriorities.put(prioritiesList.get(t), Long.valueOf(t))
+                    );
+        }
+
+
         Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
         Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
 
@@ -286,14 +316,16 @@ public class FlowClassificationRuleService {
                 population,
                 ouHierarchy,
                 dtHierarchy,
-                appGroupToEntriesMap));
+                appGroupToEntriesMap,
+                flowClassificationPriorities));
         Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
                 FlowDirection.INBOUND,
                 inboundRuleVantagePoints,
                 population,
                 ouHierarchy,
                 dtHierarchy,
-                appGroupToEntriesMap));
+                appGroupToEntriesMap,
+                flowClassificationPriorities));
 
         DiffResult<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> decoratorRatingDiff = time(
                 "calculating diff",
