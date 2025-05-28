@@ -24,4 +24,27 @@
                author="mudesmi">
         <tagDatabase tag="v1.70"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+    
+    <changeSet id="1.71-featureFlagsForFlowClassificationRules"
+               author="shreyans.jain"
+               failOnError="false">
+        <insert tableName="settings">
+            <column name="name" value="feature.flow-classification-rules.view-only"/>
+            <column name="value" value="false"/>
+            <column name="restricted" valueBoolean="false"/>
+            <column name="description" value="Overrides the 'Auth Source Editor' role.
+            If set to 'true' users will no longer be add, remove or update flow classification rules from the UI."/>
+        </insert>
+        <insert tableName="settings">
+            <column name="name" value="feature.flow-classification-rules.priority"/>
+            <column name="value" value=""/>
+            <column name="restricted" valueBoolean="false"/>
+            <column name="description" value="This setting precedes the current logic of recalculating flow ratings.
+            The value of this setting must be comma separated flow classification codes like -
+            CODE_A,CODE_B,CODE_C in the order of the priority (i,e. CODE_A > CODE_B > CODE_C.)
+            Any flow classification codes not present in this will be treated as having the lowest priority,
+            i.e. not affecting the logic of recalculation.
+            If this value is not set - it will not affect the logic of recalculating flow ratings."/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
