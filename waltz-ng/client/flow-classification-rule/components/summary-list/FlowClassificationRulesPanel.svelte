@@ -181,10 +181,12 @@
     $: flowClassificationRuleEditableSetting = _
         .chain($settingsCall?.data)
         .filter(d => d.name === flowClassificationRuleViewOnlySettingKey)
-        .map(d => d.value === "false")
         .value()[0];
 
-    $: hasEditPermissions = flowClassificationRuleEditableSetting && _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
+    $: flowClassificationRuleEditableSettingValue = !flowClassificationRuleEditableSetting?.value ? true :
+        flowClassificationRuleEditableSetting.value !== "true";
+
+    $: hasEditPermissions = flowClassificationRuleEditableSettingValue && _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
     $: inboundFlowClassifications = _
         .chain(rulesView?.flowClassifications)
         .filter(d => d.direction === 'INBOUND')
