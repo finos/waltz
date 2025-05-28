@@ -286,7 +286,7 @@ public class FlowClassificationRuleService {
         if (!hasPrioritySettingValue) {
             LOG.info("Flow classification rule priority setting not found. Default ordering will be preserved");
         } else {
-            LOG.info("Flow classification rule priority setting found with vale {}", fcrPrioritySetting.value().get());
+            LOG.info("Flow classification rule priority setting found with value {}", fcrPrioritySetting.value().get());
             List<String> prioritiesList = Arrays
                     .stream(fcrPrioritySetting
                     .value()
