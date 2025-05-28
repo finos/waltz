@@ -105,7 +105,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class FlowClassificationRuleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleService.class);
-    private static final String FCR_PRIORITY_SETTING = "feature.flow-classification-rule-priority";
+    private static final String FCR_PRIORITY_SETTING = "feature.flow-classification-rules.priority";
 
     private final ActorDao actorDao;
     private final ApplicationDao applicationDao;
@@ -279,7 +279,7 @@ public class FlowClassificationRuleService {
 
         Map<String, Long> flowClassificationPriorities = new HashMap<>();
         boolean hasPrioritySetting = settingsDao.getByName(FCR_PRIORITY_SETTING) != null;
-        boolean hasPrioritySettingValue = hasPrioritySetting && settingsDao.getByName("feature.auth-source-priority").value().isPresent();
+        boolean hasPrioritySettingValue = hasPrioritySetting && settingsDao.getByName(FCR_PRIORITY_SETTING).value().isPresent();
 
         if(hasPrioritySettingValue) {
             List<String> prioritiesList = Arrays
