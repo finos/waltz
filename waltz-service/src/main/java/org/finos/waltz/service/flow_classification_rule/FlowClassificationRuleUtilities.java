@@ -123,12 +123,12 @@ public class FlowClassificationRuleUtilities {
         if (direction.equals(FlowDirection.INBOUND)) {
             return p -> {
                 boolean dtMatches = bucketKey.dataTypeId() == null || childDTs.contains(p.dtId());
-                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.source(), p.target(), p.sourceOuId());
+                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.source(), p.sourceOuId());
             };
         } else {
             return p -> {
                 boolean dtMatches = bucketKey.dataTypeId() == null || childDTs.contains(p.dtId());
-                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.target(), p.source(), p.targetOuId());
+                return dtMatches && checkScopeMatches(bucketKey, childOUs, appGroupToEntriesMap, p.target(), p.targetOuId());
             };
         }
     }
@@ -251,7 +251,6 @@ public class FlowClassificationRuleUtilities {
                                              Set<Long> childOUs,
                                              Map<Long, List<Long>> appGroupToEntriesMap,
                                              EntityReference scopeEntity,
-                                             EntityReference flowSource, // entity from which the flow originates
                                              Long scopeEntityOuId) {
         if (bucketKey.vantagePoint().kind() == EntityKind.ORG_UNIT) {
             if (scopeEntity.kind() == EntityKind.ACTOR) {
@@ -260,10 +259,8 @@ public class FlowClassificationRuleUtilities {
                 return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
             }
         } else if (bucketKey.vantagePoint().kind().equals(EntityKind.APP_GROUP)) {
-            if(scopeEntity.kind().equals(EntityKind.APPLICATION)
-                    && flowSource.kind().equals(EntityKind.APPLICATION)) {
-                return checkAppInAppGroup(appGroupToEntriesMap, bucketKey.vantagePoint().id(), scopeEntity.id())
-                        && checkAppInAppGroup(appGroupToEntriesMap, bucketKey.vantagePoint().id(), flowSource.id());
+            if(scopeEntity.kind().equals(EntityKind.APPLICATION)) {
+                return checkAppInAppGroup(appGroupToEntriesMap, bucketKey.vantagePoint().id(), scopeEntity.id());
             }
             return false;
         } else {
