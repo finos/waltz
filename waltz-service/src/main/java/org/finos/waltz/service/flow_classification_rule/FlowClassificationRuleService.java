@@ -59,6 +59,7 @@ import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVant
 import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
 import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.settings.Setting;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -105,7 +106,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class FlowClassificationRuleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleService.class);
-    private static final String FCR_PRIORITY_SETTING = "feature.flow-classification-rules.priority";
+    private static final String FCR_PRIORITY_SETTING_KEY = "feature.flow-classification-rules.priority";
 
     private final ActorDao actorDao;
     private final ApplicationDao applicationDao;
@@ -278,12 +279,16 @@ public class FlowClassificationRuleService {
         );
 
         Map<String, Long> flowClassificationPriorities = new HashMap<>();
-        boolean hasPrioritySetting = settingsDao.getByName(FCR_PRIORITY_SETTING) != null;
-        boolean hasPrioritySettingValue = hasPrioritySetting && settingsDao.getByName(FCR_PRIORITY_SETTING).value().isPresent();
+        Setting fcrPrioritySetting = settingsDao.getByName(FCR_PRIORITY_SETTING_KEY);
+        boolean hasPrioritySetting = fcrPrioritySetting != null;
+        boolean hasPrioritySettingValue = hasPrioritySetting && fcrPrioritySetting.value().isPresent();
 
-        if(hasPrioritySettingValue) {
+        if (!hasPrioritySettingValue) {
+            LOG.info("Flow classification rule priority setting not found. Default ordering will be preserved");
+        } else {
+            LOG.info("Flow classification rule priority setting found with vale {}", fcrPrioritySetting.value().get());
             List<String> prioritiesList = Arrays
-                    .stream(settingsDao.getByName(FCR_PRIORITY_SETTING)
+                    .stream(fcrPrioritySetting
                     .value()
                     .get()
                     .split(","))
