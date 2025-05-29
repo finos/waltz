@@ -293,6 +293,7 @@ public class FlowClassificationRuleService {
                     .get()
                     .split(","))
                     .map(String::trim)
+                    .filter(String::isEmpty)
                     .collect(Collectors.toList());
 
             IntStream.range(0, prioritiesList.size())
