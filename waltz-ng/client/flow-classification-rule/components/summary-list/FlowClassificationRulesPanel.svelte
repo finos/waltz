@@ -178,15 +178,15 @@
 
     $: rulesView = $ruleViewCall?.data;
     $: permissions = $permissionsCall?.data;
-    $: flowClassificationRuleEditableSetting = _
+    $: flowClassificationRuleViewOnlySetting = _
         .chain($settingsCall?.data)
-        .filter(d => d.name === flowClassificationRuleViewOnlySettingKey)
-        .value()[0];
+        .find(d => d.name === flowClassificationRuleViewOnlySettingKey)
+        .value();
 
-    $: flowClassificationRuleEditableSettingValue = !flowClassificationRuleEditableSetting?.value ? true :
-        flowClassificationRuleEditableSetting.value !== "true";
+    $: editableFlowClassificationRule = !flowClassificationRuleViewOnlySetting?.value ? true :
+        flowClassificationRuleViewOnlySetting.value !== "true";
 
-    $: hasEditPermissions = flowClassificationRuleEditableSettingValue && _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
+    $: hasEditPermissions = editableFlowClassificationRule && _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
     $: inboundFlowClassifications = _
         .chain(rulesView?.flowClassifications)
         .filter(d => d.direction === 'INBOUND')
