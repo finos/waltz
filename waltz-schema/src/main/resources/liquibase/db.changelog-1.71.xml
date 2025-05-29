@@ -25,7 +25,7 @@
         <tagDatabase tag="v1.70"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
     
-    <changeSet id="1.71-featureFlagsForFlowClassificationRules"
+    <changeSet id="20250529-7292-1"
                author="shreyans.jain"
                failOnError="false">
         <insert tableName="settings">
