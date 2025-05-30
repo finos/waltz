@@ -14,6 +14,7 @@
     import FlowClassificationRuleEditor from "./FlowClassificationRuleEditor.svelte";
     import {toEntityRef} from "../../../common/entity-utils";
     import {messageSeverity} from "../../../common/services/enums/message-severity";
+    import {settingsStore} from "../../../svelte-stores/settings-store";
 
     const PanelModes = {
         LIST: "LIST",
@@ -31,7 +32,10 @@
 
     export let primaryEntityRef;
 
+    const flowClassificationRuleViewOnlySettingKey = "feature.flow-classification-rules.view-only";
+
     let permissionsCall = userStore.load();
+    let settingsCall = settingsStore.loadAll();
     let ruleViewCall;
     let rulesView;
 
@@ -174,8 +178,15 @@
 
     $: rulesView = $ruleViewCall?.data;
     $: permissions = $permissionsCall?.data;
+    $: flowClassificationRuleViewOnlySetting = _
+        .chain($settingsCall?.data)
+        .find(d => d.name === flowClassificationRuleViewOnlySettingKey)
+        .value();
 
-    $: hasEditPermissions = _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
+    $: editableFlowClassificationRule = !flowClassificationRuleViewOnlySetting?.value ? true :
+        flowClassificationRuleViewOnlySetting.value !== "true";
+
+    $: hasEditPermissions = editableFlowClassificationRule && _.includes(permissions?.roles, systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key) || false;
     $: inboundFlowClassifications = _
         .chain(rulesView?.flowClassifications)
         .filter(d => d.direction === 'INBOUND')
