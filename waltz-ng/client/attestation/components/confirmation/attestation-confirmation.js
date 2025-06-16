@@ -27,7 +27,8 @@ const bindings = {
     parentEntityRef: "<",
     attestedEntityRef: "<?",
     onConfirm: "<?",
-    onCancel: "<?"
+    onCancel: "<?",
+    activeTab: "<?"
 };
 
 const initialState = {
@@ -64,10 +65,32 @@ function controller($q, serviceBroker) {
                 : disableSubmission(failures))
     }
 
+    function validateViewpoints() {
+        const categoryId = _.get(vm, ["attestedEntityRef", "id"]);
+        serviceBroker
+            .loadViewData(CORE_API.AttestationPreCheckStore.viewpointCheck, [vm.parentEntityRef, categoryId])
+            .then(r => r.data)
+            .then(failures =>  _.isEmpty(failures)
+                ? enableSubmission()
+                : disableSubmission(failures))
+    }
+
     vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.ApplicationStore.getById,
+                [vm.parentEntityRef.id])
+            .then(r => {
+                if(r.data) {
+                    vm.overallRating = r.data.overallRating
+                }
+            });
         switch (vm.attestationKind) {
             case "LOGICAL_DATA_FLOW":
                 validateLogicalFlows();
+                break;
+            case "MEASURABLE_CATEGORY":
+                validateViewpoints();
                 break;
             default:
                 enableSubmission();

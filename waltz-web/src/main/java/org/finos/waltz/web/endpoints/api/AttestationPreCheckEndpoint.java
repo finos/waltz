@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -27,7 +28,7 @@ import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
+
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
@@ -47,11 +48,20 @@ public class AttestationPreCheckEndpoint implements Endpoint {
     @Override
     public void register() {
         String logicalFlowCheckPath = WebUtilities.mkPath(BASE_URL, "logical-flow", "entity", ":kind", ":id");
+        String viewpointCheckPath = WebUtilities.mkPath(BASE_URL, "viewpoint", "entity", ":kind", ":id", "category", ":categoryId");
 
         ListRoute<String> logicalFlowCheckRoute =
                 (req, res) -> attestationPreCheckService.calcLogicalFlowPreCheckFailures(WebUtilities.getEntityReference(req));
 
-        EndpointUtilities.getForList(logicalFlowCheckPath, logicalFlowCheckRoute);
-    }
 
+        ListRoute<String> viewpointFlowCheckRoute =
+                (req, res) -> {
+                    EntityReference entityReference = WebUtilities.getEntityReference(req);
+                    long attestedEntityId = WebUtilities.getLong(req, "categoryId");
+                    return attestationPreCheckService.calcCapabilitiesPreCheckFailures(entityReference, attestedEntityId);
+                };
+
+        EndpointUtilities.getForList(logicalFlowCheckPath, logicalFlowCheckRoute);
+        EndpointUtilities.getForList(viewpointCheckPath, viewpointFlowCheckRoute);
+    }
 }

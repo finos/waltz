@@ -1,5 +1,6 @@
 package org.finos.waltz.service.attestation;
 
+import org.finos.waltz.model.attestation.CapabilitiesAttestationPreChecks;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.model.EntityReference;
@@ -57,6 +58,49 @@ public class AttestationPreCheckService {
                     "attestation.logical-flow.fail.unknown",
                     "Cannot attest as there are unknown data type usages (%d violation/s)",
                     preChecks.unknownCount()));
+        }
+
+        return failures;
+    }
+
+    public List<String> calcCapabilitiesPreCheckFailures(EntityReference entityReference, Long attestedEntityId) {
+
+        Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.capability.fail");
+        CapabilitiesAttestationPreChecks preChecks = attestationPreCheckDao
+                .calcCapabilitiesAttestationPreChecks(entityReference, attestedEntityId);
+
+        List<String> failures = new ArrayList<>();
+
+        if (preChecks.mappingCount() == 0) {
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.capability.fail.count",
+                    "Cannot attest because at least one capability mapping should be present.",
+                    preChecks.mappingCount()));
+        }
+
+        if (preChecks.nonConcreteCount() > 0) {
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.capability.fail.nonConcrete.count",
+                    "Cannot attest as %d non concrete mapping(s) exists which cannot be edited",
+                    preChecks.nonConcreteCount()));
+        }
+
+        if (preChecks.mappingCount() > 0 && preChecks.totalAllocation() != 100) {
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.capability.fail.total.allocation",
+                    "Cannot attest as the total allocation for capabilities is not equal to 100",
+                    0));
+        }
+
+        if (preChecks.mappingCount() > 0 && preChecks.zeroAllocationCount() > 0) {
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.capability.fail.zeroAllocation.count",
+                    "Cannot attest as there are %d capabilities with no allocation",
+                    preChecks.zeroAllocationCount()));
         }
 
         return failures;

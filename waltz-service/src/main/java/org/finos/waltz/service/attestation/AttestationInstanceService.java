@@ -31,16 +31,7 @@ import org.finos.waltz.model.IdCommandResponse;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.attestation.ApplicationAttestationInstanceInfo;
-import org.finos.waltz.model.attestation.ApplicationAttestationInstanceSummary;
-import org.finos.waltz.model.attestation.ApplicationAttestationSummaryCounts;
-import org.finos.waltz.model.attestation.ApplicationAttestationSummaryFilters;
-import org.finos.waltz.model.attestation.AttestEntityCommand;
-import org.finos.waltz.model.attestation.AttestationInstance;
-import org.finos.waltz.model.attestation.AttestationRun;
-import org.finos.waltz.model.attestation.AttestationState;
-import org.finos.waltz.model.attestation.LatestMeasurableAttestationInfo;
-import org.finos.waltz.model.attestation.SyncRecipientsResponse;
+import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
@@ -222,6 +213,10 @@ public class AttestationInstanceService {
             checkLogicalFlowsCanBeAttested(createCommand);
         }
 
+        if(createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY) {
+            checkViewpointsCanBeAttested(createCommand);
+        }
+
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
                         createCommand,
@@ -247,6 +242,17 @@ public class AttestationInstanceService {
             Long instanceId = getInstanceId(first(findByRunId(runId)));
             return attestInstance(instanceId, username);
         }
+    }
+
+    private void checkViewpointsCanBeAttested(AttestEntityCommand createCommand) {
+        List<String> failures = attestationPreCheckService.calcCapabilitiesPreCheckFailures(
+                createCommand.entityReference(),
+                createCommand.attestedEntityId());
+        checkEmpty(
+                failures,
+                () -> format(
+                        "Capabilities check failed with the following warnings: %s",
+                        join(failures, ";")));
     }
 
 

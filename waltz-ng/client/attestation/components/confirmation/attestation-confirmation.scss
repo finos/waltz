@@ -42,4 +42,14 @@
         padding: 10px;
         width: 95%;
     }
+
+    .help-block {
+        ul {
+            list-style: none;
+        }
+
+        .waltz-static-panel {
+            text-align: start;
+        }
+    }
 }
