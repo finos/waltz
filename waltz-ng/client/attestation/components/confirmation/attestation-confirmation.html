@@ -30,8 +30,8 @@
         </div>
 
         <div class="small help-block" ng-if="$ctrl.activeTab === 'viewpoints'">
-            <waltz-static-panels 
-                group-key="SECTION.HELP.ATTESTATOIN_VIEWPOINT"
+            <waltz-static-panels
+                group-key="SECTION.HELP.ATTESTATION_VIEWPOINT"
                 class="small"
                 render-mode="minimal-border">
             </waltz-static-panels>
@@ -43,7 +43,7 @@
             <waltz-markdown text="$ctrl.message"></waltz-markdown>
         </div>
 
-        <div 
+        <div
             style="display: grid; grid-template-columns: 50px 100px; align-items: center;"
             ng-if="$ctrl.activeTab === 'viewpoints'">
             <div class="waltz-display-field-label">
@@ -62,7 +62,7 @@
                                             name="Attesting...">
                 </waltz-loading-notification>
             </div>
-            
+
             <button class="btn btn-sm btn-success"
                     ng-class="{
                         'disabled': $ctrl.disabled
