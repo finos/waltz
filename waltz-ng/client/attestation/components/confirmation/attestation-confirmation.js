@@ -27,8 +27,7 @@ const bindings = {
     parentEntityRef: "<",
     attestedEntityRef: "<?",
     onConfirm: "<?",
-    onCancel: "<?",
-    activeTab: "<?"
+    onCancel: "<?"
 };
 
 const initialState = {

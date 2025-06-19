@@ -44,12 +44,18 @@
     }
 
     .help-block {
-        ul {
-            list-style: none;
-        }
-
         .waltz-static-panel {
             text-align: start;
+        }
+        .fa-info-circle {
+            font-size: 1.6em;
+        }
+    }
+
+    .alert {
+        ul {
+            padding-left: 0;
+            list-style: none;
         }
     }
 }

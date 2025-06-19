@@ -212,9 +212,9 @@ public class AttestationPreCheckDao {
                 .as(DSL
                         .select(capabilities.field(0, Long.class))
                         .from(capabilities)
-                        .innerJoin(allocation)
-                        .on(allocation.MEASURABLE_RATING_ID.eq(capabilities.field(0, Long.class)))
-                        .where(allocation.ALLOCATION_PERCENTAGE.eq(0)));
+                        .leftJoin(allocation)
+                        .on(allocation.MEASURABLE_RATING_ID.eq(capabilities.field("mr_id", Long.class)))
+                        .where(allocation.ALLOCATION_PERCENTAGE.isNull()));
 
         CommonTableExpression<Record2<String, Integer>> zeroAllocationCount = DSL
                 .name("zero_allocation_count")

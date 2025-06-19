@@ -18,7 +18,7 @@
 
 <div class="waltz-attestation-confirmation">
     <div class="wac-header">
-        <div style="padding-bottom: 0.5em" ng-if="$ctrl.activeTab !== 'viewpoints'">
+        <div style="padding-bottom: 0.5em" ng-if="$ctrl.attestedEntityRef.name !== 'Capability'">
             You are attesting that the
             <span ng-if="!$ctrl.attestedEntityRef"
                   ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
@@ -29,7 +29,10 @@
             entries are correct.
         </div>
 
-        <div class="small help-block" ng-if="$ctrl.activeTab === 'viewpoints'">
+        <div 
+            class="small help-block" 
+            ng-if="$ctrl.attestationKind === 'MEASURABLE_CATEGORY' 
+                    && $ctrl.attestedEntityRef.name === 'Capability'">
             <waltz-static-panels
                 group-key="SECTION.HELP.ATTESTATION_VIEWPOINT"
                 class="small"
@@ -45,7 +48,8 @@
 
         <div
             style="display: grid; grid-template-columns: 50px 100px; align-items: center;"
-            ng-if="$ctrl.activeTab === 'viewpoints'">
+            ng-if="$ctrl.attestationKind === 'MEASURABLE_CATEGORY' 
+                    && $ctrl.attestedEntityRef.name === 'Capability'">
             <div class="waltz-display-field-label">
                 Overall Rating
             </div>

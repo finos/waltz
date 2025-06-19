@@ -83,7 +83,7 @@ public class AttestationPreCheckService {
             failures.add(mkFailureMessage(
                     messageTemplates,
                     "attestation.capability.fail.nonConcrete.count",
-                    "Cannot attest as %d non concrete mapping(s) exists which cannot be edited",
+                    "Cannot attest as %d abstract mapping(s) exists. Abstract nodes cannot be used in mappings as they are not specific enough.",
                     preChecks.nonConcreteCount()));
         }
 
@@ -99,7 +99,7 @@ public class AttestationPreCheckService {
             failures.add(mkFailureMessage(
                     messageTemplates,
                     "attestation.capability.fail.zeroAllocation.count",
-                    "Cannot attest as there are %d capabilities with no allocation",
+                    "Cannot attest as %d capability mapping(s) exists with no allocation",
                     preChecks.zeroAllocationCount()));
         }
 
