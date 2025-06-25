@@ -18,7 +18,9 @@
 
 <div class="waltz-attestation-confirmation">
     <div class="wac-header">
-        <div style="padding-bottom: 0.5em">
+        <div
+            style="padding-bottom: 0.5em"
+            ng-if="!$ctrl.prechecksEnabled">
             You are attesting that the
             <span ng-if="!$ctrl.attestedEntityRef"
                   ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
@@ -29,12 +31,37 @@
             entries are correct.
         </div>
 
+        <div
+            class="small help-block"
+            ng-if="$ctrl.attestationKind === 'MEASURABLE_CATEGORY'
+                    && $ctrl.prechecksEnabled">
+            <waltz-static-panels
+                group-key="SECTION.HELP.ATTESTATION_VIEWPOINT"
+                class="small"
+                render-mode="minimal-border">
+            </waltz-static-panels>
+        </div>
+
         <div class="alert alert-danger"
              style="margin-top: 0.5em"
              ng-if="$ctrl.disabled">
             <waltz-markdown text="$ctrl.message"></waltz-markdown>
         </div>
 
+        <div
+            style="display: grid; grid-template-columns: 50px 100px; align-items: center;"
+            ng-if="$ctrl.attestationKind === 'MEASURABLE_CATEGORY'
+                    && $ctrl.prechecksEnabled">
+            <div class="waltz-display-field-label">
+                Overall Rating
+            </div>
+            <div class="waltz-display-field-value">
+                <waltz-rating-indicator-cell rating="$ctrl.overallRating | useDefaultRatingScheme:'investment' "
+                                             show-description-popup="true"
+                                             show-name="true">
+                </waltz-rating-indicator-cell>
+            </div>
+        </div>
         <div>
             <div style="display: inline-block;">
                 <waltz-loading-notification show="$ctrl.attesting"

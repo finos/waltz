@@ -4,29 +4,21 @@ package org.finos.waltz.data.attestation;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.ImmutableViewpointAttestationPreChecks;
+import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
 import org.finos.waltz.model.attestation.ImmutableLogicalFlowAttestationPreChecks;
 import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
-import org.finos.waltz.schema.tables.ApplicationGroup;
-import org.finos.waltz.schema.tables.ApplicationGroupEntry;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.schema.tables.DataType;
-import org.finos.waltz.schema.tables.LogicalFlow;
-import org.finos.waltz.schema.tables.LogicalFlowDecorator;
-import org.jooq.CommonTableExpression;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.SelectOrderByStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
+
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.schema.Tables.APPLICATION_GROUP;
-import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
-import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
-import static org.finos.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 
 @Repository
@@ -44,6 +36,11 @@ public class AttestationPreCheckDao {
     private static final ApplicationGroupEntry age = APPLICATION_GROUP_ENTRY;
     private static final ApplicationGroup ag = APPLICATION_GROUP;
     private static final DataType dt = DATA_TYPE;
+
+    private static final MeasurableCategory mc = MEASURABLE_CATEGORY;
+    private static final Measurable measurable = MEASURABLE;
+    private static final MeasurableRating mr = MEASURABLE_RATING;
+    private static final Allocation allocation = ALLOCATION;
 
     private final DSLContext dsl;
 
@@ -147,6 +144,118 @@ public class AttestationPreCheckDao {
                     break;
                 case EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK:
                     builder.exemptFromDeprecatedCheck(count > 0);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unexpected check: " + check);
+            }
+        });
+
+        return builder.build();
+    }
+
+    public ViewpointAttestationPreChecks calcViewpointAttestationPreChecks(EntityReference ref,
+                                                                                 Long categoryId) {
+
+        CommonTableExpression<Record3<Long, Boolean, Long>> viewpoints = DSL
+                .name("viewpoints")
+                .as(DSL
+                        .select(measurable.ID, measurable.CONCRETE, mr.ID.as("mr_id"))
+                        .from(mc)
+                        .innerJoin(measurable)
+                        .on(measurable.MEASURABLE_CATEGORY_ID.eq(mc.ID))
+                        .innerJoin(mr)
+                        .on(mr.MEASURABLE_ID.eq(measurable.ID))
+                        .where(mr.ENTITY_ID.eq(ref.id()))
+                        .and(mc.ID.eq(categoryId)));
+
+        CommonTableExpression<Record1<Long>> nonConcreteMappings = DSL
+                .name("non_concrete_mappings")
+                .as(DSL
+                    .select(viewpoints.field(0, Long.class))
+                    .from(viewpoints)
+                    .where(viewpoints.field(1, Boolean.class).isFalse()));
+
+        CommonTableExpression<Record2<String, Integer>> mappingCount = DSL
+                .name("mapping_count")
+                .as(DSL
+                        .select(DSL.val("VIEWPOINTS").as("chk"),
+                                DSL.count().as("count"))
+                        .from(viewpoints));
+
+        CommonTableExpression<Record2<String, Integer>> nonConcreteCount = DSL
+                .name("non_concrete_count")
+                .as(DSL
+                        .select(DSL.val("NON_CONCRETE").as("chk"),
+                                DSL.count().as("count"))
+                        .from(nonConcreteMappings));
+
+        CommonTableExpression<Record1<Integer>> totalAllocation = DSL
+                .name("total_allocation")
+                .as(DSL
+                        .select(allocation.ALLOCATION_PERCENTAGE)
+                        .from(viewpoints)
+                        .innerJoin(allocation)
+                        .on(allocation.MEASURABLE_RATING_ID.eq(viewpoints.field("mr_id", Long.class))));
+
+        CommonTableExpression<Record2<String, Serializable>> totalAllocationCount = DSL
+                .name("total_allocation_count")
+                .as(DSL
+                        .select(DSL.val("TOTAL_ALLOCATION").as("chk"),
+                                DSL.coalesce(
+                                        DSL.sum(totalAllocation.field(0, Long.class)), 0)
+                                        .as("count"))
+                        .from(totalAllocation));
+
+
+        CommonTableExpression<Record1<Long>> zeroAllocation = DSL
+                .name("zero_allocation")
+                .as(DSL
+                        .select(viewpoints.field(0, Long.class))
+                        .from(viewpoints)
+                        .leftJoin(allocation)
+                        .on(allocation.MEASURABLE_RATING_ID.eq(viewpoints.field("mr_id", Long.class)))
+                        .where(allocation.ALLOCATION_PERCENTAGE.isNull()));
+
+        CommonTableExpression<Record2<String, Integer>> zeroAllocationCount = DSL
+                .name("zero_allocation_count")
+                .as(DSL
+                        .select(DSL.val("ZERO_ALLOCATION").as("chk"),
+                                DSL.count().as("count"))
+                        .from(zeroAllocation));
+
+        SelectOrderByStep<Record> qry = dsl
+                .with(viewpoints)
+                .with(nonConcreteMappings)
+                .with(mappingCount)
+                .with(nonConcreteCount)
+                .with(totalAllocation)
+                .with(totalAllocationCount)
+                .with(zeroAllocation)
+                .with(zeroAllocationCount)
+                .select(mappingCount.asterisk()).from(mappingCount)
+                .union(DSL.select(nonConcreteCount.asterisk()).from(nonConcreteCount))
+                .union(DSL.select(totalAllocationCount.asterisk()).from(totalAllocationCount))
+                .union(DSL.select(zeroAllocationCount.asterisk()).from(zeroAllocationCount));
+
+
+        ImmutableViewpointAttestationPreChecks.Builder builder = ImmutableViewpointAttestationPreChecks.builder();
+
+        System.out.println("Query: " + qry);
+        qry.forEach(r -> {
+            String check = r.get("chk", String.class);
+            int count = r.get("count", Integer.class);
+            switch (check) {
+                case "VIEWPOINTS":
+                    builder.mappingCount(count);
+                    break;
+                case "NON_CONCRETE":
+                    builder.nonConcreteCount(count);
+                    break;
+                case "TOTAL_ALLOCATION":
+                    builder.totalAllocation(count);
+                    break;
+                case "ZERO_ALLOCATION":
+                    builder.zeroAllocationCount(count);
                     break;
                 default:
                     throw new IllegalArgumentException("Unexpected check: " + check);

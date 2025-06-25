@@ -31,9 +31,18 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const viewpointCheck = (parentRef, categoryId) => {
+        checkIsEntityRef(parentRef);
+
+        return $http
+            .get(`${base}/viewpoint/entity/${parentRef.kind}/${parentRef.id}/category/${categoryId}`)
+            .then(r => r.data);
+    };
+
 
     return {
-        logicalFlowCheck
+        logicalFlowCheck,
+        viewpointCheck
     };
 }
 
@@ -52,6 +61,11 @@ export const AttestationPreCheckStore_API = {
         serviceName,
         serviceFnName: 'logicalFlowCheck',
         description: 'logicalFlowCheck for a given entity [ref]'
+    },
+    viewpointCheck: {
+        serviceName,
+        serviceFnName: 'viewpointCheck',
+        description: 'viewpointCheck for a given entity [ref]'
     }
 };
 
