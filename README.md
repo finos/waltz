@@ -66,11 +66,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date       | Provisional Change Summary                                             |
-|---------|------------|------------------------------------------------------------------------|
-| 1.69    | March 2025 | Bulk measurable ratings and allocations import add, update and remove. | 
-| 1.70    | April 2025 | TBC                                                                    | 
-| 1.71    | June 2025  | Data Type support in Assessment Definition                             | 
+| Release | Date         | Provisional Change Summary                 |
+|---------|--------------|--------------------------------------------|
+| 1.71    | 06 June 2025 | Data Type support in Assessment Definition | 
+| 1.72    | July 2025    | Provisional                                |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
