@@ -18,6 +18,8 @@
 
 package org.finos.waltz.service.attestation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
@@ -40,6 +42,7 @@ import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -49,10 +52,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkEmpty;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -69,6 +72,7 @@ import static org.finos.waltz.schema.Tables.APPLICATION;
 public class AttestationInstanceService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AttestationInstanceService.class);
+    private static final String ATTESTATION_PRECHECK_SETTING_KEY = "settings.attestation.pre-checks.enabled.for.categories";
 
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationRunService attestationRunService;
@@ -78,6 +82,7 @@ public class AttestationInstanceService {
     private final PersonDao personDao;
     private final PermissionGroupService permissionGroupService;
     private final ChangeLogService changeLogService;
+    private final SettingsService settingsService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -89,7 +94,7 @@ public class AttestationInstanceService {
                                       EntityReferenceNameResolver entityReferenceNameResolver,
                                       PersonDao personDao,
                                       PermissionGroupService permissionGroupService,
-                                      ChangeLogService changeLogService) {
+                                      ChangeLogService changeLogService, SettingsService settingsService) {
 
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
@@ -104,6 +109,7 @@ public class AttestationInstanceService {
         this.personDao = personDao;
         this.permissionGroupService = permissionGroupService;
         this.changeLogService = changeLogService;
+        this.settingsService = settingsService;
     }
 
 
@@ -214,7 +220,30 @@ public class AttestationInstanceService {
         }
 
         if(createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY) {
-            checkViewpointsCanBeAttested(createCommand);
+            Optional<String> categoriesSetting = settingsService.getValue(ATTESTATION_PRECHECK_SETTING_KEY);
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<AttestationViewpoint> preChecksEnabledCategories = categoriesSetting
+                    .map(str -> {
+                        try {
+                            AttestationViewpoint[] attestationViewpoints = mapper.readValue(str, AttestationViewpoint[].class);
+                            return Arrays.asList(attestationViewpoints);
+                        } catch (JsonProcessingException e) {
+                            LOG.error("Failed to parse AttestationViewpoint(s) from settings value: {}", str);
+                            return new ArrayList<AttestationViewpoint>();
+                        }
+                    })
+                    .orElseGet(() -> {
+                        LOG.info("No settings value found with key: {}", ATTESTATION_PRECHECK_SETTING_KEY);
+                        return emptyList();
+                    });
+
+            boolean proceedWithPreChecks = preChecksEnabledCategories
+                    .stream()
+                    .anyMatch(cat -> cat.categoryId() == createCommand.attestedEntityId());
+            if(proceedWithPreChecks) {
+                checkViewpointsCanBeAttested(createCommand);
+            }
         }
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
@@ -245,7 +274,7 @@ public class AttestationInstanceService {
     }
 
     private void checkViewpointsCanBeAttested(AttestEntityCommand createCommand) {
-        List<String> failures = attestationPreCheckService.calcCapabilitiesPreCheckFailures(
+        List<String> failures = attestationPreCheckService.calcViewpointPreCheckFailures(
                 createCommand.entityReference(),
                 createCommand.attestedEntityId());
         checkEmpty(

@@ -1,6 +1,6 @@
 package org.finos.waltz.service.attestation;
 
-import org.finos.waltz.model.attestation.CapabilitiesAttestationPreChecks;
+import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.model.EntityReference;
@@ -63,11 +63,11 @@ public class AttestationPreCheckService {
         return failures;
     }
 
-    public List<String> calcCapabilitiesPreCheckFailures(EntityReference entityReference, Long attestedEntityId) {
+    public List<String> calcViewpointPreCheckFailures(EntityReference entityReference, Long attestedEntityId) {
 
         Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.capability.fail");
-        CapabilitiesAttestationPreChecks preChecks = attestationPreCheckDao
-                .calcCapabilitiesAttestationPreChecks(entityReference, attestedEntityId);
+        ViewpointAttestationPreChecks preChecks = attestationPreCheckDao
+                .calcViewpointAttestationPreChecks(entityReference, attestedEntityId);
 
         List<String> failures = new ArrayList<>();
 

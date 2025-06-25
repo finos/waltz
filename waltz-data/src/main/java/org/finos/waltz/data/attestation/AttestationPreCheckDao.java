@@ -4,8 +4,8 @@ package org.finos.waltz.data.attestation;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.attestation.CapabilitiesAttestationPreChecks;
-import org.finos.waltz.model.attestation.ImmutableCapabilitiesAttestationPreChecks;
+import org.finos.waltz.model.attestation.ImmutableViewpointAttestationPreChecks;
+import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
 import org.finos.waltz.model.attestation.ImmutableLogicalFlowAttestationPreChecks;
 import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import org.finos.waltz.schema.tables.*;
@@ -153,7 +153,7 @@ public class AttestationPreCheckDao {
         return builder.build();
     }
 
-    public CapabilitiesAttestationPreChecks calcCapabilitiesAttestationPreChecks(EntityReference ref,
+    public ViewpointAttestationPreChecks calcViewpointAttestationPreChecks(EntityReference ref,
                                                                                  Long categoryId) {
 
         CommonTableExpression<Record3<Long, Boolean, Long>> capabilities = DSL
@@ -238,7 +238,7 @@ public class AttestationPreCheckDao {
                 .union(DSL.select(zeroAllocationCount.asterisk()).from(zeroAllocationCount));
 
 
-        ImmutableCapabilitiesAttestationPreChecks.Builder builder = ImmutableCapabilitiesAttestationPreChecks.builder();
+        ImmutableViewpointAttestationPreChecks.Builder builder = ImmutableViewpointAttestationPreChecks.builder();
 
         System.out.println("Query: " + qry);
         qry.forEach(r -> {

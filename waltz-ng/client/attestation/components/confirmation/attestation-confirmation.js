@@ -38,7 +38,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker) {
+function controller($q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
     function disableSubmission(messages) {
@@ -75,21 +75,43 @@ function controller($q, serviceBroker) {
     }
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(
-                CORE_API.ApplicationStore.getById,
-                [vm.parentEntityRef.id])
-            .then(r => {
-                if(r.data) {
-                    vm.overallRating = r.data.overallRating
-                }
-            });
         switch (vm.attestationKind) {
             case "LOGICAL_DATA_FLOW":
                 validateLogicalFlows();
                 break;
             case "MEASURABLE_CATEGORY":
-                validateViewpoints();
+                settingsService
+                .findOrDefault("settings.attestation.pre-checks.enabled.for.categories", '')
+                .then(categoriesJson => {
+                    const categoryId = _.get(vm, ["attestedEntityRef", "id"]);
+                    let categoriesToValidate = [];
+                    try {
+                        categoriesToValidate = JSON.parse(categoriesJson);
+                    } catch (e) {
+                        categoriesToValidate = [];
+                    }
+
+                    vm.prechecksEnabled = categoriesToValidate.some(c => c.categoryId === categoryId);
+                    if (vm.prechecksEnabled) {
+                        serviceBroker
+                            .loadAppData(
+                                CORE_API.ApplicationStore.getById,
+                                [vm.parentEntityRef.id]
+                            )
+                            .then(r => {
+                                if (r.data) {
+                                    vm.overallRating = r.data.overallRating;
+                                }
+                            });
+                        validateViewpoints();
+                    } else {
+                        enableSubmission();
+                    }
+                })
+                .catch(() => {
+                    vm.prechecksEnabled = false;
+                    enableSubmission();
+                });
                 break;
             default:
                 enableSubmission();
@@ -113,7 +135,8 @@ function controller($q, serviceBroker) {
 
 controller.$inject = [
     "$q",
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 

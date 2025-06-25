@@ -58,7 +58,7 @@ public class AttestationPreCheckEndpoint implements Endpoint {
                 (req, res) -> {
                     EntityReference entityReference = WebUtilities.getEntityReference(req);
                     long attestedEntityId = WebUtilities.getLong(req, "categoryId");
-                    return attestationPreCheckService.calcCapabilitiesPreCheckFailures(entityReference, attestedEntityId);
+                    return attestationPreCheckService.calcViewpointPreCheckFailures(entityReference, attestedEntityId);
                 };
 
         EndpointUtilities.getForList(logicalFlowCheckPath, logicalFlowCheckRoute);
