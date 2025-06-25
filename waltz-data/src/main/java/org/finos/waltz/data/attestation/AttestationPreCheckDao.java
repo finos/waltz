@@ -156,8 +156,8 @@ public class AttestationPreCheckDao {
     public ViewpointAttestationPreChecks calcViewpointAttestationPreChecks(EntityReference ref,
                                                                                  Long categoryId) {
 
-        CommonTableExpression<Record3<Long, Boolean, Long>> capabilities = DSL
-                .name("capabilities")
+        CommonTableExpression<Record3<Long, Boolean, Long>> viewpoints = DSL
+                .name("viewpoints")
                 .as(DSL
                         .select(measurable.ID, measurable.CONCRETE, mr.ID.as("mr_id"))
                         .from(mc)
@@ -168,34 +168,34 @@ public class AttestationPreCheckDao {
                         .where(mr.ENTITY_ID.eq(ref.id()))
                         .and(mc.ID.eq(categoryId)));
 
-        CommonTableExpression<Record1<Long>> nonConcreteCapabilities = DSL
-                .name("non_concrete_capabilities")
+        CommonTableExpression<Record1<Long>> nonConcreteMappings = DSL
+                .name("non_concrete_mappings")
                 .as(DSL
-                    .select(capabilities.field(0, Long.class))
-                    .from(capabilities)
-                    .where(capabilities.field(1, Boolean.class).isFalse()));
+                    .select(viewpoints.field(0, Long.class))
+                    .from(viewpoints)
+                    .where(viewpoints.field(1, Boolean.class).isFalse()));
 
         CommonTableExpression<Record2<String, Integer>> mappingCount = DSL
                 .name("mapping_count")
                 .as(DSL
-                        .select(DSL.val("CAPABILITIES").as("chk"),
+                        .select(DSL.val("VIEWPOINTS").as("chk"),
                                 DSL.count().as("count"))
-                        .from(capabilities));
+                        .from(viewpoints));
 
         CommonTableExpression<Record2<String, Integer>> nonConcreteCount = DSL
                 .name("non_concrete_count")
                 .as(DSL
                         .select(DSL.val("NON_CONCRETE").as("chk"),
                                 DSL.count().as("count"))
-                        .from(nonConcreteCapabilities));
+                        .from(nonConcreteMappings));
 
         CommonTableExpression<Record1<Integer>> totalAllocation = DSL
                 .name("total_allocation")
                 .as(DSL
                         .select(allocation.ALLOCATION_PERCENTAGE)
-                        .from(capabilities)
+                        .from(viewpoints)
                         .innerJoin(allocation)
-                        .on(allocation.MEASURABLE_RATING_ID.eq(capabilities.field("mr_id", Long.class))));
+                        .on(allocation.MEASURABLE_RATING_ID.eq(viewpoints.field("mr_id", Long.class))));
 
         CommonTableExpression<Record2<String, Serializable>> totalAllocationCount = DSL
                 .name("total_allocation_count")
@@ -210,10 +210,10 @@ public class AttestationPreCheckDao {
         CommonTableExpression<Record1<Long>> zeroAllocation = DSL
                 .name("zero_allocation")
                 .as(DSL
-                        .select(capabilities.field(0, Long.class))
-                        .from(capabilities)
+                        .select(viewpoints.field(0, Long.class))
+                        .from(viewpoints)
                         .leftJoin(allocation)
-                        .on(allocation.MEASURABLE_RATING_ID.eq(capabilities.field("mr_id", Long.class)))
+                        .on(allocation.MEASURABLE_RATING_ID.eq(viewpoints.field("mr_id", Long.class)))
                         .where(allocation.ALLOCATION_PERCENTAGE.isNull()));
 
         CommonTableExpression<Record2<String, Integer>> zeroAllocationCount = DSL
@@ -224,8 +224,8 @@ public class AttestationPreCheckDao {
                         .from(zeroAllocation));
 
         SelectOrderByStep<Record> qry = dsl
-                .with(capabilities)
-                .with(nonConcreteCapabilities)
+                .with(viewpoints)
+                .with(nonConcreteMappings)
                 .with(mappingCount)
                 .with(nonConcreteCount)
                 .with(totalAllocation)
@@ -245,7 +245,7 @@ public class AttestationPreCheckDao {
             String check = r.get("chk", String.class);
             int count = r.get("count", Integer.class);
             switch (check) {
-                case "CAPABILITIES":
+                case "VIEWPOINTS":
                     builder.mappingCount(count);
                     break;
                 case "NON_CONCRETE":

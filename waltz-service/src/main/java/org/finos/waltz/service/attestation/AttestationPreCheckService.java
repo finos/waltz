@@ -65,7 +65,7 @@ public class AttestationPreCheckService {
 
     public List<String> calcViewpointPreCheckFailures(EntityReference entityReference, Long attestedEntityId) {
 
-        Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.capability.fail");
+        Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.viewpoints.fail");
         ViewpointAttestationPreChecks preChecks = attestationPreCheckDao
                 .calcViewpointAttestationPreChecks(entityReference, attestedEntityId);
 
@@ -74,15 +74,15 @@ public class AttestationPreCheckService {
         if (preChecks.mappingCount() == 0) {
             failures.add(mkFailureMessage(
                     messageTemplates,
-                    "attestation.capability.fail.count",
-                    "Cannot attest because at least one capability mapping should be present.",
+                    "attestation.viewpoint.fail.count",
+                    "Cannot attest because at least one viewpoint mapping should be present.",
                     preChecks.mappingCount()));
         }
 
         if (preChecks.nonConcreteCount() > 0) {
             failures.add(mkFailureMessage(
                     messageTemplates,
-                    "attestation.capability.fail.nonConcrete.count",
+                    "attestation.viewpoint.fail.nonConcrete.count",
                     "Cannot attest as %d abstract mapping(s) exists. Abstract nodes cannot be used in mappings as they are not specific enough.",
                     preChecks.nonConcreteCount()));
         }
@@ -90,16 +90,16 @@ public class AttestationPreCheckService {
         if (preChecks.mappingCount() > 0 && preChecks.totalAllocation() != 100) {
             failures.add(mkFailureMessage(
                     messageTemplates,
-                    "attestation.capability.fail.total.allocation",
-                    "Cannot attest as the total allocation for capabilities is not equal to 100",
+                    "attestation.viewpoint.fail.total.allocation",
+                    "Cannot attest as the total allocation for viewpoint mappings is not equal to 100",
                     0));
         }
 
         if (preChecks.mappingCount() > 0 && preChecks.zeroAllocationCount() > 0) {
             failures.add(mkFailureMessage(
                     messageTemplates,
-                    "attestation.capability.fail.zeroAllocation.count",
-                    "Cannot attest as %d capability mapping(s) exists with no allocation",
+                    "attestation.viewpoint.fail.zeroAllocation.count",
+                    "Cannot attest as %d viewpoint mapping(s) exists with no allocation",
                     preChecks.zeroAllocationCount()));
         }
 

@@ -280,7 +280,7 @@ public class AttestationInstanceService {
         checkEmpty(
                 failures,
                 () -> format(
-                        "Capabilities check failed with the following warnings: %s",
+                        "Viewpoints check failed with the following warnings: %s",
                         join(failures, ";")));
     }
 
