@@ -17,6 +17,10 @@
     <div class="controls">
         <slot name="controls"></slot>
     </div>
+
+    <div class="content">
+        <slot name="changes"></slot>
+    </div>
 </div>
 
 <style type="text/scss">

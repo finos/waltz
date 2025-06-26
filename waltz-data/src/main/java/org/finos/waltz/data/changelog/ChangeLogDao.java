@@ -110,12 +110,19 @@ public class ChangeLogDao {
                 .and(latestAttestationsSubQuery.field("pei", Long.class).eq(cl.PARENT_ID))
                 .and(latestAttestationsSubQuery.field("aek", String.class).eq(cl.CHILD_KIND));
 
+        // query for viewpoints as the kinds differ
+        Condition viewpointAttestationCondition = latestAttestationsSubQuery.field("pek", String.class).eq(cl.PARENT_KIND)
+                .and(latestAttestationsSubQuery.field("pei", Long.class).eq(cl.PARENT_ID))
+                .and(latestAttestationsSubQuery.field("aek", String.class).eq(EntityKind.MEASURABLE_CATEGORY.name()))
+                .and(cl.CHILD_KIND.eq(EntityKind.MEASURABLE.name()));
+
         // giving the final query which limits the changelog based to those entries after the latest attestation:
         return DSL
                 .select(cl.fields())
                 .from(cl)
                 .innerJoin(latestAttestationsSubQuery)
-                .on(joinChangeLogToLatestAttestationCondition)
+                .on(joinChangeLogToLatestAttestationCondition
+                        .or(viewpointAttestationCondition))
                 .where(cl.CREATED_AT.greaterThan(latestAttestationsSubQuery.field("aat", Timestamp.class)))
                 .and(changeLogEntryOfInterest);
     }

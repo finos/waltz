@@ -80,7 +80,8 @@
                          ng-if="$ctrl.activeTab === 'viewpoints'">
                         <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
                                                 on-attestation-initiated="$ctrl.onMeasurableAttestationInitiated"
-                                                primary-entity-ref="$ctrl.parentEntityRef">
+                                                primary-entity-ref="$ctrl.parentEntityRef"
+                                                un-attested-changes ="$ctrl.allUnattestedChanges">
                         </waltz-svelte-component>
                     </div>
                 </div>
