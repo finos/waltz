@@ -141,6 +141,7 @@ function controller($q,
             .all([runsPromise, instancesPromise, unattestedChangesPromise, permissionGroupPromise])
             .then(([runs, instances, unattestedChanges, permissions]) => {
                 vm.attestations = mkAttestationData(runs, instances);
+                vm.allUnattestedChanges = unattestedChanges && unattestedChanges.length ? unattestedChanges : [] 
                 vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
                 vm.permissions = permissions;
             });
