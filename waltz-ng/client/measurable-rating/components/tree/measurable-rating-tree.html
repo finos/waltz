@@ -88,6 +88,10 @@
                     <waltz-icon name="pie-chart"
                                 ng-if="node.allocations.length > 0">
                     </waltz-icon>
+                    <span class="small text-muted"
+                        ng-if="node.allocations.length > 0" 
+                        ng-bind="::node.allocations[0].percentage + '%'">
+                    </span>
                     <waltz-icon name="hand-paper-o"
                                 ng-class="{'wmrt-icon-warning': !node.decommission.isValid}"
                                 ng-if="node.decommission && node.replacementApps.length === 0">

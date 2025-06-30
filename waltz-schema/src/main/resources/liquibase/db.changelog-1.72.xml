@@ -25,4 +25,14 @@
         <tagDatabase tag="v1.71"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20250625-7295-1"
+               author="patidev"
+               failOnError="false">
+        <insert tableName="settings">
+            <column name="name" value="settings.attestation.pre-checks.enabled.for.categories"/>
+            <column name="value" value=""/>
+            <column name="restricted" valueBoolean="false"/>
+            <column name="description" value="This setting is used to show different view based on pre-checks for different measurable categories."/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
