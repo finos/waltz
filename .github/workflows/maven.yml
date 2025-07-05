@@ -74,17 +74,17 @@ jobs:
   
     - name: Login to GitHub Registry
       if: ${{ github.ref_type == 'tag' }}
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        username: finos
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v3
+      uses: docker/metadata-action@v5
       with:
-        images: ghcr.io/${{ github.repository }}
+        images: ${{ github.repository }}
         flavor: latest=true
         tags: |
           type=ref,event=tag,enable=${{ github.ref_type == 'tag' }}
@@ -92,7 +92,7 @@ jobs:
           type=raw,value=postgres
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: ${{ github.ref_type == 'tag' }}
