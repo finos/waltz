@@ -77,10 +77,10 @@ public class AccessLogService {
         LocalDateTime sinceTime = nowUtc().minus(duration);
         List<AccessLogSummary> activeUsers = accessLogDao.findUniqueUsersSince(sinceTime);
 
-        Map<String, Long> dailyCounts = activeUsers
+        Map<LocalDate, Integer> dailyCounts = activeUsers
             .stream()
             .collect(Collectors.groupingBy(
-                t -> t.createdAt().toLocalDate().toString(),
+                t -> t.createdAt().toLocalDate(),
                 Collectors.mapping(
                     AccessLogSummary::userId,
                     Collectors.toSet()
@@ -90,15 +90,15 @@ public class AccessLogService {
             .stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
-                e -> (long) e.getValue().size()
+                e -> e.getValue().size()
             ));
 
         return dailyCounts.entrySet()
             .stream()
             .map(e -> ImmutableAccessLogSummary
                 .builder()
-                .createdAt(LocalDate.parse(e.getKey()).atStartOfDay()) // convert string to LocalDateTime
-                .counts(e.getValue())
+                .createdAt(e.getKey().atStartOfDay())
+                .counts(e.getValue().longValue())
                 .build()
             )
             .collect(Collectors.toList());
