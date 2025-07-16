@@ -62,6 +62,12 @@ const userManagementOptions = [
         description: "View and create fine grained permissions to users",
         state: "main.system.permissions",
         icon: "users-rectangle"
+    }, {
+        name: "Analytics Dashboard",
+        role: "USER_ADMIN",
+        description: "Dashboard to view waltz UI access analytics",
+        state: "main.system.analytics-dashboard",
+        icon: "bar-chart"
     }
 ];
 

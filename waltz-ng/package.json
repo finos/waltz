@@ -36,6 +36,7 @@
         "api-check": "7.5.5",
         "bootstrap": "3.4.1",
         "bootstrap-sass": "3.4.1",
+        "chart.js": "^4.5.0",
         "core-js": "3.19.0",
         "d3": "7.1.1",
         "d3-array": "1.2.4",

@@ -19,14 +19,18 @@
 package org.finos.waltz.data.access_log;
 
 import org.finos.waltz.model.accesslog.AccessLog;
+import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.model.accesslog.AccessTime;
 import org.finos.waltz.model.accesslog.ImmutableAccessLog;
+import org.finos.waltz.model.accesslog.ImmutableAccessLogSummary;
 import org.finos.waltz.model.accesslog.ImmutableAccessTime;
 import org.finos.waltz.schema.tables.records.AccessLogRecord;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record3;
 import org.jooq.RecordMapper;
+import org.jooq.SelectSeekStep2;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -100,6 +104,55 @@ public class AccessLogDao {
                 .groupBy(ACCESS_LOG.USER_ID)
                 .orderBy(maxCreatedAt.desc())
                 .fetch(TO_ACCESS_TIME);
+    }
+
+    public List<AccessLogSummary> findAccessCountsByPageSince(LocalDateTime dateTime) {
+        return dsl
+                .select(ACCESS_LOG.STATE, DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
+                .groupBy(ACCESS_LOG.STATE)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .state(r.get(ACCESS_LOG.STATE))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    public List<AccessLogSummary> findWeeklyAccessLogSummary(LocalDateTime dateTime) {
+        // Use MSSQL DATEPART for year and week extraction
+        Field<Integer> yearCreated = DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year_created");
+        Field<Integer> weekCreated = DSL.field("DATEPART(week, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("week_created");
+        Field<Long> numberOfAccesses = DSL.count().cast(Long.class).as("num_accesses");
+
+        SelectSeekStep2<Record3<Integer, Integer, Long>, Integer, Integer> qry = dsl
+            .select(yearCreated, weekCreated, numberOfAccesses)
+            .from(ACCESS_LOG)
+            .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
+            .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT),
+                    DSL.field("DATEPART(week, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+            .orderBy(yearCreated.asc(), weekCreated.asc());
+
+        return qry
+                .fetch(r -> ImmutableAccessLogSummary
+                .builder()
+                .year(r.get("year_created", Integer.class))
+                .week(r.get("week_created", Integer.class))
+                .counts(r.get("num_accesses", Long.class))
+                .build());
+    }
+
+    public List<AccessLogSummary> findUniqueUsersSince(LocalDateTime dateTime) {
+
+        return dsl
+                .select(ACCESS_LOG.USER_ID, ACCESS_LOG.CREATED_AT)
+                .from(ACCESS_LOG)
+                .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .userId(r.get(ACCESS_LOG.USER_ID))
+                        .createdAt(r.get(ACCESS_LOG.CREATED_AT).toLocalDateTime())
+                        .build());
     }
 
 }

@@ -20,14 +20,19 @@ package org.finos.waltz.service.access_log;
 
 import org.finos.waltz.data.access_log.AccessLogDao;
 import org.finos.waltz.model.accesslog.AccessLog;
+import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.model.accesslog.AccessTime;
+import org.finos.waltz.model.accesslog.ImmutableAccessLogSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -62,5 +67,47 @@ public class AccessLogService {
         LocalDateTime sinceTime = nowUtc().minus(duration);
         return accessLogDao.findActiveUsersSince(sinceTime);
     }
+
+    public List<AccessLogSummary> findAccessLogCountsByStateSince(Duration duration) {
+        LocalDateTime sinceTime = nowUtc().minus(duration);
+        return accessLogDao.findAccessCountsByPageSince(sinceTime);
+    }
+
+    public List<AccessLogSummary> findDailyUniqueUsersSince(Duration duration) {
+        LocalDateTime sinceTime = nowUtc().minus(duration);
+        List<AccessLogSummary> activeUsers = accessLogDao.findUniqueUsersSince(sinceTime);
+
+        Map<String, Long> dailyCounts = activeUsers
+            .stream()
+            .collect(Collectors.groupingBy(
+                t -> t.createdAt().toLocalDate().toString(),
+                Collectors.mapping(
+                    AccessLogSummary::userId,
+                    Collectors.toSet()
+                )
+            ))
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                e -> (long) e.getValue().size()
+            ));
+
+        return dailyCounts.entrySet()
+            .stream()
+            .map(e -> ImmutableAccessLogSummary
+                .builder()
+                .createdAt(LocalDate.parse(e.getKey()).atStartOfDay()) // convert string to LocalDateTime
+                .counts(e.getValue())
+                .build()
+            )
+            .collect(Collectors.toList());
+    }
+
+    public List<AccessLogSummary> findWeeklyAccessLogSummary(Duration duration) {
+        LocalDateTime sinceTime = nowUtc().minus(duration);
+        return accessLogDao.findWeeklyAccessLogSummary(sinceTime);
+    }
+
 
 }
