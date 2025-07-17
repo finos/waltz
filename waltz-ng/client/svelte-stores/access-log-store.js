@@ -54,12 +54,20 @@ export function mkStore()  {
             null,
             {force});
 
+    const findYearOnYearUsers = (mode, force) => remote
+        .fetchViewList(
+            "GET",
+            `${BASE_URL}/summary/year_on_year/${mode}`,
+            null,
+            {force});
+
     return {
         findAccessLogsForUser,
         findActiveUsersSince,
         findAccessLogsSince,
         findAccessLogCountsSince,
-        findDailyActiveUserCountsSince
+        findDailyActiveUserCountsSince,
+        findYearOnYearUsers
     };
 }
 

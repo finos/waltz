@@ -18,6 +18,8 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.apache.poi.util.StringUtil;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.service.access_log.AccessLogService;
 import org.finos.waltz.web.DatumRoute;
@@ -35,6 +37,8 @@ import spark.Request;
 import spark.Response;
 
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.temporal.TemporalUnit;
 import java.util.Map;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -69,6 +73,7 @@ public class AccessLogEndpoint implements Endpoint {
         String findAccessCountsByStatePath = WebUtilities.mkPath(BASE_URL, "counts_by_state", ":days");
         String findAccessLogCountsPath = WebUtilities.mkPath(BASE_URL, "counts_since", ":days");
         String findDailyActiveUserCountsSincePath = WebUtilities.mkPath(BASE_URL, "users_since", ":days");
+        String findYearOnYearUniqueUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
 
         ListRoute<AccessLog> findForUserRoute = (request, response) ->
                 accessLogService.findForUserId(request.params("userId"), WebUtilities.getLimit(request));
@@ -93,12 +98,18 @@ public class AccessLogEndpoint implements Endpoint {
             return accessLogService.findDailyUniqueUsersSince(days);
         };
 
+        ListRoute<AccessLogSummary> findYearOnYearUniqueUsers = (request, response) -> {
+            String mode = request.params("mode");
+            return accessLogService.findYearOnYearAccessLogSummary(mode);
+        };
+
         EndpointUtilities.getForList(findForUserPath, findForUserRoute);
         EndpointUtilities.getForList(findActiveUsersPath, findActiveUsersRoute);
         EndpointUtilities.postForDatum(writePath, this::writeRoute);
         EndpointUtilities.getForList(findAccessCountsByStatePath, findAccessLogCountsByStateSince);
         EndpointUtilities.getForList(findAccessLogCountsPath, findWeeklyAccessLogSummary);
         EndpointUtilities.getForList(findDailyActiveUserCountsSincePath, findDailyActiveUserCountsSince);
+        EndpointUtilities.getForList(findYearOnYearUniqueUsersPath, findYearOnYearUniqueUsers);
     }
 
 

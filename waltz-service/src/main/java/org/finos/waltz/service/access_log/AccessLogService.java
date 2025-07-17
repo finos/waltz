@@ -109,5 +109,9 @@ public class AccessLogService {
         return accessLogDao.findWeeklyAccessLogSummary(sinceTime);
     }
 
+    public List<AccessLogSummary> findYearOnYearAccessLogSummary(String mode){
+        return accessLogDao.findYearOnYearUsers(mode);
+    }
+
 
 }

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.access_log;
 
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.accesslog.AccessLog;
 import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.model.accesslog.AccessTime;
@@ -152,6 +153,23 @@ public class AccessLogDao {
                         .builder()
                         .userId(r.get(ACCESS_LOG.USER_ID))
                         .createdAt(r.get(ACCESS_LOG.CREATED_AT).toLocalDateTime())
+                        .build());
+    }
+
+    public List<AccessLogSummary> findYearOnYearUsers(String mode) {
+        Field<Integer> distinctCountsField = DSL.countDistinct(ACCESS_LOG.USER_ID).as("counts");
+        Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
+
+        Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
+
+        return dsl
+                .select(countsField, DSL.field("DATEPART(year, {0})", Long.class, ACCESS_LOG.CREATED_AT).as("year"))
+                .from(ACCESS_LOG)
+                .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .counts(r.get("counts", Long.class))
+                        .year(r.get("year", Integer.class))
                         .build());
     }
 

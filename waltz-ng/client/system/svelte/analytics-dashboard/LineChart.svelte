@@ -1,5 +1,6 @@
 <script>
     import * as d3 from "d3";
+    import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte"
     export let chartData = [];
 
     let svgContainer;
@@ -8,9 +9,9 @@
     $: if (svgContainer && chartData.length > 0 && containerWidth) {
         d3.select(svgContainer).select("svg").remove();
 
-        const margin = {top: 20, right: 30, bottom: 200, left: 60}; // changed bottom to 200
+        const margin = {top: 20, right: 30, bottom: 20, left: 60};
         const width = containerWidth - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom; // same as bar chart
+        const height = 200 - margin.top - margin.bottom;
 
         const svg = d3.select(svgContainer)
             .append("svg")
@@ -26,10 +27,7 @@
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "translate(-10,10)rotate(-60)")
-            .style("text-anchor", "end");
+            .call(d3.axisBottom(x).tickFormat(""))
 
         // Y scale (linear)
         const y = d3.scaleLinear()
@@ -64,5 +62,10 @@
             .text(d => `${d.name}\n${d.value}`);
     }
 </script>
-
-<div bind:this={svgContainer} bind:clientWidth={containerWidth}></div>
+<div bind:clientWidth={containerWidth} style="position: relative;">
+    {#if chartData.length === 0}
+        <LoadingPlaceholder/>
+    {:else}
+        <div bind:this={svgContainer}></div>
+    {/if}
+</div>
