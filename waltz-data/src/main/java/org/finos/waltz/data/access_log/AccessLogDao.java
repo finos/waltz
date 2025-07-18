@@ -163,7 +163,7 @@ public class AccessLogDao {
         Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
 
         return dsl
-                .select(countsField, DSL.field("DATEPART(year, {0})", Long.class, ACCESS_LOG.CREATED_AT).as("year"))
+                .select(countsField, DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year"))
                 .from(ACCESS_LOG)
                 .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
                 .fetch(r -> ImmutableAccessLogSummary

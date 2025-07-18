@@ -2,10 +2,12 @@
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import { accessLogStore } from "../../../svelte-stores/access-log-store";
+    import { changeLogStore } from "../../../change-log/services/change-log-store";
     import SubSection from "../../../common/svelte/SubSection.svelte";
     import BarChart from "./BarChart.svelte";
     import { debounce } from "../utils/debounce";
     import YearOnYearUsersChart from "./YearOnYearUsersChart.svelte";
+    import YoYChangeLogsChart from "./YoYChangeLogsChart.svelte";
 
     const DEBOUNCE_TIMEOUT = 500; //seconds
     let mostViewedPagesSinceWeeksLive  = 1;
@@ -49,9 +51,12 @@
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="row">
         <div class="col-sm-12">
-            <div class="col-sm-6">
-                <YearOnYearUsersChart/>
-            </div>
+            <YearOnYearUsersChart/>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-sm-12">
             <div class="col-sm-6">
                 <SubSection>
                     <div slot="header">
@@ -96,6 +101,9 @@
                         </div>
                     </div>
                 </SubSection>
+            </div>
+            <div class="col-sm-6">
+                <YoYChangeLogsChart/>
             </div>
         </div>
     </div>

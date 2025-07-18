@@ -33,14 +33,18 @@ import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Record5;
 import org.jooq.RecordMapper;
+import org.jooq.SelectHavingStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.parser.Entity;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -136,6 +140,26 @@ public class ChangeLogSummariesDao {
                 .orderBy(count.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_CHANGE_LOG_TALLY_MAPPER);
+    }
+
+    public Map<Integer, Long> findYearOnYearChanges(EntityKind parentEntityKind, EntityKind childEntityKind) {
+        Condition parentEntityKindSelector = parentEntityKind == null ? DSL.trueCondition()
+                : CHANGE_LOG.PARENT_KIND.eq(parentEntityKind.name());
+
+        Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
+                : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
+
+        Field<Integer> yearField = DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("year");
+
+        SelectHavingStep<Record2<Integer, Integer>> qry = dsl
+                .select(DSL.count(CHANGE_LOG.ID).as("counts"), yearField)
+                .from(CHANGE_LOG)
+                .where(parentEntityKindSelector.and(childEntityKindSelector))
+                .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT));
+
+        return  qry
+                .fetchMap(r -> r.get("year", Integer.class),
+                        r -> r.get("counts", Long.class));
     }
 
 }

@@ -18,7 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.service.changelog.ChangeLogSummariesService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -30,9 +33,13 @@ import spark.Request;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
@@ -58,6 +65,7 @@ public class ChangeLogSummariesEndpoint implements Endpoint {
     public void register() {
 
         String findSummariesForDateRangePath = mkPath(BASE_URL, "kind", ":kind", "selector");
+        String findYearOnYearChangesPath = mkPath(BASE_URL, "year_on_year");
 
         ListRoute<ChangeLogTally> findSummariesForDateRangeRoute = (request, response) -> {
 
@@ -73,7 +81,24 @@ public class ChangeLogSummariesEndpoint implements Endpoint {
                     limit);
         };
 
+        DatumRoute<Map<Integer, Long>> findYearOnYearChangesRoute = (request, response) -> {
+            EntityKind[] validKinds = EntityKind.values();
+
+            EntityKind parentKind = Arrays
+                    .stream(validKinds)
+                    .noneMatch(t -> StringUtilities.safeEq(t.name(), request.queryParams("parentKind"))) ? null
+                        : EntityKind.valueOf(request.queryParams("parentKind"));
+
+            EntityKind childKind = Arrays
+                    .stream(validKinds)
+                    .noneMatch(t -> StringUtilities.safeEq(t.name(), request.queryParams("childKind"))) ? null
+                    : EntityKind.valueOf(request.queryParams("childKind"));
+
+            return changeLogSummariesService.findYearOnYearChanges(parentKind, childKind);
+        };
+
         postForList(findSummariesForDateRangePath, findSummariesForDateRangeRoute);
+        getForDatum(findYearOnYearChangesPath, findYearOnYearChangesRoute);
     }
 
 

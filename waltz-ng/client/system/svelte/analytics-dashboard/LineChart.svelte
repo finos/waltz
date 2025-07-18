@@ -2,6 +2,8 @@
     import * as d3 from "d3";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte"
     export let chartData = [];
+    export let lineColor = "#46baff";
+    export let bulletColor = "#235D80";
 
     let svgContainer;
     let containerWidth;
@@ -27,7 +29,7 @@
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x).tickFormat(""))
+            .call(d3.axisBottom(x))
 
         // Y scale (linear)
         const y = d3.scaleLinear()
@@ -45,7 +47,7 @@
         svg.append("path")
             .datum(chartData)
             .attr("fill", "none")
-            .attr("stroke", "#69b3a2")
+            .attr("stroke", lineColor)
             .attr("stroke-width", 2)
             .attr("d", line);
 
@@ -57,9 +59,9 @@
             .attr("cx", d => x(d.name))
             .attr("cy", d => y(d.value))
             .attr("r", 4)
-            .attr("fill", "#69b3a2")
+            .attr("fill", bulletColor)
             .append("title")
-            .text(d => `${d.name}\n${d.value}`);
+            .text(d => `${d.name}: ${d.value.toLocaleString()}`);
     }
 </script>
 <div bind:clientWidth={containerWidth} style="position: relative;">
