@@ -35,19 +35,13 @@ import static java.util.Collections.emptySet;
 @JsonSerialize(as = ImmutableRequestedFlowCommand.class)
 @JsonDeserialize(as = ImmutableRequestedFlowCommand.class)
 public abstract class RequestedFlowCommand {
-
     public abstract EntityReference source();
-
     public abstract EntityReference target();
     public abstract String reasonCode();
-
     public abstract long logicalFlowId();
     public abstract long physicalFlowId();
-
     public abstract PhysicalSpecification specification();
-
     public abstract FlowAttributes flowAttributes();
-
     @Value.Default
     public Set<Long> dataTypeIds() {
         return emptySet();

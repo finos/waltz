@@ -103,6 +103,7 @@ public class EntityWorkflowTransitionDao {
                 .select(ENTITY_WORKFLOW_TRANSITION.fields())
                 .from(ENTITY_WORKFLOW_TRANSITION)
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }
