@@ -24,7 +24,6 @@
         entity.MEASURABLE_CATEGORY,
         entity.FLOW_CLASSIFICATION_RULE,
         entity.SURVEY_INSTANCE,
-        entity.ASSESSMENT_DEFINITION
     ];
 
     const TIME_FRAMES = {

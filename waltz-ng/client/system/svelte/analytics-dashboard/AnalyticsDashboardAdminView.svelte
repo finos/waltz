@@ -5,12 +5,12 @@
     import { changeLogSummariesStore } from "../../../svelte-stores/change-log-summaries-store";
     import _ from 'lodash';
     import SubSection from "../../../common/svelte/SubSection.svelte";
-    import YearOnYearUsersChart from "./YearOnYearUsersChart.svelte";
-    import YoYChangeLogsChart from "./YoYChangeLogsChart.svelte";
     import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
     import GridWithCellRenderer from "../../../common/svelte/GridWithCellRenderer.svelte";
     import ViewLinkLabelled from "../../../common/svelte/ViewLinkLabelled.svelte";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
+    import AccessLogsChartView from "./AccessLogsChartView.svelte";
+    import ChangeLogsChartView from "./ChangeLogsChartView.svelte";
 
     const VIEW_MODES = {
         YEARLY: "Yearly",
@@ -146,7 +146,7 @@ const mostViewedPagesGridColumns = [
     <hr/>
     <div class="row" style="margin-bottom: 10px">
         <div class="col-sm-12">
-            <YearOnYearUsersChart
+            <AccessLogsChartView
                 chartTimeFrame={viewMode}
                 year={selectedAccessLogYear}
                 numToMonthMap={numberToMonthMap}/>
@@ -177,7 +177,7 @@ const mostViewedPagesGridColumns = [
                 </SubSection>
             </div>
             <div class="col-sm-6">
-                <YoYChangeLogsChart
+                <ChangeLogsChartView
                     chartTimeFrame={viewMode}
                     year={selectedChangeLogYear}
                     numToMonthMap={numberToMonthMap}/>
