@@ -20,6 +20,7 @@ package org.finos.waltz.data.entity_workflow;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -87,12 +88,21 @@ public class EntityWorkflowTransitionDao {
         transitionRecord.setWorkflowId(entityWorkflowDefId);
         transitionRecord.setEntityId(requestedFlowId);
         transitionRecord.setEntityKind(EntityKind.REQUESTED_FLOW.name());
-        transitionRecord.setFromState("PROPOSED_CREATE");
-        transitionRecord.setToState("PENDING_APPROVAL");
+        transitionRecord.setFromState(MakerCheckerState.PROPOSED_CREATE.name());
+        transitionRecord.setToState(MakerCheckerState.PENDING_APPROVAL.name());
         transitionRecord.setReason("flow proposed");
         transitionRecord.setProvenance("waltz");
         transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         transitionRecord.setLastUpdatedBy(username);
         transitionRecord.insert();
+    }
+
+    public List<EntityWorkflowTransition> findForWorkflowId(long workflowId) {
+
+        return dsl
+                .select(ENTITY_WORKFLOW_TRANSITION.fields())
+                .from(ENTITY_WORKFLOW_TRANSITION)
+                .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

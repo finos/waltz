@@ -20,6 +20,7 @@ package org.finos.waltz.data.entity_workflow;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.schema.tables.records.ActorRecord;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.finos.waltz.model.EntityKind;
@@ -93,24 +94,12 @@ public class EntityWorkflowStateDao {
         stateRecord.setWorkflowId(entityWorkflowDefId);
         stateRecord.setEntityId(requestFlowId);
         stateRecord.setEntityKind(EntityKind.REQUESTED_FLOW.name());
-        stateRecord.setState("SUBMITTED");
-        stateRecord.setDescription("New MC Flow Proposed");
+        stateRecord.setState(MakerCheckerState.PROPOSED_CREATE.name());
+        stateRecord.setDescription("creation flow proposed");
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         stateRecord.insert();
 
-
-        //int id = dsl.(stateRecord);
-
-        /*ActorRecord record = dsl.newRecord(ACTOR);
-        record.setName(command.name());
-        record.setDescription(command.description());
-        record.setIsExternal(command.isExternal());
-        record.setLastUpdatedBy(username);
-        record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
-        command.externalId().ifPresent(record::setExternalId);
-        record.setProvenance(PROVENANCE);
-        record.store();*/
     }
 }

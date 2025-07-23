@@ -23,6 +23,7 @@ import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.model.actor.ActorChangeCommand;
 import org.finos.waltz.model.actor.ActorCreateCommand;
 import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.requested_flow.RequestedFlowCommand;
 import org.finos.waltz.model.user.SystemRole;
@@ -40,6 +41,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -67,10 +69,9 @@ public class MakerCheckerEndpoint implements Endpoint {
     }
 
 
-    private Long proposeNewFlow(Request request, Response response) throws IOException {
+    private List<EntityWorkflowTransition> proposeNewFlow(Request request, Response response) throws IOException {
         String username = WebUtilities.getUsername(request);
-        //RequestedFlowCommand command = WebUtilities.readBody(request, RequestedFlowCommand.class);
-        return makerCheckerService.proposedNewFlow(request.body(), username);
+        RequestedFlowCommand command = WebUtilities.readBody(request, RequestedFlowCommand.class);
+        return makerCheckerService.proposedNewFlow(request.body(), username, command);
     }
-
 }

@@ -6,6 +6,7 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.data.requested_flow.RequestedFlowDao;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.requested_flow.RequestedFlowCommand;
 import org.finos.waltz.schema.tables.records.RequestedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import static org.finos.waltz.schema.tables.RequestedFlow.REQUESTED_FLOW;
 
@@ -46,12 +48,13 @@ public class MakerCheckerService {
         this.requestedFlowDao = requestedFlowDao;
     }
 
-    public Long proposedNewFlow(String requestBody, String username){
-        Long requestedFlowId = requestedFlowDao.saveRequestedFlow(requestBody, username);
+    public List<EntityWorkflowTransition> proposedNewFlow(String requestBody, String username, RequestedFlowCommand requestedFlowCommand){
+        Long requestedFlowId = requestedFlowDao.saveRequestedFlow(requestBody, username, requestedFlowCommand);
         LOG.info("New RequestedFlowId is : {} ", requestedFlowId);
         EntityWorkflowDefinition ewd = entityWorkflowService.searchByName("Requested Flow Lifecycle Workflow");
         entityWorkflowStateDao.saveNewWorkflowState(requestedFlowId, ewd.id().get(), username);
         entityWorkflowTransitionDao.saveNewWorkflowTransition(requestedFlowId, ewd.id().get(), username);
-        return requestedFlowId;
+        List<EntityWorkflowTransition> list =  entityWorkflowTransitionDao.findForWorkflowId(ewd.id().get());
+        return list;
     }
 }

@@ -1,6 +1,7 @@
 package org.finos.waltz.data.requested_flow;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.requested_flow.RequestedFlowCommand;
 import org.finos.waltz.schema.tables.records.RequestedFlowRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +24,13 @@ public class RequestedFlowDao {
         this.dsl = dsl;
     }
 
-    public Long saveRequestedFlow(String requestBody, String username){
+    public Long saveRequestedFlow(String requestBody, String username, RequestedFlowCommand requestedFlowCommand){
         RequestedFlowRecord requestedFlowRecord = dsl.newRecord(REQUESTED_FLOW);
         requestedFlowRecord.setFlowDef(requestBody);
         requestedFlowRecord.setCreatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         requestedFlowRecord.setCreatedBy(username);
-        requestedFlowRecord.setSourceEntity(1L);
-        requestedFlowRecord.setTargetEntity(1L);
+        requestedFlowRecord.setSourceEntity(requestedFlowCommand.source().id());
+        requestedFlowRecord.setTargetEntity(requestedFlowCommand.target().id());
         requestedFlowRecord.store();
         return requestedFlowRecord.getId();
     }
