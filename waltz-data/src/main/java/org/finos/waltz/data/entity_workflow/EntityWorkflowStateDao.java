@@ -19,6 +19,8 @@
 package org.finos.waltz.data.entity_workflow;
 
 
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.schema.tables.records.ActorRecord;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -28,14 +30,23 @@ import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+
+import static org.finos.waltz.schema.tables.Actor.ACTOR;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
 @Repository
 public class EntityWorkflowStateDao {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EntityWorkflowStateDao.class);
+    public static final org.finos.waltz.schema.tables.EntityWorkflowState entityWorkflowState = ENTITY_WORKFLOW_STATE.as("entityWorkflowState");
 
     private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
@@ -75,5 +86,31 @@ public class EntityWorkflowStateDao {
                 .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
                 .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name()))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+    public void saveNewWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username){
+        EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
+        stateRecord.setWorkflowId(entityWorkflowDefId);
+        stateRecord.setEntityId(requestFlowId);
+        stateRecord.setEntityKind(EntityKind.REQUESTED_FLOW.name());
+        stateRecord.setState("SUBMITTED");
+        stateRecord.setDescription("New MC Flow Proposed");
+        stateRecord.setProvenance("waltz");
+        stateRecord.setLastUpdatedBy(username);
+        stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        stateRecord.insert();
+
+
+        //int id = dsl.(stateRecord);
+
+        /*ActorRecord record = dsl.newRecord(ACTOR);
+        record.setName(command.name());
+        record.setDescription(command.description());
+        record.setIsExternal(command.isExternal());
+        record.setLastUpdatedBy(username);
+        record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        command.externalId().ifPresent(record::setExternalId);
+        record.setProvenance(PROVENANCE);
+        record.store();*/
     }
 }

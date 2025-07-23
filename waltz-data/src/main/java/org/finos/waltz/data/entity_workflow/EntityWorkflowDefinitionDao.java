@@ -61,4 +61,11 @@ public class EntityWorkflowDefinitionDao {
                 .from(ENTITY_WORKFLOW_DEFINITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+    public EntityWorkflowDefinition searchByName(String name){
+        return dsl.select(ENTITY_WORKFLOW_DEFINITION.fields())
+                .from(ENTITY_WORKFLOW_DEFINITION)
+                .where(ENTITY_WORKFLOW_DEFINITION.NAME.eq(name))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
 }
