@@ -71,4 +71,17 @@ public class ChangeLogSummariesService {
     public Map<Integer, Long> findYearOnYearChanges(EntityKind parentEntityKind, EntityKind childEntityKind) {
         return changeLogSummariesDao.findYearOnYearChanges(parentEntityKind, childEntityKind);
     }
+
+    public List<String> findChangeLogParentEntities() {
+        return changeLogSummariesDao.findChangeLogParentEntities();
+    }
+
+    public List<Integer> findChangeLogYears() {
+        return changeLogSummariesDao.findChangeLogYears();
+    }
+
+    public Map<Integer, Long> findMonthOnMonthChanges(EntityKind parentEntityKind, EntityKind childEntityKind, Integer currentYear) {
+        return changeLogSummariesDao.findMonthOnMonthChanges(parentEntityKind, childEntityKind, currentYear);
+    }
+
 }

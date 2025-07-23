@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
+import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
 @Repository
@@ -170,6 +171,31 @@ public class AccessLogDao {
                         .builder()
                         .counts(r.get("counts", Long.class))
                         .year(r.get("year", Integer.class))
+                        .build());
+    }
+
+    public List<Integer> findAccessLogYears() {
+        return dsl
+                .selectDistinct(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year"))
+                .from(ACCESS_LOG)
+                .fetch(r -> r.get("year", Integer.class));
+    }
+
+    public List<AccessLogSummary> findMonthOnMonthUsers(String mode, Integer currentYear) {
+        Field<Integer> distinctCountsField = DSL.countDistinct(ACCESS_LOG.USER_ID).as("counts");
+        Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
+
+        Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
+
+        return dsl
+                .select(countsField, DSL.field("DATEPART(month, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("month"))
+                .from(ACCESS_LOG)
+                .where(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).eq(currentYear))
+                .groupBy(DSL.field("DATEPART(month, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .counts(r.get("counts", Long.class))
+                        .month(r.get("month", Integer.class))
                         .build());
     }
 

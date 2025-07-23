@@ -113,5 +113,11 @@ public class AccessLogService {
         return accessLogDao.findYearOnYearUsers(mode);
     }
 
+    public List<Integer> findAccessLogYears() {
+        return accessLogDao.findAccessLogYears();
+    }
 
+    public List<AccessLogSummary> findMonthOnMonthAccessLogSummary(String mode, Integer currentYear) {
+        return accessLogDao.findMonthOnMonthUsers(mode, currentYear);
+    }
 }

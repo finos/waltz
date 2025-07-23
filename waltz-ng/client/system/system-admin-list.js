@@ -63,9 +63,9 @@ const userManagementOptions = [
         state: "main.system.permissions",
         icon: "users-rectangle"
     }, {
-        name: "Analytics Dashboard",
+        name: "Analytics Dashboard (Beta)",
         role: "USER_ADMIN",
-        description: "Dashboard to view waltz UI access analytics",
+        description: "Dashboard for quick insights",
         state: "main.system.analytics-dashboard",
         icon: "bar-chart"
     }

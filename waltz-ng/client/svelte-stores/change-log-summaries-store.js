@@ -27,8 +27,23 @@ export function mkStore()  {
             null,
             {force});
 
+    const findChangeLogYears = (force) => remote
+        .fetchViewList("GET",
+            `${BASE_URL}/get_years`,
+            null,
+            {force});
+
+    const findMonthOnMonthChanges = (parentKind, childKind, year, force) => remote
+        .fetchViewDatum("GET",
+            `${BASE_URL}/month_on_month?parentKind=${parentKind}&childKind=${childKind}&year=${year}`,
+            null,
+            {force});
+
+
     return {
-        findYearOnYearChanges
+        findYearOnYearChanges,
+        findChangeLogYears,
+        findMonthOnMonthChanges
     };
 }
 

@@ -1,7 +1,8 @@
 <script>
     import * as d3 from "d3";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte"
-    export let chartData = [];
+    import NoData from "../../../common/svelte/NoData.svelte";
+    export let chartData = [] | undefined;
     export let lineColor = "#46baff";
     export let bulletColor = "#235D80";
 
@@ -64,6 +65,7 @@
             .text(d => `${d.name}: ${d.value.toLocaleString()}`);
     }
 </script>
+
 <div bind:clientWidth={containerWidth} style="position: relative;">
     {#if chartData.length === 0}
         <LoadingPlaceholder/>

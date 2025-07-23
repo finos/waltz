@@ -30,10 +30,12 @@ import org.jooq.AggregateFunction;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record5;
 import org.jooq.RecordMapper;
 import org.jooq.SelectHavingStep;
+import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -159,6 +161,44 @@ public class ChangeLogSummariesDao {
 
         return  qry
                 .fetchMap(r -> r.get("year", Integer.class),
+                        r -> r.get("counts", Long.class));
+    }
+
+    public List<String> findChangeLogParentEntities() {
+        SelectJoinStep<Record1<String>> parentKindSelector = dsl
+                .selectDistinct(CHANGE_LOG.PARENT_KIND)
+                .from(CHANGE_LOG);
+
+        return parentKindSelector
+                .fetchInto(String.class);
+    }
+
+    public List<Integer> findChangeLogYears() {
+        return dsl
+                .selectDistinct(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("year"))
+                .from(CHANGE_LOG)
+                .fetch(r -> r.get("year", Integer.class));
+    }
+
+    public Map<Integer, Long> findMonthOnMonthChanges(EntityKind parentEntityKind, EntityKind childEntityKind, Integer currentYear) {
+        Condition parentEntityKindSelector = parentEntityKind == null ? DSL.trueCondition()
+                : CHANGE_LOG.PARENT_KIND.eq(parentEntityKind.name());
+
+        Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
+                : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
+
+        Field<Integer> monthField = DSL.field("DATEPART(month, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("month");
+
+        SelectHavingStep<Record2<Integer, Integer>> qry = dsl
+                .select(DSL.count(CHANGE_LOG.ID).as("counts"), monthField)
+                .from(CHANGE_LOG)
+                .where(parentEntityKindSelector
+                        .and(childEntityKindSelector)
+                        .and(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).eq(currentYear)))
+                .groupBy(DSL.field("DATEPART(month, {0})", Integer.class, CHANGE_LOG.CREATED_AT));
+
+        return  qry
+                .fetchMap(r -> r.get("month", Integer.class),
                         r -> r.get("counts", Long.class));
     }
 

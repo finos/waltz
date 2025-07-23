@@ -28,7 +28,7 @@
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(xAxisTicks ? d3.axisBottom(x) : d3.axisBottom(x).tickFormat(""));
+            .call(xAxisTicks ? d3.axisBottom(x) : d3.axisBottom(x).tickFormat("").tickSize(0));
 
         const y = d3.scaleLinear()
             .domain([0, d3.max(chartData, d => d.value)])
@@ -47,7 +47,7 @@
             .attr("height", d => height - y(d.value))
             .attr("fill", "#46baff")
             .append("title")
-            .text(d => `${d.name}\n${d.value}`);
+            .text(d => `${d.name}: ${d.value.toLocaleString()}`);
     }
 </script>
 <div bind:clientWidth={containerWidth} style="position: relative;">

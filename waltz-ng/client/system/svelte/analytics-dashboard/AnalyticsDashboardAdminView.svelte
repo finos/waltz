@@ -2,38 +2,94 @@
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import { accessLogStore } from "../../../svelte-stores/access-log-store";
-    import { changeLogStore } from "../../../change-log/services/change-log-store";
+    import { changeLogSummariesStore } from "../../../svelte-stores/change-log-summaries-store";
+    import _ from 'lodash';
     import SubSection from "../../../common/svelte/SubSection.svelte";
-    import BarChart from "./BarChart.svelte";
-    import { debounce } from "../utils/debounce";
     import YearOnYearUsersChart from "./YearOnYearUsersChart.svelte";
     import YoYChangeLogsChart from "./YoYChangeLogsChart.svelte";
+    import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
+    import GridWithCellRenderer from "../../../common/svelte/GridWithCellRenderer.svelte";
+    import ViewLinkLabelled from "../../../common/svelte/ViewLinkLabelled.svelte";
+    import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
 
-    const DEBOUNCE_TIMEOUT = 500; //seconds
-    let mostViewedPagesSinceWeeksLive  = 1;
+    const VIEW_MODES = {
+        YEARLY: "Yearly",
+        MONTHLY: "Monthly"
+    }
 
-    let mostViewedPagesSinceWeeks = mostViewedPagesSinceWeeksLive;
+    const numberToMonthMap = {
+        1: "Jan",
+        2: "Feb",
+        3: "Mar",
+        4: "Apr",
+        5: "May",
+        6: "Jun",
+        7: "Jul",
+        8: "Aug",
+        9: "Sep",
+        10: "Oct",
+        11: "Nov",
+        12: "Dec"
+    }
 
-    $: mostViewedPagesSinceDays = mostViewedPagesSinceWeeks * 7;
+    const viewModeItemList = Object.values(VIEW_MODES)
+        .map(d => ({name: d}));
+
+    let viewMode = null;
+
+    let selectedAccessLogYear = new Date().getFullYear();
+    let selectedChangeLogYear = new Date().getFullYear();
+
+    $: mostViewedPagesSinceDays = viewMode === VIEW_MODES.MONTHLY ? 31 : 365;
 
     $: mostViewedPagesCall = accessLogStore.findAccessLogsSince(mostViewedPagesSinceDays);
 
-    $: mostViewedPages = $mostViewedPagesCall.data;
+    $: changeLogYearsListCall = changeLogSummariesStore.findChangeLogYears();
 
-    $: mostViewedPagesChartData = mostViewedPages
-        ? mostViewedPages
-            .map(d => ({ name: d.state, value: d.counts }))
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 10)
+    $: accessLogYearsListCall = accessLogStore.findAccessLogYears();
+
+    $: changeLogYearsListData = $changeLogYearsListCall.data;
+
+    $: accessLogYearsListData = $accessLogYearsListCall.data;
+
+    $: changeLogYearsList = changeLogYearsListData
+        ? changeLogYearsListData
+            .map(d => ({name: d}))
+            .sort((a, b) => b.name - a.name)
         : [];
 
-    $: console.log(mostViewedPagesChartData);
+    $: accessLogYearsList = accessLogYearsListData
+        ? accessLogYearsListData
+            .map(d => ({name: d}))
+            .sort((a, b) => b.name - a.name)
+        : [];
 
-    const refreshState = () => {
-        mostViewedPagesSinceWeeks = mostViewedPagesSinceWeeksLive;
-    };
+    $: mostViewedPages = $mostViewedPagesCall.data;
 
-    const debouncedRefreshState = debounce(refreshState, DEBOUNCE_TIMEOUT);
+    $: mostViewedPagesGridData = mostViewedPages
+        ? mostViewedPages
+            .sort((a, b) => b.counts - a.counts)
+            .slice(0, 30)
+            .map(d => ({state: d.state, counts: d.counts.toLocaleString()}))
+        : [];
+
+const mostViewedPagesGridColumns = [
+    {
+        name: "Page",
+        field: "state",
+        maxLength: 50,
+        cellRendererComponent: ViewLinkLabelled,
+        cellRendererProps: row => ({
+            state: row.state.split("|")[0],
+            label: row.state,
+            ctx: {
+                id: Math.floor(Math.random()*100)
+            }
+        }),
+        width: 20
+    },
+    { name: "Views", field: "counts", width: 20 }
+];
 
 </script>
 
@@ -51,59 +107,80 @@
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="row">
         <div class="col-sm-12">
-            <YearOnYearUsersChart/>
+            <div class="col-sm-12">
+                <SubSection>
+                    <div slot="header">
+                        Filters
+                    </div>
+                    <div slot="content">
+                        <div class="row row-mini-gutters">
+                            <div class="col-sm-4">
+                                <DropdownPicker
+                                    items={viewModeItemList}
+                                    onSelect={d => _.isNull(d) ? viewMode = null : viewMode = d.name}
+                                    selectedItem={_.find(viewModeItemList, d => d != null ? d.name === viewMode : null) ?? null}
+                                    defaultMessage="Filter Timeframe"/>
+                            </div>
+                            {#if !_.isNull(viewMode) && viewMode === VIEW_MODES.MONTHLY}
+                                <div class="col-sm-4">
+                                    <DropdownPicker
+                                        items={accessLogYearsList}
+                                        onSelect={d => selectedAccessLogYear = d.name }
+                                        selectedItem={_.find(accessLogYearsList, d => d.name === selectedAccessLogYear)}
+                                        defaultMessage="Filter Access Logs"/>
+                                </div>
+                                <div class="col-sm-4">
+                                    <DropdownPicker
+                                        items={changeLogYearsList}
+                                        onSelect={d => selectedChangeLogYear = d.name }
+                                        selectedItem={_.find(changeLogYearsList, d => d.name === selectedChangeLogYear)}
+                                        defaultMessage="Filter Change Logs"/>
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+                </SubSection>
+            </div>
         </div>
     </div>
     <hr/>
-    <div class="row">
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-sm-12">
+            <YearOnYearUsersChart
+                chartTimeFrame={viewMode}
+                year={selectedAccessLogYear}
+                numToMonthMap={numberToMonthMap}/>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 10px">
         <div class="col-sm-12">
             <div class="col-sm-6">
                 <SubSection>
                     <div slot="header">
-                        Most Viewed Pages [Top 10]
+                        Most Viewed Pages in the past {viewMode === VIEW_MODES.MONTHLY ? "Month" : "Year"} [Top 30]
                     </div>
                     <div slot="content">
                         <div class="row">
                             <div class="col-sm-12">
-                                <form class="form-inline pull-right">
-                                    <div class="form-group">
-                                        <label for="weeks-input">Number of weeks </label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            max="52"
-                                            class="form-control input-sm text-left"
-                                            id="weeks-input"
-                                            aria-label="Number of weeks"
-                                            bind:value={mostViewedPagesSinceWeeksLive}
-                                            on:input={debouncedRefreshState}
-                                        />
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <BarChart chartData={mostViewedPagesChartData} />
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {#if mostViewedPagesChartData.length > 0}
-                                    <div>
-                                        {#each mostViewedPagesChartData as d}
-                                            <ViewLink state={d.name.split("|")[0]} ctx={{id: Math.floor(Math.random() * 100)}}>{d.name}</ViewLink>
-                                            <span>({d.value}) </span>
-                                        {/each}
-                                    </div>
-                                {/if}
+                            {#if mostViewedPagesGridData.length > 0}
+                                    <GridWithCellRenderer
+                                        columnDefs={mostViewedPagesGridColumns}
+                                        rowData={mostViewedPagesGridData}
+                                        onSelectRow={(r) => console.log(r)}>
+                                    </GridWithCellRenderer>
+                            {:else}
+                                <LoadingPlaceholder/>
+                            {/if}
                             </div>
                         </div>
                     </div>
                 </SubSection>
             </div>
             <div class="col-sm-6">
-                <YoYChangeLogsChart/>
+                <YoYChangeLogsChart
+                    chartTimeFrame={viewMode}
+                    year={selectedChangeLogYear}
+                    numToMonthMap={numberToMonthMap}/>
             </div>
         </div>
     </div>

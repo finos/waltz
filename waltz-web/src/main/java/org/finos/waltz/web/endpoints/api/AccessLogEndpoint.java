@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.temporal.TemporalUnit;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -73,7 +74,9 @@ public class AccessLogEndpoint implements Endpoint {
         String findAccessCountsByStatePath = WebUtilities.mkPath(BASE_URL, "counts_by_state", ":days");
         String findAccessLogCountsPath = WebUtilities.mkPath(BASE_URL, "counts_since", ":days");
         String findDailyActiveUserCountsSincePath = WebUtilities.mkPath(BASE_URL, "users_since", ":days");
-        String findYearOnYearUniqueUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
+        String findYearOnYearUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
+        String findAccessLogYearsPath = WebUtilities.mkPath(BASE_URL, "get_years");
+        String findMonthOnMonthUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "month_on_month", ":mode", ":year");
 
         ListRoute<AccessLog> findForUserRoute = (request, response) ->
                 accessLogService.findForUserId(request.params("userId"), WebUtilities.getLimit(request));
@@ -98,9 +101,17 @@ public class AccessLogEndpoint implements Endpoint {
             return accessLogService.findDailyUniqueUsersSince(days);
         };
 
-        ListRoute<AccessLogSummary> findYearOnYearUniqueUsers = (request, response) -> {
+        ListRoute<AccessLogSummary> findYearOnYearUsersRoute = (request, response) -> {
             String mode = request.params("mode");
             return accessLogService.findYearOnYearAccessLogSummary(mode);
+        };
+
+        ListRoute<Integer> findAccessLogYearsRoute = (request, response) -> accessLogService.findAccessLogYears();
+
+        ListRoute<AccessLogSummary> findMonthOnMonthUsersRoute = (request, response) -> {
+            String mode = request.params("mode");
+            Integer year = Integer.parseInt(request.params("year"));
+            return accessLogService.findMonthOnMonthAccessLogSummary(mode, year);
         };
 
         EndpointUtilities.getForList(findForUserPath, findForUserRoute);
@@ -109,7 +120,9 @@ public class AccessLogEndpoint implements Endpoint {
         EndpointUtilities.getForList(findAccessCountsByStatePath, findAccessLogCountsByStateSince);
         EndpointUtilities.getForList(findAccessLogCountsPath, findWeeklyAccessLogSummary);
         EndpointUtilities.getForList(findDailyActiveUserCountsSincePath, findDailyActiveUserCountsSince);
-        EndpointUtilities.getForList(findYearOnYearUniqueUsersPath, findYearOnYearUniqueUsers);
+        EndpointUtilities.getForList(findYearOnYearUsersPath, findYearOnYearUsersRoute);
+        EndpointUtilities.getForList(findAccessLogYearsPath, findAccessLogYearsRoute);
+        EndpointUtilities.getForList(findMonthOnMonthUsersPath, findMonthOnMonthUsersRoute);
     }
 
 

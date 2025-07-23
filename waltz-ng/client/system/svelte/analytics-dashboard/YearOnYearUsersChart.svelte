@@ -8,45 +8,52 @@ const CHART_MODES = {
     all: "all"
 }
 
-let currentMode = CHART_MODES.distinct;
-let toggleState = true;
-
-const handleToggle = () => {
-    const currentToggleState = toggleState;
-    if(currentToggleState) {
-        currentMode = CHART_MODES.all;
-    } else {
-        currentMode = CHART_MODES.distinct;
-    }
-    toggleState = !currentToggleState;
+const TIME_FRAMES = {
+    YEARLY: "Yearly",
+    MONTHLY: "Monthly"
 }
 
-$: yearOnYearUsersCall = accessLogStore.findYearOnYearUsers(CHART_MODES.distinct);
+export let chartTimeFrame = TIME_FRAMES.YEARLY;
+export let year;
+export let numToMonthMap;
+
+$: yearOnYearUsersCall = chartTimeFrame === TIME_FRAMES.MONTHLY ? accessLogStore.findMonthOnMonthUsers(CHART_MODES.distinct, year)
+    : accessLogStore.findYearOnYearUsers(CHART_MODES.distinct);
+
 $: yearOnYearUsers = $yearOnYearUsersCall.data;
 $: yearOnYearUsersChartData = yearOnYearUsers
     ? yearOnYearUsers
         .map(d => (
-            {name: d.year, value: d.counts}
+            chartTimeFrame === TIME_FRAMES.MONTHLY ? {name: d.month, value: d.counts}
+                : {name: d.year, value: d.counts}
         ))
         .sort((a, b) => a.name - b.name)
+        .map(d => chartTimeFrame === TIME_FRAMES.MONTHLY ? {name: numToMonthMap[d.name], value: d.value} : d)
     : [];
 
-$: yearOnYearHitsCall = accessLogStore.findYearOnYearUsers(CHART_MODES.all);
+$: yearOnYearHitsCall = chartTimeFrame === TIME_FRAMES.MONTHLY ? accessLogStore.findMonthOnMonthUsers(CHART_MODES.all, year)
+    : accessLogStore.findYearOnYearUsers(CHART_MODES.all)
+
+
 $: yearOnYearHits = $yearOnYearHitsCall.data;
 $: yearOnYearHitsChartData = yearOnYearHits
     ? yearOnYearHits
         .map(d => (
-            {name: d.year, value: d.counts}
+            chartTimeFrame === TIME_FRAMES.MONTHLY ? {name: d.month, value: d.counts} : {name: d.year, value: d.counts}
         ))
         .sort((a, b) => a.name - b.name)
+        .map(d => chartTimeFrame === TIME_FRAMES.MONTHLY ? {name: numToMonthMap[d.name], value: d.value} : d)
     : [];
+
+$: timeFramePlaceholderText = chartTimeFrame ?? TIME_FRAMES.YEARLY;
+$: yearPlaceholderText = chartTimeFrame === TIME_FRAMES.MONTHLY && year ? `(${year})` : "";
 
 </script>
 
 <div class="col-sm-6">
 <SubSection>
     <div slot="header">
-        Year On Year Users
+        {timeFramePlaceholderText} Users {yearPlaceholderText}
     </div>
     <div slot="content">
         <div class="row">
@@ -57,17 +64,13 @@ $: yearOnYearHitsChartData = yearOnYearHits
             </div>
         </div>
     </div>
-<!--    <div slot="controls">-->
-<!--        <div class="col-sm-12">-->
-<!--            <Toggle labelOn="Unique" labelOff="All" state={toggleState} onToggle={() => handleToggle()}/>-->
-<!--        </div>-->
-<!--    </div>-->
 </SubSection>
 </div>
+
 <div class="col-sm-6">
     <SubSection>
         <div slot="header">
-            Year On Year Hits
+            {timeFramePlaceholderText} Hits {yearPlaceholderText}
         </div>
         <div slot="content">
             <div class="row">
@@ -78,10 +81,5 @@ $: yearOnYearHitsChartData = yearOnYearHits
                 </div>
             </div>
         </div>
-        <!--    <div slot="controls">-->
-        <!--        <div class="col-sm-12">-->
-        <!--            <Toggle labelOn="Unique" labelOff="All" state={toggleState} onToggle={() => handleToggle()}/>-->
-        <!--        </div>-->
-        <!--    </div>-->
     </SubSection>
 </div>

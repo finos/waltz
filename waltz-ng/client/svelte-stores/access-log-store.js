@@ -61,13 +61,28 @@ export function mkStore()  {
             null,
             {force});
 
+    const findAccessLogYears = (force) => remote
+        .fetchViewList("GET",
+            `${BASE_URL}/get_years`,
+            null,
+            {force});
+
+    const findMonthOnMonthUsers = (mode, year, force) => remote
+        .fetchViewList(
+            "GET",
+            `${BASE_URL}/summary/month_on_month/${mode}/${year}`,
+            null,
+            {force});
+
     return {
         findAccessLogsForUser,
         findActiveUsersSince,
         findAccessLogsSince,
         findAccessLogCountsSince,
         findDailyActiveUserCountsSince,
-        findYearOnYearUsers
+        findYearOnYearUsers,
+        findAccessLogYears,
+        findMonthOnMonthUsers
     };
 }
 
