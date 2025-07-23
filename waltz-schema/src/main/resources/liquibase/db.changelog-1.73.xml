@@ -28,7 +28,7 @@
     <!-- 4249 Create Table - ProposedFlow Table -->
     <changeSet id="20250723-4249-1"
                author="jindkul">
-        <createTable tableName="requested_flow"
+        <createTable tableName="proposed_flow"
                      remarks="details about proposed flow by requesters ">
 
             <column name="id"
@@ -39,13 +39,23 @@
                              primaryKeyName="requested_flow_pkey"/>
             </column>
 
-            <column name="source_entity"
+            <column name="source_entity_id"
                     type="${id.type}">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="target_entity"
+            <column name="source_entity_kind"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_id"
                     type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_kind"
+                    type="${name.type}">
                 <constraints nullable="false"/>
             </column>
 

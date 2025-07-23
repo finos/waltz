@@ -93,7 +93,7 @@ public class EntityWorkflowStateDao {
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(entityWorkflowDefId);
         stateRecord.setEntityId(requestFlowId);
-        stateRecord.setEntityKind(EntityKind.REQUESTED_FLOW.name());
+        stateRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
         stateRecord.setState(MakerCheckerState.PROPOSED_CREATE.name());
         stateRecord.setDescription("creation flow proposed");
         stateRecord.setProvenance("waltz");
