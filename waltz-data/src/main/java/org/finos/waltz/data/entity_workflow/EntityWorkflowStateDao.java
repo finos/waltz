@@ -45,10 +45,6 @@ import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_
 
 @Repository
 public class EntityWorkflowStateDao {
-
-    private static final Logger LOG = LoggerFactory.getLogger(EntityWorkflowStateDao.class);
-    public static final org.finos.waltz.schema.tables.EntityWorkflowState entityWorkflowState = ENTITY_WORKFLOW_STATE.as("entityWorkflowState");
-
     private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
