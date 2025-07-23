@@ -48,7 +48,7 @@ public class MakerCheckerService {
 
     public Long proposedNewFlow(String requestBody, String username){
         Long requestedFlowId = requestedFlowDao.saveRequestedFlow(requestBody, username);
-        LOG.info("New RequestedFlowId is {} :", requestedFlowId);
+        LOG.info("New RequestedFlowId is : {} ", requestedFlowId);
         EntityWorkflowDefinition ewd = entityWorkflowService.searchByName("Requested Flow Lifecycle Workflow");
         entityWorkflowStateDao.saveNewWorkflowState(requestedFlowId, ewd.id().get(), username);
         entityWorkflowTransitionDao.saveNewWorkflowTransition(requestedFlowId, ewd.id().get(), username);
