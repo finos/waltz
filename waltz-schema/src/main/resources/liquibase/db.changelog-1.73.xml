@@ -28,24 +28,34 @@
     <!-- 4249 Create Table - ProposedFlow Table -->
     <changeSet id="20250723-4249-1"
                author="jindkul">
-        <createTable tableName="requested_flow"
-                     remarks="details about proposed flow by requesters ">
+        <createTable tableName="proposed_flow"
+                     remarks="detail about all the proposed flows by users ">
 
             <column name="id"
                     type="${id.type}"
                     autoIncrement="true">
                 <constraints nullable="false"
                              primaryKey="true"
-                             primaryKeyName="requested_flow_pkey"/>
+                             primaryKeyName="proposed_flow_pkey"/>
             </column>
 
-            <column name="source_entity"
+            <column name="source_entity_id"
                     type="${id.type}">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="target_entity"
+            <column name="source_entity_kind"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_id"
                     type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_kind"
+                    type="${name.type}">
                 <constraints nullable="false"/>
             </column>
 
@@ -70,7 +80,6 @@
 
     <changeSet author="jindkul"
                id="20250723-4249-2">
-
         <sql>
             insert into entity_workflow_definition
                 (name, description) values ('Requested Flow Lifecycle Workflow','Requested Flow Workflow');
