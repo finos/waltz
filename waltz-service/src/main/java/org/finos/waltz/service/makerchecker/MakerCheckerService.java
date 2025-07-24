@@ -43,8 +43,7 @@ public class MakerCheckerService {
         if(ewd.id().isPresent()){
             entityWorkflowStateDao.saveNewWorkflowState(proposedFlowId, ewd.id().get(), username);
             entityWorkflowTransitionDao.saveNewWorkflowTransition(proposedFlowId, ewd.id().get(), username);
-            List<EntityWorkflowTransition> list =  entityWorkflowTransitionDao.findForWorkflowId(ewd.id().get());
-            return list;
+            return entityWorkflowTransitionDao.findForWorkflowId(ewd.id().get());
         }else{
             throw new NoDataFoundException("Could not find workflow definition: Requested Flow Lifecycle Workflow");
         }

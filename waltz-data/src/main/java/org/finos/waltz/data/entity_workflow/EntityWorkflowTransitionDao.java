@@ -83,10 +83,10 @@ public class EntityWorkflowTransitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public void saveNewWorkflowTransition(Long requestedFlowId, Long entityWorkflowDefId, String username){
+    public void saveNewWorkflowTransition(Long proposedFlowId, Long entityWorkflowDefId, String username){
         EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
         transitionRecord.setWorkflowId(entityWorkflowDefId);
-        transitionRecord.setEntityId(requestedFlowId);
+        transitionRecord.setEntityId(proposedFlowId);
         transitionRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
         transitionRecord.setFromState(MakerCheckerState.PROPOSED_CREATE.name());
         transitionRecord.setToState(MakerCheckerState.PENDING_APPROVAL.name());
