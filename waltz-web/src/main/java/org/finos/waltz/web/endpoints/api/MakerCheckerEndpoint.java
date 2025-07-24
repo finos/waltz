@@ -40,7 +40,7 @@ public class MakerCheckerEndpoint implements Endpoint {
     }
 
 
-    private List<EntityWorkflowTransition> proposeNewFlow(Request request, Response response) throws IOException {
+    public List<EntityWorkflowTransition> proposeNewFlow(Request request, Response response) throws IOException {
         String username = WebUtilities.getUsername(request);
         ProposedFlowCommand proposedFlowCommand = WebUtilities.readBody(request, ProposedFlowCommand.class);
         return makerCheckerService.proposedNewFlow(request.body(), username, proposedFlowCommand);
