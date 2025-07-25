@@ -23,7 +23,9 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.service.actor.ActorService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.makerchecker.MakerCheckerService;
@@ -91,12 +93,9 @@ public class EntityWorkflowServiceTest extends BaseInMemoryIntegrationTest {
                 "}";
 
         try{
-            ProposedFlowCommand command = getJsonMapper().readValue(
-                    requestBody,
-                    ProposedFlowCommand.class);
-
-            List<EntityWorkflowTransition> list = makerCheckerService.proposedNewFlow(requestBody, "testUser", command);
-            assertNotNull(list);
+            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
+            ProposedFlowCommandResponse response = makerCheckerService.proposedNewFlow(requestBody, "testUser", command);
+            assertNotNull(response);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -3,7 +3,9 @@ package org.finos.waltz.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.finos.waltz.common.JacksonUtilities;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.service.makerchecker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
@@ -103,10 +105,16 @@ class MakerCheckerEndpointTest {
             when(request.attribute("waltz-user")).thenReturn("testUser");
             when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
 
-            List<EntityWorkflowTransition> list = new ArrayList<>();
-            when(makerCheckerService.proposedNewFlow(any(),any(),any())).thenReturn(list);
+            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
 
-            List<EntityWorkflowTransition> result = makerCheckerEndpoint.proposeNewFlow(request,response);
+            ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
+                    .message("SUCCESS")
+                    .outcome("SUCCESS")
+                    .proposedFlowCommand(command)
+                    .proposedFlowId(1L)
+                    .build();
+            when(makerCheckerService.proposedNewFlow(any(),any(),any())).thenReturn(proposedFlowCommandResponse);
+            ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request,response);
             assertNotNull(result);
         }catch (Exception e){
             e.printStackTrace();
