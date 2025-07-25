@@ -1,6 +1,7 @@
 package org.finos.waltz.model;
 
 public enum MakerCheckerState {
+    SUBMITTED,
     PROPOSED_CREATE,
     SOURCE_APPROVED,
     TARGET_APPROVED,

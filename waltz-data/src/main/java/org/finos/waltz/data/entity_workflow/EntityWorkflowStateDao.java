@@ -90,7 +90,7 @@ public class EntityWorkflowStateDao {
         stateRecord.setWorkflowId(entityWorkflowDefId);
         stateRecord.setEntityId(requestFlowId);
         stateRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
-        stateRecord.setState(MakerCheckerState.PROPOSED_CREATE.name());
+        stateRecord.setState(MakerCheckerState.SUBMITTED.name());
         stateRecord.setDescription("creation flow proposed");
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);

@@ -89,7 +89,7 @@ public class EntityWorkflowTransitionDao {
         transitionRecord.setEntityId(proposedFlowId);
         transitionRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
         transitionRecord.setFromState(MakerCheckerState.PROPOSED_CREATE.name());
-        transitionRecord.setToState(MakerCheckerState.PENDING_APPROVAL.name());
+        transitionRecord.setToState(MakerCheckerState.ACTION_PENDING.name());
         transitionRecord.setReason("flow proposed");
         transitionRecord.setProvenance("waltz");
         transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
