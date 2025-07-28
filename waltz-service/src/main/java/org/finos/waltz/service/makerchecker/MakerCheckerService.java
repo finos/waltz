@@ -1,8 +1,15 @@
 package org.finos.waltz.service.makerchecker;
 
+import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
@@ -16,8 +23,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service
@@ -28,27 +39,38 @@ public class MakerCheckerService {
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
-
     private final DSLContext dslContext;
+
+    private final ChangeLogDao changeLogDao;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
                         EntityWorkflowStateDao entityWorkflowStateDao,
                         EntityWorkflowTransitionDao entityWorkflowTransitionDao,
                         ProposedFlowDao proposedFlowDao,
-                        DSLContext dslContext){
+                        DSLContext dslContext,
+                        ChangeLogDao changeLogDao){
+
+        checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
+        checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
+        checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
+        checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
+        checkNotNull(dslContext, "dslContext cannot be null");
+        checkNotNull(changeLogDao, "changeLogDao cannot be null");
+
         this.entityWorkflowService = entityWorkflowService;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
         this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
+        this.changeLogDao = changeLogDao;
     }
 
     public ProposedFlowCommandResponse proposedNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
 
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
-        String msg = "FLOW_CREATED";
-        String outcome = "SUCCESS";
+        String msg = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
+        String outcome = CommandOutcome.SUCCESS.name();
         try {
             dslContext.transaction(dslContext ->{
                 DSLContext dsl = dslContext.dsl();
@@ -62,17 +84,35 @@ public class MakerCheckerService {
                     throw new NoDataFoundException("Could not find workflow definition: Requested Flow Lifecycle Workflow");
                 }
             });
+
+            List<ChangeLog> changeLogList = new ArrayList<>();
+            changeLogList.add(createChangeLogObject("New Proposed Flow Created", username, proposedFlowId.get()));
+            changeLogList.add(createChangeLogObject("Entity Workflow State changed to Submitted", username, proposedFlowId.get()));
+            changeLogList.add(createChangeLogObject("Entity Workflow Transition saved with from: Proposed-Create to: Action-Pending State", username, proposedFlowId.get()));
+            changeLogDao.write(changeLogList);
         }
         catch (Exception e){
-            msg = "FLOW_NOT_CREATED";
-            outcome = "FAILURE";
+            msg = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
+            outcome = CommandOutcome.FAILURE.name();
             LOG.info("Error Occurred : {} ", e.getMessage());
+            e.printStackTrace();
         }
         return ImmutableProposedFlowCommandResponse.builder()
                 .message(msg)
                 .outcome(outcome)
                 .proposedFlowCommand(proposedFlowCommand)
                 .proposedFlowId(proposedFlowId.get())
+                .build();
+    }
+
+    public ChangeLog createChangeLogObject(String msg, String userName, Long proposedFlowId){
+        return ImmutableChangeLog
+                .builder()
+                .message(msg)
+                .userId(userName)
+                .parentReference(mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId))
+                .operation(Operation.ADD)
+                .severity(Severity.INFORMATION)
                 .build();
     }
 }
