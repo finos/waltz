@@ -20,26 +20,21 @@ package org.finos.waltz.data.entity_workflow;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.model.MakerCheckerState;
-import org.finos.waltz.schema.tables.records.ActorRecord;
-import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
+import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.schema.tables.Actor.ACTOR;
-import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
@@ -91,7 +86,7 @@ public class EntityWorkflowStateDao {
         stateRecord.setEntityId(requestFlowId);
         stateRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
         stateRecord.setState(MakerCheckerState.SUBMITTED.name());
-        stateRecord.setDescription("creation flow proposed");
+        stateRecord.setDescription("Proposed Flow Submitted");
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));

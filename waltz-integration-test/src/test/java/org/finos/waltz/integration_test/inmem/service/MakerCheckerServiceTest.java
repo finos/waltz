@@ -19,31 +19,17 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.actor.Actor;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.service.actor.ActorService;
-import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.makerchecker.MakerCheckerService;
-import org.finos.waltz.test_common.helpers.ActorHelper;
-import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
+import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
-import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-public class EntityWorkflowServiceTest extends BaseInMemoryIntegrationTest {
+public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     MakerCheckerService makerCheckerService;
@@ -94,7 +80,7 @@ public class EntityWorkflowServiceTest extends BaseInMemoryIntegrationTest {
 
         try{
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-            ProposedFlowCommandResponse response = makerCheckerService.proposedNewFlow(requestBody, "testUser", command);
+            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
             assertNotNull(response);
         }catch (Exception e){
             e.printStackTrace();
