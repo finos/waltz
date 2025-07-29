@@ -20,7 +20,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.73.0.xml">
 
-    <changeSet id="v1.72-tag"
+    <changeSet id="v1-72-tag"
                author="jainshrk">
         <tagDatabase tag="v1.72"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
