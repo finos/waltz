@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -114,5 +115,16 @@ public class MakerCheckerService {
                 .operation(Operation.ADD)
                 .severity(Severity.INFORMATION)
                 .build();
+    }
+
+    /**
+     * Service-layer façade: delegates to DAO and keeps business rules here.
+     *
+     * @param id the primary key of the flow
+     * @return JSON string if the row exists, otherwise empty
+     */
+    public Optional<String> getFlowDefinition(long id) {
+        // Any additional business logic can be added here
+        return proposedFlowDao.findFlowDefById(id);
     }
 }

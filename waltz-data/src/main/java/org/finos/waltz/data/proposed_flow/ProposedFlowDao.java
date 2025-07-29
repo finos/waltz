@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -35,5 +36,17 @@ public class ProposedFlowDao {
         proposedFlowRecord.setTargetEntityKind(proposedFlowCommand.target().kind().name());
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
+    }
+
+    /**
+     * Retrieves the raw JSON flow definition for the record for the given id
+     *
+     * @return JSON string wrapped in Optional, empty if no row found
+     */
+    public Optional<String> findFlowDefById(long id) {
+        return dsl.select(PROPOSED_FLOW.FLOW_DEF)
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOptional(PROPOSED_FLOW.FLOW_DEF);
     }
 }
