@@ -36,7 +36,7 @@
                     autoIncrement="true">
                 <constraints nullable="false"
                              primaryKey="true"
-                             primaryKeyName="requested_flow_pkey"/>
+                             primaryKeyName="proposed_flow_pkey"/>
             </column>
 
             <column name="source_entity_id"
@@ -45,7 +45,7 @@
             </column>
 
             <column name="source_entity_kind"
-                    type="${name.type}">
+                    type="${enum.type}">
                 <constraints nullable="false"/>
             </column>
 
@@ -55,7 +55,7 @@
             </column>
 
             <column name="target_entity_kind"
-                    type="${name.type}">
+                    type="${enum.type}">
                 <constraints nullable="false"/>
             </column>
 
@@ -83,7 +83,7 @@
 
         <sql>
             insert into entity_workflow_definition
-                (name, description) values ('Requested Flow Lifecycle Workflow','Requested Flow Workflow');
+                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
         </sql>
     </changeSet>
 

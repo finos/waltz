@@ -68,7 +68,7 @@ public class MakerCheckerService {
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
 
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
-        String msg = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
+        String msg = "PROPOSE_FLOW_CREATED_WITH_SUCCESS";
         String outcome = CommandOutcome.SUCCESS.name();
         try {
             dslContext.transaction(dslContext ->{
@@ -90,11 +90,9 @@ public class MakerCheckerService {
                 changeLogDao.write(changeLogList);
 
             });
-
-
         }
         catch (Exception e){
-            msg = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
+            msg = "PROPOSE_FLOW_CREATED_WITH_FAILURE";
             outcome = CommandOutcome.FAILURE.name();
             LOG.info("Error Occurred : {} ", e.getMessage());
             e.printStackTrace();

@@ -18,15 +18,11 @@
 
 package org.finos.waltz.integration_test.inmem.dao;
 
-import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -86,7 +82,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                     requestBody,
                     ProposedFlowCommand.class);
 
-            Long proposedFlowId = proposedFlowDao.saveRequestedFlow(requestBody, "testUser", command);
+            Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
             assertNotNull(proposedFlowId);
         }catch (Exception e){
             e.printStackTrace();
