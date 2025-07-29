@@ -52,6 +52,8 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +74,13 @@ import static org.finos.waltz.model.utils.IdUtilities.toIds;
 
 @Service
 public class AssessmentRatingService {
+    private static final Logger LOG = LoggerFactory.getLogger(AssessmentRatingService.class);
+    private static final String RECORDS_MGMT = "RECORDS_MGMT";
+    private static final String COMPLETED_NOT_RECORDS_MANAGEMENT_RELEVANT = "N";
+    private static final String COMPLETED_RECORDS_MANAGEMENT_RELEVANT = "M";
+    private static final String DISPOSAL_CAPABILITY = "DISPOSAL_CAPABILITY";
+    private static final String CAPABILITY_AUTOMATED = "Capability – Automated";
+    private static final String CAPABILITY = "Capability";
 
     private final AssessmentRatingDao assessmentRatingDao;
     private final AssessmentDefinitionDao assessmentDefinitionDao;
@@ -299,6 +308,8 @@ public class AssessmentRatingService {
                 username);
 
         if (definition.cardinality().equals(Cardinality.ZERO_ONE)) {
+            // Check and update DC with RM assessment change
+            checkRecordsMgmtRatingForDisposalCapability(definition,existingRating,cmd,username);
             createUpdateRatingChangeLogs(existingRating, definition, cmd, username); // do first so that comment from old rating retained
             return assessmentRatingDao.updateRating(assessmentRatingId, cmd, username);
         } else {
@@ -515,5 +526,43 @@ public class AssessmentRatingService {
 
     public Set<AssessmentRipplerJobConfiguration> findRippleConfig() {
         return rippler.findRippleConfig();
+    }
+
+    private void checkRecordsMgmtRatingForDisposalCapability(AssessmentDefinition definition, AssessmentRating existingRating,
+                                                             UpdateRatingCommand cmd,
+                                                             String username) {
+        LOG.info("Assessment definition Id: {}", definition.externalId().get());
+
+        if (definition.externalId().get().equals(RECORDS_MGMT)
+                && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(COMPLETED_NOT_RECORDS_MANAGEMENT_RELEVANT) //old rating
+                && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(COMPLETED_RECORDS_MANAGEMENT_RELEVANT)) {  //new rating
+
+            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(DISPOSAL_CAPABILITY);
+
+            RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
+            Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
+
+            Long entityId = existingRating.entityReference().id();
+            boolean flag = assessmentRatingDao.updateRatingByCheckingOldRatingId(asd.id(), entityId,
+                    username, ratingTdByName.get(CAPABILITY_AUTOMATED), ratingTdByName.get(CAPABILITY));
+
+            if (flag) {
+                LOG.info("Updated required rating through Records Management Assessment");
+
+                ImmutableChangeLog log = ImmutableChangeLog.builder()
+                        .message(format(
+                                "Updated rating for assessment '%s' via 'Records Management Assessment' from '%s' to '%s'",
+                                asd.name(),
+                                CAPABILITY_AUTOMATED,
+                                CAPABILITY))
+                        .parentReference(existingRating.entityReference())
+                        .userId(username)
+                        .severity(Severity.INFORMATION)
+                        .operation(Operation.UPDATE)
+                        .build();
+
+                changeLogService.write(asSet(log));
+            }
+        }
     }
 }

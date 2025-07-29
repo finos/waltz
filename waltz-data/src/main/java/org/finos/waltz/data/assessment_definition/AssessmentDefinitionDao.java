@@ -213,4 +213,12 @@ public class AssessmentDefinitionDao {
 
         return findByCondition(defnCondition);
     }
+
+    public AssessmentDefinition getByExternalId(String extId) {
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
+                .where(ASSESSMENT_DEFINITION.EXTERNAL_ID.eq(extId))
+                .fetchOne(TO_DOMAIN);
+    }
 }
