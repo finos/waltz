@@ -1,4 +1,4 @@
-package org.finos.waltz.service.makerchecker;
+package org.finos.waltz.service.maker_checker;
 
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
@@ -11,7 +11,6 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
@@ -66,7 +65,7 @@ public class MakerCheckerService {
         this.changeLogDao = changeLogDao;
     }
 
-    public ProposedFlowCommandResponse proposedNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
+    public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
 
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
         String msg = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
@@ -74,22 +73,25 @@ public class MakerCheckerService {
         try {
             dslContext.transaction(dslContext ->{
                 DSLContext dsl = dslContext.dsl();
-                proposedFlowId.set(proposedFlowDao.saveRequestedFlow(requestBody, username, proposedFlowCommand));
+                proposedFlowId.set(proposedFlowDao.saveProposedFlow(requestBody, username, proposedFlowCommand));
                 LOG.info("New ProposedFlowId is : {} ", proposedFlowId);
-                EntityWorkflowDefinition ewd = entityWorkflowService.searchByName("Requested Flow Lifecycle Workflow");
+                EntityWorkflowDefinition ewd = entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow");
                 if(ewd.id().isPresent()){
                     entityWorkflowStateDao.saveNewWorkflowState(proposedFlowId.get(), ewd.id().get(), username);
                     entityWorkflowTransitionDao.saveNewWorkflowTransition(proposedFlowId.get(), ewd.id().get(), username);
                 }else{
-                    throw new NoDataFoundException("Could not find workflow definition: Requested Flow Lifecycle Workflow");
+                    throw new NoDataFoundException("Could not find workflow definition: Propose Flow Lifecycle Workflow");
                 }
+
+                List<ChangeLog> changeLogList = new ArrayList<>();
+                changeLogList.add(createChangeLogObject("New Proposed Flow Created", username, proposedFlowId.get()));
+                changeLogList.add(createChangeLogObject("Entity Workflow State changed to Submitted", username, proposedFlowId.get()));
+                changeLogList.add(createChangeLogObject("Entity Workflow Transition saved with from: Proposed-Create to: Action-Pending State", username, proposedFlowId.get()));
+                changeLogDao.write(changeLogList);
+
             });
 
-            List<ChangeLog> changeLogList = new ArrayList<>();
-            changeLogList.add(createChangeLogObject("New Proposed Flow Created", username, proposedFlowId.get()));
-            changeLogList.add(createChangeLogObject("Entity Workflow State changed to Submitted", username, proposedFlowId.get()));
-            changeLogList.add(createChangeLogObject("Entity Workflow Transition saved with from: Proposed-Create to: Action-Pending State", username, proposedFlowId.get()));
-            changeLogDao.write(changeLogList);
+
         }
         catch (Exception e){
             msg = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
