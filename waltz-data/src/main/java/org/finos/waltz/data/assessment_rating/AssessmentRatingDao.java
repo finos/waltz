@@ -597,10 +597,11 @@ public class AssessmentRatingDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    public boolean updateRatingByCheckingOldRatingId(Optional<Long> assessmentDefId, Long entityId,
+    public boolean updateRating(Optional<Long> assessmentDefId, Long entityId,
                                                      String username, Optional<Long> oldRating,
                                                      Optional<Long> newRating) {
-        return dsl
+        return oldRating.isPresent() && newRating.isPresent() &&
+                dsl
                 .update(ar)
                 .set(ar.RATING_ID, newRating.get())
                 .set(ar.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
