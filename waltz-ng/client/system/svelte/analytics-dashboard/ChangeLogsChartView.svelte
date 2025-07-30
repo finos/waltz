@@ -45,7 +45,6 @@
             .map(d => chartTimeFrame === TIME_FRAMES.MONTHLY ? {name: numToMonthMap[d.name], value: d.value} : d)
         : [];
 
-    $: console.log(changeLogChartData);
     $: timeFramePlaceholderText = chartTimeFrame ?? TIME_FRAMES.YEARLY;
     $: yearPlaceholderText = chartTimeFrame === TIME_FRAMES.MONTHLY && year ? `(${year})` : "";
 </script>
