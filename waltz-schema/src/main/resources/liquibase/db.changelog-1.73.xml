@@ -18,10 +18,29 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-                   logicalFilePath="db.changelog-1.73.0.xml">
+                   logicalFilePath="db.changelog-1.73.xml">
 
     <changeSet id="v1-72-tag"
-               author="jainshrk">
+               author="patidev">
         <tagDatabase tag="v1.72"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <!--  Adding index to hierarchy table -->
+
+    <changeSet author="jindkul"
+               id="20250708-4213-1">
+        <createIndex indexName="id_idx"
+                     tableName="entity_hierarchy">
+            <column name="id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="jindkul"
+               id="20250708-4213-2">
+        <createIndex indexName="level_idx"
+                     tableName="entity_hierarchy">
+            <column name="level"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
