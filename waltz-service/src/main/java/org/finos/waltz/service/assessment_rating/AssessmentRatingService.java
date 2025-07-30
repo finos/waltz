@@ -544,7 +544,7 @@ public class AssessmentRatingService {
                 && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get("EXISTING_RATING_CODE")) //old rating
                 && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get("NEW_RATING_CODE"))) {  //new rating
 
-            AssessmentDefinition asd = assessmentDefinitionDao.findByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
+            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
             if (null != asd) {
                 RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
                 Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
