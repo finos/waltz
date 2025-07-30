@@ -305,7 +305,9 @@ public class AssessmentRatingService {
         if (definition.cardinality().equals(Cardinality.ZERO_ONE)) {
             // Validate and update dependent assessment
             Map<String, String> dataMap = getDataForValidation("ar.auto.validation.");
-            validateAndAutoUpdateAssessmentRating(definition, existingRating, cmd, username, dataMap);
+            if ( null != dataMap) {
+                validateAndAutoUpdateAssessmentRating(definition, existingRating, cmd, username, dataMap);
+            }
 
             createUpdateRatingChangeLogs(existingRating, definition, cmd, username); // do first so that comment from old rating retained
             return assessmentRatingDao.updateRating(assessmentRatingId, cmd, username);
