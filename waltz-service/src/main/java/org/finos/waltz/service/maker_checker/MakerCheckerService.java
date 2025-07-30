@@ -1,5 +1,7 @@
 package org.finos.waltz.service.maker_checker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -14,6 +16,7 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.jooq.DSLContext;
 import org.jooq.exception.NoDataFoundException;
@@ -40,8 +43,8 @@ public class MakerCheckerService {
     private final ProposedFlowDao proposedFlowDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
-
     private final ChangeLogDao changeLogDao;
+    private final ObjectMapper objectMapper;   // Spring’s bean
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -49,7 +52,7 @@ public class MakerCheckerService {
                         EntityWorkflowTransitionDao entityWorkflowTransitionDao,
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
-                        ChangeLogDao changeLogDao){
+                        ChangeLogDao changeLogDao, ObjectMapper objectMapper){
 
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
@@ -64,6 +67,7 @@ public class MakerCheckerService {
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
+        this.objectMapper = objectMapper;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
@@ -121,10 +125,18 @@ public class MakerCheckerService {
      * Service-layer façade: delegates to DAO and keeps business rules here.
      *
      * @param id the primary key of the flow
-     * @return JSON string if the row exists, otherwise empty
+     * @return ProposedFlowDefinition
      */
-    public Optional<String> getFlowDefinition(long id) {
+    public Optional<ProposedFlowDefinition> getProposedFlowDefinition(long id) {
         // Any additional business logic can be added here
-        return proposedFlowDao.findFlowDefById(id);
+        Optional<ProposedFlowDefinition> proposedFlowDef = proposedFlowDao.findFlowDefById(id)
+                .map(json -> {
+                    try {
+                        return objectMapper.readValue(json, ProposedFlowDefinition.class);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        return proposedFlowDef;
     }
 }

@@ -2,6 +2,7 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
@@ -44,5 +48,10 @@ public class MakerCheckerEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         ProposedFlowCommand proposedFlowCommand = WebUtilities.readBody(request, ProposedFlowCommand.class);
         return makerCheckerService.proposeNewFlow(request.body(), username, proposedFlowCommand);
+    }
+
+    public Optional<ProposedFlowDefinition> getProposedFlowDefinition(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        return makerCheckerService.getProposedFlowDefinition(Long.parseLong(request.getParameter("id")));
     }
 }
