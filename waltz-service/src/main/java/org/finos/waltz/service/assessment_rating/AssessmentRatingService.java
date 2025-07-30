@@ -26,6 +26,7 @@ import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingRippler;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -72,18 +73,7 @@ import static org.finos.waltz.model.utils.IdUtilities.toIds;
 public class AssessmentRatingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AssessmentRatingService.class);
-    private static final String RECORDS_MGMT = "RECORDS_MGMT";
-    private static final String COMPLETED_NOT_RECORDS_MANAGEMENT_RELEVANT = "N";
-    private static final String COMPLETED_RECORDS_MANAGEMENT_RELEVANT = "M";
-    private static final String DISPOSAL_CAPABILITY = "DISPOSAL_CAPABILITY";
-    private static final String CAPABILITY_AUTOMATED = "Capability – Automated";
-    private static final String CAPABILITY = "Capability";
-    public static final String CURRENT_ASSESSMENT_DEFINITION = "CURRENT_ASSESSMENT_DEFINITION";
-    public static final String EXISTING_RATING_CODE = "EXISTING_RATING_CODE";
-    public static final String NEW_RATING_CODE = "NEW_RATING_CODE";
-    public static final String UPDATE_ASSESSMENT_DEFINITION = "UPDATE_ASSESSMENT_DEFINITION";
-    public static final String UAD_EXISTING_RATING = "UAD_EXISTING_RATING";
-    public static final String UAD_NEW_RATING = "UAD_NEW_RATING";
+
 
     private final AssessmentRatingDao assessmentRatingDao;
     private final AssessmentDefinitionDao assessmentDefinitionDao;
@@ -92,6 +82,7 @@ public class AssessmentRatingService {
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final AssessmentRatingRippler rippler;
+    private final SettingsDao settingsDao;
 
 
     @Autowired
@@ -101,7 +92,7 @@ public class AssessmentRatingService {
             RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService,
             AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
-            AssessmentRatingRippler rippler) {
+            AssessmentRatingRippler rippler, SettingsDao settingsDao) {
 
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
@@ -117,6 +108,7 @@ public class AssessmentRatingService {
         this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.changeLogService = changeLogService;
         this.rippler = rippler;
+        this.settingsDao = settingsDao;
 
     }
 
@@ -312,7 +304,7 @@ public class AssessmentRatingService {
 
         if (definition.cardinality().equals(Cardinality.ZERO_ONE)) {
             // Validate and update dependent assessment
-            Map<String, String> dataMap = getDataForValidation();
+            Map<String, String> dataMap = getDataForValidation("ar.auto.validation.");
             validateAndAutoUpdateAssessmentRating(definition, existingRating, cmd, username, dataMap);
 
             createUpdateRatingChangeLogs(existingRating, definition, cmd, username); // do first so that comment from old rating retained
@@ -546,29 +538,29 @@ public class AssessmentRatingService {
                                                     String username, Map<String, String> dataMap) {
         LOG.info("Assessment definition Id: {}", definition.externalId().get());
 
-        if (definition.externalId().get().equals(dataMap.get(CURRENT_ASSESSMENT_DEFINITION))
-                && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get(EXISTING_RATING_CODE)) //old rating
-                && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get(NEW_RATING_CODE))) {  //new rating
+        if (definition.externalId().get().equals(dataMap.get("CURRENT_ASSESSMENT_DEFINITION"))
+                && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get("EXISTING_RATING_CODE")) //old rating
+                && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get("NEW_RATING_CODE"))) {  //new rating
 
-            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(dataMap.get(UPDATE_ASSESSMENT_DEFINITION));
+            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
 
             RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
             Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
 
             Long entityId = existingRating.entityReference().id();
             boolean flag = assessmentRatingDao.updateRating(asd.id(), entityId,
-                    username, ratingTdByName.get(dataMap.get(UAD_EXISTING_RATING)), ratingTdByName.get(dataMap.get(UAD_NEW_RATING)));
+                    username, ratingTdByName.get(dataMap.get("UAD_EXISTING_RATING")), ratingTdByName.get(dataMap.get("UAD_NEW_RATING")));
 
             if (flag) {
-                LOG.info("Updated required rating through {}", dataMap.get(CURRENT_ASSESSMENT_DEFINITION));
+                LOG.info("Updated required rating through {}", dataMap.get("CURRENT_ASSESSMENT_DEFINITION"));
 
                 ImmutableChangeLog log = ImmutableChangeLog.builder()
                         .message(format(
                                 "Updated rating for assessment '%s' via '%s' from '%s' to '%s'",
                                 asd.name(),
-                                dataMap.get(CURRENT_ASSESSMENT_DEFINITION),
-                                dataMap.get(UAD_EXISTING_RATING),
-                                dataMap.get(UAD_NEW_RATING)))
+                                dataMap.get("CURRENT_ASSESSMENT_DEFINITION"),
+                                dataMap.get("UAD_EXISTING_RATING"),
+                                dataMap.get("UAD_NEW_RATING")))
                         .parentReference(existingRating.entityReference())
                         .userId(username)
                         .severity(Severity.INFORMATION)
@@ -582,16 +574,19 @@ public class AssessmentRatingService {
 
     /**
      * get data for validation of auto updating the assessment rating
+     * @param prefixVal
      * @return
      */
-    private static Map<String, String> getDataForValidation() {
-        Map<String, String> dataMap = new HashMap<>();
-        dataMap.put(CURRENT_ASSESSMENT_DEFINITION, RECORDS_MGMT);
-        dataMap.put(EXISTING_RATING_CODE, COMPLETED_NOT_RECORDS_MANAGEMENT_RELEVANT);
-        dataMap.put(NEW_RATING_CODE, COMPLETED_RECORDS_MANAGEMENT_RELEVANT);
-        dataMap.put(UPDATE_ASSESSMENT_DEFINITION, DISPOSAL_CAPABILITY);
-        dataMap.put(UAD_EXISTING_RATING, CAPABILITY_AUTOMATED);
-        dataMap.put(UAD_NEW_RATING, CAPABILITY);
-        return dataMap;
+    private Map<String, String> getDataForValidation(String prefixVal) {
+        Map<String, String> configEntries = settingsDao
+                .indexByPrefix(prefixVal);
+
+        return configEntries.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().startsWith(prefixVal) ?
+                                entry.getKey().substring(prefixVal.length()) :
+                                entry.getKey(),
+                        Map.Entry::getValue
+                ));
     }
 }
