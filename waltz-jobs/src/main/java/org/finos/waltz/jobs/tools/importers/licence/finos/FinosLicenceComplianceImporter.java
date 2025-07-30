@@ -319,7 +319,6 @@ public class FinosLicenceComplianceImporter {
 
     private Optional<LicenceCompliance> parseCompliance(Path path) {
         try {
-            System.out.println("Parsing: " + path);
             LicenceCompliance compliance = getYamlMapper().readValue(path.toFile(), LicenceCompliance.class);
             return Optional.of(compliance);
         } catch (IOException e) {

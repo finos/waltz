@@ -93,7 +93,6 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setLastUpdatedBy("admin");
                     record.setCreatedBy("admin");
                     record.setCreatedAt(nowUtcTimestamp());
-                    record.setName(String.format("Physical Flow: Spec: [%s], Logical Flow: [%s]", spec.name(), logicalFlowId));
                     return record;
                 })
                 .collect(Collectors.toList());
