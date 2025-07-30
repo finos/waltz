@@ -542,32 +542,33 @@ public class AssessmentRatingService {
                 && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get("EXISTING_RATING_CODE")) //old rating
                 && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get("NEW_RATING_CODE"))) {  //new rating
 
-            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
+            AssessmentDefinition asd = assessmentDefinitionDao.findByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
+            if (null != asd) {
+                RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
+                Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
 
-            RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
-            Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
+                Long entityId = existingRating.entityReference().id();
+                boolean flag = assessmentRatingDao.updateRating(asd.id(), entityId,
+                        username, ratingTdByName.get(dataMap.get("UAD_EXISTING_RATING")), ratingTdByName.get(dataMap.get("UAD_NEW_RATING")));
 
-            Long entityId = existingRating.entityReference().id();
-            boolean flag = assessmentRatingDao.updateRating(asd.id(), entityId,
-                    username, ratingTdByName.get(dataMap.get("UAD_EXISTING_RATING")), ratingTdByName.get(dataMap.get("UAD_NEW_RATING")));
+                if (flag) {
+                    LOG.info("Updated required rating through {}", dataMap.get("CURRENT_ASSESSMENT_DEFINITION"));
 
-            if (flag) {
-                LOG.info("Updated required rating through {}", dataMap.get("CURRENT_ASSESSMENT_DEFINITION"));
+                    ImmutableChangeLog log = ImmutableChangeLog.builder()
+                            .message(format(
+                                    "Updated rating for assessment '%s' via '%s' from '%s' to '%s'",
+                                    asd.name(),
+                                    dataMap.get("CURRENT_ASSESSMENT_DEFINITION"),
+                                    dataMap.get("UAD_EXISTING_RATING"),
+                                    dataMap.get("UAD_NEW_RATING")))
+                            .parentReference(existingRating.entityReference())
+                            .userId(username)
+                            .severity(Severity.INFORMATION)
+                            .operation(Operation.UPDATE)
+                            .build();
 
-                ImmutableChangeLog log = ImmutableChangeLog.builder()
-                        .message(format(
-                                "Updated rating for assessment '%s' via '%s' from '%s' to '%s'",
-                                asd.name(),
-                                dataMap.get("CURRENT_ASSESSMENT_DEFINITION"),
-                                dataMap.get("UAD_EXISTING_RATING"),
-                                dataMap.get("UAD_NEW_RATING")))
-                        .parentReference(existingRating.entityReference())
-                        .userId(username)
-                        .severity(Severity.INFORMATION)
-                        .operation(Operation.UPDATE)
-                        .build();
-
-                changeLogService.write(asSet(log));
+                    changeLogService.write(asSet(log));
+                }
             }
         }
     }
