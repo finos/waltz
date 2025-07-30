@@ -215,11 +215,11 @@ public class AssessmentDefinitionDao {
     }
 
     /**
-     * find AD by ext id
+     * get AD by ext id
      * @param extId
      * @return
      */
-    public AssessmentDefinition findByExternalId(String extId) {
+    public AssessmentDefinition getByExternalId(String extId) {
         Condition condition = ASSESSMENT_DEFINITION.EXTERNAL_ID.eq(extId);
         Set<AssessmentDefinition> asd = findByCondition(condition);
         return asd.isEmpty() ? null : asd.stream().findFirst().get();
