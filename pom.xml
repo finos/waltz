@@ -110,7 +110,7 @@
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <playwright.skip>true</playwright.skip>
-        <jetty.version>9.4.55.v20240627</jetty.version>
+        <jetty.version>9.4.57.v20241219</jetty.version>
     </properties>
 
 
