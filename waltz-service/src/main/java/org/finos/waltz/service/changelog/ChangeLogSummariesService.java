@@ -22,7 +22,6 @@ import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.tally.ChangeLogTally;
 import org.slf4j.Logger;
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -67,21 +65,4 @@ public class ChangeLogSummariesService {
                 endDate,
                 limit);
     }
-
-    public Map<Integer, Long> findYearOnYearChanges(EntityKind parentEntityKind, EntityKind childEntityKind) {
-        return changeLogSummariesDao.findYearOnYearChanges(parentEntityKind, childEntityKind);
-    }
-
-    public List<String> findChangeLogParentEntities() {
-        return changeLogSummariesDao.findChangeLogParentEntities();
-    }
-
-    public List<Integer> findChangeLogYears() {
-        return changeLogSummariesDao.findChangeLogYears();
-    }
-
-    public Map<Integer, Long> findMonthOnMonthChanges(EntityKind parentEntityKind, EntityKind childEntityKind, Integer currentYear) {
-        return changeLogSummariesDao.findMonthOnMonthChanges(parentEntityKind, childEntityKind, currentYear);
-    }
-
 }

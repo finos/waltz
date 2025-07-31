@@ -62,12 +62,6 @@ const userManagementOptions = [
         description: "View and create fine grained permissions to users",
         state: "main.system.permissions",
         icon: "users-rectangle"
-    }, {
-        name: "Analytics Dashboard (Beta)",
-        role: "USER_ADMIN",
-        description: "Dashboard for quick insights",
-        state: "main.system.analytics-dashboard",
-        icon: "bar-chart"
     }
 ];
 

@@ -30,23 +30,17 @@ import org.jooq.AggregateFunction;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record5;
 import org.jooq.RecordMapper;
-import org.jooq.SelectHavingStep;
-import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.parser.Entity;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -142,64 +136,6 @@ public class ChangeLogSummariesDao {
                 .orderBy(count.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_CHANGE_LOG_TALLY_MAPPER);
-    }
-
-    public Map<Integer, Long> findYearOnYearChanges(EntityKind parentEntityKind, EntityKind childEntityKind) {
-        Condition parentEntityKindSelector = parentEntityKind == null ? DSL.trueCondition()
-                : CHANGE_LOG.PARENT_KIND.eq(parentEntityKind.name());
-
-        Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
-                : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
-
-        Field<Integer> yearField = DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("year");
-
-        SelectHavingStep<Record2<Integer, Integer>> qry = dsl
-                .select(DSL.count(CHANGE_LOG.ID).as("counts"), yearField)
-                .from(CHANGE_LOG)
-                .where(parentEntityKindSelector.and(childEntityKindSelector))
-                .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT));
-
-        return  qry
-                .fetchMap(r -> r.get("year", Integer.class),
-                        r -> r.get("counts", Long.class));
-    }
-
-    public List<String> findChangeLogParentEntities() {
-        SelectJoinStep<Record1<String>> parentKindSelector = dsl
-                .selectDistinct(CHANGE_LOG.PARENT_KIND)
-                .from(CHANGE_LOG);
-
-        return parentKindSelector
-                .fetchInto(String.class);
-    }
-
-    public List<Integer> findChangeLogYears() {
-        return dsl
-                .selectDistinct(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("year"))
-                .from(CHANGE_LOG)
-                .fetch(r -> r.get("year", Integer.class));
-    }
-
-    public Map<Integer, Long> findMonthOnMonthChanges(EntityKind parentEntityKind, EntityKind childEntityKind, Integer currentYear) {
-        Condition parentEntityKindSelector = parentEntityKind == null ? DSL.trueCondition()
-                : CHANGE_LOG.PARENT_KIND.eq(parentEntityKind.name());
-
-        Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
-                : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
-
-        Field<Integer> monthField = DSL.field("DATEPART(month, {0})", Integer.class, CHANGE_LOG.CREATED_AT).as("month");
-
-        SelectHavingStep<Record2<Integer, Integer>> qry = dsl
-                .select(DSL.count(CHANGE_LOG.ID).as("counts"), monthField)
-                .from(CHANGE_LOG)
-                .where(parentEntityKindSelector
-                        .and(childEntityKindSelector)
-                        .and(DSL.field("DATEPART(year, {0})", Integer.class, CHANGE_LOG.CREATED_AT).eq(currentYear)))
-                .groupBy(DSL.field("DATEPART(month, {0})", Integer.class, CHANGE_LOG.CREATED_AT));
-
-        return  qry
-                .fetchMap(r -> r.get("month", Integer.class),
-                        r -> r.get("counts", Long.class));
     }
 
 }

@@ -9,8 +9,10 @@ services:
       - postgres
 
   postgres:
-    image: postgres:11
+    image: postgres:16
     environment:
       POSTGRES_USER: waltz
       POSTGRES_DB: waltz
       POSTGRES_PASSWORD: waltz
+    ports:
+      - 5432:5432

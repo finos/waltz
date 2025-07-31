@@ -44,7 +44,6 @@ import MeasurableCategoryEditView from "./measurable-category-edit-view";
 import MeasurableCategoryCreateView from "./measurable-category-create-view";
 import DiagramBuilderView from "./diagram-builder-view";
 import NavAidAdminView from "./nav-aids-view";
-import AnalyticsDasboardAdminView from "./analytics-dashboard-view";
 
 
 const baseState = {
@@ -200,11 +199,6 @@ const permissionsState = {
     views: {"content@": PermissionsView}
 };
 
-const analyticsDashboardState = {
-    url: "/analytics-dashboard",
-    views: {"content@": AnalyticsDasboardAdminView}
-}
-
 
 function setupRoutes($stateProvider) {
     $stateProvider
@@ -234,8 +228,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.static-diagrams", staticDiagramsState)
         .state("main.system.static-diagram", staticDiagramState)
         .state("main.system.static-panels", staticPanelsState)
-        .state("main.system.version-info", versionInfoState)
-        .state("main.system.analytics-dashboard", analyticsDashboardState);
+        .state("main.system.version-info", versionInfoState);
 }
 
 

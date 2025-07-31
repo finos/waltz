@@ -10,10 +10,6 @@
 
     const routes = {
         "main": {
-            path: () => "/",
-            title: "Home page"
-        },
-        "main.home": {
             path: () => "home",
             title: "Home page"
         },
@@ -24,10 +20,6 @@
         "main.actor.view": {
             path: ctx => `actor/${ctx.id}`,
             title: "Actor View"
-        },
-        "main.actor.list": {
-            path: () => "actor/list",
-            title: "Actor List"
         },
         "main.aggregate-overlay-diagram.instance-view": {
             path: ctx => `aggregate-overlay-diagram/instance/${ctx.id}`,
@@ -140,10 +132,6 @@
         "main.system.static-diagram": {
             path: () => `system/static-diagrams/${ctx.id}`,
             title: ""
-        },
-        "main.system.analytics-dashboard": {
-            path: () => "system/analytics-dashboard",
-            title: "Analytics Dashboard"
         },
         "main.survey.instance.view": {
             path: ctx => `survey/instance/${ctx.id}/response/view`,
