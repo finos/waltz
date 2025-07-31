@@ -8,11 +8,11 @@ Monday DD MMM yyyy - 8am EST / 1pm UK
 Occurs the second Monday of every month 
 
 ## Zoom 
-Join Zoom Meeting
-https://zoom.us/j/98495304665
+[Join Zoom Meeting](
+https://zoom-lfx.platform.linuxfoundation.org/meeting/96950469863?password=a4229b81-221e-4262-8d22-f7ba73ca007f)
 
-Meeting ID: 984 9530 4665
-Passcode: 202795
+
+Register for the meeting [here](https://zoom-lfx.platform.linuxfoundation.org/meeting/96950469863?password=a4229b81-221e-4262-8d22-f7ba73ca007f&invite=true)
 
 Find your local number: https://zoom.us/u/aeyTu3Q7E8
 
