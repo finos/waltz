@@ -44,7 +44,8 @@ public class MakerCheckerService {
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
-    private final ObjectMapper objectMapper;   // Spring’s bean
+    @Autowired
+    ObjectMapper objectMapper;   // Spring’s bean
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -52,7 +53,7 @@ public class MakerCheckerService {
                         EntityWorkflowTransitionDao entityWorkflowTransitionDao,
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
-                        ChangeLogDao changeLogDao, ObjectMapper objectMapper){
+                        ChangeLogDao changeLogDao){
 
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
@@ -67,7 +68,6 @@ public class MakerCheckerService {
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
-        this.objectMapper = objectMapper;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
