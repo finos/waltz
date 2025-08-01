@@ -1,7 +1,6 @@
 package org.finos.waltz.service.maker_checker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -31,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 
@@ -44,8 +44,6 @@ public class MakerCheckerService {
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
-    @Autowired
-    ObjectMapper objectMapper;   // Spring’s bean
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -132,7 +130,7 @@ public class MakerCheckerService {
         Optional<ProposedFlowDefinition> proposedFlowDef = proposedFlowDao.findFlowDefById(id)
                 .map(json -> {
                     try {
-                        return objectMapper.readValue(json, ProposedFlowDefinition.class);
+                        return getJsonMapper().readValue(json, ProposedFlowDefinition.class);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
