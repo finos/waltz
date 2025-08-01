@@ -73,3 +73,19 @@
         {/if}
     </div>
 </PageHeader>
+
+<style type="text/scss">
+    @import "../../../../../../style/_variables.scss";
+
+    .incomplete-warning {
+        color: $waltz-amber;
+    }
+
+    .selection-step {
+        border: #EEEEEE 1px solid;
+        padding-bottom: 1em;
+        padding-left: 1em;
+        padding-right: 1em;
+        margin-bottom: 0.25em;
+    }
+</style>
