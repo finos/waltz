@@ -6,7 +6,6 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -148,7 +147,6 @@ class MakerCheckerEndpointTest {
                 makerCheckerEndpoint.getProposedFlowDefinition(httpServletRequest, httpServletResponse);
 
         assertTrue(!result.isPresent());
-
     }
 
     @Test
