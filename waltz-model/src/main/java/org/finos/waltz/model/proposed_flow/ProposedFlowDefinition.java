@@ -35,7 +35,7 @@ public class ProposedFlowDefinition {
         private String format;
         private String lastUpdatedBy;
         private String externalId;
-        private Long id;        // nullable
+        private Long id;
         private FlowAttributes flowAttributes;
         private List<Long> dataTypeIds;
 
@@ -63,10 +63,10 @@ public class ProposedFlowDefinition {
     public static class OwningEntity {
         private Long id;
         private String kind;
-        private String name;          // "AMG" in the sample
-        private String externalId;    // "60487-1"
-        private String description;   // multi-line text
-        private String entityLifecycleStatus; // "ACTIVE"
+        private String name;
+        private String externalId;
+        private String description;
+        private String entityLifecycleStatus;
 
         /* getters & setters */
         public Long getId() { return id; }
@@ -87,7 +87,7 @@ public class ProposedFlowDefinition {
         private String name;
         private String transport;
         private String frequency;
-        @JsonProperty("basis0ffset")  // typo retained from image
+        @JsonProperty("basis0ffset")
         private Integer basis0ffset;
         private String criticality;
         private String description;
