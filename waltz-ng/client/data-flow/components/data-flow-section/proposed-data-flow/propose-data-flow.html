@@ -16,20 +16,8 @@
   ~
   -->
 <div>
-<!--    <waltz-page-header name="Propose Data Flow"-->
-<!--                       icon="code-pull-request">-->
-<!--        <ol class="waltz-breadcrumbs">-->
-<!--            <li><a ui-sref="main">Home</a></li>-->
-<!--            <li>Playpen</li>-->
-<!--        </ol>-->
-<!--    </waltz-page-header>-->
-<!--    <waltz-section>-->
-<!--        <div class="row" >-->
-<!--            <div class="col-md-12">-->
-                <waltz-svelte-component component="$ctrl.ProposeDataFlowView"
-                                        parent-entity-ref="$ctrl.parentEntityRef">
-                </waltz-svelte-component>
-<!--            </div>-->
-<!--        </div>-->
-<!--    </waltz-section>-->
+    <waltz-svelte-component component="$ctrl.ProposeDataFlowView"
+                            primary-entity-ref="$ctrl.sourceEntityRef"
+                            target-logical-flow-id="$ctrl.targetLogicalFlowId">
+    </waltz-svelte-component>
 </div>

@@ -3,23 +3,76 @@
     import PageHeader from "../../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../../common/svelte/EntityLink.svelte";
-    import { loadSvelteEntity } from "../../../../../common/entity-utils";
+    import {dataTypes,
+        expandedSections,
+        logicalFlow,
+        nestedEnums,
+        physicalFlow,
+        physicalSpecification,
+        skipDataTypes,
+        viewMode,
+        ViewMode,
+        proposalReason} from "./propose-data-flow-store";
+    import {loadSvelteEntity, toEntityRef} from "../../../../../common/entity-utils";
     import NoData from "../../../../../common/svelte/NoData.svelte";
-    import ApplicationInfoPanel from "../../../../../common/svelte/info-panels/ApplicationInfoPanel.svelte";
-    import RouteSelector from "../../../../../physical-flows/svelte/RouteSelector.svelte";
-    import LogicalFlowSelectionStep from "../../../../../physical-flows/svelte/LogicalFlowSelectionStep.svelte";
-    import PhysicalFlowCharacteristicsStep
-        from "../../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
-    import PhysicalSpecificationStep from "../../../../../physical-flows/svelte/PhysicalSpecificationStep.svelte";
-    import DataTypeSelectionStep from "../../../../../physical-flows/svelte/DataTypeSelectionStep.svelte";
+    import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
+    import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
+    import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
-    export let parentEntityRef;
+    import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
+    import {logicalFlowStore} from "../../../../../svelte-stores/logical-flow-store";
 
-    $: sourceEntityCall = loadSvelteEntity(parentEntityRef);
+    export let primaryEntityRef;
+    export let targetLogicalFlowId;
+
+    $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
         $sourceEntityCall.data
         : {};
 
+    $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
+    $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
+    $: console.log($logicalFlow);
+
+    function launchCommand() {
+        const specification = {
+            owningEntity: toEntityRef(primaryEntityRef),
+            name: $physicalSpecification.name,
+            description: $physicalSpecification.description,
+            format: $physicalSpecification.format,
+            lastUpdatedBy: "waltz",
+            externalId: !_.isEmpty($physicalSpecification.externalId) ? $physicalSpecification.externalId : null,
+            id: $physicalSpecification.id ? $physicalSpecification.id : null
+        }
+
+        const flowAttributes = {
+            name: $physicalFlow.name,
+            transport: $physicalFlow.transport,
+            frequency: $physicalFlow.frequency,
+            basisOffset: $physicalFlow.basisOffset,
+            criticality: $physicalFlow.criticality,
+            description: $physicalFlow.description,
+            externalId: !_.isEmpty($physicalFlow.externalId) ? $physicalFlow.externalId : null
+        }
+
+        const command = {
+            specification,
+            flowAttributes,
+            logicalFlowId: $logicalFlow.id ?? null,
+            dataTypeIds: $dataTypes,
+            reasonCode: $proposalReason.rating[0] ? $proposalReason.rating[0].id : null
+        }
+
+        if(!$logicalFlow.id) {
+            _.set(command, 'source', $logicalFlow.source ?? null);
+            _.set(command, 'target', $logicalFlow.target ?? null);
+        }
+
+        console.log(command);
+    }
+
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
 </script>
 
 
@@ -36,34 +89,38 @@
     <div slot="summary">
         {#if !sourceEntity.name}
             <NoData>
-                No data found for {parentEntityRef.kind} {parentEntityRef.id}
+                No data found for {primaryEntityRef.kind} {primaryEntityRef.id}
             </NoData>
         {:else}
             <div class="selection-step">
-                <LogicalFlowSelectionStep primaryEntityRef={parentEntityRef}/>
+                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity}/>
             </div>
 
             <div class="selection-step">
-                <PhysicalSpecificationStep primaryEntityRef={parentEntityRef}/>
+                <PhysicalSpecificationStep primaryEntityRef={primaryEntityRef}/>
             </div>
 
             <div class="selection-step">
-                <PhysicalFlowCharacteristicsStep primaryEntityRef={parentEntityRef}/>
+                <PhysicalFlowCharacteristicsStep primaryEntityRef={primaryEntityRef}/>
             </div>
 
             <div class="selection-step">
-                <DataTypeSelectionStep primaryEntityRef={parentEntityRef}/>
+                <DataTypeSelectionStep primaryEntityRef={primaryEntityRef}/>
+            </div>
+
+            <div class="selection-step">
+                <ReasonSelectionStep primaryEntityRef={primaryEntityRef}/>
             </div>
             <br>
 
             <span>
                 <button class="btn btn-success"
-                        disabled={true}
-                        on:click={() => true}>
+                        disabled={incompleteRecord}
+                        on:click={() => launchCommand()}>
                     Create
                 </button>
 
-                {#if true}
+                {#if incompleteRecord}
                     <span class="incomplete-warning">
                         <Icon name="exclamation-triangle"/>You must complete all sections
                     </span>

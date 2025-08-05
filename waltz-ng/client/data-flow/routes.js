@@ -4,7 +4,7 @@ const baseState = {
 };
 
 const createState = {
-    url: "/create/{kind:string}/{id:int}",
+    url: "/create/{kind:string}/{id:int}?{targetLogicalFlowId:int}",
     views: {"content@": ProposeDataFlowView }
 };
 
