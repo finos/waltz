@@ -34,8 +34,6 @@
         dispatch("cancel");
     }
 
-    $: console.log(source, target);
-
 
 </script>
 

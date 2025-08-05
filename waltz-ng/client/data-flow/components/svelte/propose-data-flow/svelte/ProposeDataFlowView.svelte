@@ -60,6 +60,7 @@
             specification,
             flowAttributes,
             logicalFlowId: $logicalFlow.id ?? null,
+            physicalFlowId: null,
             dataTypeIds: $dataTypes,
             reasonCode: $proposalReason.rating[0] ? $proposalReason.rating[0].id : null
         }
@@ -68,8 +69,6 @@
             _.set(command, 'source', $logicalFlow.source ?? null);
             _.set(command, 'target', $logicalFlow.target ?? null);
         }
-
-        console.log(command);
     }
 
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
@@ -97,19 +96,19 @@
             </div>
 
             <div class="selection-step">
-                <PhysicalSpecificationStep primaryEntityRef={primaryEntityRef}/>
+                <PhysicalSpecificationStep primaryEntityRef={sourceEntity}/>
             </div>
 
             <div class="selection-step">
-                <PhysicalFlowCharacteristicsStep primaryEntityRef={primaryEntityRef}/>
+                <PhysicalFlowCharacteristicsStep primaryEntityRef={sourceEntity}/>
             </div>
 
             <div class="selection-step">
-                <DataTypeSelectionStep primaryEntityRef={primaryEntityRef}/>
+                <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
             </div>
 
             <div class="selection-step">
-                <ReasonSelectionStep primaryEntityRef={primaryEntityRef}/>
+                <ReasonSelectionStep primaryEntityRef={sourceEntity}/>
             </div>
             <br>
 

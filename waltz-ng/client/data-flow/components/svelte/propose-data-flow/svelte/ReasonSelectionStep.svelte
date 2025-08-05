@@ -80,13 +80,12 @@
     $: specifications = $specificationCall?.data;
     $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
     $: dataFormatKinds = toOptions(enumsByType, "DataFormatKind");
-    $: ratingSchemeCall = ratingSchemeStore.getById(23924);
+    $: ratingSchemeCall = ratingSchemeStore.getById(23779);
 
     $: done = workingCopy.rating[0] && true;
 
     $: expanded = _.includes($expandedSections, sections.REASON);
     $: ratingScheme = $ratingSchemeCall.data;
-    $: console.log(workingCopy.rating);
 
     function onRatingsSelect(evt) {
         workingCopy.rating = evt.detail;
