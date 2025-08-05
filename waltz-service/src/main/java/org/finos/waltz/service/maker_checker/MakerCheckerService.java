@@ -127,7 +127,7 @@ public class MakerCheckerService {
      */
     public Optional<ProposedFlowDefinition> getProposedFlowDefinitionById(long id) {
         // Any additional business logic can be added here
-        Optional<ProposedFlowDefinition> proposedFlowDef = proposedFlowDao.getFlowDefById(id)
+        return proposedFlowDao.getFlowDefById(id)
                 .map(json -> {
                     try {
                         return getJsonMapper().readValue(json, ProposedFlowDefinition.class);
@@ -135,6 +135,5 @@ public class MakerCheckerService {
                         throw new RuntimeException(e);
                     }
                 });
-        return proposedFlowDef;
     }
 }
