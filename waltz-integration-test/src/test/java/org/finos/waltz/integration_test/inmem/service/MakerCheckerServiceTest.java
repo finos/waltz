@@ -138,7 +138,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
             ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
             assertNotNull(response);
-            Optional<ProposedFlowDefinition> proposedFlowDefinition = makerCheckerService.getProposedFlowDefinition(response.proposedFlowId());
+            Optional<ProposedFlowDefinition> proposedFlowDefinition = makerCheckerService.getProposedFlowDefinitionById(response.proposedFlowId());
             assertNotNull(proposedFlowDefinition);
 
         }catch (Exception e){

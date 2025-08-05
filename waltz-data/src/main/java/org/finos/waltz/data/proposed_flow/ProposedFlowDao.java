@@ -43,7 +43,7 @@ public class ProposedFlowDao {
      *
      * @return JSON string wrapped in Optional, empty if no row found
      */
-    public Optional<String> findFlowDefById(long id) {
+    public Optional<String> getFlowDefById(long id) {
         return dsl.select(PROPOSED_FLOW.FLOW_DEF)
                 .from(PROPOSED_FLOW)
                 .where(PROPOSED_FLOW.ID.eq(id))

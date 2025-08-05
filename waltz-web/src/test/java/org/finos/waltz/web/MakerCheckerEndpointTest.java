@@ -14,8 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import spark.Request;
 import spark.Response;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -38,12 +36,6 @@ class MakerCheckerEndpointTest {
 
     @Mock
     private WebUtilities webUtilities;
-
-    @Mock
-    private HttpServletRequest httpServletRequest;
-
-    @Mock
-    private HttpServletResponse httpServletResponse;
 
     @BeforeEach
     public void setUp(){
@@ -125,36 +117,36 @@ class MakerCheckerEndpointTest {
         proposedFlowDefExpected.setPhysicalFlowId(12345L);
         proposedFlowDefExpected.setReasonCode(1234);
 
-        when(httpServletRequest.getParameter("id")).thenReturn("123");
-        when(makerCheckerService.getProposedFlowDefinition(id))
+        when(request.queryParams("id")).thenReturn("123");
+        when(makerCheckerService.getProposedFlowDefinitionById(id))
                 .thenReturn(Optional.of(proposedFlowDefExpected));
 
         Optional<ProposedFlowDefinition> result =
-                makerCheckerEndpoint.getProposedFlowDefinition(httpServletRequest, httpServletResponse);
+                makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
 
         assertNotNull(result);
         assertTrue(result.isPresent());
-        verify(makerCheckerService).getProposedFlowDefinition(id);
+        verify(makerCheckerService).getProposedFlowDefinitionById(id);
     }
 
     @Test
     void testShouldReturnEmptyWhenServiceReturnsEmpty() throws IOException {
-        when(httpServletRequest.getParameter("id")).thenReturn("999");
-        when(makerCheckerService.getProposedFlowDefinition(999L))
+        when(request.queryParams("id")).thenReturn("999");
+        when(makerCheckerService.getProposedFlowDefinitionById(999L))
                 .thenReturn(Optional.empty());
 
         Optional<ProposedFlowDefinition> result =
-                makerCheckerEndpoint.getProposedFlowDefinition(httpServletRequest, httpServletResponse);
+                makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
 
         assertTrue(!result.isPresent());
     }
 
     @Test
     void testShouldThrowNumberFormatExceptionWhenIdIsNotANumber() {
-        when(httpServletRequest.getParameter("id")).thenReturn("abc");
+        when(request.queryParams("id")).thenReturn("abc");
 
         assertThrows(NumberFormatException.class, () -> {
-            makerCheckerEndpoint.getProposedFlowDefinition(httpServletRequest, httpServletResponse);
+            makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
         });
 
         verifyNoInteractions(makerCheckerService);
@@ -162,12 +154,12 @@ class MakerCheckerEndpointTest {
 
     @Test
     void testShouldRethrowIOExceptionFromServiceWhenDbIsDown() throws IOException {
-        when(httpServletRequest.getParameter("id")).thenReturn("42");
-        when(makerCheckerService.getProposedFlowDefinition(42L))
+        when(request.queryParams("id")).thenReturn("42");
+        when(makerCheckerService.getProposedFlowDefinitionById(42L))
                 .thenThrow(new IOException("db down"));
 
         IOException exception = assertThrows(IOException.class, () -> {
-            makerCheckerEndpoint.getProposedFlowDefinition(httpServletRequest, httpServletResponse);
+            makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
         });
         assertEquals("db down", exception.getMessage());
     }

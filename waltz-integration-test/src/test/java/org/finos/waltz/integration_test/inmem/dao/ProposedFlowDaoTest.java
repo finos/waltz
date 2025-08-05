@@ -143,7 +143,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
 
             Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
             assertNotNull(proposedFlowId);
-            Optional<String> proposedFlowDef = proposedFlowDao.findFlowDefById(proposedFlowId);
+            Optional<String> proposedFlowDef = proposedFlowDao.getFlowDefById(proposedFlowId);
             assertNotNull(proposedFlowDef);
         }catch (Exception e){
             e.printStackTrace();

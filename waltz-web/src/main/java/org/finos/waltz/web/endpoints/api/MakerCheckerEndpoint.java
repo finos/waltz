@@ -4,8 +4,10 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,6 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -41,6 +41,17 @@ public class MakerCheckerEndpoint implements Endpoint {
     public void register() {
         // propose a new MC flow
         postForDatum(mkPath(BASE_URL, "propose-flow"), this:: proposeNewFlow);
+
+        String getByIdPath = WebUtilities.mkPath(
+                BASE_URL,
+                "id",
+                ":id");
+
+        DatumRoute<Optional<ProposedFlowDefinition>> getByIdRoute =
+                (request, response) -> makerCheckerService
+                        .getProposedFlowDefinitionById(WebUtilities.getLong(request, "id"));
+
+        EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
     }
 
 
@@ -50,8 +61,7 @@ public class MakerCheckerEndpoint implements Endpoint {
         return makerCheckerService.proposeNewFlow(request.body(), username, proposedFlowCommand);
     }
 
-    public Optional<ProposedFlowDefinition> getProposedFlowDefinition(HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        return makerCheckerService.getProposedFlowDefinition(Long.parseLong(request.getParameter("id")));
+    public Optional<ProposedFlowDefinition> getProposedFlowDefinitionById(Request request, Response response) {
+        return makerCheckerService.getProposedFlowDefinitionById(Long.parseLong(request.queryParams("id")));
     }
 }
