@@ -8,6 +8,7 @@ import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.immutables.value.Value;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -19,8 +20,8 @@ public abstract class ProposedFlowCommand implements Command {
     public abstract EntityReference source();
     public abstract EntityReference target();
     public abstract Reason reason();
-    public abstract Long logicalFlowId();
-    public abstract Long physicalFlowId();
+    public abstract Optional<Long> logicalFlowId();
+    public abstract Optional<Long> physicalFlowId();
     public abstract PhysicalSpecification specification();
     public abstract FlowAttributes flowAttributes();
     @Value.Default
