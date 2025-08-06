@@ -1,0 +1,85 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.73.xml">
+
+    <!-- 4249 Create Table - ProposedFlow Table -->
+    <changeSet id="20250723-4249-1"
+               author="jindkul">
+        <createTable tableName="proposed_flow"
+                     remarks="details about proposed flow by requesters ">
+
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="proposed_flow_pkey"/>
+            </column>
+
+            <column name="source_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="source_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="flow_def"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jindkul"
+               id="20250723-4249-2">
+
+        <sql>
+            insert into entity_workflow_definition
+                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -26,6 +26,7 @@ import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingRippler;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -52,14 +53,12 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -73,6 +72,9 @@ import static org.finos.waltz.model.utils.IdUtilities.toIds;
 @Service
 public class AssessmentRatingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AssessmentRatingService.class);
+
+
     private final AssessmentRatingDao assessmentRatingDao;
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
@@ -80,6 +82,7 @@ public class AssessmentRatingService {
     private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final AssessmentRatingRippler rippler;
+    private final SettingsDao settingsDao;
 
 
     @Autowired
@@ -89,7 +92,7 @@ public class AssessmentRatingService {
             RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService,
             AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
-            AssessmentRatingRippler rippler) {
+            AssessmentRatingRippler rippler, SettingsDao settingsDao) {
 
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
@@ -105,6 +108,7 @@ public class AssessmentRatingService {
         this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.changeLogService = changeLogService;
         this.rippler = rippler;
+        this.settingsDao = settingsDao;
 
     }
 
@@ -299,6 +303,12 @@ public class AssessmentRatingService {
                 username);
 
         if (definition.cardinality().equals(Cardinality.ZERO_ONE)) {
+            // Validate and update dependent assessment
+            Map<String, String> dataMap = getDataForValidation("ar.auto.validation.");
+            if ( null != dataMap) {
+                validateAndAutoUpdateAssessmentRating(definition, existingRating, cmd, username, dataMap);
+            }
+
             createUpdateRatingChangeLogs(existingRating, definition, cmd, username); // do first so that comment from old rating retained
             return assessmentRatingDao.updateRating(assessmentRatingId, cmd, username);
         } else {
@@ -515,5 +525,71 @@ public class AssessmentRatingService {
 
     public Set<AssessmentRipplerJobConfiguration> findRippleConfig() {
         return rippler.findRippleConfig();
+    }
+
+    /**
+     * Validate and update the dependent assessment rating
+     * @param definition
+     * @param existingRating
+     * @param cmd
+     * @param username
+     * @param dataMap
+     */
+    private void validateAndAutoUpdateAssessmentRating(AssessmentDefinition definition, AssessmentRating existingRating,
+                                                    UpdateRatingCommand cmd,
+                                                    String username, Map<String, String> dataMap) {
+        LOG.info("Assessment definition Id: {}", definition.externalId().get());
+
+        if (definition.externalId().get().equals(dataMap.get("CURRENT_ASSESSMENT_DEFINITION"))
+                && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get("EXISTING_RATING_CODE")) //old rating
+                && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get("NEW_RATING_CODE"))) {  //new rating
+
+            AssessmentDefinition asd = assessmentDefinitionDao.getByExternalId(dataMap.get("UPDATE_ASSESSMENT_DEFINITION"));
+            if (null != asd) {
+                RatingScheme ratingScheme = ratingSchemeDAO.getById(asd.ratingSchemeId());
+                Map<String, Optional<Long>> ratingTdByName = indexBy(ratingScheme.ratings(), d -> d.name(), RatingSchemeItem::id);
+
+                Long entityId = existingRating.entityReference().id();
+                boolean flag = assessmentRatingDao.updateRating(asd.id(), entityId,
+                        username, ratingTdByName.get(dataMap.get("UAD_EXISTING_RATING")), ratingTdByName.get(dataMap.get("UAD_NEW_RATING")));
+
+                if (flag) {
+                    LOG.info("Updated required rating through {}", dataMap.get("CURRENT_ASSESSMENT_DEFINITION"));
+
+                    ImmutableChangeLog log = ImmutableChangeLog.builder()
+                            .message(format(
+                                    "Updated rating for assessment '%s' via '%s' from '%s' to '%s'",
+                                    asd.name(),
+                                    dataMap.get("CURRENT_ASSESSMENT_DEFINITION"),
+                                    dataMap.get("UAD_EXISTING_RATING"),
+                                    dataMap.get("UAD_NEW_RATING")))
+                            .parentReference(existingRating.entityReference())
+                            .userId(username)
+                            .severity(Severity.INFORMATION)
+                            .operation(Operation.UPDATE)
+                            .build();
+
+                    changeLogService.write(asSet(log));
+                }
+            }
+        }
+    }
+
+    /**
+     * get data for validation of auto updating the assessment rating
+     * @param prefixVal
+     * @return
+     */
+    private Map<String, String> getDataForValidation(String prefixVal) {
+        Map<String, String> configEntries = settingsDao
+                .indexByPrefix(prefixVal);
+
+        return configEntries.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().startsWith(prefixVal) ?
+                                entry.getKey().substring(prefixVal.length()) :
+                                entry.getKey(),
+                        Map.Entry::getValue
+                ));
     }
 }

@@ -18,73 +18,29 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-                   logicalFilePath="db.changelog-1.72.xml">
+                   logicalFilePath="db.changelog-1.73.xml">
 
     <changeSet id="v1-72-tag"
                author="patidev">
         <tagDatabase tag="v1.72"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-    <!-- 4249 Create Table - ProposedFlow Table -->
-    <changeSet id="20250723-4249-1"
-               author="jindkul">
-        <createTable tableName="proposed_flow"
-                     remarks="details about proposed flow by requesters ">
+    <!--  Adding index to hierarchy table -->
 
-            <column name="id"
-                    type="${id.type}"
-                    autoIncrement="true">
-                <constraints nullable="false"
-                             primaryKey="true"
-                             primaryKeyName="proposed_flow_pkey"/>
-            </column>
-
-            <column name="source_entity_id"
-                    type="${id.type}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="source_entity_kind"
-                    type="${enum.type}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="target_entity_id"
-                    type="${id.type}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="target_entity_kind"
-                    type="${enum.type}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="created_at"
-                    type="TIMESTAMP"
-                    defaultValueComputed="${now.value}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="created_by"
-                    type="${name.type}">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="flow_def"
-                    type="${longvarchar.type}">
-                <constraints nullable="false"/>
-            </column>
-
-        </createTable>
+    <changeSet author="jindkul"
+               id="20250708-4213-1">
+        <createIndex indexName="id_idx"
+                     tableName="entity_hierarchy">
+            <column name="id"/>
+        </createIndex>
     </changeSet>
 
     <changeSet author="jindkul"
-               id="20250723-4249-2">
-
-        <sql>
-            insert into entity_workflow_definition
-                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
-        </sql>
+               id="20250708-4213-2">
+        <createIndex indexName="level_idx"
+                     tableName="entity_hierarchy">
+            <column name="level"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>
