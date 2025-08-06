@@ -4,10 +4,8 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
-import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
@@ -42,16 +41,10 @@ public class MakerCheckerEndpoint implements Endpoint {
         // propose a new MC flow
         postForDatum(mkPath(BASE_URL, "propose-flow"), this:: proposeNewFlow);
 
-        String getByIdPath = WebUtilities.mkPath(
+        getForDatum(mkPath(
                 BASE_URL,
                 "id",
-                ":id");
-
-        DatumRoute<Optional<ProposedFlowDefinition>> getByIdRoute =
-                (request, response) -> makerCheckerService
-                        .getProposedFlowDefinitionById(WebUtilities.getLong(request, "id"));
-
-        EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
+                ":id"), this:: getProposedFlowDefinitionById);
     }
 
 
@@ -62,6 +55,6 @@ public class MakerCheckerEndpoint implements Endpoint {
     }
 
     public Optional<ProposedFlowDefinition> getProposedFlowDefinitionById(Request request, Response response) {
-        return makerCheckerService.getProposedFlowDefinitionById(Long.parseLong(request.queryParams("id")));
+        return makerCheckerService.getProposedFlowDefinitionById(WebUtilities.getLong(request, "id"));
     }
 }
