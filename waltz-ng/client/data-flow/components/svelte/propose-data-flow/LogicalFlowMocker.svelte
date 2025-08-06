@@ -97,10 +97,11 @@
         </div>
     {/if}
 
-    <button class="btn btn-success"
-            disabled={!(source && target)}
+    <button class="btn btn-skinny"
+            disabled={!(source && target)
+            || ((source.kind === target.kind) && (source.id === target.id))}
             on:click|preventDefault={() => createNewLogical()}>
-        Create new flow
+        Done
     </button>
     <button class="btn btn-skinny"
             on:click={() => cancel()}>

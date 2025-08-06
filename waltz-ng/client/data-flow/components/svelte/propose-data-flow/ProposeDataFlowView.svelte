@@ -55,13 +55,19 @@
             externalId: !_.isEmpty($physicalFlow.externalId) ? $physicalFlow.externalId : null
         }
 
+        const mkReason = (rating) => ({
+            ratingId: rating.id,
+            description: rating.description
+        });
+
+
         const command = {
             specification,
             flowAttributes,
             logicalFlowId: $logicalFlow.id ?? null,
             physicalFlowId: null,
             dataTypeIds: $dataTypes,
-            reasonCode: $proposalReason.rating[0] ? $proposalReason.rating[0].id : null
+            reason: $proposalReason.rating[0] ? mkReason($proposalReason.rating[0]) : null
         }
 
         if(!$logicalFlow.id) {
