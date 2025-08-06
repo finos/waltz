@@ -33,7 +33,6 @@
 
     $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
-    $: console.log($logicalFlow);
 
     function launchCommand() {
         const specification = {
@@ -69,6 +68,8 @@
             _.set(command, 'source', $logicalFlow.source ?? null);
             _.set(command, 'target', $logicalFlow.target ?? null);
         }
+
+        // TODO: code that would perform the API call to the maker - checker API
     }
 
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
