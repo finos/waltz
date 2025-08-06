@@ -71,6 +71,7 @@ public class MakerCheckerService {
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
 
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
+        AtomicReference<EntityWorkflowDefinition> entityWorkflowDefinition = new AtomicReference<>();
         String msg = "PROPOSE_FLOW_CREATED_WITH_SUCCESS";
         String outcome = CommandOutcome.SUCCESS.name();
         try {
@@ -78,10 +79,10 @@ public class MakerCheckerService {
                 DSLContext dsl = dslContext.dsl();
                 proposedFlowId.set(proposedFlowDao.saveProposedFlow(requestBody, username, proposedFlowCommand));
                 LOG.info("New ProposedFlowId is : {} ", proposedFlowId);
-                EntityWorkflowDefinition ewd = entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow");
-                if(ewd.id().isPresent()){
-                    entityWorkflowStateDao.saveNewWorkflowState(proposedFlowId.get(), ewd.id().get(), username);
-                    entityWorkflowTransitionDao.saveNewWorkflowTransition(proposedFlowId.get(), ewd.id().get(), username);
+                entityWorkflowDefinition.set(entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow"));
+                if(entityWorkflowDefinition.get().id().isPresent()){
+                    entityWorkflowStateDao.saveNewWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
+                    entityWorkflowTransitionDao.saveNewWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
                 }else{
                     throw new NoDataFoundException("Could not find workflow definition: Propose Flow Lifecycle Workflow");
                 }
@@ -105,6 +106,7 @@ public class MakerCheckerService {
                 .outcome(outcome)
                 .proposedFlowCommand(proposedFlowCommand)
                 .proposedFlowId(proposedFlowId.get())
+                .workflowDefinitionId(entityWorkflowDefinition.get().id().isPresent()?entityWorkflowDefinition.get().id().get(): -1L)
                 .build();
     }
 

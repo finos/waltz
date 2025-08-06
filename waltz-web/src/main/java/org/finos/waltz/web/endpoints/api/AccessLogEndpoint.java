@@ -18,7 +18,11 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.apache.poi.util.StringUtil;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.service.access_log.AccessLogService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.WaltzVersionInfo;
@@ -31,6 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
+
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.temporal.TemporalUnit;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -61,17 +71,58 @@ public class AccessLogEndpoint implements Endpoint {
         String findForUserPath = WebUtilities.mkPath(BASE_URL, "user", ":userId");
         String findActiveUsersPath = WebUtilities.mkPath(BASE_URL, "active", ":minutes");
         String writePath = WebUtilities.mkPath(BASE_URL, ":state");
+        String findAccessCountsByStatePath = WebUtilities.mkPath(BASE_URL, "counts_by_state", ":days");
+        String findAccessLogCountsPath = WebUtilities.mkPath(BASE_URL, "counts_since", ":days");
+        String findDailyActiveUserCountsSincePath = WebUtilities.mkPath(BASE_URL, "users_since", ":days");
+        String findYearOnYearUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
+        String findAccessLogYearsPath = WebUtilities.mkPath(BASE_URL, "get_years");
+        String findMonthOnMonthUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "month_on_month", ":mode", ":year");
 
         ListRoute<AccessLog> findForUserRoute = (request, response) ->
                 accessLogService.findForUserId(request.params("userId"), WebUtilities.getLimit(request));
+
         ListRoute<AccessTime> findActiveUsersRoute = (request, response) -> {
             java.time.Duration minutes = java.time.Duration.ofMinutes(Integer.parseInt(request.params("minutes")));
             return accessLogService.findActiveUsersSince(minutes);
         };
 
+        ListRoute<AccessLogSummary> findAccessLogCountsByStateSince = (request, response) -> {
+            java.time.Duration days = java.time.Duration.ofDays(Integer.parseInt(request.params("days")));
+            return accessLogService.findAccessLogCountsByStateSince(days);
+        };
+
+        ListRoute<AccessLogSummary> findWeeklyAccessLogSummary = (request, response) -> {
+            java.time.Duration days = java.time.Duration.ofDays(Integer.parseInt(request.params("days")));
+            return accessLogService.findWeeklyAccessLogSummary(days);
+        };
+
+        ListRoute<AccessLogSummary> findDailyActiveUserCountsSince = (request, response) -> {
+            java.time.Duration days = java.time.Duration.ofDays(Integer.parseInt(request.params("days")));
+            return accessLogService.findDailyUniqueUsersSince(days);
+        };
+
+        ListRoute<AccessLogSummary> findYearOnYearUsersRoute = (request, response) -> {
+            String mode = request.params("mode");
+            return accessLogService.findYearOnYearAccessLogSummary(mode);
+        };
+
+        ListRoute<Integer> findAccessLogYearsRoute = (request, response) -> accessLogService.findAccessLogYears();
+
+        ListRoute<AccessLogSummary> findMonthOnMonthUsersRoute = (request, response) -> {
+            String mode = request.params("mode");
+            Integer year = Integer.parseInt(request.params("year"));
+            return accessLogService.findMonthOnMonthAccessLogSummary(mode, year);
+        };
+
         EndpointUtilities.getForList(findForUserPath, findForUserRoute);
         EndpointUtilities.getForList(findActiveUsersPath, findActiveUsersRoute);
         EndpointUtilities.postForDatum(writePath, this::writeRoute);
+        EndpointUtilities.getForList(findAccessCountsByStatePath, findAccessLogCountsByStateSince);
+        EndpointUtilities.getForList(findAccessLogCountsPath, findWeeklyAccessLogSummary);
+        EndpointUtilities.getForList(findDailyActiveUserCountsSincePath, findDailyActiveUserCountsSince);
+        EndpointUtilities.getForList(findYearOnYearUsersPath, findYearOnYearUsersRoute);
+        EndpointUtilities.getForList(findAccessLogYearsPath, findAccessLogYearsRoute);
+        EndpointUtilities.getForList(findMonthOnMonthUsersPath, findMonthOnMonthUsersRoute);
     }
 
 

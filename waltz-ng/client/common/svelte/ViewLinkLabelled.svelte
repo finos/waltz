@@ -5,6 +5,7 @@
     export let title = null;
     export let ctx = {};
     export let isSecondaryLink = false;
+    export let label = null;
 
     let path;
 
@@ -186,11 +187,11 @@
     <a href={path}
        class:secondary-link={isSecondaryLink}
        {title}>
-        <slot></slot>
+        <slot>{label ?? ""}</slot>
     </a>
 {:else }
     <span>
-        <slot/>
+        <slot>{label ?? ""}</slot>
     </span>
 {/if}
 

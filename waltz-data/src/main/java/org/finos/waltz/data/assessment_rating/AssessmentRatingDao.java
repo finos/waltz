@@ -596,4 +596,20 @@ public class AssessmentRatingDao {
                         .and(ar.ASSESSMENT_DEFINITION_ID.in(defIds)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
+
+    public boolean updateRating(Optional<Long> assessmentDefId, Long entityId,
+                                                     String username, Optional<Long> oldRating,
+                                                     Optional<Long> newRating) {
+        return oldRating.isPresent() && newRating.isPresent() &&
+                dsl
+                .update(ar)
+                .set(ar.RATING_ID, newRating.get())
+                .set(ar.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ar.LAST_UPDATED_BY, username)
+                .set(ar.DESCRIPTION, "")
+                .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentDefId.get()))
+                .and(ar.ENTITY_ID.eq(entityId))
+                .and(ar.RATING_ID.eq(oldRating.get()))
+                .execute() == 1;
+    }
 }
