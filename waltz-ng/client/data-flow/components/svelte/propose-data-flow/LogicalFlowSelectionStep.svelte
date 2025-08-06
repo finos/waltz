@@ -1,13 +1,13 @@
 <script>
     import {expandedSections, logicalFlow} from "./propose-data-flow-store";
-    import {logicalFlowStore} from "../../../../../svelte-stores/logical-flow-store";
+    import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import _ from "lodash";
     import RouteSelector from "./RouteSelector.svelte";
     import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import StepHeader from "./StepHeader.svelte";
     import {determineExpandedSections, Direction, sections} from "./propose-data-flow-utils";
-    import {toEntityRef} from "../../../../../common/entity-utils";
+    import {toEntityRef} from "../../../../common/entity-utils";
     import LogicalFlowMocker from "./LogicalFlowMocker.svelte";
     import {onMount} from "svelte";
 

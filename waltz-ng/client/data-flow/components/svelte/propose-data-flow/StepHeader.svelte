@@ -1,7 +1,7 @@
 <script>
 
     import Check from "./Check.svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let checked = false;
     export let label;

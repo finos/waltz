@@ -1,11 +1,11 @@
 <script>
 
-    import EntityLabel from "../../../../../common/svelte/EntityLabel.svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
-    import {sameRef} from "../../../../../common/entity-utils";
-    import SearchInput from "../../../../../common/svelte/SearchInput.svelte";
-    import {termSearch} from "../../../../../common";
+    import {sameRef} from "../../../../common/entity-utils";
+    import SearchInput from "../../../../common/svelte/SearchInput.svelte";
+    import {termSearch} from "../../../../common";
     import _ from "lodash";
 
     import {createEventDispatcher} from "svelte";
@@ -72,7 +72,7 @@
 
 
 <style type="text/scss">
-    @import "../../../../../../style/_variables.scss";
+    @import "../../../../../style/variables";
 
     .mainNode {
         color: #999;

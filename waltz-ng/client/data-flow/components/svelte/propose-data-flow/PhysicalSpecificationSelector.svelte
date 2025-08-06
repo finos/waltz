@@ -1,7 +1,7 @@
 <script>
 
-    import SearchInput from "../../../../../common/svelte/SearchInput.svelte";
-    import {termSearch} from "../../../../../common";
+    import SearchInput from "../../../../common/svelte/SearchInput.svelte";
+    import {termSearch} from "../../../../common";
     import _ from "lodash";
     import {createEventDispatcher} from "svelte";
     import {nestedEnums} from "./propose-data-flow-store";

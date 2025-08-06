@@ -1,7 +1,7 @@
 <script>
-    import EntityLabel from "../../../../../common/svelte/EntityLabel.svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
-    import {sameRef} from "../../../../../common/entity-utils";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import {sameRef} from "../../../../common/entity-utils";
 
     export let logicalFlow;
     export let primaryEntityRef;

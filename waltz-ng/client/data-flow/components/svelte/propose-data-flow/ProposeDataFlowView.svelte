@@ -1,8 +1,8 @@
 <script>
     import _ from "lodash";
-    import PageHeader from "../../../../../common/svelte/PageHeader.svelte";
-    import ViewLink from "../../../../../common/svelte/ViewLink.svelte";
-    import EntityLink from "../../../../../common/svelte/EntityLink.svelte";
+    import PageHeader from "../../../../common/svelte/PageHeader.svelte";
+    import ViewLink from "../../../../common/svelte/ViewLink.svelte";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import {dataTypes,
         expandedSections,
         logicalFlow,
@@ -13,15 +13,15 @@
         viewMode,
         ViewMode,
         proposalReason} from "./propose-data-flow-store";
-    import {loadSvelteEntity, toEntityRef} from "../../../../../common/entity-utils";
-    import NoData from "../../../../../common/svelte/NoData.svelte";
+    import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
+    import NoData from "../../../../common/svelte/NoData.svelte";
     import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
     import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
     import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
     import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
-    import {logicalFlowStore} from "../../../../../svelte-stores/logical-flow-store";
+    import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
@@ -131,7 +131,7 @@
 </PageHeader>
 
 <style type="text/scss">
-    @import "../../../../../../style/_variables.scss";
+    @import "../../../../../style/variables";
 
     .incomplete-warning {
         color: $waltz-amber;

@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
     import StepHeader from "./StepHeader.svelte";
-    import {enumValueStore} from "../../../../../svelte-stores/enum-value-store";
+    import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
     import EnumSelect from "./EnumSelect.svelte";
     import {
         basisOffsetDefaultOptions,
@@ -11,9 +11,9 @@
     } from "./propose-data-flow-utils";
     import BasisOffsetSelect from "./BasisOffsetSelect.svelte";
     import {expandedSections, nestedEnums, physicalFlow} from "./propose-data-flow-store";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
-    import Markdown from "../../../../../common/svelte/Markdown.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
     let workingCopy = {};
     let transportKinds = [];

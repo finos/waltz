@@ -3,11 +3,11 @@
     import StepHeader from "./StepHeader.svelte";
     import {dataTypes, expandedSections, physicalSpecification, skipDataTypes} from "./propose-data-flow-store";
     import {determineExpandedSections, sections} from "./propose-data-flow-utils";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
-    import DataTypeTreeSelector from "../../../../../common/svelte/DataTypeTreeSelector.svelte";
-    import {dataTypeStore} from "../../../../../svelte-stores/data-type-store";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import DataTypeTreeSelector from "../../../../common/svelte/DataTypeTreeSelector.svelte";
+    import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
     import {onMount} from "svelte";
-    import NoData from "../../../../../common/svelte/NoData.svelte";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     let dataTypeList = [];
 
@@ -121,7 +121,7 @@
 {/if}
 
 <style type="text/scss">
-    @import "../../../../../../style/_variables.scss";
+    @import "../../../../../style/variables";
 
     .step-body {
         padding-left: 1em;

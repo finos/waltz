@@ -1,12 +1,12 @@
 <script>
 
-    import Icon from "../../../../../common/svelte/Icon.svelte";
-    import EntitySearchSelector from "../../../../../common/svelte/EntitySearchSelector.svelte";
-    import { logicalFlowStore } from "../../../../../svelte-stores/logical-flow-store";
-    import toasts from "../../../../../svelte-stores/toast-store";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
+    import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
+    import toasts from "../../../../svelte-stores/toast-store";
     import { createEventDispatcher } from "svelte";
     import { Direction } from "./propose-data-flow-utils";
-    import EntityLabel from "../../../../../common/svelte/EntityLabel.svelte";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
     import { logicalFlow } from "./propose-data-flow-store";
 
     export let direction;

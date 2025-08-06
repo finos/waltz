@@ -1,6 +1,6 @@
 <script>
-    import Icon from "../../../../../common/svelte/Icon.svelte";
-    import Popover from "../../../../../svelte-stores/popover-store";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Popover from "../../../../svelte-stores/popover-store";
     import EnumHelpPanel from "./EnumHelpPanel.svelte";
 
     export let options = [];

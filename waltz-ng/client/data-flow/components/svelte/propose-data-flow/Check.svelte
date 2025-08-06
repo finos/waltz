@@ -1,5 +1,5 @@
 <script>
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let selected = false;
 </script>
@@ -11,7 +11,7 @@
 </span>
 
 <style type="text/scss">
-    @import "../../../../../../style/variables";
+    @import "../../../../../style/variables";
 
     .selected {
         color: $waltz-green;

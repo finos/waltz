@@ -5,7 +5,7 @@ const baseState = {
 
 const createState = {
     url: "/create/{kind:string}/{id:int}?{targetLogicalFlowId:int}",
-    views: {"content@": ProposeDataFlowView }
+    views: { "content@": ProposeDataFlowView }
 };
 
 function setup($stateProvider) {

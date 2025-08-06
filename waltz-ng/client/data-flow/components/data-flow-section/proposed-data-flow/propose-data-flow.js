@@ -1,4 +1,4 @@
-import ProposeDataFlowView from "../../svelte/propose-data-flow/svelte/ProposeDataFlowView.svelte";
+import ProposeDataFlowView from "../../svelte/propose-data-flow/ProposeDataFlowView.svelte";
 import template from "./propose-data-flow.html";
 import {initialiseData} from "../../../../common";
 

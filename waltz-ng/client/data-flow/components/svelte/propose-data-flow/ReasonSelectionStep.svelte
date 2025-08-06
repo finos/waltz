@@ -1,11 +1,11 @@
 <script>
     import _ from "lodash";
     import StepHeader from "./StepHeader.svelte";
-    import {enumValueStore} from "../../../../../svelte-stores/enum-value-store";
+    import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
     import EnumSelect from "./EnumSelect.svelte";
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
-    import {physicalSpecStore} from "../../../../../svelte-stores/physical-spec-store";
-    import {mkSelectionOptions} from "../../../../../common/selector-utils";
+    import {physicalSpecStore} from "../../../../svelte-stores/physical-spec-store";
+    import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {expandedSections, proposalReason, nestedEnums} from "./propose-data-flow-store";
     import {
         determineExpandedSections,
@@ -13,11 +13,11 @@
         toDataFormatKindName,
         toOptions
     } from "./propose-data-flow-utils";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
-    import toasts from "../../../../../svelte-stores/toast-store";
-    import {ratingSchemeStore} from "../../../../../svelte-stores/rating-schemes";
-    import RatingPicker from "../../../../../common/svelte/RatingPicker.svelte";
+    import toasts from "../../../../svelte-stores/toast-store";
+    import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
+    import RatingPicker from "../../../../common/svelte/RatingPicker.svelte";
 
     const Modes = {
         SELECT: "SELECT",
