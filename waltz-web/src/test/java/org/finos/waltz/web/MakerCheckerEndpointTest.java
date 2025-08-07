@@ -44,46 +44,102 @@ class MakerCheckerEndpointTest {
     @Test
     void testEndpoint() throws IOException {
         String requestBody = "{\n" +
-                "    \"source\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 101\n" +
+                "\n" +
+                "  \"specification\": {\n" +
+                "\n" +
+                "    \"owningEntity\": {\n" +
+                "\n" +
+                "      \"id\": 20506,\n" +
+                "\n" +
+                "      \"kind\": \"APPLICATION\"\n" +
+                "\n" +
                 "    },\n" +
-                "    \"target\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 202\n" +
-                "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
-                "    \"logicalFlowId\": 12345,\n" +
-                "    \"physicalFlowId\": 12345,\n" +
-                "    \"specification\": {\n" +
-                "        \"owningEntity\": {\n" +
-                "            \"id\": 18703,\n" +
-                "            \"kind\": \"APPLICATION\",\n" +
-                "            \"name\": \"AMG\",\n" +
-                "            \"externalId\": \"60487-1\",\n" +
-                "            \"description\": \"Business IT Management with utilising core functions of: \\r\\nEnterprise Architecture Management tool for IT Planning\",\n" +
-                "            \"entityLifecycleStatus\": \"ACTIVE\"\n" +
-                "        },\n" +
-                "        \"name\": \"mc_specification\",\n" +
-                "        \"description\": \"mc_specification description\",\n" +
-                "        \"format\": \"DATABASE\",\n" +
-                "        \"lastUpdatedBy\": \"waltz\",\n" +
-                "        \"externalId\": \"mc-extId001\",\n" +
-                "        \"id\": null\n" +
-                "    },\n" +
-                "    \"flowAttributes\": {\n" +
-                "        \"name\": \"mc_deliverCharacterstics\",\n" +
-                "        \"transport\": \"DATABASE_CONNECTION\",\n" +
-                "        \"frequency\": \"BIANNUALLY\",\n" +
-                "        \"basisOffset\": -30,\n" +
-                "        \"criticality\": \"HIGH\",\n" +
-                "        \"description\": \"mc-deliver-description\",\n" +
-                "        \"externalId\": \"mc-deliver-ext001\"\n" +
-                "    },\n" +
-                "    \"dataTypeIds\": [\n" +
-                "        41200\n" +
-                "    ]\n" +
-                "}";
+                "\n" +
+                "    \"name\": \"Shreyans Jain\",\n" +
+                "\n" +
+                "    \"description\": \"\",\n" +
+                "\n" +
+                "    \"format\": \"UNKNOWN\",\n" +
+                "\n" +
+                "    \"lastUpdatedBy\": \"waltz\",\n" +
+                "\n" +
+                "    \"externalId\": null,\n" +
+                "\n" +
+                "    \"id\": null\n" +
+                "\n" +
+                "  },\n" +
+                "\n" +
+                "  \"flowAttributes\": {\n" +
+                "\n" +
+                "    \"name\": \"sss\",\n" +
+                "\n" +
+                "    \"transport\": \"UNKNOWN\",\n" +
+                "\n" +
+                "    \"frequency\": \"QUARTERLY\",\n" +
+                "\n" +
+                "    \"basisOffset\": 0,\n" +
+                "\n" +
+                "    \"criticality\": \"NONE\",\n" +
+                "\n" +
+                "    \"description\": \"\",\n" +
+                "\n" +
+                "    \"externalId\": null\n" +
+                "\n" +
+                "  },\n" +
+                "\n" +
+                "  \"logicalFlowId\": null,\n" +
+                "\n" +
+                "  \"physicalFlowId\": null,\n" +
+                "\n" +
+                "  \"dataTypeIds\": [\n" +
+                "\n" +
+                "    44400,\n" +
+                "\n" +
+                "    82084\n" +
+                "\n" +
+                "  ],\n" +
+                "\n" +
+                "  \"reason\": {\n" +
+                "\n" +
+                "    \"ratingId\": 42770,\n" +
+                "\n" +
+                "    \"description\": \"Approved data flow in an external system\"\n" +
+                "\n" +
+                "  },\n" +
+                "\n" +
+                "  \"source\": {\n" +
+                "\n" +
+                "    \"id\": 20506,\n" +
+                "\n" +
+                "    \"kind\": \"APPLICATION\",\n" +
+                "\n" +
+                "    \"name\": \"Waltz\",\n" +
+                "\n" +
+                "    \"externalId\": \"109235-1\",\n" +
+                "\n" +
+                "    \"description\": \"Architecture tool to aggregate information from different source. To provide reporting and visualization across CT for applications, tech and data for both senior management and the architecture community.\",\n" +
+                "\n" +
+                "    \"entityLifecycleStatus\": \"ACTIVE\"\n" +
+                "\n" +
+                "  },\n" +
+                "\n" +
+                "  \"target\": {\n" +
+                "\n" +
+                "    \"description\": \"db-GHS I(Geneos Hosting Services) s a Redhat virtualised platform that will host Geneos Gateway  instances to provide Hardware and Application monitoring throughout the bank. Geneos is the standard tool within Deutsche Bank for application monitoring. It is a full featured and fully customizable application monitoring tool. A powerful and customisable console enables real-time and historical metrics from application and infrastructure components to be visualised in an application, infrastructure or business centric way.  Notification of threshold breaches to support teams is automated though email, SMS, Symphony and dbUnity incident ticket as well as visually in the console.  Automated corrective actions, links to knowledge articles, operator commands and dashboards are just a few more of its many features.\\r\\n\\r\\nConfluence Link  -  https://confluence.intranet.db.com/display/GENEOS/Home\",\n" +
+                "\n" +
+                "    \"kind\": \"APPLICATION\",\n" +
+                "\n" +
+                "    \"id\": 20798,\n" +
+                "\n" +
+                "    \"name\": \"db-GHS\",\n" +
+                "\n" +
+                "    \"externalId\": \"97626-1\",\n" +
+                "\n" +
+                "    \"entityLifecycleStatus\": \"ACTIVE\"\n" +
+                "\n" +
+                "  }\n" +
+                "\n" +
+                "}\n";
 
         try{
 
@@ -97,6 +153,7 @@ class MakerCheckerEndpointTest {
                     .outcome("SUCCESS")
                     .proposedFlowCommand(command)
                     .proposedFlowId(1L)
+                    .workflowDefinitionId(1L)
                     .build();
             when(makerCheckerService.proposeNewFlow(any(),any(),any())).thenReturn(proposedFlowCommandResponse);
             ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request,response);

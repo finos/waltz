@@ -18,13 +18,11 @@
 
 package org.finos.waltz.integration_test.inmem.dao;
 
-import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,7 @@ public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void testSearchByName(){
-        entityWorkflowStateDao.saveNewWorkflowState(1L, 2L, "testUser");
+        entityWorkflowStateDao.createWorkflowState(1L, 2L, "testUser");
         EntityReference entityReference = ImmutableEntityReference.builder()
                 .kind(EntityKind.PROPOSED_FLOW)
                 .id(1L)

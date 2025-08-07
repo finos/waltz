@@ -32,7 +32,7 @@ public class EntityWorkflowDefinitionDaoTest extends BaseInMemoryIntegrationTest
 
     @Test
     public void testSearchByName(){
-        EntityWorkflowDefinition entityWorkflowDefinition =  entityWorkflowDefinitionDao.searchByName("Requested Flow Lifecycle Workflow");
+        EntityWorkflowDefinition entityWorkflowDefinition =  entityWorkflowDefinitionDao.searchByName("Propose Flow Lifecycle Workflow");
         assertNotNull(entityWorkflowDefinition);
     }
 
