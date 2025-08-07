@@ -2,12 +2,11 @@
 
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
-    import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
-    import toasts from "../../../../svelte-stores/toast-store";
     import { createEventDispatcher } from "svelte";
-    import { Direction } from "./propose-data-flow-utils";
+    import {Direction, sections} from "./propose-data-flow-utils";
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
-    import { logicalFlow } from "./propose-data-flow-store";
+    import {expandedSections, logicalFlow} from "./propose-data-flow-store";
+    import _ from "lodash";
 
     export let direction;
     export let source;
@@ -20,6 +19,11 @@
             source: source,
             target: target
         };
+
+        const specSectionOpen = _.includes($expandedSections, sections.SPECIFICATION);
+        if (!specSectionOpen) {
+            $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
+        }
     }
 
     function onSelectSource(sourceEntity) {

@@ -12,14 +12,14 @@
     </colgroup>
 
     <thead>
-    <tr>
-        <th>
-            Transport Kind
-        </th>
-        <th>
-            Description
-        </th>
-    </tr>
+        <tr>
+            <th>
+                Transport Kind
+            </th>
+            <th>
+                Description
+            </th>
+        </tr>
     </thead>
     <tbody>
     {#each options as option}

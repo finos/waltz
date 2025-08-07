@@ -11,7 +11,6 @@
         physicalSpecification,
         skipDataTypes,
         viewMode,
-        ViewMode,
         proposalReason} from "./propose-data-flow-store";
     import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
@@ -115,7 +114,7 @@
             </div>
 
             <div class="selection-step">
-                <ReasonSelectionStep primaryEntityRef={sourceEntity}/>
+                <ReasonSelectionStep/>
             </div>
             <br>
 

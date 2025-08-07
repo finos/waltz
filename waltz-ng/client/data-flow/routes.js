@@ -1,4 +1,4 @@
-import ProposeDataFlowView from "./components/data-flow-section/proposed-data-flow/propose-data-flow";
+import ProposeDataFlowView from "./components/data-flow-section/propose-data-flow/propose-data-flow";
 const baseState = {
     url: "data-flow"
 };
