@@ -38,6 +38,9 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 public class MakerCheckerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MakerCheckerService.class);
+
+    private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
+    private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private final EntityWorkflowService entityWorkflowService;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
@@ -72,7 +75,7 @@ public class MakerCheckerService {
 
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
         AtomicReference<EntityWorkflowDefinition> entityWorkflowDefinition = new AtomicReference<>();
-        String msg = "PROPOSE_FLOW_CREATED_WITH_SUCCESS";
+        String msg = PROPOSED_FLOW_CREATED_WITH_SUCCESS;
         String outcome = CommandOutcome.SUCCESS.name();
         try {
             dslContext.transaction(dslContext ->{
@@ -81,8 +84,8 @@ public class MakerCheckerService {
                 LOG.info("New ProposedFlowId is : {} ", proposedFlowId);
                 entityWorkflowDefinition.set(entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow"));
                 if(entityWorkflowDefinition.get().id().isPresent()){
-                    entityWorkflowStateDao.saveNewWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
-                    entityWorkflowTransitionDao.saveNewWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
+                    entityWorkflowStateDao.createWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
+                    entityWorkflowTransitionDao.createWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
                 }else{
                     throw new NoDataFoundException("Could not find workflow definition: Propose Flow Lifecycle Workflow");
                 }
@@ -96,7 +99,7 @@ public class MakerCheckerService {
             });
         }
         catch (Exception e){
-            msg = "PROPOSE_FLOW_CREATED_WITH_FAILURE";
+            msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = CommandOutcome.FAILURE.name();
             LOG.info("Error Occurred : {} ", e.getMessage());
             e.printStackTrace();

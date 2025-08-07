@@ -80,7 +80,7 @@ public class EntityWorkflowStateDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public void saveNewWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username){
+    public void createWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username){
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(entityWorkflowDefId);
         stateRecord.setEntityId(requestFlowId);

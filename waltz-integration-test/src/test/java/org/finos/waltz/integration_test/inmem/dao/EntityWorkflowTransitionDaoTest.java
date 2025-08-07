@@ -18,22 +18,13 @@
 
 package org.finos.waltz.integration_test.inmem.dao;
 
-import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
-import org.finos.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -45,7 +36,7 @@ public class EntityWorkflowTransitionDaoTest extends BaseInMemoryIntegrationTest
     @Test
     public void testSearchByName(){
 
-        entityWorkflowTransitionDao.saveNewWorkflowTransition(1L, 2L, "testUser");
+        entityWorkflowTransitionDao.createWorkflowTransition(1L, 2L, "testUser");
         List<EntityWorkflowTransition> list = entityWorkflowTransitionDao.findForWorkflowId(2);
         assertNotNull(list);
     }
