@@ -82,4 +82,25 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20250708-4251-1"
+               author="jindkul">
+        <insert tableName="role">
+            <column name="key" value="FLOW_PROPOSER"/>
+            <column name="name" value="FLOW PROPOSER"/>
+            <column name="description" value="FLOW PROPOSER"/>
+            <column name="is_custom" valueBoolean="true"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="20250708-4251-2"
+               author="jindkul">
+        <sql>
+            UPDATE settings
+            SET value = 'BOOKMARK_EDITOR,FLOW_PROPOSER'
+            where name = 'server.authentication.roles.default'
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
