@@ -94,13 +94,22 @@
     </changeSet>
 
 
-    <changeSet id="20250708-4251-2"
+    <!--<changeSet id="20250708-4251-2"
                author="jindkul">
         <sql>
             UPDATE settings
             SET value = 'BOOKMARK_EDITOR,FLOW_PROPOSER'
             where name = 'server.authentication.roles.default'
         </sql>
+    </changeSet>-->
+
+    <changeSet id="20250708-4251-2"
+               author="jindkul">
+        <update tableName="settings">
+            <column name="value"
+                    value="BOOKMARK_EDITOR,FLOW_PROPOSER"/>
+            <where>name='server.authentication.roles.default'</where>
+        </update>
     </changeSet>
 
 </databaseChangeLog>
