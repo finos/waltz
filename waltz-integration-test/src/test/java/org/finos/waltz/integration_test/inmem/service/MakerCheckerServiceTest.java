@@ -21,12 +21,10 @@ package org.finos.waltz.integration_test.inmem.service;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Optional;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -89,9 +87,9 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
             e.printStackTrace();
         }
     }
+
     @Test
-    public void testGetProposedFlowDefinition()
-    {
+    public void testGetProposedFlowDefinition() {
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -134,16 +132,16 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "    ]\n" +
                 "}";
 
-        try{
+        try {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
             ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
             assertNotNull(response);
-            Optional<ProposedFlowDefinition> proposedFlowDefinition = makerCheckerService.getProposedFlowDefinitionById(response.proposedFlowId());
-            assertNotNull(proposedFlowDefinition);
 
-        }catch (Exception e){
+            ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
+            assertNotNull(proposedFlowResponse);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

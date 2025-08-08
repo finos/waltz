@@ -12,10 +12,7 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.jooq.DSLContext;
 import org.jooq.exception.NoDataFoundException;
@@ -26,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -125,20 +122,36 @@ public class MakerCheckerService {
     }
 
     /**
-     * Service-layer façade: delegates to DAO and keeps business rules here.
+     * Retrieves a proposed flow by its primary key.
      *
-     * @param id the primary key of the flow
-     * @return ProposedFlowDefinition
+     * @param id the flow's primary key
+     * @return ProposedFlowResponse
      */
-    public Optional<ProposedFlowDefinition> getProposedFlowDefinitionById(long id) {
-        // Any additional business logic can be added here
-        return proposedFlowDao.getFlowDefById(id)
-                .map(json -> {
-                    try {
-                        return getJsonMapper().readValue(json, ProposedFlowDefinition.class);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+    public ProposedFlowResponse getProposedFlowById(long id) {
+        ProposedFlow flow = proposedFlowDao.getProposedFlowById(id);
+        if (flow == null) {
+            throw new NoSuchElementException("ProposedFlow not found: " + id);
+        }
+
+        ProposedFlowDefinition definition = parseFlowDefinition(flow.flowDef());
+
+        return ImmutableProposedFlowResponse.builder()
+                .id(flow.id())
+                .sourceEntityId(flow.sourceEntityId())
+                .sourceEntityKind(flow.sourceEntityKind())
+                .targetEntityId(flow.targetEntityId())
+                .targetEntityKind(flow.targetEntityKind())
+                .createdAt(flow.createdAt())
+                .createdBy(flow.createdBy())
+                .flowDef(definition)
+                .build();
+    }
+
+    private ProposedFlowDefinition parseFlowDefinition(String json) {
+        try {
+            return getJsonMapper().readValue(json, ProposedFlowDefinition.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Invalid flow definition JSON", e);
+        }
     }
 }

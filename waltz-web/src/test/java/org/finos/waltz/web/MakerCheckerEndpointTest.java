@@ -1,9 +1,6 @@
 package org.finos.waltz.web;
 
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +12,12 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MakerCheckerEndpointTest {
@@ -166,58 +163,85 @@ class MakerCheckerEndpointTest {
     }
 
     @Test
-    void testShouldReturnProposedFlowWhenServiceReturnsValue() throws IOException {
-        long id = 123L;
-       ProposedFlowDefinition proposedFlowDefExpected = new ProposedFlowDefinition();
+    void testShouldReturnProposedFlowWhenExists() {
+        long id = 42L;
 
-        proposedFlowDefExpected.setLogicalFlowId(12345L);
-        proposedFlowDefExpected.setPhysicalFlowId(12345L);
-        proposedFlowDefExpected.setReasonCode(1234);
+        ProposedFlowDefinition proposedFlowDefinition = new ProposedFlowDefinition();
+        proposedFlowDefinition.setPhysicalFlowId(54321L);
+        proposedFlowDefinition.setLogicalFlowId(12345L);
+        proposedFlowDefinition.setDataTypeIds(null);
+        proposedFlowDefinition.setFlowAttributes(null);
+        proposedFlowDefinition.setReasonCode(333);
+        proposedFlowDefinition.setSource(null);
+        proposedFlowDefinition.setTarget(null);
+        proposedFlowDefinition.setSpecification(null);
 
-        when(request.queryParams("id")).thenReturn("123");
-        when(makerCheckerService.getProposedFlowDefinitionById(id))
-                .thenReturn(Optional.of(proposedFlowDefExpected));
+        ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
+                .id(1L)
+                .sourceEntityId(601L)
+                .sourceEntityKind("APPLICATION")
+                .targetEntityId(602L)
+                .targetEntityKind("APPLICATION")
+                .createdAt(LocalDateTime.now())
+                .createdBy("anonymous")
+                .flowDef(proposedFlowDefinition)
+                .build();
 
-        Optional<ProposedFlowDefinition> result =
-                makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
+        when(request.params("id")).thenReturn("42");
+        when(makerCheckerService.getProposedFlowById(id)).thenReturn(expected);
 
-        assertNotNull(result);
-        assertTrue(result.isPresent());
-        verify(makerCheckerService).getProposedFlowDefinitionById(id);
+        ProposedFlowResponse actual = makerCheckerEndpoint.getProposedFlowById(request, response);
+
+        assertEquals(expected, actual);
     }
 
+    /* ----------Missing id Parameter ---------- */
     @Test
-    void testShouldReturnEmptyWhenServiceReturnsEmpty() throws IOException {
-        when(request.queryParams("id")).thenReturn("999");
-        when(makerCheckerService.getProposedFlowDefinitionById(999L))
-                .thenReturn(Optional.empty());
+    void testShouldThrowWhenIdParameterMissing() {
+        when(request.params("id")).thenThrow(new IllegalArgumentException("Missing id"));
 
-        Optional<ProposedFlowDefinition> result =
-                makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
-
-        assertTrue(!result.isPresent());
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+        );
+        assertEquals("Missing id", ex.getMessage());
     }
 
+    /* ----------Non-numeric id Parameter ---------- */
     @Test
-    void testShouldThrowNumberFormatExceptionWhenIdIsNotANumber() {
-        when(request.queryParams("id")).thenReturn("abc");
-
-        assertThrows(NumberFormatException.class, () -> {
-            makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
-        });
-
-        verifyNoInteractions(makerCheckerService);
+    void testShouldThrowWhenIdIsNotNumeric() {
+        when(request.params("id")).thenThrow(new NumberFormatException("For input string: \"abc\""));
+        NumberFormatException ex = assertThrows(
+                NumberFormatException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+        );
+        assertTrue(ex.getMessage().contains("For input string: \"abc\""));
     }
 
+    /* ----------Service Returns null ---------- */
     @Test
-    void testShouldRethrowIOExceptionFromServiceWhenDbIsDown() throws IOException {
-        when(request.queryParams("id")).thenReturn("42");
-        when(makerCheckerService.getProposedFlowDefinitionById(42L))
-                .thenThrow(new IOException("db down"));
+    void testShouldReturnNullWhenServiceReturnsNull() {
+        long id = 99L;
 
-        IOException exception = assertThrows(IOException.class, () -> {
-            makerCheckerEndpoint.getProposedFlowDefinitionById(request, response);
-        });
-        assertEquals("db down", exception.getMessage());
+        when(request.params("id")).thenReturn("99");
+        when(makerCheckerService.getProposedFlowById(id)).thenReturn(null);
+
+        ProposedFlowResponse result = makerCheckerEndpoint.getProposedFlowById(request, response);
+
+        assertNull(result);
+    }
+
+    /* ----------Service Throws RuntimeException ---------- */
+    @Test
+    void testShouldBubbleUpServiceException() {
+        long id = 77L;
+        when(request.params("id")).thenReturn("77");
+        when(makerCheckerService.getProposedFlowById(id))
+                .thenThrow(new RuntimeException("DB down"));
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response));
+
+        assertEquals("DB down", ex.getMessage());
     }
 }

@@ -1,23 +1,41 @@
 package org.finos.waltz.data.proposed_flow;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlow;
+import org.finos.waltz.model.proposed_flow.ProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Optional;
+import java.util.List;
 
-import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
 
-    private final DSLContext dsl;
+    public static final RecordMapper<Record, ProposedFlow> TO_DOMAIN_MAPPER = r -> {
+        ProposedFlowRecord record = r.into(PROPOSED_FLOW);
+        return ImmutableProposedFlow.builder()
+                .id(record.getId())
+                .sourceEntityId(record.getSourceEntityId())
+                .sourceEntityKind(record.getSourceEntityKind())
+                .targetEntityId(record.getTargetEntityId())
+                .targetEntityKind(record.getTargetEntityKind())
+                .createdAt(record.getCreatedAt().toLocalDateTime())
+                .createdBy(record.getCreatedBy())
+                .flowDef(record.getFlowDef())
+                .build();
+    };
 
+    private final DSLContext dsl;
 
     @Autowired
     public ProposedFlowDao(DSLContext dsl) {
@@ -38,15 +56,24 @@ public class ProposedFlowDao {
         return proposedFlowRecord.getId();
     }
 
-    /**
-     * Retrieves the raw JSON flow definition for the record for the given id
-     *
-     * @return JSON string wrapped in Optional, empty if no row found
-     */
-    public Optional<String> getFlowDefById(long id) {
-        return dsl.select(PROPOSED_FLOW.FLOW_DEF)
+    private List<ProposedFlow> findByCondition(Condition condition) {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
                 .from(PROPOSED_FLOW)
-                .where(PROPOSED_FLOW.ID.eq(id))
-                .fetchOptional(PROPOSED_FLOW.FLOW_DEF);
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    /**
+     * Fetches the single ProposedFlow row whose primary-key equals {@code id}.
+     *
+     * @param id primary key of the row (e.g. 1)
+     * @return Optional containing the row, or empty if not found
+     */
+    public ProposedFlow getProposedFlowById(long id) {
+        return findByCondition(PROPOSED_FLOW.ID.eq(id))
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 }

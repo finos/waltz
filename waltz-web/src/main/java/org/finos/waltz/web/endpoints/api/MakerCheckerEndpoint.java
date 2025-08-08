@@ -2,7 +2,7 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowDefinition;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -14,7 +14,6 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
@@ -39,12 +38,12 @@ public class MakerCheckerEndpoint implements Endpoint {
     @Override
     public void register() {
         // propose a new MC flow
-        postForDatum(mkPath(BASE_URL, "propose-flow"), this:: proposeNewFlow);
+        postForDatum(mkPath(BASE_URL, "propose-flow"), this::proposeNewFlow);
 
         getForDatum(mkPath(
                 BASE_URL,
                 "id",
-                ":id"), this:: getProposedFlowDefinitionById);
+                ":id"), this::getProposedFlowById);
     }
 
 
@@ -54,7 +53,8 @@ public class MakerCheckerEndpoint implements Endpoint {
         return makerCheckerService.proposeNewFlow(request.body(), username, proposedFlowCommand);
     }
 
-    public Optional<ProposedFlowDefinition> getProposedFlowDefinitionById(Request request, Response response) {
-        return makerCheckerService.getProposedFlowDefinitionById(WebUtilities.getLong(request, "id"));
+    public ProposedFlowResponse getProposedFlowById(Request request, Response response) {
+        long proposedFlowId = WebUtilities.getLong(request, "id");
+        return makerCheckerService.getProposedFlowById(proposedFlowId);
     }
 }

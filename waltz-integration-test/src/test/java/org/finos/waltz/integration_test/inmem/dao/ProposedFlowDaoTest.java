@@ -20,11 +20,10 @@ package org.finos.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.proposed_flow.ProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Optional;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -92,8 +91,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    public void testSearchByProposedFlowId()
-    {
+    public void testSearchByProposedFlowId() {
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -136,16 +134,17 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "    ]\n" +
                 "}";
 
-        try{
+        try {
             ProposedFlowCommand command = getJsonMapper().readValue(
                     requestBody,
                     ProposedFlowCommand.class);
 
             Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
             assertNotNull(proposedFlowId);
-            Optional<String> proposedFlowDef = proposedFlowDao.getFlowDefById(proposedFlowId);
-            assertNotNull(proposedFlowDef);
-        }catch (Exception e){
+
+            ProposedFlow proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
+            assertNotNull(proposedFlow);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
