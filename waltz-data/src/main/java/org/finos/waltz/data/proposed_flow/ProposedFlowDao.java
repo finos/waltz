@@ -58,7 +58,7 @@ public class ProposedFlowDao {
      * Fetches the single ProposedFlow row whose primary-key equals {@code id}.
      *
      * @param id primary key of the row (e.g. 1)
-     * @return Optional containing the row, or empty if not found
+     * @return ProposedFlow
      */
 
     public ProposedFlow getProposedFlowById(long id) {
