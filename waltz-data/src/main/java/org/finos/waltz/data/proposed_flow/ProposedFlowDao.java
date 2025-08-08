@@ -5,7 +5,6 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
@@ -56,24 +54,18 @@ public class ProposedFlowDao {
         return proposedFlowRecord.getId();
     }
 
-    private List<ProposedFlow> findByCondition(Condition condition) {
-        return dsl
-                .select(PROPOSED_FLOW.fields())
-                .from(PROPOSED_FLOW)
-                .where(condition)
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
     /**
      * Fetches the single ProposedFlow row whose primary-key equals {@code id}.
      *
      * @param id primary key of the row (e.g. 1)
      * @return Optional containing the row, or empty if not found
      */
+
     public ProposedFlow getProposedFlowById(long id) {
-        return findByCondition(PROPOSED_FLOW.ID.eq(id))
-                .stream()
-                .findFirst()
-                .orElse(null);
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 }
