@@ -7,8 +7,8 @@ public class ProposedFlowWorkflowContext extends WorkflowContext<ProposedFlowWor
     private boolean isSourceApprover;
     private String userRole;
 
-    public ProposedFlowWorkflowContext(ProposedFlowWorkflowState currentState, long workflowId, long entityId, String entityKind, String userId, String reason) {
-        super(currentState, workflowId, entityId, entityKind, userId, reason);
+    public ProposedFlowWorkflowContext(long workflowId, long entityId, String entityKind, String userId, String reason) {
+        super(workflowId, entityId, entityKind, userId, reason);
     }
 
     public ProposedFlowWorkflowState getPreviousState() {

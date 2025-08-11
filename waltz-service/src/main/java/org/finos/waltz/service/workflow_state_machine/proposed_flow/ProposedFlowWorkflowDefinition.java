@@ -1,10 +1,12 @@
 package org.finos.waltz.service.workflow_state_machine.proposed_flow;
 
+import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
-import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachineBuilder;
 import org.finos.waltz.service.workflow_state_machine.WorkflowTransitionListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Predicate;
@@ -18,6 +20,10 @@ import static org.finos.waltz.service.workflow_state_machine.proposed_flow.Propo
  */
 @Component
 public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> {
+    private WorkflowStateMachine workflowStateMachine;
+
+    private final EntityWorkflowStateDao stateDao;
+    private final EntityWorkflowTransitionDao transitionDao;
     // FILTERS
     private static Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> false/*ctx.userHasRole("SOURCE_APPROVER")*/;
     private static Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> false/*ctx.userHasRole("TARGET_APPROVER")*/;
@@ -33,16 +39,19 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                     /*ctx.getUserId(),*/ from, to, ctx.getEntityId()
             );
 
+    @Autowired
+    public ProposedFlowWorkflowDefinition(EntityWorkflowStateDao stateDao, EntityWorkflowTransitionDao transitionDao) {
+        this.stateDao = stateDao;
+        this.transitionDao = transitionDao;
+    }
+
     @Override
     public EntityKind getEntityKind() {
         return EntityKind.PROPOSED_FLOW;
     }
 
-    @Override
-    public WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> build(
-            WorkflowStateMachineBuilder<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> builder) {
-
-        builder
+    private WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> build() {
+        WorkflowStateMachine.WorkflowStateMachineBuilder builder = WorkflowStateMachine.builder(stateDao, transitionDao)
                 .permit(PROPOSED_CREATE, PENDING_APPROVALS, PROPOSE)
                 // PENDING_APPROVAL transitions
                 .permit(PENDING_APPROVALS, SOURCE_APPROVED, APPROVE,
@@ -71,5 +80,12 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                         isSourceApprover);
 
         return builder.build();
+    }
+
+    public WorkflowStateMachine getMachine() {
+        if (workflowStateMachine == null) {
+            workflowStateMachine = build();
+        }
+        return this.workflowStateMachine;
     }
 }

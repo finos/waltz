@@ -6,25 +6,27 @@ import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFou
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 // --- STATE MACHINE ---
+
 /**
  * The main state machine class.
+ *
  * @param <S> The enum representing the states.
  * @param <A> The enum representing the actions that trigger transitions.
  * @param <C> The type of the context object, which must extend WorkflowContext.
  */
 public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extends WorkflowContext> {
-
     private final Map<S, List<WorkflowStateTransition<S, A, C>>> transitionsByState;
     private final EntityWorkflowStateDao stateDao;
     private final EntityWorkflowTransitionDao transitionDao;
 
-    public WorkflowStateMachine(Class<S> stateClass,
-                                Set<WorkflowStateTransition<S, A, C>> transitions,
-                                EntityWorkflowStateDao stateDao,
-                                EntityWorkflowTransitionDao transitionDao) {
+    private WorkflowStateMachine(Class<S> stateClass,
+                                 Set<WorkflowStateTransition<S, A, C>> transitions,
+                                 EntityWorkflowStateDao stateDao,
+                                 EntityWorkflowTransitionDao transitionDao) {
         this.stateDao = Objects.requireNonNull(stateDao);
         this.transitionDao = Objects.requireNonNull(transitionDao);
         this.transitionsByState = new EnumMap<>(stateClass);
@@ -67,7 +69,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
 //                    context.getReason());
 
             // 3. Execute supplementary listener only after successful persistence
-            if(transition.getListener() != null) {
+            if (transition.getListener() != null) {
                 //TODO.. refresh context to reflect new changes?
                 transition.getListener().onTransition(currentState, toState, context);
             }
@@ -102,5 +104,46 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
                 currentState,
                 action,
                 context.getEntityId())));
+    }
+
+    public static WorkflowStateMachineBuilder builder(EntityWorkflowStateDao stateDao, EntityWorkflowTransitionDao transitionDao) {
+        return new WorkflowStateMachineBuilder(stateDao, transitionDao);
+    }
+
+    public static class WorkflowStateMachineBuilder<S extends Enum<S>, A extends Enum<A>, C extends WorkflowContext> {
+        private final Set<WorkflowStateTransition<S, A, C>> transitions = new HashSet<>();
+        private final EntityWorkflowStateDao stateDao;
+        private final EntityWorkflowTransitionDao transitionDao;
+        private Class<S> stateClass;
+
+        public WorkflowStateMachineBuilder(EntityWorkflowStateDao stateDao, EntityWorkflowTransitionDao transitionDao) {
+            this.stateDao = stateDao;
+            this.transitionDao = transitionDao;
+        }
+
+        public WorkflowStateMachineBuilder<S, A, C> permit(S from, S to, A action) {
+            return permit(from, to, action, c -> true); // Default condition is always true
+        }
+
+        public WorkflowStateMachineBuilder<S, A, C> permit(S from, S to, A action, Predicate<C> condition) {
+            // By default, provide a no-op listener
+            return permit(from, to, action, condition, (f, t, c) -> {
+            });
+        }
+
+        public WorkflowStateMachineBuilder<S, A, C> permit(S from, S to, A action, Predicate<C> condition, WorkflowTransitionListener<S, C> listener) {
+            if (this.stateClass == null && from != null) {
+                this.stateClass = from.getDeclaringClass();
+            }
+            this.transitions.add(new WorkflowStateTransition<>(from, to, action, condition, listener));
+            return this;
+        }
+
+        public WorkflowStateMachine<S, A, C> build() {
+            if (stateClass == null) {
+                throw new IllegalStateException("Cannot build a state machine with no transitions. At least one 'permit' call must be made.");
+            }
+            return new WorkflowStateMachine<>(this.stateClass, this.transitions, stateDao, transitionDao);
+        }
     }
 }

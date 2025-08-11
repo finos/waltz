@@ -17,7 +17,7 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.workflow_state_machine.WorkflowRegistry;
+import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowState;
@@ -54,7 +54,7 @@ public class MakerCheckerService {
     //    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
-    private final WorkflowRegistry workflowRegistry;
+    private final WorkflowDefinition proposedFlowWorkflowDefinition;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -63,8 +63,7 @@ public class MakerCheckerService {
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
                         ChangeLogDao changeLogDao,
-                        WorkflowRegistry workflowRegistry) {
-
+                        WorkflowDefinition proposedFlowWorkflowDefinition) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
 //        checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
 //        checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
@@ -78,7 +77,7 @@ public class MakerCheckerService {
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
-        this.workflowRegistry = workflowRegistry;
+        this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
@@ -95,13 +94,12 @@ public class MakerCheckerService {
                 entityWorkflowDefinition.set(entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow"));
                 if (entityWorkflowDefinition.get().id().isPresent()) {
                     // 1. Get the state machine from the registry
-                    WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> proposedFlowStateMachine =
-                            (WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>) workflowRegistry
-                                    .getMachine(EntityKind.PROPOSED_FLOW);
+                    WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
+                            proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
 
                     // 2. Get current state and build context
                     ProposedFlowWorkflowContext workflowContext = new ProposedFlowWorkflowContext(
-                            PROPOSED_CREATE, entityWorkflowDefinition.get().id().get(),
+                            entityWorkflowDefinition.get().id().get(),
                             proposedFlowId.get(), EntityKind.PROPOSED_FLOW.name(), username, "reason");
 
                     // 3. Fire the action
