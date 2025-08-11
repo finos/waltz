@@ -1,5 +1,11 @@
 package org.finos.waltz.web;
 
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
@@ -13,8 +19,12 @@ import spark.Response;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -166,15 +176,63 @@ class MakerCheckerEndpointTest {
     void testShouldReturnProposedFlowWhenExists() {
         long id = 42L;
 
-        ProposedFlowDefinition proposedFlowDefinition = new ProposedFlowDefinition();
-        proposedFlowDefinition.setPhysicalFlowId(54321L);
-        proposedFlowDefinition.setLogicalFlowId(12345L);
-        proposedFlowDefinition.setDataTypeIds(null);
-        proposedFlowDefinition.setFlowAttributes(null);
-        proposedFlowDefinition.setReasonCode(333);
-        proposedFlowDefinition.setSource(null);
-        proposedFlowDefinition.setTarget(null);
-        proposedFlowDefinition.setSpecification(null);
+        EntityReference entityReference = ImmutableEntityReference.builder()
+                .kind(APPLICATION)
+                .id(33L)
+                .name("test")
+                .externalId("456-1")
+                .build();
+
+        Reason reason = ImmutableReason.builder()
+                .description("test")
+                .ratingId(3)
+                .build();
+
+        TransportKindValue transportKindValue = TransportKindValue.of("UNKNOWN");
+        FrequencyKindValue frequencyKindValue = FrequencyKindValue.of("QUARTERLY");
+        CriticalityValue criticalityValue = CriticalityValue.of("low");
+
+        Set<Long> dataTypeIdSet = new HashSet<>();
+        dataTypeIdSet.add(2222L);
+        dataTypeIdSet.add(3333L);
+
+        FlowAttributes flowAttributes = ImmutableFlowAttributes.builder()
+                .name("sss")
+                .transport(transportKindValue)
+                .frequency(frequencyKindValue)
+                .basisOffset(0)
+                .criticality(criticalityValue)
+                .description("testing")
+                .externalId("567s")
+                .build();
+
+        EntityReference owningEntity = ImmutableEntityReference.builder()
+                .id(18703L)
+                .kind(APPLICATION)
+                .name("AMG")
+                .externalId("60487-1")
+                .description("Testing")
+                .build();
+
+        PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
+                .owningEntity(owningEntity)
+                .name("mc_specification")
+                .description("mc_specification description")
+                .format(DataFormatKindValue.of("DATABASE"))
+                .lastUpdatedBy("waltz")
+                .id(567)
+                .build();
+
+        ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
+                .source(entityReference)
+                .target(entityReference)
+                .reason(reason)
+                .logicalFlowId(123L)
+                .physicalFlowId(234L)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
                 .id(1L)
@@ -184,7 +242,7 @@ class MakerCheckerEndpointTest {
                 .targetEntityKind("APPLICATION")
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
-                .flowDef(proposedFlowDefinition)
+                .flowDef(proposedFlowcommand)
                 .build();
 
         when(request.params("id")).thenReturn("42");
@@ -231,17 +289,17 @@ class MakerCheckerEndpointTest {
         assertNull(result);
     }
 
-    /* ----------Service Throws RuntimeException ---------- */
+    /* ----------Service Throws NoSuchElementException ---------- */
     @Test
     void testShouldBubbleUpServiceException() {
         long id = 77L;
         when(request.params("id")).thenReturn("77");
         when(makerCheckerService.getProposedFlowById(id))
-                .thenThrow(new RuntimeException("DB down"));
+                .thenThrow(new NoSuchElementException("ProposedFlow not found: 77"));
 
-        RuntimeException ex = assertThrows(RuntimeException.class,
+        NoSuchElementException ex = assertThrows(NoSuchElementException.class,
                 () -> makerCheckerEndpoint.getProposedFlowById(request, response));
 
-        assertEquals("DB down", ex.getMessage());
+        assertEquals("ProposedFlow not found: 77", ex.getMessage());
     }
 }

@@ -1,6 +1,7 @@
 package org.finos.waltz.service.maker_checker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.finos.waltz.common.JacksonUtilities;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -27,7 +28,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 
@@ -133,7 +133,7 @@ public class MakerCheckerService {
             throw new NoSuchElementException("ProposedFlow not found: " + id);
         }
 
-        ProposedFlowDefinition definition = parseFlowDefinition(flow.flowDef());
+        ProposedFlowCommand definition = parseFlowDefinition(flow.flowDef());
 
         return ImmutableProposedFlowResponse.builder()
                 .id(flow.id())
@@ -147,9 +147,10 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private ProposedFlowDefinition parseFlowDefinition(String json) {
+    private ProposedFlowCommand parseFlowDefinition(String json) {
         try {
-            return getJsonMapper().readValue(json, ProposedFlowDefinition.class);
+            return JacksonUtilities.getJsonMapper().readValue(json, ProposedFlowCommand.class);
+
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }

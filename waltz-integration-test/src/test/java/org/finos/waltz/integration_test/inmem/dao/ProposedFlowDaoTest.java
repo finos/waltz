@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
 
@@ -45,7 +46,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "    \"reason\": 1234,\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -101,7 +102,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "    \"reason\": 1234,\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -141,6 +142,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
 
             long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
             assertNotNull(proposedFlowId);
+            assertTrue(proposedFlowId > 0);
 
             ProposedFlow proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
             assertNotNull(proposedFlow);

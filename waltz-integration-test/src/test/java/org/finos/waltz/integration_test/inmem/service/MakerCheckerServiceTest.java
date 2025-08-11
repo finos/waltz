@@ -46,7 +46,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "    \"reason\": 1234,\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -99,7 +99,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "    \"reason\": 1234,\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +

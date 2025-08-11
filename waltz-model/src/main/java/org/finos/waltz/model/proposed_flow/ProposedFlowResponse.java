@@ -25,6 +25,6 @@ public abstract class ProposedFlowResponse {
 
     public abstract String createdBy();
 
-    public abstract ProposedFlowDefinition flowDef();
+    public abstract ProposedFlowCommand flowDef();
 
 }

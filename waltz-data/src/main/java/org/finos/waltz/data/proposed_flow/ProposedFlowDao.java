@@ -18,6 +18,13 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
+    private final DSLContext dsl;
+
+    @Autowired
+    public ProposedFlowDao(DSLContext dsl) {
+        checkNotNull(dsl, "dsl cannot be null");
+        this.dsl = dsl;
+    }
 
     public static final RecordMapper<Record, ProposedFlow> TO_DOMAIN_MAPPER = r -> {
         ProposedFlowRecord record = r.into(PROPOSED_FLOW);
@@ -33,14 +40,6 @@ public class ProposedFlowDao {
                 .build();
     };
 
-    private final DSLContext dsl;
-
-    @Autowired
-    public ProposedFlowDao(DSLContext dsl) {
-        checkNotNull(dsl, "dsl cannot be null");
-        this.dsl = dsl;
-    }
-
     public Long saveProposedFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
         ProposedFlowRecord proposedFlowRecord = dsl.newRecord(PROPOSED_FLOW);
         proposedFlowRecord.setFlowDef(requestBody);
@@ -55,10 +54,10 @@ public class ProposedFlowDao {
     }
 
     /**
-     * Fetches the single ProposedFlow row whose primary-key equals {@code id}.
+     * Fetches the single ProposedFlow row whose primary-key equals the given id.
      *
      * @param id primary key of the row (e.g. 1)
-     * @return ProposedFlow
+     * @return ProposedFlow and null if no record found for the given id
      */
 
     public ProposedFlow getProposedFlowById(long id) {
