@@ -96,7 +96,6 @@
         <mockito.version>4.11.0</mockito.version>  <!-- 5.3.1 is 9+ -->
         <liquibase.maven.version>4.18.0</liquibase.maven.version>
         <logback.version>1.3.14</logback.version> <!-- 1.4.x needs 9+ -->
-        <!--<lombok.version>1.18.38</lombok.version>-->
         <pcollections.version>4.0.1</pcollections.version>
         <poi.version>5.2.4</poi.version>
         <slf4j.version>2.0.7</slf4j.version>
@@ -217,12 +216,6 @@
 
 
             <!-- core -->
-            <!--<dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-                <scope>provided</scope>
-            </dependency>-->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
@@ -329,7 +322,7 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-                        <dependency>
+            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
@@ -529,9 +522,9 @@
                 <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE</database.url>
                 <database.user>sa</database.user>
                 <database.password>sa</database.password>
-<!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
-<!--                <database.user>root</database.user>-->
-<!--                <database.password></database.password>-->
+                <!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
+                <!--                <database.user>root</database.user>-->
+                <!--                <database.password></database.password>-->
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
@@ -572,19 +565,6 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.0.0</version>
             </plugin>
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -681,22 +661,22 @@
     <reporting>
         <plugins>
             <!-- DISABLING: causes a build failure with message: "Unable to download NVD CVE 2022" -->
-<!--            <plugin>-->
-<!--                <groupId>org.owasp</groupId>-->
-<!--                <artifactId>dependency-check-maven</artifactId>-->
-<!--                <configuration>-->
-<!--                    <cveValidForHours>48</cveValidForHours>-->
-<!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
-<!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
-<!--                </configuration>-->
-<!--                <reportSets>-->
-<!--                    <reportSet>-->
-<!--                        <reports>-->
-<!--                            <report>aggregate</report>-->
-<!--                        </reports>-->
-<!--                    </reportSet>-->
-<!--                </reportSets>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.owasp</groupId>-->
+            <!--                <artifactId>dependency-check-maven</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <cveValidForHours>48</cveValidForHours>-->
+            <!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
+            <!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
+            <!--                </configuration>-->
+            <!--                <reportSets>-->
+            <!--                    <reportSet>-->
+            <!--                        <reports>-->
+            <!--                            <report>aggregate</report>-->
+            <!--                        </reports>-->
+            <!--                    </reportSet>-->
+            <!--                </reportSets>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
