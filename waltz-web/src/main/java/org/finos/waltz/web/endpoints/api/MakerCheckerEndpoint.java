@@ -14,6 +14,7 @@ import spark.Response;
 
 import java.io.IOException;
 
+import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
@@ -26,7 +27,6 @@ public class MakerCheckerEndpoint implements Endpoint {
     private final MakerCheckerService makerCheckerService;
 
 
-
     @Autowired
     public MakerCheckerEndpoint(MakerCheckerService makerCheckerService) {
         this.makerCheckerService = makerCheckerService;
@@ -36,7 +36,8 @@ public class MakerCheckerEndpoint implements Endpoint {
     @Override
     public void register() {
         // propose a new MC flow
-        postForDatum(mkPath(BASE_URL, "propose-flow"), this:: proposeNewFlow);
+        //TODO.. we will let this action "PROPOSE" come from UI
+        postForDatum(mkPath(BASE_URL, PROPOSE.name()), this::proposeNewFlow);
     }
 
 

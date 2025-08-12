@@ -26,6 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PENDING_APPROVALS;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EntityWorkflowTransitionDaoTest extends BaseInMemoryIntegrationTest {
@@ -34,9 +37,9 @@ public class EntityWorkflowTransitionDaoTest extends BaseInMemoryIntegrationTest
     EntityWorkflowTransitionDao entityWorkflowTransitionDao;
 
     @Test
-    public void testSearchByName(){
-
-        entityWorkflowTransitionDao.createWorkflowTransition(1L, 2L, "testUser");
+    public void testSearchByName() {
+        entityWorkflowTransitionDao.createWorkflowTransition(1L, 2L, "testUser",
+                PROPOSED_FLOW, PROPOSED_CREATE, PENDING_APPROVALS, "");
         List<EntityWorkflowTransition> list = entityWorkflowTransitionDao.findForWorkflowId(2);
         assertNotNull(list);
     }

@@ -23,9 +23,10 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.WorkflowStateChangeCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -34,12 +35,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
 @Repository
 public class EntityWorkflowStateDao {
+    private final DSLContext dsl;
+
+    @Autowired
+    public EntityWorkflowStateDao(DSLContext dsl) {
+        this.dsl = dsl;
+    }
+
     private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
@@ -58,16 +67,6 @@ public class EntityWorkflowStateDao {
                 .build();
     };
 
-
-    private final DSLContext dsl;
-
-
-    @Autowired
-    public EntityWorkflowStateDao(DSLContext dsl) {
-        this.dsl = dsl;
-    }
-
-
     public EntityWorkflowState getByEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
@@ -80,16 +79,51 @@ public class EntityWorkflowStateDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username) {
+    public void createWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username, EntityKind entityKind,
+                                    ProposedFlowWorkflowState workflowState, String description) {
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(entityWorkflowDefId);
         stateRecord.setEntityId(requestFlowId);
-        stateRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
-        stateRecord.setState(MakerCheckerState.SUBMITTED.name());
-        stateRecord.setDescription("Proposed Flow Submitted");
+        stateRecord.setEntityKind(entityKind.name());
+        stateRecord.setState(workflowState.name());
+        stateRecord.setDescription(description);
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         stateRecord.insert();
+    }
+
+    /**
+     * Inserts a new workflow state record, or updates the existing record
+     * if one already exists for the given entity reference. The uniqueness
+     * is determined by the combination of entity_id and entity_kind.
+     *
+     * @param command  The command object containing details of the state change.
+     * @param username The user performing the action.
+     */
+    // TODO..unsed method for future use by the state machine??
+    public void insertOrUpdate(WorkflowStateChangeCommand command, String username) {
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+
+        dsl.insertInto(ENTITY_WORKFLOW_STATE)
+                .set(ENTITY_WORKFLOW_STATE.ENTITY_ID, command.entityReference().id())
+                .set(ENTITY_WORKFLOW_STATE.ENTITY_KIND, command.entityReference().kind().name())
+                .set(ENTITY_WORKFLOW_STATE.WORKFLOW_ID, command.workflowId())
+                .set(ENTITY_WORKFLOW_STATE.STATE, command.state())
+                .set(ENTITY_WORKFLOW_STATE.PROVENANCE, command.provenance())
+                .set(ENTITY_WORKFLOW_STATE.DESCRIPTION, command.description())
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, username)
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, now)
+                // This is the "upsert" part.
+                // It specifies the unique key to check for conflicts.
+                .onConflict(
+                        ENTITY_WORKFLOW_STATE.ENTITY_ID,
+                        ENTITY_WORKFLOW_STATE.ENTITY_KIND)
+                // If a conflict occurs, perform an update instead.
+                .doUpdate()
+                .set(ENTITY_WORKFLOW_STATE.STATE, command.state())
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, username)
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, now)
+                .execute();
     }
 }

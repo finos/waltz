@@ -16,7 +16,7 @@
  *
  */
 
-package org.finos.waltz.service.workflow_state_machine.proposed_flow;
+package org.finos.waltz.model.proposed_flow;
 
 public enum ProposedFlowWorkflowState {
 
