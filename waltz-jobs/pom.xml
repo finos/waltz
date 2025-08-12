@@ -23,7 +23,7 @@
     <parent>
         <artifactId>waltz</artifactId>
         <groupId>org.finos</groupId>
-        <version>1.73.0-SNAPSHOT</version>
+        <version>1.73.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
