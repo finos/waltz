@@ -32,7 +32,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         this.transitionsByState = new EnumMap<>(stateClass);
         for (WorkflowStateTransition<S, A, C> t : transitions) {
             this.transitionsByState
-                    .computeIfAbsent(t.getFromState(), k -> new ArrayList<>())
+                    .computeIfAbsent(t.getFromState(), k -> new LinkedList<>())
                     .add(t);
         }
     }
@@ -109,7 +109,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
     }
 
     public static class WorkflowStateMachineBuilder<S extends Enum<S>, A extends Enum<A>, C extends WorkflowContext> {
-        private final Set<WorkflowStateTransition<S, A, C>> transitions = new HashSet<>();
+        private final Set<WorkflowStateTransition<S, A, C>> transitions = new LinkedHashSet<>();
         private final EntityWorkflowStateDao stateDao;
         private final EntityWorkflowTransitionDao transitionDao;
         private Class<S> stateClass;
