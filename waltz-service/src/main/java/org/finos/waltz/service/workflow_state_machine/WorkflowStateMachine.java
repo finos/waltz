@@ -66,6 +66,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
 //                    context.getReason());
 
             // 3. Execute supplementary listener only after successful persistence
+            //TODO.. make listener work asynchronous?
             if (transition.getListener() != null) {
                 //TODO.. refresh context to reflect new changes?
                 transition.getListener().onTransition(currentState, toState, context);
