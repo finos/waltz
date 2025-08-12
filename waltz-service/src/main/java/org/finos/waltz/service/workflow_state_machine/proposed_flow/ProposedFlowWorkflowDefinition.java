@@ -21,8 +21,6 @@ import static org.finos.waltz.service.workflow_state_machine.proposed_flow.Propo
  */
 @Component
 public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> {
-    private WorkflowStateMachine workflowStateMachine;
-
     private final EntityWorkflowStateDao stateDao;
     private final EntityWorkflowTransitionDao transitionDao;
     // FILTERS
@@ -39,6 +37,8 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                     "LISTENER: User '%s' was notified of transition from %s -> %s for entity %d%n",
                     /*ctx.getUserId(),*/ from, to, ctx.getEntityId()
             );
+
+    private WorkflowStateMachine workflowStateMachine;
 
     @Autowired
     public ProposedFlowWorkflowDefinition(EntityWorkflowStateDao stateDao, EntityWorkflowTransitionDao transitionDao) {
