@@ -1,6 +1,5 @@
 package org.finos.waltz.service.maker_checker;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
@@ -11,16 +10,13 @@ import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
-import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
 import org.jooq.exception.NoDataFoundException;
@@ -31,13 +27,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 
 
@@ -49,31 +43,32 @@ public class MakerCheckerService {
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private final EntityWorkflowService entityWorkflowService;
-    //    private final EntityWorkflowStateDao entityWorkflowStateDao;
+    private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
-    //    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
+    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
-//                        EntityWorkflowStateDao entityWorkflowStateDao,
-//                        EntityWorkflowTransitionDao entityWorkflowTransitionDao,
+                        EntityWorkflowStateDao entityWorkflowStateDao,
+                        EntityWorkflowTransitionDao entityWorkflowTransitionDao,
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
                         ChangeLogDao changeLogDao,
                         WorkflowDefinition proposedFlowWorkflowDefinition) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
-//        checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
-//        checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
+        checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
+        checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(changeLogDao, "changeLogDao cannot be null");
+        checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
-//        this.entityWorkflowStateDao = entityWorkflowStateDao;
-//        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
+        this.entityWorkflowStateDao = entityWorkflowStateDao;
+        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
@@ -93,7 +88,7 @@ public class MakerCheckerService {
                 LOG.info("New ProposedFlowId is : {} ", proposedFlowId);
                 entityWorkflowDefinition.set(entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow"));
                 if (entityWorkflowDefinition.get().id().isPresent()) {
-                    // 1. Get the state machine from the registry
+                    // 1. Get the state machine from the definition
                     WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
                             proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
 
@@ -104,8 +99,10 @@ public class MakerCheckerService {
 
                     // 3. Fire the action
                     ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(PROPOSED_CREATE, PROPOSE, workflowContext);
-//                    entityWorkflowStateDao.createWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
-//                    entityWorkflowTransitionDao.createWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(), username);
+                    entityWorkflowStateDao.createWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(),
+                            username, EntityKind.PROPOSED_FLOW, newState, "Proposed Flow Submitted");
+                    entityWorkflowTransitionDao.createWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(),
+                            username, EntityKind.PROPOSED_FLOW, PROPOSED_CREATE, newState, "flow proposed");
                 } else {
                     throw new NoDataFoundException("Could not find workflow definition: Propose Flow Lifecycle Workflow");
                 }

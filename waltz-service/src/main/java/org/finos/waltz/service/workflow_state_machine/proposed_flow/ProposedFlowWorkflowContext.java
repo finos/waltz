@@ -1,5 +1,6 @@
 package org.finos.waltz.service.workflow_state_machine.proposed_flow;
 
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowContext;
 
 public class ProposedFlowWorkflowContext extends WorkflowContext<ProposedFlowWorkflowState> {

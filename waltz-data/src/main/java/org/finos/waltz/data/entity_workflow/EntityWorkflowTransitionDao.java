@@ -20,13 +20,13 @@ package org.finos.waltz.data.entity_workflow;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.model.MakerCheckerState;
-import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -36,8 +36,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
 
 @Repository
 public class EntityWorkflowTransitionDao {
@@ -83,14 +83,16 @@ public class EntityWorkflowTransitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowTransition(Long proposedFlowId, Long entityWorkflowDefId, String username){
+    public void createWorkflowTransition(Long proposedFlowId, Long entityWorkflowDefId, String username,
+                                         EntityKind entityKind, ProposedFlowWorkflowState from,
+                                         ProposedFlowWorkflowState to, String reason) {
         EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
         transitionRecord.setWorkflowId(entityWorkflowDefId);
         transitionRecord.setEntityId(proposedFlowId);
-        transitionRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
-        transitionRecord.setFromState(MakerCheckerState.PROPOSED_CREATE.name());
-        transitionRecord.setToState(MakerCheckerState.ACTION_PENDING.name());
-        transitionRecord.setReason("flow proposed");
+        transitionRecord.setEntityKind(entityKind.name());
+        transitionRecord.setFromState(from.name());
+        transitionRecord.setToState(to.name());
+        transitionRecord.setReason(reason);
         transitionRecord.setProvenance("waltz");
         transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         transitionRecord.setLastUpdatedBy(username);

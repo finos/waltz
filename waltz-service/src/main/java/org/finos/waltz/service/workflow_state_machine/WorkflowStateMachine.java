@@ -42,10 +42,9 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         S toState = transition.getToState();
 
         try {
+            //TODO.. currently the state machine will only return the next transition state and is not responsible for database updates
             // 1. Log the transition
-            transitionDao.createWorkflowTransition(
-                    context.getEntityId(), context.getWorkflowDefId(), context.getUserId());
-//            transitionDao.logTransition(
+//            transitionDao.createWorkflowTransition(
 //                    context.getWorkflowDefId(),
 //                    context.getEntityId(),
 //                    context.getEntityKind(),
@@ -57,10 +56,8 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
 
             // 2. Update the current state; insert if it's a new state
             //TODO.. should be insert or update
-            stateDao.createWorkflowState(
-                    context.getEntityId(), context.getWorkflowDefId(), context.getUserId());
-//            stateDao.insertOrUpdateState(
-//                    context.getWorkflowDefId(),
+//            stateDao.insertOrUpdate(
+//                    context.getWorkflowId(),
 //                    context.getEntityId(),
 //                    context.getEntityKind(),
 //                    toState.name(),

@@ -3,6 +3,7 @@ package org.finos.waltz.service.workflow_state_machine.proposed_flow;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.WorkflowTransitionListener;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Predicate;
 
-import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowState.*;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.*;
 
 /**
