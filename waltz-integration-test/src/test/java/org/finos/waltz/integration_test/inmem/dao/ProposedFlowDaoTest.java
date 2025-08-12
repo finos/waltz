@@ -20,8 +20,8 @@ package org.finos.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.proposed_flow.ProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,7 +46,10 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reason\": null,\n" +
+                "     \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -102,7 +105,10 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reason\": 1234,\n" +
+                "     \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -141,10 +147,9 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                     ProposedFlowCommand.class);
 
             long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
-            assertNotNull(proposedFlowId);
             assertTrue(proposedFlowId > 0);
 
-            ProposedFlow proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
+            ProposedFlowRecord proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
             assertNotNull(proposedFlow);
         } catch (Exception e) {
             e.printStackTrace();

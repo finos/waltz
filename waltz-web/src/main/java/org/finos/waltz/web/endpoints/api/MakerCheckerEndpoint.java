@@ -40,7 +40,7 @@ public class MakerCheckerEndpoint implements Endpoint {
         // propose a new MC flow
         postForDatum(mkPath(BASE_URL, "propose-flow"), this::proposeNewFlow);
 
-        getForDatum(mkPath(BASE_URL, "id", ":id"), this::getProposedFlowById);
+        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id"), this::getProposedFlowById);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {

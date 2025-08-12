@@ -13,7 +13,12 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.jooq.DSLContext;
 import org.jooq.exception.NoDataFoundException;
@@ -128,29 +133,28 @@ public class MakerCheckerService {
      * @return ProposedFlowResponse
      */
     public ProposedFlowResponse getProposedFlowById(long id) {
-        ProposedFlow flow = proposedFlowDao.getProposedFlowById(id);
-        if (flow == null) {
+        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+        if (proposedFlowRecord == null) {
             throw new NoSuchElementException("ProposedFlow not found: " + id);
         }
 
-        ProposedFlowCommand definition = parseFlowDefinition(flow.flowDef());
+        ProposedFlowCommand flowDefinition = parseFlowDefinition(proposedFlowRecord.getFlowDef());
 
         return ImmutableProposedFlowResponse.builder()
-                .id(flow.id())
-                .sourceEntityId(flow.sourceEntityId())
-                .sourceEntityKind(flow.sourceEntityKind())
-                .targetEntityId(flow.targetEntityId())
-                .targetEntityKind(flow.targetEntityKind())
-                .createdAt(flow.createdAt())
-                .createdBy(flow.createdBy())
-                .flowDef(definition)
+                .id(proposedFlowRecord.getId())
+                .sourceEntityId(proposedFlowRecord.getSourceEntityId())
+                .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
+                .targetEntityId(proposedFlowRecord.getTargetEntityId())
+                .targetEntityKind(proposedFlowRecord.getTargetEntityKind())
+                .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                .createdBy(proposedFlowRecord.getCreatedBy())
+                .flowDef(flowDefinition)
                 .build();
     }
 
-    private ProposedFlowCommand parseFlowDefinition(String json) {
+    private ProposedFlowCommand parseFlowDefinition(String flowDefJson) {
         try {
-            return JacksonUtilities.getJsonMapper().readValue(json, ProposedFlowCommand.class);
-
+            return JacksonUtilities.getJsonMapper().readValue(flowDefJson, ProposedFlowCommand.class);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }

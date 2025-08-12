@@ -1,13 +1,9 @@
 package org.finos.waltz.data.proposed_flow;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlow;
-import org.finos.waltz.model.proposed_flow.ProposedFlow;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,20 +22,6 @@ public class ProposedFlowDao {
         this.dsl = dsl;
     }
 
-    public static final RecordMapper<Record, ProposedFlow> TO_DOMAIN_MAPPER = r -> {
-        ProposedFlowRecord record = r.into(PROPOSED_FLOW);
-        return ImmutableProposedFlow.builder()
-                .id(record.getId())
-                .sourceEntityId(record.getSourceEntityId())
-                .sourceEntityKind(record.getSourceEntityKind())
-                .targetEntityId(record.getTargetEntityId())
-                .targetEntityKind(record.getTargetEntityKind())
-                .createdAt(record.getCreatedAt().toLocalDateTime())
-                .createdBy(record.getCreatedBy())
-                .flowDef(record.getFlowDef())
-                .build();
-    };
-
     public Long saveProposedFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
         ProposedFlowRecord proposedFlowRecord = dsl.newRecord(PROPOSED_FLOW);
         proposedFlowRecord.setFlowDef(requestBody);
@@ -57,14 +39,14 @@ public class ProposedFlowDao {
      * Fetches the single ProposedFlow row whose primary-key equals the given id.
      *
      * @param id primary key of the row (e.g. 1)
-     * @return ProposedFlow and null if no record found for the given id
+     * @return ProposedFlowRecord and null if no record found for the given id
      */
 
-    public ProposedFlow getProposedFlowById(long id) {
+    public ProposedFlowRecord getProposedFlowById(long id) {
         return dsl
                 .select(PROPOSED_FLOW.fields())
                 .from(PROPOSED_FLOW)
                 .where(PROPOSED_FLOW.ID.eq(id))
-                .fetchOne(TO_DOMAIN_MAPPER);
+                .fetchOneInto(ProposedFlowRecord.class);
     }
 }

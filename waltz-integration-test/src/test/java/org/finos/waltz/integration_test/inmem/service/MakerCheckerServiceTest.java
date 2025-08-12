@@ -36,7 +36,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     MakerCheckerService makerCheckerService;
 
     @Test
-    public void testProposedNewFlow(){
+    public void testProposedNewFlow() {
+
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -46,7 +47,10 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reason\": null,\n" +
+                "    \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -79,17 +83,18 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "    ]\n" +
                 "}";
 
-        try{
+        try {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
             ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
             assertNotNull(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
     public void testGetProposedFlowDefinition() {
+
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -99,7 +104,10 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reason\": 1234,\n" +
+                "    \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
