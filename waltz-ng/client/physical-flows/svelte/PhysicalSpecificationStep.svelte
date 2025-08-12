@@ -6,13 +6,13 @@
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
     import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
     import {mkSelectionOptions} from "../../common/selector-utils";
-    import {expandedSections, physicalSpecification, nestedEnums} from "./physical-flow-editor-store";
+    import {expandedSections, physicalSpecification, nestedEnums} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import {
         determineExpandedSections,
         sections,
         toDataFormatKindName,
         toOptions
-    } from "./physical-flow-registration-utils";
+    } from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import Icon from "../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
     import toasts from "../../svelte-stores/toast-store";

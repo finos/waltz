@@ -3,27 +3,35 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
-    import {dataTypes,
-        expandedSections,
+    import { dataTypes,
         logicalFlow,
-        nestedEnums,
         physicalFlow,
         physicalSpecification,
         skipDataTypes,
-        viewMode,
-        proposalReason} from "./propose-data-flow-store";
-    import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
+        proposalReason } from "./propose-data-flow-store";
+    import { loadSvelteEntity, toEntityRef } from "../../../../common/entity-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
-    import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
-    import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
-    import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
+    import LogicalFlowSelectionStep from "../../../../physical-flows/svelte/LogicalFlowSelectionStep.svelte";
+    import PhysicalFlowCharacteristicsStep from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalSpecificationStep from "../../../../physical-flows/svelte/PhysicalSpecificationStep.svelte";
+    import DataTypeSelectionStep from "../../../../physical-flows/svelte/DataTypeSelectionStep.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
-    import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
+    import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
+    import {settingsStore} from "../../../../svelte-stores/settings-store";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
+
+    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
+
+    let settingsCall = settingsStore.loadAll();
+
+    $: dataFlowProposalToggleSetting = $settingsCall.data
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
+        [0];
+
+    $: console.log(dataFlowProposalToggleSetting);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -75,6 +83,7 @@
         }
 
         // TODO: code that would perform the API call to the maker - checker API
+        console.log(command);
     }
 
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
@@ -98,7 +107,7 @@
             </NoData>
         {:else}
             <div class="selection-step">
-                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity}/>
+                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalToggleSetting}/>
             </div>
 
             <div class="selection-step">

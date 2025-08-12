@@ -1,6 +1,6 @@
 <script>
     import _ from "lodash";
-    import StepHeader from "./StepHeader.svelte";
+    import StepHeader from "../../../../physical-flows/svelte/StepHeader.svelte";
     import {expandedSections, proposalReason} from "./propose-data-flow-store";
     import {
         determineExpandedSections,

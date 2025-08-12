@@ -5,7 +5,7 @@
     import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
     import toasts from "../../svelte-stores/toast-store";
     import {createEventDispatcher} from "svelte";
-    import {Direction} from "./physical-flow-registration-utils";
+    import {Direction} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import EntityLabel from "../../common/svelte/EntityLabel.svelte";
 
     export let direction;
