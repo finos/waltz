@@ -1,7 +1,6 @@
 package org.finos.waltz.service.maker_checker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.finos.waltz.common.JacksonUtilities;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -33,6 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 
@@ -137,25 +137,22 @@ public class MakerCheckerService {
         if (proposedFlowRecord == null) {
             throw new NoSuchElementException("ProposedFlow not found: " + id);
         }
-
-        ProposedFlowCommand flowDefinition = parseFlowDefinition(proposedFlowRecord.getFlowDef());
-
-        return ImmutableProposedFlowResponse.builder()
-                .id(proposedFlowRecord.getId())
-                .sourceEntityId(proposedFlowRecord.getSourceEntityId())
-                .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
-                .targetEntityId(proposedFlowRecord.getTargetEntityId())
-                .targetEntityKind(proposedFlowRecord.getTargetEntityKind())
-                .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
-                .createdBy(proposedFlowRecord.getCreatedBy())
-                .flowDef(flowDefinition)
-                .build();
-    }
-
-    private ProposedFlowCommand parseFlowDefinition(String flowDefJson) {
         try {
-            return JacksonUtilities.getJsonMapper().readValue(flowDefJson, ProposedFlowCommand.class);
+
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+
+            return ImmutableProposedFlowResponse.builder()
+                    .id(proposedFlowRecord.getId())
+                    .sourceEntityId(proposedFlowRecord.getSourceEntityId())
+                    .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
+                    .targetEntityId(proposedFlowRecord.getTargetEntityId())
+                    .targetEntityKind(proposedFlowRecord.getTargetEntityKind())
+                    .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                    .createdBy(proposedFlowRecord.getCreatedBy())
+                    .flowDef(flowDefinition)
+                    .build();
         } catch (JsonProcessingException e) {
+            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
     }

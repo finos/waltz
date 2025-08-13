@@ -45,17 +45,15 @@ class MakerCheckerEndpointTest {
     @Mock
     private Response response;
 
-    @Mock
-    private WebUtilities webUtilities;
-
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         makerCheckerEndpoint = new MakerCheckerEndpoint(makerCheckerService);
     }
 
-
     @Test
     void testEndpoint() throws IOException {
+
+        //Given
         String requestBody = "{\n" +
                 "\n" +
                 "  \"specification\": {\n" +
@@ -154,30 +152,30 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "}\n";
 
-        try{
+        //When
+        when(request.attribute("waltz-user")).thenReturn("testUser");
+        when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
 
-            when(request.attribute("waltz-user")).thenReturn("testUser");
-            when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
+        ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
 
-            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
+        ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
+                .message("SUCCESS")
+                .outcome("SUCCESS")
+                .proposedFlowCommand(command)
+                .proposedFlowId(1L)
+                .workflowDefinitionId(1L)
+                .build();
+        when(makerCheckerService.proposeNewFlow(any(), any(), any())).thenReturn(proposedFlowCommandResponse);
+        ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request, response);
 
-            ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
-                    .message("SUCCESS")
-                    .outcome("SUCCESS")
-                    .proposedFlowCommand(command)
-                    .proposedFlowId(1L)
-                    .workflowDefinitionId(1L)
-                    .build();
-            when(makerCheckerService.proposeNewFlow(any(),any(),any())).thenReturn(proposedFlowCommandResponse);
-            ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request,response);
-            assertNotNull(result);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        //Then
+        assertNotNull(result);
     }
 
     @Test
     void testShouldReturnProposedFlowWhenExists() {
+
+        //Given
         long id = 42L;
 
         EntityReference entityReference = ImmutableEntityReference.builder()
@@ -249,54 +247,72 @@ class MakerCheckerEndpointTest {
                 .flowDef(proposedFlowcommand)
                 .build();
 
+        //When
         when(request.params("id")).thenReturn("42");
         when(makerCheckerService.getProposedFlowById(id)).thenReturn(expected);
 
         ProposedFlowResponse actual = makerCheckerEndpoint.getProposedFlowById(request, response);
 
+        //Then
         assertEquals(expected, actual);
     }
 
     /* ----------Missing id Parameter ---------- */
     @Test
-    void testShouldThrowWhenIdParameterMissing() {
+    public void testShouldThrowWhenIdParameterMissing() {
+
+        //When
         when(request.params("id")).thenThrow(new IllegalArgumentException("Missing id"));
 
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> makerCheckerEndpoint.getProposedFlowById(request, response)
         );
+
+        //Then
         assertEquals("Missing id", ex.getMessage());
     }
 
     /* ----------Non-numeric id Parameter ---------- */
     @Test
     void testShouldThrowWhenIdIsNotNumeric() {
+
+        //When
         when(request.params("id")).thenThrow(new NumberFormatException("For input string: \"abc\""));
         NumberFormatException ex = assertThrows(
                 NumberFormatException.class,
                 () -> makerCheckerEndpoint.getProposedFlowById(request, response)
         );
+
+        //Then
         assertTrue(ex.getMessage().contains("For input string: \"abc\""));
     }
 
     /* ----------Service Returns null ---------- */
     @Test
     void testShouldReturnNullWhenServiceReturnsNull() {
+
+        //Given
         long id = 99L;
 
+        //When
         when(request.params("id")).thenReturn("99");
         when(makerCheckerService.getProposedFlowById(id)).thenReturn(null);
 
         ProposedFlowResponse result = makerCheckerEndpoint.getProposedFlowById(request, response);
 
+        //Then
         assertNull(result);
     }
 
     /* ----------Service Throws NoSuchElementException ---------- */
     @Test
     void testShouldBubbleUpServiceException() {
+
+        //Given
         long id = 77L;
+
+        //When
         when(request.params("id")).thenReturn("77");
         when(makerCheckerService.getProposedFlowById(id))
                 .thenThrow(new NoSuchElementException("ProposedFlow not found: 77"));
@@ -304,6 +320,7 @@ class MakerCheckerEndpointTest {
         NoSuchElementException ex = assertThrows(NoSuchElementException.class,
                 () -> makerCheckerEndpoint.getProposedFlowById(request, response));
 
+        //Then
         assertEquals("ProposedFlow not found: 77", ex.getMessage());
     }
 }
