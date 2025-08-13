@@ -17,7 +17,7 @@
     }
 
     export let primaryEntityRef;
-    export let dataFlowProposalToggleSetting;
+    export let dataFlowProposalSetting;
 
     let logicalFlowsCall = null;
     let editableFlowsCall = null;
@@ -111,7 +111,7 @@
 
             {:else if activeMode === Modes.CREATE}
                 <!--setting can be undefined if the setting is not created-->
-                {#if dataFlowProposalToggleSetting && dataFlowProposalToggleSetting.value === "true"}
+                {#if dataFlowProposalSetting && dataFlowProposalSetting.value === "true"}
                     <LogicalFlowMocker {primaryEntityRef}
                                        bind:source
                                        bind:target

@@ -27,11 +27,12 @@
 
     let settingsCall = settingsStore.loadAll();
 
-    $: dataFlowProposalToggleSetting = $settingsCall.data
+    $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
 
-    $: console.log(dataFlowProposalToggleSetting);
+    $: console.log(dataFlowProposalSetting);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -89,7 +90,7 @@
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
 </script>
 
-
+{#if dataFlowProposalsEnabled && primaryEntityRef}
 <PageHeader name="Propose Data Flow"
             icon="code-pull-request"
             small={_.get(sourceEntity, ["name"], "-")}>
@@ -107,7 +108,7 @@
             </NoData>
         {:else}
             <div class="selection-step">
-                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalToggleSetting}/>
+                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
             </div>
 
             <div class="selection-step">
@@ -144,6 +145,7 @@
         {/if}
     </div>
 </PageHeader>
+{/if}
 
 <style type="text/scss">
     @import "../../../../../style/variables";

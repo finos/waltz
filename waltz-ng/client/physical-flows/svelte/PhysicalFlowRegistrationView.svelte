@@ -48,8 +48,9 @@
     let settingsCall = settingsStore.loadAll();
 
     $: $nestedEnums = nestEnums($enumsCall.data);
-    $: dataFlowProposalToggleSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
+    $: dataFlowProposalSetting = $settingsCall.data
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
@@ -131,7 +132,7 @@
 </script>
 
 
-{#if primaryEntityRef}
+{#if !dataFlowProposalsEnabled && primaryEntityRef}
 <PageHeader name="Register new Physical Flow"
             icon="dot-circle-o"
             small={_.get(primaryEntityRef, ["name"], "-")}>
@@ -174,7 +175,7 @@
             </div>
 
             <div class="selection-step">
-                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalToggleSetting}/>
+                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalSetting}/>
             </div>
 
             <div class="selection-step">
