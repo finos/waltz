@@ -4,12 +4,12 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-// --- STATE MACHINE ---
 
 /**
  * The main state machine class.
@@ -19,7 +19,9 @@ import java.util.stream.Collectors;
  * @param <C> The type of the context object, which must extend WorkflowContext.
  */
 public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extends WorkflowContext> {
-    private final Map<S, List<WorkflowStateTransition<S, A, C>>> transitionsByState;
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowStateMachine.class);
+
+    private final Map<S, Set<WorkflowStateTransition<S, A, C>>> transitionsByState;
     private final EntityWorkflowStateDao stateDao;
     private final EntityWorkflowTransitionDao transitionDao;
 
@@ -32,7 +34,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         this.transitionsByState = new EnumMap<>(stateClass);
         for (WorkflowStateTransition<S, A, C> t : transitions) {
             this.transitionsByState
-                    .computeIfAbsent(t.getFromState(), k -> new LinkedList<>())
+                    .computeIfAbsent(t.getFromState(), k -> new LinkedHashSet<>())
                     .add(t);
         }
     }
@@ -80,28 +82,35 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
     }
 
     private WorkflowStateTransition<S, A, C> findFirstMatchingTransition(S currentState, A action, C context) throws TransitionNotFoundException, TransitionPredicateFailedException {
-        List<WorkflowStateTransition<S, A, C>> possibleTransitions = transitionsByState.getOrDefault(currentState, Collections.emptyList())
+        List<WorkflowStateTransition<S, A, C>> possibleTransitions = transitionsByState.getOrDefault(currentState, Collections.emptySet())
                 .stream()
                 .filter(t -> t.getAction() == action)
                 .collect(Collectors.toList());
 
         if (possibleTransitions.isEmpty()) {
-            throw new TransitionNotFoundException(String.format(
+            String message = String.format(
                     "No transition definition found for state '%s' and action '%s' for entity %s",
                     currentState,
                     action,
-                    context.getEntityId()));
+                    context.getEntityId());
+            LOG.error(message);
+            throw new TransitionNotFoundException(message);
         }
 
         Optional<WorkflowStateTransition<S, A, C>> passingTransition = possibleTransitions.stream()
                 .filter(t -> t.getCondition().test(context))
                 .findFirst();
 
-        return passingTransition.orElseThrow(() -> new TransitionPredicateFailedException(String.format(
-                "A transition for state '%s' and action '%s' exists for entity %s, but its predicate failed",
-                currentState,
-                action,
-                context.getEntityId())));
+        if (!passingTransition.isPresent()) {
+            String message = String.format(
+                    "A transition for state '%s' and action '%s' exists for entity %s, but its predicate failed",
+                    currentState,
+                    action,
+                    context.getEntityId());
+            LOG.error(message);
+            throw new TransitionPredicateFailedException(message);
+        }
+        return passingTransition.get();
     }
 
     public static WorkflowStateMachineBuilder builder(EntityWorkflowStateDao stateDao, EntityWorkflowTransitionDao transitionDao) {
@@ -127,6 +136,10 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
             // By default, provide a no-op listener
             return permit(from, to, action, condition, (f, t, c) -> {
             });
+        }
+
+        public WorkflowStateMachineBuilder<S, A, C> permit(S from, S to, A action, WorkflowTransitionListener<S, C> listener) {
+            return permit(from, to, action, c -> true, listener);
         }
 
         public WorkflowStateMachineBuilder<S, A, C> permit(S from, S to, A action, Predicate<C> condition, WorkflowTransitionListener<S, C> listener) {

@@ -1,7 +1,5 @@
 package org.finos.waltz.service.workflow_state_machine;
 
-// --- CONTEXT ---
-
 /**
  * A generic context object passed to predicates and listeners.
  * This should contain all information necessary to evaluate a transition.

@@ -1,7 +1,5 @@
 package org.finos.waltz.service.workflow_state_machine;
 
-// --- LISTENER ---
-
 /**
  * A listener that is executed after a successful transition for supplementary actions.
  *

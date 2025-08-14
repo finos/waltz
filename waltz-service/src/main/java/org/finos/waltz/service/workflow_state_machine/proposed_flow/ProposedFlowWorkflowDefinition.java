@@ -24,15 +24,15 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
     private final EntityWorkflowStateDao stateDao;
     private final EntityWorkflowTransitionDao transitionDao;
     // FILTERS
-    private static Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> false/*ctx.userHasRole("SOURCE_APPROVER")*/;
-    private static Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> false/*ctx.userHasRole("TARGET_APPROVER")*/;
-    private static Predicate<ProposedFlowWorkflowContext> canSourceFullyApprove = isSourceApprover
+    private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> false/*ctx.userHasRole("SOURCE_APPROVER")*/;
+    private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> false/*ctx.userHasRole("TARGET_APPROVER")*/;
+    private static final Predicate<ProposedFlowWorkflowContext> canSourceFullyApprove = isSourceApprover
             .and(ctx -> ctx.getPreviousState() == TARGET_APPROVED);
-    private static Predicate<ProposedFlowWorkflowContext> canTargetFullyApprove = isTargetApprover
+    private static final Predicate<ProposedFlowWorkflowContext> canTargetFullyApprove = isTargetApprover
             .and(ctx -> ctx.getPreviousState() == SOURCE_APPROVED);
 
     // TODO.. might have to refresh the context object, the state values can be stale
-    private static WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
+    private static final WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
             System.out.printf(
                     "LISTENER: User '%s' was notified of transition from %s -> %s for entity %d%n",
                     /*ctx.getUserId(),*/ from, to, ctx.getEntityId()
