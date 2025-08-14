@@ -3,8 +3,6 @@ package org.finos.waltz.service.workflow_state_machine;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-// --- TRANSITION ---
-
 /**
  * Represents a single potential transition from one state to another.
  *
