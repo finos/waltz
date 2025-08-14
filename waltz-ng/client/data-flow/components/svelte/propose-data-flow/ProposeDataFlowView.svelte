@@ -3,6 +3,8 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
+    import toasts from "../../../../svelte-stores/toast-store";
+    import { proposeDataFlowStore } from "../../../../svelte-stores/propose-data-flow-store";
     import { dataTypes,
         logicalFlow,
         physicalFlow,
@@ -25,14 +27,22 @@
 
     const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
+    const PROPOSAL_OUTCOMES = {
+        SUCCESS: "SUCCESS",
+        FAILURE: "FAILURE"
+    }
+
+    const PROPOSAL_OUTCOME_MESSAGES = {
+        PROPOSED_FLOW_CREATED_WITH_SUCCESS: "PROPOSED_FLOW_CREATED_WITH_SUCCESS",
+        PROPOSED_FLOW_CREATED_WITH_FAILURE: "PROPOSED_FLOW_CREATED_WITH_FAILURE"
+    };
+
     let settingsCall = settingsStore.loadAll();
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
     $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
-
-    $: console.log(dataFlowProposalSetting);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -78,13 +88,22 @@
             reason: $proposalReason.rating[0] ? mkReason($proposalReason.rating[0]) : null
         }
 
-        if(!$logicalFlow.id) {
-            _.set(command, 'source', $logicalFlow.source ?? null);
-            _.set(command, 'target', $logicalFlow.target ?? null);
-        }
+        _.set(command, 'source', $logicalFlow.source ?? null);
+        _.set(command, 'target', $logicalFlow.target ?? null);
 
-        // TODO: code that would perform the API call to the maker - checker API
-        console.log(command);
+        proposeDataFlowStore.proposeDataFlow(command)
+            .then(r => {
+                const response = r.data;
+                if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
+                    toasts.success("Data Flow Proposed");
+                    //TODO: route to the created workflow on success
+                } else {
+                    toasts.error("Error proposing data flow");
+                }
+            })
+            .catch(e => {
+                displayError("Error proposing data flow", e);
+            });
     }
 
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
