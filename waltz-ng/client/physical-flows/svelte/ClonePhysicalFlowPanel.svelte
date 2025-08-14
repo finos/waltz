@@ -7,14 +7,14 @@
     import SearchInput from "../../common/svelte/SearchInput.svelte";
     import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
     import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
-    import {nestedEnums} from "./physical-flow-editor-store";
+    import {nestedEnums} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import {createEventDispatcher} from "svelte";
     import {
         toCriticalityName,
         toDataFormatKindName,
         toFrequencyKindName,
         toTransportKindName
-    } from "./physical-flow-registration-utils";
+    } from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import toasts from "../../svelte-stores/toast-store";
 
     export let primaryEntityRef;

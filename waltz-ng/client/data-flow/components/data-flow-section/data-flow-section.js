@@ -79,6 +79,7 @@ const initialState = {
     lastTabId: tabs[0].id
 };
 
+const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
 
 function controller(serviceBroker) {
@@ -164,6 +165,15 @@ function controller(serviceBroker) {
                 [vm.parentEntityRef])
             .then(r => {
                 vm.canEdit = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+            });
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.SettingsStore.findAll, [], {force: true}
+            )
+            .then(r => {
+                const dataFlowProposalSetting = r.data.filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
+                vm.dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value === 'true';
             });
     }
 

@@ -15,14 +15,14 @@
         skipDataTypes,
         viewMode,
         ViewMode
-    } from "./physical-flow-editor-store";
+    } from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 
     import _ from "lodash";
     import {onMount} from "svelte";
     import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
     import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
     import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
-    import {sections} from "./physical-flow-registration-utils";
+    import {sections} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import {physicalFlowStore} from "../../svelte-stores/physical-flow-store";
     import {toEntityRef} from "../../common/entity-utils";
     import {displayError} from "../../common/error-utils";
@@ -32,6 +32,7 @@
     import {nestEnums} from "../../common/svelte/enum-utils";
     import Toggle from "../../common/svelte/Toggle.svelte";
     import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
+    import {settingsStore} from "../../svelte-stores/settings-store";
 
     export let primaryEntityRef = {};
 
@@ -40,10 +41,16 @@
         CLONE: "CLONE"
     }
 
+    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
+
     let activeMode = Modes.CREATE;
     let enumsCall = enumValueStore.load();
+    let settingsCall = settingsStore.loadAll();
 
     $: $nestedEnums = nestEnums($enumsCall.data);
+    $: dataFlowProposalSetting = $settingsCall.data
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
@@ -125,7 +132,7 @@
 </script>
 
 
-{#if primaryEntityRef}
+{#if !dataFlowProposalsEnabled && primaryEntityRef}
 <PageHeader name="Register new Physical Flow"
             icon="dot-circle-o"
             small={_.get(primaryEntityRef, ["name"], "-")}>
@@ -168,7 +175,7 @@
             </div>
 
             <div class="selection-step">
-                <LogicalFlowSelectionStep {primaryEntityRef}/>
+                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalSetting}/>
             </div>
 
             <div class="selection-step">

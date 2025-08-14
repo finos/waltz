@@ -1,15 +1,15 @@
 <script>
-    import {expandedSections, logicalFlow} from "./physical-flow-editor-store";
+    import {expandedSections, logicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
     import _ from "lodash";
     import RouteSelector from "./RouteSelector.svelte";
     import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
     import StepHeader from "./StepHeader.svelte";
-    import {determineExpandedSections, Direction, sections} from "./physical-flow-registration-utils";
+    import {determineExpandedSections, Direction, sections} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import {toEntityRef} from "../../common/entity-utils";
     import FlowCreator from "./FlowCreator.svelte";
-    import {onMount} from "svelte";
+    import LogicalFlowMocker from "../../data-flow/components/svelte/propose-data-flow/LogicalFlowMocker.svelte";
 
     const Modes = {
         CREATE: "CREATE",
@@ -17,6 +17,7 @@
     }
 
     export let primaryEntityRef;
+    export let dataFlowProposalSetting;
 
     let logicalFlowsCall = null;
     let editableFlowsCall = null;
@@ -109,13 +110,22 @@
                                on:select={(evt) => selectFlow(evt.detail)}/>
 
             {:else if activeMode === Modes.CREATE}
-
-                <FlowCreator {primaryEntityRef}
-                             bind:source
-                             bind:target
-                             {direction}
-                             on:cancel={cancel}
-                             on:select={(evt) => selectFlow(evt.detail)}/>
+                <!--setting can be undefined if the setting is not created-->
+                {#if dataFlowProposalSetting && dataFlowProposalSetting.value === "true"}
+                    <LogicalFlowMocker {primaryEntityRef}
+                                       bind:source
+                                       bind:target
+                                       {direction}
+                                       on:cancel={cancel}
+                                       on:select={(evt) => selectFlow(evt.detail)}/>
+                {:else}
+                    <FlowCreator {primaryEntityRef}
+                                 bind:source
+                                 bind:target
+                                 {direction}
+                                 on:cancel={cancel}
+                                 on:select={(evt) => selectFlow(evt.detail)}/>
+                {/if}
             {/if}
 
         {:else}

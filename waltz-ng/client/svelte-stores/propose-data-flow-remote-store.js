@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016 - 2025 Waltz open source project
  * See README.md for more information
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +16,19 @@
  *
  */
 
-import {writable} from "svelte/store";
+import {remote} from "./remote";
 
-export const ViewMode = {
-    SECTION: "SECTION",
-    FLOW: "FLOW"
+export function mkStore()  {
+    const BASE_URL = "api/mc";
+
+    const proposeDataFlow = (command) => remote
+        .execute("POST",
+        `${BASE_URL}/propose-flow`,
+        command);
+
+    return {
+        proposeDataFlow
+    }
 }
 
-export const logicalFlow = writable(null);
-export const physicalFlow = writable(null);
-export const physicalSpecification = writable(null);
-export const dataTypes = writable([]);
-export const expandedSections = writable([]);
-export const nestedEnums = writable({});
-export const skipDataTypes = writable(false);
-export const viewMode = writable(ViewMode.SECTION)
-
+export const proposeDataFlowRemoteStore = mkStore();

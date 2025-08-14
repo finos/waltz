@@ -1,12 +1,12 @@
 <script>
 
-    import Icon from "../../common/svelte/Icon.svelte";
-    import EntitySearchSelector from "../../common/svelte/EntitySearchSelector.svelte";
-    import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
-    import toasts from "../../svelte-stores/toast-store";
-    import {createEventDispatcher} from "svelte";
-    import {Direction} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
-    import EntityLabel from "../../common/svelte/EntityLabel.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
+    import { createEventDispatcher } from "svelte";
+    import {Direction, sections} from "./propose-data-flow-utils";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import {expandedSections, logicalFlow} from "./propose-data-flow-store";
+    import _ from "lodash";
 
     export let direction;
     export let source;
@@ -15,15 +15,15 @@
     const dispatch = createEventDispatcher();
 
     function createNewLogical() {
-        const command = {
-            source,
-            target
+        $logicalFlow = {
+            source: source,
+            target: target
+        };
+
+        const specSectionOpen = _.includes($expandedSections, sections.SPECIFICATION);
+        if (!specSectionOpen) {
+            $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
         }
-        logicalFlowStore.addFlow(command)
-            .then(r => {
-                toasts.success(`Successfully created new logical flow from ${source.name} to ${target.name}`);
-                dispatch("select", r.data);
-            });
     }
 
     function onSelectSource(sourceEntity) {
@@ -71,7 +71,7 @@
                 {:else}
                     <EntitySearchSelector on:select={(evt) => onSelectSource(evt.detail)}
                                           placeholder="Search for source"
-                                          entityKinds={['APPLICATION', 'ACTOR']}>
+                                          entityKinds={['APPLICATION', 'ACTOR', 'END_USER_APPLICATION']}>
                     </EntitySearchSelector>
                 {/if}
             </div>
@@ -94,17 +94,18 @@
                 {:else}
                     <EntitySearchSelector on:select={(evt) => onSelectTarget(evt.detail)}
                                           placeholder="Search for target"
-                                          entityKinds={['APPLICATION', 'ACTOR']}>
+                                          entityKinds={['APPLICATION', 'ACTOR', 'END_USER_APPLICATION']}>
                     </EntitySearchSelector>
                 {/if}
             </div>
         </div>
     {/if}
 
-    <button class="btn btn-success"
-            disabled={!(source && target)}
+    <button class="btn btn-skinny"
+            disabled={!(source && target)
+            || ((source.kind === target.kind) && (source.id === target.id))}
             on:click|preventDefault={() => createNewLogical()}>
-        Create new flow
+        Done
     </button>
     <button class="btn btn-skinny"
             on:click={() => cancel()}>
