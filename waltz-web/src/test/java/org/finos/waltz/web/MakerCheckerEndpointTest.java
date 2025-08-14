@@ -1,8 +1,12 @@
 package org.finos.waltz.web;
 
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +18,18 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -32,17 +45,15 @@ class MakerCheckerEndpointTest {
     @Mock
     private Response response;
 
-    @Mock
-    private WebUtilities webUtilities;
-
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         makerCheckerEndpoint = new MakerCheckerEndpoint(makerCheckerService);
     }
 
-
     @Test
     void testEndpoint() throws IOException {
+
+        //Given
         String requestBody = "{\n" +
                 "\n" +
                 "  \"specification\": {\n" +
@@ -141,26 +152,175 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "}\n";
 
-        try{
+        //When
+        when(request.attribute("waltz-user")).thenReturn("testUser");
+        when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
 
-            when(request.attribute("waltz-user")).thenReturn("testUser");
-            when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
+        ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
 
-            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
+        ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
+                .message("SUCCESS")
+                .outcome("SUCCESS")
+                .proposedFlowCommand(command)
+                .proposedFlowId(1L)
+                .workflowDefinitionId(1L)
+                .build();
+        when(makerCheckerService.proposeNewFlow(any(), any(), any())).thenReturn(proposedFlowCommandResponse);
+        ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request, response);
 
-            ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
-                    .message("SUCCESS")
-                    .outcome("SUCCESS")
-                    .proposedFlowCommand(command)
-                    .proposedFlowId(1L)
-                    .workflowDefinitionId(1L)
-                    .build();
-            when(makerCheckerService.proposeNewFlow(any(),any(),any())).thenReturn(proposedFlowCommandResponse);
-            ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request,response);
-            assertNotNull(result);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        //Then
+        assertNotNull(result);
     }
 
+    @Test
+    void testShouldReturnProposedFlowWhenExists() {
+
+        //Given
+        long id = 42L;
+
+        EntityReference entityReference = ImmutableEntityReference.builder()
+                .kind(APPLICATION)
+                .id(33L)
+                .name("test")
+                .externalId("456-1")
+                .build();
+
+        Reason reason = ImmutableReason.builder()
+                .description("test")
+                .ratingId(3)
+                .build();
+
+        TransportKindValue transportKindValue = TransportKindValue.of("UNKNOWN");
+        FrequencyKindValue frequencyKindValue = FrequencyKindValue.of("QUARTERLY");
+        CriticalityValue criticalityValue = CriticalityValue.of("low");
+
+        Set<Long> dataTypeIdSet = new HashSet<>();
+        dataTypeIdSet.add(2222L);
+        dataTypeIdSet.add(3333L);
+
+        FlowAttributes flowAttributes = ImmutableFlowAttributes.builder()
+                .name("sss")
+                .transport(transportKindValue)
+                .frequency(frequencyKindValue)
+                .basisOffset(0)
+                .criticality(criticalityValue)
+                .description("testing")
+                .externalId("567s")
+                .build();
+
+        EntityReference owningEntity = ImmutableEntityReference.builder()
+                .id(18703L)
+                .kind(APPLICATION)
+                .name("AMG")
+                .externalId("60487-1")
+                .description("Testing")
+                .build();
+
+        PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
+                .owningEntity(owningEntity)
+                .name("mc_specification")
+                .description("mc_specification description")
+                .format(DataFormatKindValue.of("DATABASE"))
+                .lastUpdatedBy("waltz")
+                .id(567)
+                .build();
+
+        ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
+                .source(entityReference)
+                .target(entityReference)
+                .reason(reason)
+                .logicalFlowId(123L)
+                .physicalFlowId(234L)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .build();
+
+        ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
+                .id(1L)
+                .sourceEntityId(601L)
+                .sourceEntityKind("APPLICATION")
+                .targetEntityId(602L)
+                .targetEntityKind("APPLICATION")
+                .createdAt(LocalDateTime.now())
+                .createdBy("anonymous")
+                .flowDef(proposedFlowcommand)
+                .build();
+
+        //When
+        when(request.params("id")).thenReturn("42");
+        when(makerCheckerService.getProposedFlowById(id)).thenReturn(expected);
+
+        ProposedFlowResponse actual = makerCheckerEndpoint.getProposedFlowById(request, response);
+
+        //Then
+        assertEquals(expected, actual);
+    }
+
+    /* ----------Missing id Parameter ---------- */
+    @Test
+    public void testShouldThrowWhenIdParameterMissing() {
+
+        //When
+        when(request.params("id")).thenThrow(new IllegalArgumentException("Missing id"));
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+        );
+
+        //Then
+        assertEquals("Missing id", ex.getMessage());
+    }
+
+    /* ----------Non-numeric id Parameter ---------- */
+    @Test
+    void testShouldThrowWhenIdIsNotNumeric() {
+
+        //When
+        when(request.params("id")).thenThrow(new NumberFormatException("For input string: \"abc\""));
+        NumberFormatException ex = assertThrows(
+                NumberFormatException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+        );
+
+        //Then
+        assertTrue(ex.getMessage().contains("For input string: \"abc\""));
+    }
+
+    /* ----------Service Returns null ---------- */
+    @Test
+    void testShouldReturnNullWhenServiceReturnsNull() {
+
+        //Given
+        long id = 99L;
+
+        //When
+        when(request.params("id")).thenReturn("99");
+        when(makerCheckerService.getProposedFlowById(id)).thenReturn(null);
+
+        ProposedFlowResponse result = makerCheckerEndpoint.getProposedFlowById(request, response);
+
+        //Then
+        assertNull(result);
+    }
+
+    /* ----------Service Throws NoSuchElementException ---------- */
+    @Test
+    void testShouldBubbleUpServiceException() {
+
+        //Given
+        long id = 77L;
+
+        //When
+        when(request.params("id")).thenReturn("77");
+        when(makerCheckerService.getProposedFlowById(id))
+                .thenThrow(new NoSuchElementException("ProposedFlow not found: 77"));
+
+        NoSuchElementException ex = assertThrows(NoSuchElementException.class,
+                () -> makerCheckerEndpoint.getProposedFlowById(request, response));
+
+        //Then
+        assertEquals("ProposedFlow not found: 77", ex.getMessage());
+    }
 }

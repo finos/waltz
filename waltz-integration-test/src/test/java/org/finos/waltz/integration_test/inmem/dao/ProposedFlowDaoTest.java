@@ -21,11 +21,13 @@ package org.finos.waltz.integration_test.inmem.dao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
 
@@ -44,7 +46,10 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "     \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -85,6 +90,68 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
             Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
             assertNotNull(proposedFlowId);
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testSearchByProposedFlowId() {
+        String requestBody = "{\n" +
+                "    \"source\": {\n" +
+                "        \"kind\": \"APPLICATION\",\n" +
+                "        \"id\": 101\n" +
+                "    },\n" +
+                "    \"target\": {\n" +
+                "        \"kind\": \"APPLICATION\",\n" +
+                "        \"id\": 202\n" +
+                "    },\n" +
+                "     \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
+                "    \"logicalFlowId\": 12345,\n" +
+                "    \"physicalFlowId\": 12345,\n" +
+                "    \"specification\": {\n" +
+                "        \"owningEntity\": {\n" +
+                "            \"id\": 18703,\n" +
+                "            \"kind\": \"APPLICATION\",\n" +
+                "            \"name\": \"AMG\",\n" +
+                "            \"externalId\": \"60487-1\",\n" +
+                "            \"description\": \"Business IT Management with utilising core functions of: \\r\\nEnterprise Architecture Management tool for IT Planning\",\n" +
+                "            \"entityLifecycleStatus\": \"ACTIVE\"\n" +
+                "        },\n" +
+                "        \"name\": \"mc_specification\",\n" +
+                "        \"description\": \"mc_specification description\",\n" +
+                "        \"format\": \"DATABASE\",\n" +
+                "        \"lastUpdatedBy\": \"waltz\",\n" +
+                "        \"externalId\": \"mc-extId001\",\n" +
+                "        \"id\": null\n" +
+                "    },\n" +
+                "    \"flowAttributes\": {\n" +
+                "        \"name\": \"mc_deliverCharacterstics\",\n" +
+                "        \"transport\": \"DATABASE_CONNECTION\",\n" +
+                "        \"frequency\": \"BIANNUALLY\",\n" +
+                "        \"basisOffset\": -30,\n" +
+                "        \"criticality\": \"HIGH\",\n" +
+                "        \"description\": \"mc-deliver-description\",\n" +
+                "        \"externalId\": \"mc-deliver-ext001\"\n" +
+                "    },\n" +
+                "    \"dataTypeIds\": [\n" +
+                "        41200\n" +
+                "    ]\n" +
+                "}";
+
+        try {
+            ProposedFlowCommand command = getJsonMapper().readValue(
+                    requestBody,
+                    ProposedFlowCommand.class);
+
+            long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
+            assertTrue(proposedFlowId > 0);
+
+            ProposedFlowRecord proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
+            assertNotNull(proposedFlow);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

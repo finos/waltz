@@ -21,6 +21,7 @@ package org.finos.waltz.integration_test.inmem.service;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     MakerCheckerService makerCheckerService;
 
     @Test
-    public void testProposedNewFlow(){
+    public void testProposedNewFlow() {
+
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -45,7 +47,10 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "        \"kind\": \"APPLICATION\",\n" +
                 "        \"id\": 202\n" +
                 "    },\n" +
-                "    \"reasonCode\": 1234,\n" +
+                "    \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
                 "    \"logicalFlowId\": 12345,\n" +
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
@@ -78,11 +83,72 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 "    ]\n" +
                 "}";
 
-        try{
+        try {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
             ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
             assertNotNull(response);
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testGetProposedFlowDefinition() {
+
+        String requestBody = "{\n" +
+                "    \"source\": {\n" +
+                "        \"kind\": \"APPLICATION\",\n" +
+                "        \"id\": 101\n" +
+                "    },\n" +
+                "    \"target\": {\n" +
+                "        \"kind\": \"APPLICATION\",\n" +
+                "        \"id\": 202\n" +
+                "    },\n" +
+                "    \"reason\": {\n" +
+                "        \"description\": \"test\",\n" +
+                "          \"ratingId\": 1\n" +
+                "     },\n" +
+                "    \"logicalFlowId\": 12345,\n" +
+                "    \"physicalFlowId\": 12345,\n" +
+                "    \"specification\": {\n" +
+                "        \"owningEntity\": {\n" +
+                "            \"id\": 18703,\n" +
+                "            \"kind\": \"APPLICATION\",\n" +
+                "            \"name\": \"AMG\",\n" +
+                "            \"externalId\": \"60487-1\",\n" +
+                "            \"description\": \"Business IT Management with utilising core functions of: \\r\\nEnterprise Architecture Management tool for IT Planning\",\n" +
+                "            \"entityLifecycleStatus\": \"ACTIVE\"\n" +
+                "        },\n" +
+                "        \"name\": \"mc_specification\",\n" +
+                "        \"description\": \"mc_specification description\",\n" +
+                "        \"format\": \"DATABASE\",\n" +
+                "        \"lastUpdatedBy\": \"waltz\",\n" +
+                "        \"externalId\": \"mc-extId001\",\n" +
+                "        \"id\": null\n" +
+                "    },\n" +
+                "    \"flowAttributes\": {\n" +
+                "        \"name\": \"mc_deliverCharacterstics\",\n" +
+                "        \"transport\": \"DATABASE_CONNECTION\",\n" +
+                "        \"frequency\": \"BIANNUALLY\",\n" +
+                "        \"basisOffset\": -30,\n" +
+                "        \"criticality\": \"HIGH\",\n" +
+                "        \"description\": \"mc-deliver-description\",\n" +
+                "        \"externalId\": \"mc-deliver-ext001\"\n" +
+                "    },\n" +
+                "    \"dataTypeIds\": [\n" +
+                "        41200\n" +
+                "    ]\n" +
+                "}";
+
+        try {
+            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
+            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
+            assertNotNull(response);
+
+            ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
+            assertNotNull(proposedFlowResponse);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -2,6 +2,7 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -15,6 +16,7 @@ import spark.Response;
 import java.io.IOException;
 
 import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
@@ -36,13 +38,19 @@ public class MakerCheckerEndpoint implements Endpoint {
     @Override
     public void register() {
         // propose a new MC flow
-        postForDatum(mkPath(BASE_URL, "propose-flow"), this:: proposeNewFlow);
-    }
+        postForDatum(mkPath(BASE_URL, "propose-flow"), this::proposeNewFlow);
 
+        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id"), this::getProposedFlowById);
+    }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
         String username = WebUtilities.getUsername(request);
         ProposedFlowCommand proposedFlowCommand = WebUtilities.readBody(request, ProposedFlowCommand.class);
         return makerCheckerService.proposeNewFlow(request.body(), username, proposedFlowCommand);
+    }
+
+    public ProposedFlowResponse getProposedFlowById(Request request, Response response) {
+        long proposedFlowId = WebUtilities.getLong(request, "id");
+        return makerCheckerService.getProposedFlowById(proposedFlowId);
     }
 }

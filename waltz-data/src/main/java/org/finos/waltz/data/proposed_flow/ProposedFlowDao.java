@@ -9,14 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
-
     private final DSLContext dsl;
-
 
     @Autowired
     public ProposedFlowDao(DSLContext dsl) {
@@ -35,5 +33,20 @@ public class ProposedFlowDao {
         proposedFlowRecord.setTargetEntityKind(proposedFlowCommand.target().kind().name());
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
+    }
+
+    /**
+     * Fetches the single ProposedFlow row whose primary-key equals the given id.
+     *
+     * @param id primary key of the row (e.g. 1)
+     * @return ProposedFlowRecord and null if no record found for the given id
+     */
+
+    public ProposedFlowRecord getProposedFlowById(long id) {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOneInto(ProposedFlowRecord.class);
     }
 }

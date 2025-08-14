@@ -1,5 +1,6 @@
 package org.finos.waltz.service.maker_checker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -12,8 +13,11 @@ import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.jooq.DSLContext;
 import org.jooq.exception.NoDataFoundException;
@@ -24,9 +28,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 
@@ -42,7 +48,6 @@ public class MakerCheckerService {
     private final ProposedFlowDao proposedFlowDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final DSLContext dslContext;
-
     private final ChangeLogDao changeLogDao;
 
     @Autowired
@@ -119,5 +124,36 @@ public class MakerCheckerService {
                 .operation(Operation.ADD)
                 .severity(Severity.INFORMATION)
                 .build();
+    }
+
+    /**
+     * Retrieves a proposed flow by its primary key.
+     *
+     * @param id the flow's primary key
+     * @return ProposedFlowResponse
+     */
+    public ProposedFlowResponse getProposedFlowById(long id) {
+        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+        if (proposedFlowRecord == null) {
+            throw new NoSuchElementException("ProposedFlow not found: " + id);
+        }
+        try {
+
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+
+            return ImmutableProposedFlowResponse.builder()
+                    .id(proposedFlowRecord.getId())
+                    .sourceEntityId(proposedFlowRecord.getSourceEntityId())
+                    .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
+                    .targetEntityId(proposedFlowRecord.getTargetEntityId())
+                    .targetEntityKind(proposedFlowRecord.getTargetEntityKind())
+                    .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                    .createdBy(proposedFlowRecord.getCreatedBy())
+                    .flowDef(flowDefinition)
+                    .build();
+        } catch (JsonProcessingException e) {
+            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
+            throw new IllegalArgumentException("Invalid flow definition JSON", e);
+        }
     }
 }
