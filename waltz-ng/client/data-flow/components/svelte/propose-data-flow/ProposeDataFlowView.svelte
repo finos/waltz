@@ -4,7 +4,7 @@
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import toasts from "../../../../svelte-stores/toast-store";
-    import { proposeDataFlowStore } from "../../../../svelte-stores/propose-data-flow-store";
+    import { proposeDataFlowRemoteStore } from "../../../../svelte-stores/propose-data-flow-remote-store";
     import { dataTypes,
         logicalFlow,
         physicalFlow,
@@ -91,7 +91,7 @@
         _.set(command, 'source', $logicalFlow.source ?? null);
         _.set(command, 'target', $logicalFlow.target ?? null);
 
-        proposeDataFlowStore.proposeDataFlow(command)
+        proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {

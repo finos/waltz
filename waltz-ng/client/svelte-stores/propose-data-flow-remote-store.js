@@ -31,4 +31,4 @@ export function mkStore()  {
     }
 }
 
-export const proposeDataFlowStore = mkStore();
+export const proposeDataFlowRemoteStore = mkStore();
