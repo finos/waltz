@@ -1,4 +1,4 @@
-import ProposeDataFlowView from "./components/data-flow-section/proposed-data-flow/propose-data-flow";
+import ProposeDataFlowView from "./components/data-flow-section/propose-data-flow/propose-data-flow";
 import UserDashboardView from "./components/user-dashboard/user-dashboard-view";
 
 const baseState = {

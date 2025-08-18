@@ -109,7 +109,9 @@ public enum EntityKind {
     CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
 
     @Deprecated
-    AUTHORITATIVE_SOURCE("Authoritative source"); // TO BE REMOVED IN 1.36
+    AUTHORITATIVE_SOURCE("Authoritative source"), // TO BE REMOVED IN 1.36
+
+    PROPOSED_FLOW("Proposed Flow");
 
 
     private final String prettyName;

@@ -1,21 +1,13 @@
 <script>
     import _ from "lodash";
-    import StepHeader from "./StepHeader.svelte";
-    import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
-    import EnumSelect from "./EnumSelect.svelte";
-    import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
-    import {physicalSpecStore} from "../../../../svelte-stores/physical-spec-store";
-    import {mkSelectionOptions} from "../../../../common/selector-utils";
-    import {expandedSections, proposalReason, nestedEnums} from "./propose-data-flow-store";
+    import StepHeader from "../../../../physical-flows/svelte/StepHeader.svelte";
+    import {expandedSections, proposalReason} from "./propose-data-flow-store";
     import {
         determineExpandedSections,
-        sections,
-        toDataFormatKindName,
-        toOptions
+        sections
     } from "./propose-data-flow-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
-    import toasts from "../../../../svelte-stores/toast-store";
     import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
     import RatingPicker from "../../../../common/svelte/RatingPicker.svelte";
 
@@ -26,12 +18,8 @@
 
     const dispatch = createEventDispatcher();
 
-    export let primaryEntityRef;
-
     let workingCopy = {rating: []};
-    let specificationCall;
     let activeMode = Modes.SELECT;
-    let enumsCall = enumValueStore.load();
 
     onMount(() => {
         if ($proposalReason) {
@@ -44,16 +32,10 @@
         openNextSection();
     }
 
-    function selectSpecification(evt) {
-        $proposalReason = evt.detail;
-        workingCopy = evt.detail;
-        openNextSection();
-    }
-
     function openNextSection() {
-        const flowSectionOpen = _.includes($expandedSections, sections.FLOW);
+        const flowSectionOpen = _.includes($expandedSections, sections.ROUTE);
         if (!flowSectionOpen) {
-            $expandedSections = _.concat($expandedSections, sections.FLOW)
+            $expandedSections = _.concat($expandedSections, sections.ROUTE)
         }
     }
 
@@ -70,18 +52,8 @@
         activeMode = Modes.SELECT;
     }
 
-    $: {
-        if (primaryEntityRef) {
-            const selector = mkSelectionOptions(primaryEntityRef);
-            specificationCall = physicalSpecStore.findBySelector(selector)
-        }
-    }
-
-    $: specifications = $specificationCall?.data;
-    $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
-    $: dataFormatKinds = toOptions(enumsByType, "DataFormatKind");
+    // placeholder for when we 'create' the feature.maker-checker.config
     $: ratingSchemeCall = ratingSchemeStore.getById(23779);
-
     $: done = workingCopy.rating[0] && true;
 
     $: expanded = _.includes($expandedSections, sections.REASON);

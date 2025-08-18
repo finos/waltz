@@ -5,7 +5,7 @@
     import {
         toCriticalityName,
         toDataFormatKindName, toFrequencyKindName, toTransportKindName
-    } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
+    } from "../propose-data-flow/propose-data-flow-utils";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
     import {nestEnums} from "../../../../common/svelte/enum-utils";

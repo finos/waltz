@@ -19,6 +19,8 @@
 package org.finos.waltz.data.entity_workflow;
 
 
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -31,6 +33,7 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
@@ -77,6 +80,30 @@ public class EntityWorkflowTransitionDao {
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
                 .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(ref.id()))
                 .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(ref.kind().name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public void createWorkflowTransition(Long proposedFlowId, Long entityWorkflowDefId, String username){
+        EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
+        transitionRecord.setWorkflowId(entityWorkflowDefId);
+        transitionRecord.setEntityId(proposedFlowId);
+        transitionRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
+        transitionRecord.setFromState(MakerCheckerState.PROPOSED_CREATE.name());
+        transitionRecord.setToState(MakerCheckerState.ACTION_PENDING.name());
+        transitionRecord.setReason("flow proposed");
+        transitionRecord.setProvenance("waltz");
+        transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        transitionRecord.setLastUpdatedBy(username);
+        transitionRecord.insert();
+    }
+
+    public List<EntityWorkflowTransition> findForWorkflowId(long workflowId) {
+
+        return dsl
+                .select(ENTITY_WORKFLOW_TRANSITION.fields())
+                .from(ENTITY_WORKFLOW_TRANSITION)
+                .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

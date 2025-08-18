@@ -69,4 +69,8 @@ public class EntityWorkflowService {
 
         return entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workflowId, ref);
     }
+
+    public EntityWorkflowDefinition searchByName(String name){
+        return entityWorkflowDefinitionDao.searchByName(name);
+    }
 }
