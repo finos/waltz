@@ -38,9 +38,8 @@ public class MakerCheckerEndpoint implements Endpoint {
     @Override
     public void register() {
         // propose a new MC flow
-        //TODO.. we will let this action "PROPOSE" come from UI
-        postForDatum(mkPath(BASE_URL, PROPOSE.name()), this::proposeNewFlow);
-    }
+        //TODO.. we will let this action "propose" come from UI
+        postForDatum(mkPath(BASE_URL, PROPOSE.getVerb()), this::proposeNewFlow);
 
         getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id"), this::getProposedFlowById);
     }
