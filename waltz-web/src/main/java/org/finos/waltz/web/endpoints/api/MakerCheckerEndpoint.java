@@ -29,7 +29,6 @@ public class MakerCheckerEndpoint implements Endpoint {
     private final MakerCheckerService makerCheckerService;
 
 
-
     @Autowired
     public MakerCheckerEndpoint(MakerCheckerService makerCheckerService) {
         this.makerCheckerService = makerCheckerService;
