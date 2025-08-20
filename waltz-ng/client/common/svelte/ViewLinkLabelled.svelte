@@ -1,11 +1,15 @@
 <script>
     import _ from "lodash";
+    import EntityIcon from "./EntityIcon.svelte";
 
     export let state;
     export let title = null;
     export let ctx = {};
     export let isSecondaryLink = false;
     export let label = null;
+    export let openInNewTab = false;
+    export let isEntityLink = false;
+    export let entityKind = "";
 
     let path;
 
@@ -186,12 +190,24 @@
 {#if path}
     <a href={path}
        class:secondary-link={isSecondaryLink}
-       {title}>
-        <slot>{label ?? ""}</slot>
+       {title}
+       target={openInNewTab ? "_blank" : undefined}
+       rel={openInNewTab ? "noopener noreferrer" : undefined}>
+        <slot>
+            {#if isEntityLink}
+                <EntityIcon kind={entityKind}/>
+            {/if}
+            {label ?? ""}
+        </slot>
     </a>
 {:else }
     <span>
-        <slot>{label ?? ""}</slot>
+        <slot>
+            {#if isEntityLink}
+                <EntityIcon kind={entityKind}/>
+            {/if}
+            {label ?? ""}
+        </slot>
     </span>
 {/if}
 
