@@ -50,7 +50,7 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record3;
-import org.jooq.Record9;
+import org.jooq.Result;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -92,6 +93,7 @@ import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.jooq.impl.DSL.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -281,8 +283,8 @@ public class MeasurableRatingDao {
     public List<MeasurableRating> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
         return mkExtendedBaseQuery()
                 .where(dsl.renderInlined(MEASURABLE_CATEGORY.ID.eq(categoryId)
-                                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                        .and(MEASURABLE_RATING.ENTITY_ID.in(subjectIdSelector)))))
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                .and(MEASURABLE_RATING.ENTITY_ID.in(subjectIdSelector)))))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -398,7 +400,6 @@ public class MeasurableRatingDao {
                 .select(MEASURABLE.ID)
                 .from(MEASURABLE)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId));
-
         return dsl
                 .deleteFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
@@ -532,36 +533,39 @@ public class MeasurableRatingDao {
             // RATINGS
 
             SelectOrderByStep<Record2<Long, String>> allowableMigrations = selectRatingsThatCanBeModified(measurableId, targetId);
-            // Do not update the measurable where an existing mapping already exists
 
-            SelectConditionStep<Record9<Long, String, Long, String, String, Timestamp, String, String, Boolean>> ratingsToInsert = DSL
-                    .select(Tables.MEASURABLE_RATING.ENTITY_ID,
-                            Tables.MEASURABLE_RATING.ENTITY_KIND,
-                            DSL.val(targetId),
-                            Tables.MEASURABLE_RATING.RATING,
-                            Tables.MEASURABLE_RATING.DESCRIPTION,
-                            Tables.MEASURABLE_RATING.LAST_UPDATED_AT,
-                            Tables.MEASURABLE_RATING.LAST_UPDATED_BY,
-                            Tables.MEASURABLE_RATING.PROVENANCE,
-                            Tables.MEASURABLE_RATING.IS_READONLY)
+
+            org.finos.waltz.schema.tables.MeasurableRating srcMr = MEASURABLE_RATING.as("srcMr");
+            org.finos.waltz.schema.tables.MeasurableRating trgMr = MEASURABLE_RATING.as("trgMr");
+
+
+            //Check existing target rating
+            Result<Record1<Long>> intersectionList= tx.selectDistinct(trgMr.ENTITY_ID)
+                    .from(trgMr)
+                    .innerJoin(srcMr)
+                    .on(trgMr.ENTITY_ID.eq(srcMr.ENTITY_ID))
+                    .where(trgMr.MEASURABLE_ID.eq(targetId))
+                    .and(srcMr.MEASURABLE_ID.eq(measurableId))
+                    .fetch();
+
+            List<Record1<Long>> existingTargetRatingIds = tx.select(MEASURABLE_RATING.ID)
+                    .from(MEASURABLE_RATING)
+                    .where(MEASURABLE_RATING.MEASURABLE_ID.eq(targetId))
+                    .and(MEASURABLE_RATING.ENTITY_ID.in(intersectionList))
+                    .fetch();
+
+
+            SelectConditionStep<Record1<Long>> ratingsToUpdate = select(Tables.MEASURABLE_RATING.ID)
                     .from(Tables.MEASURABLE_RATING)
                     .innerJoin(allowableMigrations).on(Tables.MEASURABLE_RATING.ENTITY_ID.eq(allowableMigrations.field(Tables.MEASURABLE_RATING.ENTITY_ID))
                             .and(Tables.MEASURABLE_RATING.ENTITY_KIND.eq(allowableMigrations.field(Tables.MEASURABLE_RATING.ENTITY_KIND))))
                     .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId));
 
-            int migratedRatings = tx
-                    .insertInto(Tables.MEASURABLE_RATING)
-                    .columns(Tables.MEASURABLE_RATING.ENTITY_ID,
-                            Tables.MEASURABLE_RATING.ENTITY_KIND,
-                            Tables.MEASURABLE_RATING.MEASURABLE_ID,
-                            Tables.MEASURABLE_RATING.RATING,
-                            Tables.MEASURABLE_RATING.DESCRIPTION,
-                            Tables.MEASURABLE_RATING.LAST_UPDATED_AT,
-                            Tables.MEASURABLE_RATING.LAST_UPDATED_BY,
-                            Tables.MEASURABLE_RATING.PROVENANCE,
-                            Tables.MEASURABLE_RATING.IS_READONLY)
-                    .select(ratingsToInsert)
+            int migratedRatings = tx.update(Tables.MEASURABLE_RATING)
+                    .set(Tables.MEASURABLE_RATING.MEASURABLE_ID, val(targetId))
+                    .where(Tables.MEASURABLE_RATING.ID.in(ratingsToUpdate))
                     .execute();
+
 
             if (migratedRatings > 0) {
                 writeChangeLogForMerge(
@@ -588,8 +592,7 @@ public class MeasurableRatingDao {
             // all ratings that can be migrated, decomms automatically updated.
             // Need to find the ratings that cannot be migrated, then see if there is a target decom to match
 
-            org.finos.waltz.schema.tables.MeasurableRating srcMr = MEASURABLE_RATING.as("srcMr");
-            org.finos.waltz.schema.tables.MeasurableRating trgMr = MEASURABLE_RATING.as("trgMr");
+
 
             org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission srcDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("srcDecom");
             org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission trgDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("trgDecom");
@@ -643,6 +646,38 @@ public class MeasurableRatingDao {
 
             org.finos.waltz.schema.tables.Allocation srcAlloc = ALLOCATION.as("srcAlloc");
             org.finos.waltz.schema.tables.Allocation trgAlloc = ALLOCATION.as("trgAlloc");
+
+            List allocList = existingTargetRatingIds.stream().map(rId -> {
+
+                boolean srcAllocExists = tx.select(DSL.value(Boolean.TRUE))
+                        .from(srcAlloc)
+                        .join(srcMr)
+                        .on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID))
+                        .join(trgMr)
+                        .on(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID))
+                        .where(srcMr.MEASURABLE_ID.eq(measurableId))
+                        .and(trgMr.ID.eq(rId.value1()))
+                        .fetchOne() != null;
+
+                if (srcAllocExists) {
+                    AllocationRecord record = tx.newRecord(ALLOCATION);
+                    record.setAllocationSchemeId(2L);
+                    record.setMeasurableRatingId(rId.value1());
+                    record.setAllocationPercentage(0);
+                    record.setLastUpdatedBy("admin");
+                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+                    record.setProvenance("waltz");
+
+                    int i = tx.insertInto(ALLOCATION)
+                            .set(record)
+                            .onDuplicateKeyIgnore() // This handles the "if not exists" logic
+                            .execute();
+                    return i;
+                } else
+                    return 0;
+            }).collect(Collectors.toList());
+
+            LOG.info("allocList : {}",allocList);
 
             Field<Integer> totalAlloc = srcAlloc.ALLOCATION_PERCENTAGE.add(trgAlloc.ALLOCATION_PERCENTAGE).as("totalAlloc");
             Field<Long> updateTargetAllocId = trgAlloc.ID.as("updateTargetAllocId");
@@ -711,6 +746,19 @@ public class MeasurableRatingDao {
                     mergedAllocs,
                     measurableId,
                     targetId));
+
+            SelectConditionStep<Record1<Long>> ratingsToUpdateForPrimaryFlag = select(Tables.MEASURABLE_RATING.ENTITY_ID)
+                    .from(Tables.MEASURABLE_RATING)
+                    .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId)
+                            .and(Tables.MEASURABLE_RATING.IS_PRIMARY.isTrue()));
+
+            int migratedPrimary = tx.update(Tables.MEASURABLE_RATING)
+                    .set(Tables.MEASURABLE_RATING.IS_PRIMARY, Boolean.TRUE)
+                    .where(Tables.MEASURABLE_RATING.ENTITY_ID.in(ratingsToUpdateForPrimaryFlag))
+                    .and(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(targetId))
+                    .execute();
+
+            LOG.info("Migrated primary flag for intersecting rating, {}", migratedPrimary);
 
             int removedRatings = tx
                     .deleteFrom(Tables.MEASURABLE_RATING)
