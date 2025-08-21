@@ -12,9 +12,17 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
@@ -29,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -52,6 +61,9 @@ public class MakerCheckerService {
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
+    private final LogicalFlowService logicalFlowService;
+
+    private final PhysicalFlowService physicalFlowService;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -60,7 +72,9 @@ public class MakerCheckerService {
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
                         ChangeLogDao changeLogDao,
-                        WorkflowDefinition proposedFlowWorkflowDefinition) {
+                        WorkflowDefinition proposedFlowWorkflowDefinition,
+                        LogicalFlowService logicalFlowService,
+                        PhysicalFlowService physicalFlowService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
         checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
@@ -68,6 +82,8 @@ public class MakerCheckerService {
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(changeLogDao, "changeLogDao cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
+        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
@@ -76,6 +92,8 @@ public class MakerCheckerService {
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
         this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
+        this.logicalFlowService = logicalFlowService;
+        this.physicalFlowService = physicalFlowService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
@@ -172,5 +190,69 @@ public class MakerCheckerService {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
+    }
+
+    /**
+     * Creates both a logical and a physical flow from a previously-defined “proposed” flow.
+     *
+     * <p>The method is intended to be called after a {@code ProposedFlow} has been persisted and
+     * validated. It performs two main actions:
+     * <ol>
+     *   <li>Converts the {@code ProposedFlow} into a canonical {@code LogicalFlow}.</li>
+     *   <li>Materializes the {@code LogicalFlow} into an executable {@code PhysicalFlow}.</li>
+     * </ol>
+     *
+     * <p>If either step fails, an appropriate runtime exception is propagated (e.g.,
+     * {@code ProposedFlowNotFoundException}, {@code FlowCreationException}).
+     *
+     * @param proposedFlowId the primary key of the persisted {@code ProposedFlow} to materialize
+     * @return an immutable response object containing both the created logical and physical flows
+     */
+    public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(long proposedFlowId, String username) {
+        ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+
+        //create logical flow
+        LogicalFlow logicalFlow = createLogicalFlow(proposedFlow, username);
+
+        //create physical flow
+        PhysicalFlowCreateCommandResponse physicalFlow = createPhysicalFlow(proposedFlow, username);
+
+        return ImmutableLogicalPhysicalFlowCreationResponse.builder()
+                .logicalFlow(logicalFlow)
+                .physicalFlowCreateCommandResponse(physicalFlow)
+                .build();
+    }
+
+    private AddLogicalFlowCommand mapProposedFlowToAddLogicalFlowCommand(ProposedFlowResponse proposedFlow) {
+        return ImmutableAddLogicalFlowCommand.builder()
+                .source(proposedFlow.flowDef().source())
+                .target(proposedFlow.flowDef().target())
+                .build();
+    }
+
+    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow) {
+        return ImmutablePhysicalFlowCreateCommand.builder()
+                .specification(proposedFlow.flowDef().specification())
+                .logicalFlowId(Optional.of(proposedFlow.id()).get())
+                .flowAttributes(proposedFlow.flowDef().flowAttributes())
+                .dataTypeIds(proposedFlow.flowDef().dataTypeIds())
+                .build();
+    }
+
+    private LogicalFlow createLogicalFlow(ProposedFlowResponse proposedFlow, String username) {
+        AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlow);
+
+        //add validations related to logical flow creation below
+
+        LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
+        return logicalFlowService.addFlow(addCmd, username);
+    }
+
+    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
+        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
+
+        //add validations related to physical flow creation below
+
+        return physicalFlowService.create(command, username);
     }
 }
