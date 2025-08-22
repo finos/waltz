@@ -2,6 +2,9 @@ package org.finos.waltz.service.workflow_state_machine.proposed_flow;
 
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -11,10 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PENDING_APPROVALS;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
-import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
-import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
+import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -28,6 +29,10 @@ class ProposedFlowWorkflowDefinitionTest {
     private ProposedFlowWorkflowDefinition definition;
     private WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> machine;
     private ProposedFlowWorkflowContext mockContext;
+    private final EntityReference entityRef = ImmutableEntityReference.builder()
+            .kind(EntityKind.PROPOSED_FLOW)
+            .id(1L)
+            .build();
 
     @BeforeEach
     void setup() {
@@ -76,20 +81,66 @@ class ProposedFlowWorkflowDefinitionTest {
         assertSame(machine1, machine2, "getMachine() should return the same instance on subsequent calls");
     }
 
-    // TODO.. following test cases need to be updated when real predicates are defined
     @Test
-    void testSourceApprovedTransition_UserIsSourceApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        // context need to be set with correct attributes/values for transition predicate to return true
-//        ProposedFlowWorkflowContext context = new ProposedFlowWorkflowContext();
-//        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, );
-//        assertEquals(SOURCE_APPROVED, newState);
+    void testSourceApprovedTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, PENDING_APPROVALS);
+        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, context);
+        assertEquals(SOURCE_APPROVED, newState);
     }
 
     @Test
-    void testTargetApprovedTransition_UserIsTargetApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        // context need to be set with correct attributes/values for transition predicate to return true
-//        ProposedFlowWorkflowContext context = new ProposedFlowWorkflowContext();
-//        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, );
-//        assertEquals(TARGET_APPROVED, newState);
+    void testTargetApprovedTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(false, true, PENDING_APPROVALS);
+        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, context);
+        assertEquals(TARGET_APPROVED, newState);
+    }
+
+    @Test
+    void testFullyApprovedTransition_UserIsSourceApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, APPROVE, context);
+        assertEquals(FULLY_APPROVED, newState);
+    }
+
+    @Test
+    void testFullyApprovedTransition_UserIsTargetApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, APPROVE, context);
+        assertEquals(FULLY_APPROVED, newState);
+    }
+
+    @Test
+    void testSourceApprovedToTargetRejected() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, REJECT, context);
+        assertEquals(TARGET_REJECTED, newState);
+    }
+
+    @Test
+    void testTargetApprovedToSourceRejected() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, REJECT, context);
+        assertEquals(SOURCE_REJECTED, newState);
+    }
+
+    @Test
+    void testPendingApprovalsToSourceRejected() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, PENDING_APPROVALS);
+        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, REJECT, context);
+        assertEquals(SOURCE_REJECTED, newState);
+    }
+
+    @Test
+    void testPendingApprovalsToTargetRejected() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(false, true, PENDING_APPROVALS);
+        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, REJECT, context);
+        assertEquals(TARGET_REJECTED, newState);
+    }
+
+    private ProposedFlowWorkflowContext createContext(boolean isSourceApprover, boolean isTargetApprover, ProposedFlowWorkflowState state) {
+        return new ProposedFlowWorkflowContext(1L, entityRef, "test_user", "test reason")
+                .setSourceApprover(isSourceApprover)
+                .setTargetApprover(isTargetApprover)
+                .setCurrentState(state);
     }
 }

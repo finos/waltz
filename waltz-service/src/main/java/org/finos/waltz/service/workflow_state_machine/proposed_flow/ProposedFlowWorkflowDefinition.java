@@ -16,26 +16,43 @@ import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.*;
 
 /**
- * A concrete implementation of a workflow definition for the PROPOSED_FLOW entity kind.
+ * A concrete implementation of a {@link WorkflowDefinition} for the {@link EntityKind#PROPOSED_FLOW} entity kind.
+ * <p>
  * This class defines all the states, actions, and transition rules for this specific workflow.
+ *
+ * <h3>Workflow Transitions:</h3>
+ * <ul>
+ *     <li>{@code PROPOSED_CREATE -> PENDING_APPROVALS}</li>
+ *     <li>{@code PENDING_APPROVALS -> SOURCE_APPROVED}</li>
+ *     <li>{@code PENDING_APPROVALS -> TARGET_APPROVED}</li>
+ *     <li>{@code PENDING_APPROVALS -> SOURCE_REJECTED}</li>
+ *     <li>{@code PENDING_APPROVALS -> TARGET_REJECTED}</li>
+ *     <li>{@code SOURCE_APPROVED -> TARGET_REJECTED}</li>
+ *     <li>{@code SOURCE_APPROVED -> FULLY_APPROVED}</li>
+ *     <li>{@code TARGET_APPROVED -> SOURCE_REJECTED}</li>
+ *     <li>{@code TARGET_APPROVED -> FULLY_APPROVED}</li>
+ * </ul>
+ *
+ * @see ProposedFlowWorkflowState
+ * @see ProposedFlowWorkflowTransitionAction
  */
 @Component
 public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> {
     private final EntityWorkflowStateDao stateDao;
     private final EntityWorkflowTransitionDao transitionDao;
     // FILTERS
-    private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> false/*ctx.userHasRole("SOURCE_APPROVER")*/;
-    private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> false/*ctx.userHasRole("TARGET_APPROVER")*/;
+    private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> ctx.isSourceApprover();
+    private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> ctx.isTargetApprover();
     private static final Predicate<ProposedFlowWorkflowContext> canSourceFullyApprove = isSourceApprover
-            .and(ctx -> ctx.getPreviousState() == TARGET_APPROVED);
+            .and(ctx -> ctx.getCurrentState() == TARGET_APPROVED);
     private static final Predicate<ProposedFlowWorkflowContext> canTargetFullyApprove = isTargetApprover
-            .and(ctx -> ctx.getPreviousState() == SOURCE_APPROVED);
+            .and(ctx -> ctx.getCurrentState() == SOURCE_APPROVED);
 
     // TODO.. might have to refresh the context object, the state values can be stale
     private static final WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
             System.out.printf(
-                    "LISTENER: User '%s' was notified of transition from %s -> %s for entity %d%n",
-                    /*ctx.getUserId(),*/ from, to, ctx.getEntityId()
+                    "LISTENER: User '%s' was notified of transition from %s -> %s for entity %s%n",
+                    ctx.getUserId(), from, to, ctx.getEntityReference()
             );
 
     private WorkflowStateMachine workflowStateMachine;
@@ -66,17 +83,13 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
-                        canSourceFullyApprove, fullyApprovedTransitionListener)
-                .permit(SOURCE_APPROVED, TARGET_APPROVED, APPROVE,
-                        isTargetApprover)
+                        canTargetFullyApprove, fullyApprovedTransitionListener)
                 .permit(SOURCE_APPROVED, TARGET_REJECTED, REJECT,
                         isTargetApprover)
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
-                        canTargetFullyApprove, fullyApprovedTransitionListener)
-                .permit(TARGET_APPROVED, SOURCE_APPROVED, APPROVE,
-                        isSourceApprover)
+                        canSourceFullyApprove, fullyApprovedTransitionListener)
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,
                         isSourceApprover);
 
