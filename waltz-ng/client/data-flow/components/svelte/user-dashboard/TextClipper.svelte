@@ -1,9 +1,9 @@
 <script>
-    export let dataTypes = "";
+    export let text = "";
 </script>
 
-<div class="fit-text" title={dataTypes}>
-    { dataTypes }
+<div class="fit-text" title={text}>
+    { text }
 </div>
 
 <style>

@@ -8,13 +8,14 @@ import { filters } from "./filter-store";
 import Icon from "../../../../common/svelte/Icon.svelte";
 import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
-import ProposedFlowDataTypes from "./ProposedFlowDataTypes.svelte";
+import TextClipper from "./TextClipper.svelte";
+import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
 
 export let userName;
 export let flows = [];
 export let dataTypeIdToNameMap = {};
 
-const PILL_DEFINITION = {
+const STATUS_PILL_DEFINITION = {
     PROPOSED_CREATE: {
         name: "Proposed Create",
         color: "#a77a52"
@@ -45,7 +46,31 @@ const PILL_DEFINITION = {
     }
 }
 
-let filterDefs = _.cloneDeep(PILL_DEFINITION);
+const CHANGE_TYPE_PILL_DEFINITION = {
+    ADD: {
+        name: "Create",
+        color: "#267dda"
+    },
+    EDIT: {
+        name: "Modify",
+        color: "#716b9e"
+    },
+    REMOVE: {
+        name: "Delete",
+        color: "#da524b"
+    }
+}
+
+const PROPOSER_PILL_DEFINITION = {
+    USER: {
+        name: "You",
+        color: "#000000"
+    },
+    OTHERS: {
+        name: "Others",
+        color: "#000000"
+    }
+}
 
 const columnDefs = [
     {
@@ -91,13 +116,12 @@ const columnDefs = [
             entityKind: row.proposedFlowCommand.target.kind
         })
     },
-    { field: "changeType", name: "Change" },
     {
         field: "dataTypes",
         name: "Data Types",
-        cellRendererComponent: ProposedFlowDataTypes,
+        cellRendererComponent: TextClipper,
         cellRendererProps: row => ({
-            dataTypes: row.dataTypes
+            text: row.dataTypes
         })
     },
     {
@@ -106,10 +130,20 @@ const columnDefs = [
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
             pillKey: row.status,
-            pillDefs: PILL_DEFINITION
+            pillDefs: STATUS_PILL_DEFINITION
         })
     },
-    { field: "created_by", name: "Created By" },
+    {
+        field: "changeType",
+        name: "Change",
+        cellRendererComponent: Pill,
+        cellRendererProps: row => ({
+            pillKey: row.changeType,
+            pillDefs: CHANGE_TYPE_PILL_DEFINITION
+        })
+    },
+    { field: "proposedFlowCommand.reason.description", name: "Proposal Reason" },
+    { field: "createdBy", name: "Created By" },
     { field: "created_at", name: "Created At" },
     { field: "sourceApprovedBy", name: "Source Approver"},
     { field: "sourceApprovedAt", name: "Source Approved At"},
@@ -117,6 +151,9 @@ const columnDefs = [
     { field: "targetApprovedAt", name: "Target Approved At"}
 ];
 
+let stateFilterDefs = _.cloneDeep(STATUS_PILL_DEFINITION);
+let changeFilterDefs = _.cloneDeep(CHANGE_TYPE_PILL_DEFINITION);
+let proposerFilterDefs = _.cloneDeep(PROPOSER_PILL_DEFINITION);
 
 $: fetch("http://localhost:3456/api/get/prop-flows", {method: "GET"})
     .then(r => r.json())
@@ -131,34 +168,45 @@ $: gridData = flows && flows.length
     }))
     : [];
 
-$: console.log(gridData);
-$: console.log(dataTypeIdToNameMap);
-$: gridData.map(d => console.log(d.dataTypes));
-
 $: filteredGridData = gridData
     ? gridData
         .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.status))
+        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.changeType))
+        .filter(d => ($filters.proposer.length === 0) || $filters.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
         .sort((a, b) => $filters.state.indexOf(a.status) - $filters.state.indexOf(b.status))
+        .sort((a, b) => $filters.change.indexOf(a.changeType) - $filters.change.indexOf(b.changeType))
+        .sort((a, b) => $filters.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
+            - $filters.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
     : [];
 
-$: deffCounts = _.countBy(gridData, "status");
-
+$: stateCounts = _.countBy(gridData, "status");
+$: changeTypeCounts = _.countBy(gridData, "changeType");
+$: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "USER" : "OTHERS");
 
 </script>
 
 <div>
-    <h2>
-        <Icon name="envelope-open-o"/>
-        Actionable Flows ({filteredGridData.length})
-    </h2>
-    <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
-    {#if flows.length !== 0}
-        <ProposedFlowFilters pillDefs={filterDefs} deffCounts={deffCounts}/>
-        <GridWithCellRenderer columnDefs={columnDefs}
-                              rowData={filteredGridData}/>
-    {:else }
-        <NoData>
-            No actionable data flows found for {userName}
-        </NoData>
+    {#if flows}
+        <h2>
+            <Icon name="envelope-open-o"/>
+            Actionable Flows ({filteredGridData.length})
+        </h2>
+        <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
+        {#if flows.length === 0}
+            <NoData>
+                No actionable data flows found for {userName}
+            </NoData>
+        {:else }
+            <ProposedFlowFilters pillDefs={stateFilterDefs}
+                                 stateCounts={stateCounts}
+                                 changePillDefs={changeFilterDefs}
+                                 changeTypeCounts={changeTypeCounts}
+                                 proposerPillDefs={proposerFilterDefs}
+                                 proposerPillCounts={proposerCounts}/>
+            <GridWithCellRenderer columnDefs={columnDefs}
+                                  rowData={filteredGridData}/>
+        {/if}
+    {:else}
+        <LoadingPlaceholder/>
     {/if}
 </div>
