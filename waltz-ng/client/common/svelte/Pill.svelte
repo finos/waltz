@@ -6,6 +6,7 @@
     // }, ....
     export let pillDefs;
     export let pillKey = undefined;
+    export let smallText = undefined;
     export let cleanPill = false; // toggles between dark and light text
 
     $: pillColor = pillDefs[pillKey].color;
@@ -17,6 +18,9 @@
          class:pill-clean={cleanPill}
          style="--pillColor: {pillColor}">
         {pillText}
+        <small>
+            { smallText ?? '' }
+        </small>
     </div>
 {/if}
 

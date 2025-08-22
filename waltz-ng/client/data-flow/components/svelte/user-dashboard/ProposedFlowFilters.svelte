@@ -1,7 +1,6 @@
 <script>
     import { filters } from "./filter-store";
     import Pill from "../../../../common/svelte/Pill.svelte";
-    import {onMount} from "svelte";
 
     export let pillDefs = {};
     export let stateCounts = {};
@@ -13,27 +12,6 @@
     export let proposerPillCounts = {};
 
     let showFilters = false;
-
-    onMount(() => {
-        // state filters
-        Object.keys(pillDefs)
-            .map(key => {
-                const count = stateCounts[key] ?? 0;
-                pillDefs[key].name += ` (${count})`;
-            });
-        // change filters
-        Object.keys(changePillDefs)
-            .map(key => {
-                const count = changeTypeCounts[key] ?? 0;
-                changePillDefs[key].name += ` (${count})`;
-            });
-        // user or proposer filters
-        Object.keys(proposerPillDefs)
-            .map(key => {
-                const count = proposerPillCounts[key] ?? 0;
-                proposerPillDefs[key].name += ` (${count})`;
-            })
-    })
 
     const updateStateFilters = (filterKey) => {
         const selectedStates = $filters.state.includes(filterKey);
@@ -86,6 +64,12 @@
     function toggleFilters() {
         showFilters = !showFilters;
     }
+
+    const resetFilters = () => {
+        $filters.proposer = [];
+        $filters.change = [];
+        $filters.state = [];
+    }
 </script>
 
 <div class="filter-dropdown">
@@ -94,6 +78,12 @@
     </button>
     {#if showFilters}
         <div class="filter-groups single-section">
+            <div class="filter-group">
+                <button class="btn btn-skinny" on:click={resetFilters}>
+                    ✕ Clear filters
+                </button>
+            </div>
+            <hr class="filter-divider" />
             <div class="filter-group">
                 <h4>Proposed By</h4>
                 <div class="filter-pills">
@@ -106,6 +96,7 @@
                             <Pill pillDefs={proposerPillDefs}
                                   pillKey={key}
                                   cleanPill={!$filters.proposer.includes(key)}
+                                  smallText={proposerPillCounts[key]}
                             />
                         </div>
                     {/each}
@@ -124,6 +115,7 @@
                         <Pill pillDefs={pillDefs}
                             pillKey={key}
                             cleanPill={!$filters.state.includes(key)}
+                            smallText={stateCounts[key]}
                         />
                     </div>
                     {/each}
@@ -142,6 +134,7 @@
                         <Pill pillDefs={changePillDefs}
                             pillKey={key}
                             cleanPill={!$filters.change.includes(key)}
+                            smallText={changeTypeCounts[key]}
                         />
                     </div>
                     {/each}

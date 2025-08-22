@@ -1,5 +1,5 @@
 <script>
-    export let text = "";
+    export let text = '';
 </script>
 
 <div class="fit-text" title={text}>

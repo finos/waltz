@@ -151,6 +151,12 @@ const columnDefs = [
     { field: "targetApprovedAt", name: "Target Approved At"}
 ];
 
+const TABS = {
+    ACTION: "Actionable",
+    HISTORY: "Historical"
+}
+
+let selectedTab = TABS.ACTION;
 let stateFilterDefs = _.cloneDeep(STATUS_PILL_DEFINITION);
 let changeFilterDefs = _.cloneDeep(CHANGE_TYPE_PILL_DEFINITION);
 let proposerFilterDefs = _.cloneDeep(PROPOSER_PILL_DEFINITION);
@@ -164,7 +170,9 @@ $: fetch("http://localhost:3456/api/get/prop-flows", {method: "GET"})
 $: gridData = flows && flows.length
     ? flows.map(flow => ({
         ...flow,
-        dataTypes: flow.proposedFlowCommand.dataTypeIds ? flow.proposedFlowCommand.dataTypeIds.map(id => dataTypeIdToNameMap[id]).join(", ") : ""
+        dataTypes: flow.proposedFlowCommand.dataTypeIds
+            ? flow.proposedFlowCommand.dataTypeIds.map(id => dataTypeIdToNameMap[id]).join(", ")
+            : ""
     }))
     : [];
 
@@ -186,27 +194,50 @@ $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "U
 </script>
 
 <div>
-    {#if flows}
-        <h2>
-            <Icon name="envelope-open-o"/>
-            Actionable Flows ({filteredGridData.length})
-        </h2>
-        <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
-        {#if flows.length === 0}
-            <NoData>
-                No actionable data flows found for {userName}
-            </NoData>
-        {:else }
-            <ProposedFlowFilters pillDefs={stateFilterDefs}
-                                 stateCounts={stateCounts}
-                                 changePillDefs={changeFilterDefs}
-                                 changeTypeCounts={changeTypeCounts}
-                                 proposerPillDefs={proposerFilterDefs}
-                                 proposerPillCounts={proposerCounts}/>
-            <GridWithCellRenderer columnDefs={columnDefs}
-                                  rowData={filteredGridData}/>
-        {/if}
-    {:else}
-        <LoadingPlaceholder/>
-    {/if}
+    <div class="waltz-tabs" style="padding-top: 1em">
+        <input type="radio"
+               bind:group={selectedTab}
+               value={TABS.ACTION}
+               id={TABS.ACTION}>
+        <label class="wt-label"
+               for={TABS.ACTION}>
+            <span><Icon name="pencil-square-o"/>{TABS.ACTION} Flows
+                <small class="text-muted">{filteredGridData ? filteredGridData.length : 0}</small>
+            </span>
+        </label>
+
+        <input type="radio"
+               bind:group={selectedTab}
+               value={TABS.HISTORY}
+               id={TABS.HISTORY}>
+        <label class="wt-label"
+               for={TABS.HISTORY}>
+            <span><Icon name="pencil-square-o"/>{TABS.HISTORY} Flows</span>
+        </label>
+        <div class="wt-tab wt-active">
+            {#if selectedTab === TABS.ACTION}
+                {#if flows}
+                    <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
+                    {#if flows.length === 0}
+                        <NoData>
+                            No actionable data flows found for {userName}
+                        </NoData>
+                    {:else }
+                        <ProposedFlowFilters pillDefs={stateFilterDefs}
+                                             stateCounts={stateCounts}
+                                             changePillDefs={changeFilterDefs}
+                                             changeTypeCounts={changeTypeCounts}
+                                             proposerPillDefs={proposerFilterDefs}
+                                             proposerPillCounts={proposerCounts}/>
+                        <GridWithCellRenderer columnDefs={columnDefs}
+                                              rowData={filteredGridData}/>
+                    {/if}
+                {:else}
+                    <LoadingPlaceholder/>
+                {/if}
+            {:else if selectedTab === TABS.HISTORY}
+                -> TODO: Implement this
+            {/if}
+        </div>
+    </div>
 </div>
