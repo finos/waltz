@@ -647,9 +647,9 @@ public class MeasurableRatingDao {
             org.finos.waltz.schema.tables.Allocation srcAlloc = ALLOCATION.as("srcAlloc");
             org.finos.waltz.schema.tables.Allocation trgAlloc = ALLOCATION.as("trgAlloc");
 
-            List allocList = existingTargetRatingIds.stream().map(rId -> {
+            List<Integer> allocList = existingTargetRatingIds.stream().map(rId -> {
 
-                boolean srcAllocExists = tx.select(DSL.value(Boolean.TRUE))
+                Long srcAllocExists = tx.select(srcAlloc.ALLOCATION_SCHEME_ID)
                         .from(srcAlloc)
                         .join(srcMr)
                         .on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID))
@@ -657,27 +657,27 @@ public class MeasurableRatingDao {
                         .on(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID))
                         .where(srcMr.MEASURABLE_ID.eq(measurableId))
                         .and(trgMr.ID.eq(rId.value1()))
-                        .fetchOne() != null;
+                        .fetchOne(srcAlloc.ALLOCATION_SCHEME_ID);
 
-                if (srcAllocExists) {
+                if (null != srcAllocExists) {
                     AllocationRecord record = tx.newRecord(ALLOCATION);
-                    record.setAllocationSchemeId(2L);
+                    record.setAllocationSchemeId(srcAllocExists);
                     record.setMeasurableRatingId(rId.value1());
                     record.setAllocationPercentage(0);
-                    record.setLastUpdatedBy("admin");
+                    record.setLastUpdatedBy(userId);
                     record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
                     record.setProvenance("waltz");
 
-                    int i = tx.insertInto(ALLOCATION)
+                    return tx.insertInto(ALLOCATION)
                             .set(record)
                             .onDuplicateKeyIgnore() // This handles the "if not exists" logic
                             .execute();
-                    return i;
-                } else
+                } else {
                     return 0;
+                }
             }).collect(Collectors.toList());
 
-            LOG.info("allocList : {}",allocList);
+            LOG.info("allocList : {}", allocList);
 
             Field<Integer> totalAlloc = srcAlloc.ALLOCATION_PERCENTAGE.add(trgAlloc.ALLOCATION_PERCENTAGE).as("totalAlloc");
             Field<Long> updateTargetAllocId = trgAlloc.ID.as("updateTargetAllocId");
