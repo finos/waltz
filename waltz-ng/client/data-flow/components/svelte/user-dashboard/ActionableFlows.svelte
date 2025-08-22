@@ -8,7 +8,7 @@ import { filters } from "./filter-store";
 import Icon from "../../../../common/svelte/Icon.svelte";
 import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
-import TextClipper from "./TextClipper.svelte";
+import TextClipper from "../../../../common/svelte/TextClipper.svelte";
 import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
 
 export let userName;
