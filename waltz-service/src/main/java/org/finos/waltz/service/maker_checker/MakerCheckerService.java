@@ -1,6 +1,7 @@
 package org.finos.waltz.service.maker_checker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
@@ -8,12 +9,14 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
@@ -34,13 +37,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.Objects.requireNonNull;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -193,29 +199,39 @@ public class MakerCheckerService {
     }
 
     /**
-     * Creates both a logical and a physical flow from a previously-defined “proposed” flow.
+     * Creates logical and physical flows from the ProposedFlow.
      *
-     * <p>The method is intended to be called after a {@code ProposedFlow} has been persisted and
-     * validated. It performs two main actions:
-     * <ol>
-     *   <li>Converts the {@code ProposedFlow} into a canonical {@code LogicalFlow}.</li>
-     *   <li>Materializes the {@code LogicalFlow} into an executable {@code PhysicalFlow}.</li>
-     * </ol>
-     *
-     * <p>If either step fails, an appropriate runtime exception is propagated (e.g.,
-     * {@code ProposedFlowNotFoundException}, {@code FlowCreationException}).
-     *
-     * @param proposedFlowId the primary key of the persisted {@code ProposedFlow} to materialize
-     * @return an immutable response object containing both the created logical and physical flows
+     * @param proposedFlowId primary key of the ProposedFlow
+     * @param username       actor requesting the creation
+     * @return immutable response containing the created flows
+     * @throws FlowCreationException if either creation step fails
      */
-    public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(long proposedFlowId, String username) {
+    public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(long proposedFlowId, String username) throws FlowCreationException {
+
+        requireNonNull(username, "username must not be null");
+        PhysicalFlowCreateCommandResponse physicalFlow;
+        LogicalFlow logicalFlow;
+
         ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+        if (proposedFlow.flowDef().logicalFlowId().isPresent()) {
+            LOG.debug("Logical flow already exists; skipping creation");
+            //create only physical flow
+            physicalFlow = createPhysicalFlow(proposedFlow, username);
+            LocalDateTime now = nowUtc();
 
-        //create logical flow
-        LogicalFlow logicalFlow = createLogicalFlow(proposedFlow, username);
-
-        //create physical flow
-        PhysicalFlowCreateCommandResponse physicalFlow = createPhysicalFlow(proposedFlow, username);
+            logicalFlow = ImmutableLogicalFlow.builder()
+                    .source(proposedFlow.flowDef().source())
+                    .target(proposedFlow.flowDef().target())
+                    .lastUpdatedAt(now)
+                    .lastUpdatedBy(username)
+                    .created(UserTimestamp.mkForUser(username, now))
+                    .build();
+        } else {
+            //create logical flow
+            logicalFlow = createLogicalFlow(proposedFlow, username);
+            //create physical flow
+            physicalFlow = createPhysicalFlow(proposedFlow, username);
+        }
 
         return ImmutableLogicalPhysicalFlowCreationResponse.builder()
                 .logicalFlow(logicalFlow)
@@ -239,20 +255,25 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private LogicalFlow createLogicalFlow(ProposedFlowResponse proposedFlow, String username) {
+    private LogicalFlow createLogicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlow);
 
-        //add validations related to logical flow creation below
-
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
-        return logicalFlowService.addFlow(addCmd, username);
+        try {
+            return logicalFlowService.addFlow(addCmd, username);
+        } catch (Exception ex) {
+            LOG.error("Failed to create logical flow from proposedFlowId={}", proposedFlow.id(), ex);
+            throw new FlowCreationException("Logical flow creation failed", ex);
+        }
     }
 
-    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
+    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
-
-        //add validations related to physical flow creation below
-
-        return physicalFlowService.create(command, username);
+        try {
+            return physicalFlowService.create(command, username);
+        } catch (Exception ex) {
+            LOG.error("Failed to create physical flow from proposedFlowId={}", proposedFlow.id(), ex);
+            throw new FlowCreationException("Physical flow creation failed", ex);
+        }
     }
 }
