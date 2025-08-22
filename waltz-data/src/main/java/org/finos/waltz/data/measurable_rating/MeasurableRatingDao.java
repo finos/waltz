@@ -649,7 +649,7 @@ public class MeasurableRatingDao {
 
             List<Integer> allocList = existingTargetRatingIds.stream().map(rId -> {
 
-                Long srcAllocExists = tx.select(srcAlloc.ALLOCATION_SCHEME_ID)
+                Long schemeIdWhenSrcAllocExists = tx.select(srcAlloc.ALLOCATION_SCHEME_ID)
                         .from(srcAlloc)
                         .join(srcMr)
                         .on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID))
@@ -659,9 +659,9 @@ public class MeasurableRatingDao {
                         .and(trgMr.ID.eq(rId.value1()))
                         .fetchOne(srcAlloc.ALLOCATION_SCHEME_ID);
 
-                if (null != srcAllocExists) {
+                if (null != schemeIdWhenSrcAllocExists) {
                     AllocationRecord record = tx.newRecord(ALLOCATION);
-                    record.setAllocationSchemeId(srcAllocExists);
+                    record.setAllocationSchemeId(schemeIdWhenSrcAllocExists);
                     record.setMeasurableRatingId(rId.value1());
                     record.setAllocationPercentage(0);
                     record.setLastUpdatedBy(userId);
