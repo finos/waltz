@@ -23,7 +23,7 @@ export function mkStore()  {
 
     const proposeDataFlow = (command) => remote
         .execute("POST",
-        `${BASE_URL}/propose-flow`,
+        `${BASE_URL}/propose`,
         command);
 
     return {
