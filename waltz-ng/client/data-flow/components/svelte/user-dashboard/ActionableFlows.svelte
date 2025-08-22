@@ -5,7 +5,6 @@ import GridWithCellRenderer from "../../../../common/svelte/GridWithCellRenderer
 import Pill from "../../../../common/svelte/Pill.svelte";
 import ProposedFlowFilters from "./ProposedFlowFilters.svelte";
 import { filters } from "./filter-store";
-import Icon from "../../../../common/svelte/Icon.svelte";
 import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
 import TextClipper from "../../../../common/svelte/TextClipper.svelte";
@@ -14,63 +13,9 @@ import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.sve
 export let userName;
 export let flows = [];
 export let dataTypeIdToNameMap = {};
-
-const STATUS_PILL_DEFINITION = {
-    PROPOSED_CREATE: {
-        name: "Proposed Create",
-        color: "#a77a52"
-    },
-    PENDING_APPROVALS: {
-        name: "Pending Approvals",
-        color: "#8e8e56"
-    },
-    FULLY_APPROVED: {
-        name: "Fully Approved",
-        color: "#5bb65d"
-    },
-    SOURCE_APPROVED: {
-        name: "Source Approved",
-        color: "#74a259"
-    },
-    TARGET_APPROVED: {
-        name: "Target Approved",
-        color: "#74a259"
-    },
-    SOURCE_REJECTED: {
-        name: "Source Rejected",
-        color: "#c1664f"
-    },
-    TARGET_REJECTED: {
-        name: "Target Rejected",
-        color: "#c1664f"
-    }
-}
-
-const CHANGE_TYPE_PILL_DEFINITION = {
-    ADD: {
-        name: "Create",
-        color: "#267dda"
-    },
-    EDIT: {
-        name: "Modify",
-        color: "#716b9e"
-    },
-    REMOVE: {
-        name: "Delete",
-        color: "#da524b"
-    }
-}
-
-const PROPOSER_PILL_DEFINITION = {
-    USER: {
-        name: "You",
-        color: "#000000"
-    },
-    OTHERS: {
-        name: "Others",
-        color: "#000000"
-    }
-}
+export let statusPillDefs = {};
+export let changeTypePillDefs = {};
+export let proposerTypePillDefs = {};
 
 const columnDefs = [
     {
@@ -130,7 +75,7 @@ const columnDefs = [
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
             pillKey: row.status,
-            pillDefs: STATUS_PILL_DEFINITION
+            pillDefs: statusPillDefs
         })
     },
     {
@@ -139,7 +84,7 @@ const columnDefs = [
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
             pillKey: row.changeType,
-            pillDefs: CHANGE_TYPE_PILL_DEFINITION
+            pillDefs: changeTypePillDefs
         })
     },
     { field: "proposedFlowCommand.reason.description", name: "Proposal Reason" },
@@ -150,22 +95,6 @@ const columnDefs = [
     { field: "targetApprovedBy", name: "Target Approver"},
     { field: "targetApprovedAt", name: "Target Approved At"}
 ];
-
-const TABS = {
-    ACTION: "Actionable",
-    HISTORY: "Historical"
-}
-
-let selectedTab = TABS.ACTION;
-let stateFilterDefs = _.cloneDeep(STATUS_PILL_DEFINITION);
-let changeFilterDefs = _.cloneDeep(CHANGE_TYPE_PILL_DEFINITION);
-let proposerFilterDefs = _.cloneDeep(PROPOSER_PILL_DEFINITION);
-
-$: fetch("http://localhost:3456/api/get/prop-flows", {method: "GET"})
-    .then(r => r.json())
-    .then(r => flows = r)
-    .catch(e => flows = []);
-
 
 $: gridData = flows && flows.length
     ? flows.map(flow => ({
@@ -194,50 +123,23 @@ $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "U
 </script>
 
 <div>
-    <div class="waltz-tabs" style="padding-top: 1em">
-        <input type="radio"
-               bind:group={selectedTab}
-               value={TABS.ACTION}
-               id={TABS.ACTION}>
-        <label class="wt-label"
-               for={TABS.ACTION}>
-            <span><Icon name="pencil-square-o"/>{TABS.ACTION} Flows
-                <small class="text-muted">{filteredGridData ? filteredGridData.length : 0}</small>
-            </span>
-        </label>
-
-        <input type="radio"
-               bind:group={selectedTab}
-               value={TABS.HISTORY}
-               id={TABS.HISTORY}>
-        <label class="wt-label"
-               for={TABS.HISTORY}>
-            <span><Icon name="pencil-square-o"/>{TABS.HISTORY} Flows</span>
-        </label>
-        <div class="wt-tab wt-active">
-            {#if selectedTab === TABS.ACTION}
-                {#if flows}
-                    <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
-                    {#if flows.length === 0}
-                        <NoData>
-                            No actionable data flows found for {userName}
-                        </NoData>
-                    {:else }
-                        <ProposedFlowFilters pillDefs={stateFilterDefs}
-                                             stateCounts={stateCounts}
-                                             changePillDefs={changeFilterDefs}
-                                             changeTypeCounts={changeTypeCounts}
-                                             proposerPillDefs={proposerFilterDefs}
-                                             proposerPillCounts={proposerCounts}/>
-                        <GridWithCellRenderer columnDefs={columnDefs}
-                                              rowData={filteredGridData}/>
-                    {/if}
-                {:else}
-                    <LoadingPlaceholder/>
-                {/if}
-            {:else if selectedTab === TABS.HISTORY}
-                -> TODO: Implement this
-            {/if}
-        </div>
-    </div>
+    {#if flows}
+        <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
+        {#if flows.length === 0}
+            <NoData>
+                No actionable data flows found for {userName}
+            </NoData>
+        {:else }
+            <ProposedFlowFilters pillDefs={statusPillDefs}
+                                 stateCounts={stateCounts}
+                                 changePillDefs={changeTypePillDefs}
+                                 changeTypeCounts={changeTypeCounts}
+                                 proposerPillDefs={proposerTypePillDefs}
+                                 proposerPillCounts={proposerCounts}/>
+            <GridWithCellRenderer columnDefs={columnDefs}
+                                  rowData={filteredGridData}/>
+        {/if}
+    {:else}
+        <LoadingPlaceholder/>
+    {/if}
 </div>

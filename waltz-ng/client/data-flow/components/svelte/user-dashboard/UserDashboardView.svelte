@@ -10,6 +10,7 @@
     import {personStore} from "../../../../svelte-stores/person-store";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
+    import ProposedFlows from "./ProposedFlows.svelte";
 
     $: userCall = userStore.load();
     $: user = $userCall?.data;
@@ -54,7 +55,7 @@
                 </ol>
             </div>
             <div slot="summary">
-                <ActionableFlows userName={user.userName} dataTypeIdToNameMap={dataTypeIdToNameMap}/>
+                <ProposedFlows userName={user.userName} dataTypeIdToNameMap={dataTypeIdToNameMap}/>
                 <br/>
                 <hr/>
                 <UserFlows userName={user.userName} flows={involvedFlows}/>
