@@ -5,23 +5,29 @@ import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
-import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -37,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -46,7 +51,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -68,8 +72,8 @@ public class MakerCheckerService {
     private final ChangeLogDao changeLogDao;
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final LogicalFlowService logicalFlowService;
-
     private final PhysicalFlowService physicalFlowService;
+    private final LogicalFlowDao logicalFlowDao;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -80,7 +84,8 @@ public class MakerCheckerService {
                         ChangeLogDao changeLogDao,
                         WorkflowDefinition proposedFlowWorkflowDefinition,
                         LogicalFlowService logicalFlowService,
-                        PhysicalFlowService physicalFlowService) {
+                        PhysicalFlowService physicalFlowService,
+                        LogicalFlowDao logicalFlowDao) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
         checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
@@ -90,6 +95,7 @@ public class MakerCheckerService {
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
@@ -100,6 +106,7 @@ public class MakerCheckerService {
         this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
+        this.logicalFlowDao = logicalFlowDao;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
@@ -213,25 +220,22 @@ public class MakerCheckerService {
         LogicalFlow logicalFlow;
 
         ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
-        if (proposedFlow.flowDef().logicalFlowId().isPresent()) {
-            LOG.debug("Logical flow already exists; skipping creation");
-            //create only physical flow
-            physicalFlow = createPhysicalFlow(proposedFlow, username);
-            LocalDateTime now = nowUtc();
+        LOG.info("Proposed flow definition : {}", proposedFlow);
 
-            logicalFlow = ImmutableLogicalFlow.builder()
-                    .source(proposedFlow.flowDef().source())
-                    .target(proposedFlow.flowDef().target())
-                    .lastUpdatedAt(now)
-                    .lastUpdatedBy(username)
-                    .created(UserTimestamp.mkForUser(username, now))
-                    .build();
+        Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();
+
+        if (logicalFlowId.isPresent()) {
+            LOG.debug("Logical flow already exists, logical flow id is : {}, so skipping creation", logicalFlowId.get());
+            logicalFlow = logicalFlowDao.getByFlowId(logicalFlowId.get());
         } else {
             //create logical flow
             logicalFlow = createLogicalFlow(proposedFlow, username);
-            //create physical flow
-            physicalFlow = createPhysicalFlow(proposedFlow, username);
         }
+
+        //create physical flow
+        physicalFlow = createPhysicalFlow(proposedFlow, username);
+
+        LOG.info("Successfully created flows for proposedFlowId = {}", proposedFlowId);
 
         return ImmutableLogicalPhysicalFlowCreationResponse.builder()
                 .logicalFlow(logicalFlow)
@@ -247,9 +251,11 @@ public class MakerCheckerService {
     }
 
     private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow) {
+        Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();
+
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(proposedFlow.flowDef().specification())
-                .logicalFlowId(Optional.of(proposedFlow.id()).get())
+                .logicalFlowId(logicalFlowId.orElse(0L))
                 .flowAttributes(proposedFlow.flowDef().flowAttributes())
                 .dataTypeIds(proposedFlow.flowDef().dataTypeIds())
                 .build();
@@ -269,6 +275,8 @@ public class MakerCheckerService {
 
     private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
+
+        LOG.info("User: {}, adding new physical flow: {}", username, command);
         try {
             return physicalFlowService.create(command, username);
         } catch (Exception ex) {
