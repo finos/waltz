@@ -3,6 +3,7 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.utils.Checker;
+import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.service.maker_checker.MakerCheckerPermissionService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -35,7 +36,7 @@ public class MakerCheckerPermissionEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "checkUserPermission"), this::checkUserPermission);
 
     }
-    public Checker checkUserPermission(Request request, Response response) throws IOException, InsufficientPrivelegeException {
+    public ProposeFlowPermission checkUserPermission(Request request, Response response) throws IOException, InsufficientPrivelegeException {
         String username = WebUtilities.getUsername(request);
         ProposedFlowCommand proposedFlowCommand = WebUtilities.readBody(request, ProposedFlowCommand.class);
         return makerCheckerPermissionService.checkUserPermission(username, proposedFlowCommand.source(), proposedFlowCommand.target());
