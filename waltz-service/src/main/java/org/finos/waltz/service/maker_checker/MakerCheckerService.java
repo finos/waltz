@@ -50,6 +50,7 @@ public class MakerCheckerService {
 
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
+    private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private final EntityWorkflowService entityWorkflowService;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
@@ -160,17 +161,16 @@ public class MakerCheckerService {
      */
     public ProposedFlowResponse getProposedFlowById(long id) {
         ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+        if (proposedFlowRecord == null) {
+            throw new NoSuchElementException("ProposedFlow not found: " + id);
+        }
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, id);
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName("Propose Flow Lifecycle Workflow");
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
                 .flatMap(EntityWorkflowDefinition::id)
                 .orElseThrow(() -> new NoSuchElementException("Propose Flow Lifecycle Workflow not found"));
         EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, entityReference);
         List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, entityReference);
-
-        if (proposedFlowRecord == null) {
-            throw new NoSuchElementException("ProposedFlow not found: " + id);
-        }
         try {
 
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
