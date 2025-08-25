@@ -2,7 +2,6 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.utils.Checker;
 import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.service.maker_checker.MakerCheckerPermissionService;
 import org.finos.waltz.web.WebUtilities;
@@ -15,7 +14,6 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.Set;
 
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
