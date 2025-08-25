@@ -26,32 +26,36 @@
             adding PROPOSED_FLOW to permission_group_involvement table with their operations
             for APPLICATION , END_USER_APPLICATION, ACTOR
         </comment>
-        <sql>
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'APPROVE', N'APPLICATION', N'PROPOSED_FLOW', NULL, NULL);
-
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'REJECT', N'APPLICATION', N'PROPOSED_FLOW', NULL, NULL);
-
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'APPROVE', N'END_USER_APPLICATION', N'PROPOSED_FLOW', NULL, NULL);
-
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'REJECT', N'END_USER_APPLICATION', N'PROPOSED_FLOW', NULL, NULL);
-
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'APPROVE', N'ACTOR', N'PROPOSED_FLOW', NULL, NULL);
-
-            INSERT INTO WALTZ_DEV.dbo.permission_group_involvement
-            (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-            VALUES(1, 1, N'REJECT', N'ACTOR', N'PROPOSED_FLOW', NULL, NULL);
-
-        </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
+            <sql>
+                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+                    select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+                    from involvement_group ig where name = 'Flow Approvers'
+            </sql>
 
     </changeSet>
 

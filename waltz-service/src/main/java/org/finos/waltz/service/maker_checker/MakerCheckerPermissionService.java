@@ -4,8 +4,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.permission_group.Permission;
-import org.finos.waltz.model.utils.Checker;
-import org.finos.waltz.model.utils.ImmutableChecker;
+import org.finos.waltz.model.utils.ImmutableProposeFlowPermission;
+import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.slf4j.Logger;
@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service
@@ -32,12 +30,12 @@ public class MakerCheckerPermissionService {
         this.permissionGroupService = permissionGroupService;
     }
 
-    public Checker checkUserPermission(String username, EntityReference sourceEntityReference , EntityReference targetEntityReference) {
+    public ProposeFlowPermission checkUserPermission(String username, EntityReference sourceEntityReference , EntityReference targetEntityReference) {
         Set<Operation> sourceOperationSet = validatePermission(username, sourceEntityReference);
         LOG.info("sourceOperationSet : {}", sourceOperationSet);
         Set<Operation> targetOperationSet = validatePermission(username, targetEntityReference);
         LOG.info("targetOperationSet : {}", targetOperationSet);
-        return ImmutableChecker.builder()
+        return ImmutableProposeFlowPermission.builder()
                 .sourceApprover(sourceOperationSet)
                 .targetApprover(targetOperationSet)
                 .build();
