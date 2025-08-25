@@ -162,10 +162,11 @@ public class MakerCheckerService {
         ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, id);
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName("Propose Flow Lifecycle Workflow");
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(Optional.ofNullable(entityWorkflowDefinition)
+        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
                 .flatMap(EntityWorkflowDefinition::id)
-                .orElseThrow(() -> new NoSuchElementException("Propose Flow Lifecycle Workflow not found")), entityReference);
-        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForWorkflowId(id);
+                .orElseThrow(() -> new NoSuchElementException("Propose Flow Lifecycle Workflow not found"));
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, entityReference);
+        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, entityReference);
 
         if (proposedFlowRecord == null) {
             throw new NoSuchElementException("ProposedFlow not found: " + id);
