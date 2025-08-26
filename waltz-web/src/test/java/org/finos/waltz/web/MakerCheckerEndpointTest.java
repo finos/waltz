@@ -2,6 +2,10 @@ package org.finos.waltz.web;
 
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
 import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -19,12 +23,11 @@ import spark.Response;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -224,7 +227,44 @@ class MakerCheckerEndpointTest {
                 .lastUpdatedBy("waltz")
                 .id(567)
                 .build();
-
+        EntityReference proposedFlowEntity = ImmutableEntityReference.builder()
+                .id(1L)
+                .kind(PROPOSED_FLOW)
+                .name("Proposed Flow")
+                .externalId("487-1")
+                .description("Testing")
+                .build();
+        EntityWorkflowState workflowState = ImmutableEntityWorkflowState.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .state("PENDING_APPROVALS")
+                .build();
+        EntityWorkflowTransition workflowTransition = ImmutableEntityWorkflowTransition.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .fromState("PROPOSED_CREATE")
+                .toState("PENDING_APPROVALS")
+                .reason("flow proposed")
+                .build();
+        EntityWorkflowTransition workflowTransition2 = ImmutableEntityWorkflowTransition.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .fromState("PENDING_APPROVALS")
+                .toState("SOURCE_APPROVED")
+                .reason("source approved")
+                .build();
+        List<EntityWorkflowTransition> workflowTransitionList = new ArrayList<>();
+        workflowTransitionList.add(workflowTransition);
+        workflowTransitionList.add(workflowTransition2);
         ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
                 .source(entityReference)
                 .target(entityReference)
@@ -245,6 +285,8 @@ class MakerCheckerEndpointTest {
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
+                .workflowState(workflowState)
+                .workflowTransitionList(workflowTransitionList)
                 .build();
 
         //When
