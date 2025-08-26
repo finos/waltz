@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
@@ -147,6 +148,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
             ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
             assertNotNull(proposedFlowResponse);
+            assertNotNull((proposedFlowResponse.workflowState().workflowId()));
+            assertTrue(proposedFlowResponse.workflowTransitionList().size() > 0);
 
         } catch (Exception e) {
             e.printStackTrace();
