@@ -26,5 +26,7 @@ public enum Operation {
     LOCK,
     REMOVE,
     UPDATE,
-    UNKNOWN
+    UNKNOWN,
+    APPROVE,
+    REJECT
 }
