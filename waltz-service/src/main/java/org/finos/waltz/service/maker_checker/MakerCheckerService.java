@@ -24,7 +24,15 @@ import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -89,7 +97,7 @@ public class MakerCheckerService {
                         WorkflowDefinition proposedFlowWorkflowDefinition,
                         LogicalFlowService logicalFlowService,
                         PhysicalFlowService physicalFlowService,
-                        LogicalFlowDao logicalFlowDao, DSLContext dsl, MakerCheckerPermissionService permissionService) throws FlowCreationException {
+                        LogicalFlowDao logicalFlowDao, DSLContext dsl, MakerCheckerPermissionService permissionService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
         checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
@@ -248,7 +256,7 @@ public class MakerCheckerService {
         }
 
         //create physical flow
-        physicalFlow = createPhysicalFlow(proposedFlow, username);
+        physicalFlow = createPhysicalFlow(proposedFlow, username, logicalFlow.id());
 
         LOG.info("Successfully created flows for proposedFlowId = {}", proposedFlowId);
 
@@ -265,12 +273,10 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow) {
-        Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();
-
+    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow, Optional<Long> logicalFlowId) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(proposedFlow.flowDef().specification())
-                .logicalFlowId(logicalFlowId.orElse(0L))
+                .logicalFlowId(proposedFlow.flowDef().logicalFlowId().orElse(logicalFlowId.get()))
                 .flowAttributes(proposedFlow.flowDef().flowAttributes())
                 .dataTypeIds(proposedFlow.flowDef().dataTypeIds())
                 .build();
@@ -288,8 +294,8 @@ public class MakerCheckerService {
         }
     }
 
-    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
-        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
+    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username, Optional<Long> logicalFlowId) throws FlowCreationException {
+        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow, logicalFlowId);
 
         LOG.info("User: {}, adding new physical flow: {}", username, command);
         try {
