@@ -233,7 +233,7 @@ public class MakerCheckerService {
         }
 
         //create physical flow
-        physicalFlow = createPhysicalFlow(proposedFlow, username);
+        physicalFlow = createPhysicalFlow(proposedFlow, username, logicalFlow.id());
 
         LOG.info("Successfully created flows for proposedFlowId = {}", proposedFlowId);
 
@@ -250,12 +250,10 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow) {
-        Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();
-
+    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow, Optional<Long> logicalFlowId) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(proposedFlow.flowDef().specification())
-                .logicalFlowId(logicalFlowId.orElse(0L))
+                .logicalFlowId(proposedFlow.flowDef().logicalFlowId().orElse(logicalFlowId.get()))
                 .flowAttributes(proposedFlow.flowDef().flowAttributes())
                 .dataTypeIds(proposedFlow.flowDef().dataTypeIds())
                 .build();
@@ -273,8 +271,8 @@ public class MakerCheckerService {
         }
     }
 
-    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
-        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
+    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username, Optional<Long> logicalFlowId) throws FlowCreationException {
+        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow, logicalFlowId);
 
         LOG.info("User: {}, adding new physical flow: {}", username, command);
         try {
