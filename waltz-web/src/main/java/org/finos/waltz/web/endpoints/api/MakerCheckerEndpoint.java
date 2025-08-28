@@ -1,5 +1,7 @@
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -16,6 +18,7 @@ import spark.Response;
 import java.io.IOException;
 
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
+import static org.finos.waltz.web.WebUtilities.getUsername;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
@@ -42,6 +45,8 @@ public class MakerCheckerEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, PROPOSE.getVerb()), this::proposeNewFlow);
 
         getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id"), this::getProposedFlowById);
+
+        getForDatum(mkPath(BASE_URL, ":proposed_flow_id", "approve"), this::createLogicalAndPhysicalFlowFromProposedFlowDef);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -53,5 +58,11 @@ public class MakerCheckerEndpoint implements Endpoint {
     public ProposedFlowResponse getProposedFlowById(Request request, Response response) {
         long proposedFlowId = WebUtilities.getLong(request, "id");
         return makerCheckerService.getProposedFlowById(proposedFlowId);
+    }
+
+    public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(Request request, Response response) throws FlowCreationException {
+        long proposedFlowId = WebUtilities.getLong(request, "proposed_flow_id");
+        String username = getUsername(request);
+        return makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
     }
 }

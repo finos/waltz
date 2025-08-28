@@ -3,11 +3,13 @@ package org.finos.waltz.service.maker_checker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.changelog.ChangeLogDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
@@ -28,6 +30,8 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -64,10 +68,12 @@ public class MakerCheckerService {
 
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
+    private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private final EntityWorkflowService entityWorkflowService;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
+    private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
     private final DSLContext dslContext;
     private final ChangeLogDao changeLogDao;
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
@@ -79,6 +85,7 @@ public class MakerCheckerService {
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
                         EntityWorkflowStateDao entityWorkflowStateDao,
                         EntityWorkflowTransitionDao entityWorkflowTransitionDao,
+                        EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
                         ChangeLogDao changeLogDao,
@@ -89,6 +96,7 @@ public class MakerCheckerService {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
         checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
+        checkNotNull(entityWorkflowDefinitionDao, "entityWorkflowDefinitionDao cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(changeLogDao, "changeLogDao cannot be null");
@@ -100,6 +108,7 @@ public class MakerCheckerService {
         this.entityWorkflowService = entityWorkflowService;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
         this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
+        this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.proposedFlowDao = proposedFlowDao;
         this.dslContext = dslContext;
         this.changeLogDao = changeLogDao;
@@ -185,6 +194,13 @@ public class MakerCheckerService {
         if (proposedFlowRecord == null) {
             throw new NoSuchElementException("ProposedFlow not found: " + id);
         }
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, id);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Propose Flow Lifecycle Workflow not found"));
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, entityReference);
+        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, entityReference);
         try {
 
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
@@ -198,6 +214,8 @@ public class MakerCheckerService {
                     .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
                     .createdBy(proposedFlowRecord.getCreatedBy())
                     .flowDef(flowDefinition)
+                    .workflowState(entityWorkflowState)
+                    .workflowTransitionList(entityWorkflowTransitionList)
                     .build();
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
