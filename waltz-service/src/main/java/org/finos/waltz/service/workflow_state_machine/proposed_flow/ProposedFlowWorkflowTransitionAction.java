@@ -36,6 +36,18 @@ public enum ProposedFlowWorkflowTransitionAction {
         return null;
     }
 
+    public static ProposedFlowWorkflowTransitionAction findByVerb(String verb) {
+        if (verb == null) {
+            return null;
+        }
+        for (ProposedFlowWorkflowTransitionAction action : ProposedFlowWorkflowTransitionAction.values()) {
+            if (action.verb.equalsIgnoreCase(verb)) {
+                return action;
+            }
+        }
+        return null;
+    }
+
     public String getVerb() {
         return verb;
     }

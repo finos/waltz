@@ -75,7 +75,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
             }
         } catch (Exception e) {
             // Wrap persistence exceptions in a runtime exception to signal a critical failure
-            throw new IllegalStateException("Failed to persist state change for entity " + context.getEntityId() + ": " + e.getMessage(), e);
+            throw new IllegalStateException("Failed to persist state change for entity " + context.getEntityReference() + ": " + e.getMessage(), e);
         }
 
         return toState;
@@ -92,7 +92,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
                     "No transition definition found for state '%s' and action '%s' for entity %s",
                     currentState,
                     action,
-                    context.getEntityId());
+                    context.getEntityReference());
             LOG.error(message);
             throw new TransitionNotFoundException(message);
         }
@@ -106,7 +106,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
                     "A transition for state '%s' and action '%s' exists for entity %s, but its predicate failed",
                     currentState,
                     action,
-                    context.getEntityId());
+                    context.getEntityReference());
             LOG.error(message);
             throw new TransitionPredicateFailedException(message);
         }

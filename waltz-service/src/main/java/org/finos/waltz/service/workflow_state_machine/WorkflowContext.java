@@ -1,36 +1,27 @@
 package org.finos.waltz.service.workflow_state_machine;
 
+import org.finos.waltz.model.EntityReference;
+
 /**
  * A generic context object passed to predicates and listeners.
  * This should contain all information necessary to evaluate a transition.
  */
-public class WorkflowContext<S extends Enum<S>> {
+public class WorkflowContext {
     //workflow_id, entity_id, entity_kind uniquely identifies a record in the entity_workflow_state
     private final long workflowId;
-    private final long entityId;
-    private final String entityKind;
+    private final EntityReference entityReference;
     private final String userId;
     private final String reason; // Reason for the transition
 
-    public WorkflowContext(long workflowId, long entityId, String entityKind, String userId, String reason) {
+    public WorkflowContext(long workflowId, EntityReference entityReference, String userId, String reason) {
         this.workflowId = workflowId;
-        this.entityId = entityId;
-        this.entityKind = entityKind;
+        this.entityReference = entityReference;
         this.userId = userId;
         this.reason = reason;
     }
 
-    // Getters...
     public long getWorkflowId() {
         return workflowId;
-    }
-
-    public long getEntityId() {
-        return entityId;
-    }
-
-    public String getEntityKind() {
-        return entityKind;
     }
 
     public String getUserId() {
@@ -39,5 +30,9 @@ public class WorkflowContext<S extends Enum<S>> {
 
     public String getReason() {
         return reason;
+    }
+
+    public EntityReference getEntityReference() {
+        return entityReference;
     }
 }

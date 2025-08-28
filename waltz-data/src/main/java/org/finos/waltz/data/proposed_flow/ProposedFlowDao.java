@@ -22,7 +22,7 @@ public class ProposedFlowDao {
         this.dsl = dsl;
     }
 
-    public Long saveProposedFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand){
+    public Long saveProposedFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
         ProposedFlowRecord proposedFlowRecord = dsl.newRecord(PROPOSED_FLOW);
         proposedFlowRecord.setFlowDef(requestBody);
         proposedFlowRecord.setCreatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));

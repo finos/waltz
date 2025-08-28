@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
 @Repository
@@ -89,5 +90,17 @@ public class EntityWorkflowStateDao {
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         stateRecord.insert();
+    }
+
+    public long updateState(long workflowId, EntityReference ref, String user, String workflowState) {
+        return dsl
+                .update(ENTITY_WORKFLOW_STATE)
+                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
+                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
+                .execute();
     }
 }

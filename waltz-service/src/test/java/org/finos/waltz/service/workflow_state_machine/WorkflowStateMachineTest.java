@@ -2,6 +2,9 @@ package org.finos.waltz.service.workflow_state_machine;
 
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +30,10 @@ public class WorkflowStateMachineTest {
 
     private WorkflowStateMachine<WorkflowStateMachineState, WorkflowStateMachineTransitionAction, WorkflowStateMachineContext> machine;
     private WorkflowStateMachineContext context;
+    private EntityReference entityRef = ImmutableEntityReference.builder()
+            .kind(EntityKind.APPLICATION)
+            .id(1L)
+            .build();
 
     protected enum WorkflowStateMachineState {
         START,
@@ -45,7 +52,7 @@ public class WorkflowStateMachineTest {
 
     class WorkflowStateMachineContext extends WorkflowContext {
         public WorkflowStateMachineContext() {
-            super(1L, 101L, "TEST_ENTITY", "test_user", "Initial context reason");
+            super(1L, entityRef, "test_user", "Initial context reason");
         }
     }
 
