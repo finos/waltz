@@ -241,7 +241,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    void testWhenLogicalFlowAlreadyExistsThenOnlyPhysicalFlowIsCreated_1() throws JsonProcessingException, FlowCreationException {
+    void testWhenLogicalFlowAlreadyExistsThenOnlyPhysicalFlowIsCreated() throws JsonProcessingException, FlowCreationException {
         // 1. Arrange ----------------------------------------------------------
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
