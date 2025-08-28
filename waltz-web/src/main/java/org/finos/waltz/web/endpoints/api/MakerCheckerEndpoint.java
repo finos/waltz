@@ -1,8 +1,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -21,7 +19,6 @@ import java.io.IOException;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
-import static org.finos.waltz.web.WebUtilities.getUsername;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.findByVerb;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readBody;
@@ -75,11 +72,5 @@ public class MakerCheckerEndpoint implements Endpoint {
                 proposedFlowAction,
                 WebUtilities.getUsername(request),
                 proposedFlowActionCommand);
-    }
-
-    public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(Request request, Response response) throws FlowCreationException {
-        long proposedFlowId = WebUtilities.getLong(request, "proposed_flow_id");
-        String username = getUsername(request);
-        return makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
     }
 }
