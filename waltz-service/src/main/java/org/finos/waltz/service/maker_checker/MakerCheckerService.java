@@ -16,6 +16,8 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -26,12 +28,12 @@ import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationR
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -47,28 +49,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 
 
 @Service
 public class MakerCheckerService {
-
     private static final Logger LOG = LoggerFactory.getLogger(MakerCheckerService.class);
-
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
+    private static final EntityKind PROPOSED_FLOW_ENTITY_KIND = EntityKind.PROPOSED_FLOW;
+
     private final EntityWorkflowService entityWorkflowService;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final ProposedFlowDao proposedFlowDao;
@@ -80,6 +81,10 @@ public class MakerCheckerService {
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowService physicalFlowService;
     private final LogicalFlowDao logicalFlowDao;
+    private final DSLContext dsl;
+    private final MakerCheckerPermissionService permissionService;
+    private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
+            proposedFlowStateMachine;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -92,7 +97,7 @@ public class MakerCheckerService {
                         WorkflowDefinition proposedFlowWorkflowDefinition,
                         LogicalFlowService logicalFlowService,
                         PhysicalFlowService physicalFlowService,
-                        LogicalFlowDao logicalFlowDao) {
+                        LogicalFlowDao logicalFlowDao, DSLContext dsl, MakerCheckerPermissionService permissionService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
         checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
@@ -103,6 +108,7 @@ public class MakerCheckerService {
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+        checkNotNull(permissionService, "MakerCheckerPermissionService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
@@ -116,10 +122,13 @@ public class MakerCheckerService {
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.logicalFlowDao = logicalFlowDao;
+        this.dsl = dsl;
+//        Get the state machine from the definition
+        proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
+        this.permissionService = permissionService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
-
         AtomicReference<Long> proposedFlowId = new AtomicReference<>(-1L);
         AtomicReference<EntityWorkflowDefinition> entityWorkflowDefinition = new AtomicReference<>();
         String msg = PROPOSED_FLOW_CREATED_WITH_SUCCESS;
@@ -131,21 +140,17 @@ public class MakerCheckerService {
                 LOG.info("New ProposedFlowId is : {} ", proposedFlowId);
                 entityWorkflowDefinition.set(entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow"));
                 if (entityWorkflowDefinition.get().id().isPresent()) {
-                    // 1. Get the state machine from the definition
-                    WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
-                            proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
-
-                    // 2. Get current state and build context
+                    // Get current state and build context
                     ProposedFlowWorkflowContext workflowContext = new ProposedFlowWorkflowContext(
                             entityWorkflowDefinition.get().id().get(),
-                            proposedFlowId.get(), EntityKind.PROPOSED_FLOW.name(), username, "reason");
+                            mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowId.get()), username, "reason");
 
-                    // 3. Fire the action
+                    // Fire the action
                     ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(PROPOSED_CREATE, PROPOSE, workflowContext);
                     entityWorkflowStateDao.createWorkflowState(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(),
-                            username, EntityKind.PROPOSED_FLOW, newState, "Proposed Flow Submitted");
+                            username, PROPOSED_FLOW_ENTITY_KIND, newState, "Proposed Flow Submitted");
                     entityWorkflowTransitionDao.createWorkflowTransition(proposedFlowId.get(), entityWorkflowDefinition.get().id().get(),
-                            username, EntityKind.PROPOSED_FLOW, PROPOSED_CREATE, newState, "flow proposed");
+                            username, PROPOSED_FLOW_ENTITY_KIND, PROPOSED_CREATE, newState, "flow proposed");
                 } else {
                     throw new NoDataFoundException("Could not find workflow definition: Propose Flow Lifecycle Workflow");
                 }
@@ -177,7 +182,7 @@ public class MakerCheckerService {
                 .builder()
                 .message(msg)
                 .userId(userName)
-                .parentReference(mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId))
+                .parentReference(mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowId))
                 .operation(Operation.ADD)
                 .severity(Severity.INFORMATION)
                 .build();
@@ -251,7 +256,7 @@ public class MakerCheckerService {
         }
 
         //create physical flow
-        physicalFlow = createPhysicalFlow(proposedFlow, username);
+        physicalFlow = createPhysicalFlow(proposedFlow, username, logicalFlow.id());
 
         LOG.info("Successfully created flows for proposedFlowId = {}", proposedFlowId);
 
@@ -268,12 +273,10 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow) {
-        Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();
-
+    private PhysicalFlowCreateCommand mapProposedFlowToPhysicalFlowCreateCommand(ProposedFlowResponse proposedFlow, Optional<Long> logicalFlowId) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(proposedFlow.flowDef().specification())
-                .logicalFlowId(logicalFlowId.orElse(0L))
+                .logicalFlowId(proposedFlow.flowDef().logicalFlowId().orElse(logicalFlowId.get()))
                 .flowAttributes(proposedFlow.flowDef().flowAttributes())
                 .dataTypeIds(proposedFlow.flowDef().dataTypeIds())
                 .build();
@@ -291,8 +294,8 @@ public class MakerCheckerService {
         }
     }
 
-    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
-        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow);
+    private PhysicalFlowCreateCommandResponse createPhysicalFlow(ProposedFlowResponse proposedFlow, String username, Optional<Long> logicalFlowId) throws FlowCreationException {
+        PhysicalFlowCreateCommand command = mapProposedFlowToPhysicalFlowCreateCommand(proposedFlow, logicalFlowId);
 
         LOG.info("User: {}, adding new physical flow: {}", username, command);
         try {
@@ -301,5 +304,72 @@ public class MakerCheckerService {
             LOG.error("Failed to create physical flow from proposedFlowId={}", proposedFlow.id(), ex);
             throw new FlowCreationException("Physical flow creation failed", ex);
         }
+    }
+
+    public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
+                                                   ProposedFlowWorkflowTransitionAction transitionAction,
+                                                   String username,
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
+        AtomicReference<ProposedFlowResponse> proposedFlowResponse = new AtomicReference<>();
+        Long workflowId = entityWorkflowService.searchByName("Propose Flow Lifecycle Workflow").id().get();
+
+        final ProposedFlowResponse proposedFlowById = getProposedFlowById(proposedFlowId);
+        proposedFlowResponse.set(proposedFlowById);
+        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
+                username,
+                mkRef(EntityKind.valueOf(proposedFlowById.sourceEntityKind()), proposedFlowById.sourceEntityId()),
+                mkRef(EntityKind.valueOf(proposedFlowById.targetEntityKind()), proposedFlowById.targetEntityId())
+        );
+        boolean isSourceApprover = !flowPermission.sourceApprover().isEmpty();
+        boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
+
+//        Fetch the current state
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(
+                workflowId,
+                mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowId));
+        ProposedFlowWorkflowState currentState = valueOf(entityWorkflowState.state());
+
+        // 2. Get current state and build context
+        ProposedFlowWorkflowContext workflowContext =
+                new ProposedFlowWorkflowContext(
+                        workflowId, entityWorkflowState.entityReference(), username, proposedFlowActionCommand.comment())
+                        .setSourceApprover(isSourceApprover)
+                        .setTargetApprover(isTargetApprover)
+                        .setCurrentState(currentState);
+
+        try {
+            dslContext.transaction(dslContext -> {
+                // Fire the transitionAction
+                ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(
+                        currentState,
+                        transitionAction,
+                        workflowContext);
+
+                // if the transition not found, not permitted or new state == current state happen, abort
+                // Persist the new state.
+                entityWorkflowTransitionDao.createWorkflowTransition(proposedFlowId, workflowId,
+                        username, PROPOSED_FLOW_ENTITY_KIND, currentState, newState, proposedFlowActionCommand.comment());
+                entityWorkflowStateDao.updateState(workflowId, entityWorkflowState.entityReference(),
+                        username, newState.name());
+
+                List<ChangeLog> changeLogList = Arrays.asList(
+                        createChangeLogObject(format("Entity Workflow State changed to %s", newState), username, proposedFlowId),
+                        createChangeLogObject(format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState), username, proposedFlowId));
+                changeLogDao.write(changeLogList);
+
+                if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(newState)) {
+                    LogicalPhysicalFlowCreationResponse response = createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
+                    proposedFlowResponse.set(ImmutableProposedFlowResponse
+                            .copyOf(proposedFlowResponse.get())
+                            .withLogicalFlowId(response.logicalFlow().id().get())
+                            .withPhysicalFlowId(response.physicalFlowCreateCommandResponse().entityReference().id()));
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Error Occurred : {} ", e.getMessage());
+            throw e;
+        }
+
+        return proposedFlowResponse.get();
     }
 }

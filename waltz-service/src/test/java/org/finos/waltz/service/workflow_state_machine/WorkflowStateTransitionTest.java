@@ -1,5 +1,8 @@
 package org.finos.waltz.service.workflow_state_machine;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,11 +14,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class WorkflowStateTransitionTest {
-    public static final TestContext CONTEXT = new TestContext();
+    public final TestContext CONTEXT = new TestContext();
     @Mock
     private WorkflowTransitionListener mockListener;
     @Mock
     private Predicate<TestContext> mockPredicate;
+
+    private EntityReference entityRef = ImmutableEntityReference.builder()
+            .kind(EntityKind.APPLICATION)
+            .id(1L)
+            .build();
 
     private enum TestState {
         A, B
@@ -25,9 +33,9 @@ public class WorkflowStateTransitionTest {
         GO
     }
 
-    private static class TestContext extends WorkflowContext {
+    class TestContext extends WorkflowContext {
         public TestContext() {
-            super(1L, 101L, "TEST_ENTITY", "test_user", "Test context reason");
+            super(1L, entityRef, "test_user", "Test context reason");
         }
     }
 

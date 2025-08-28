@@ -1,22 +1,42 @@
 package org.finos.waltz.service.workflow_state_machine.proposed_flow;
 
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowContext;
 
-public class ProposedFlowWorkflowContext extends WorkflowContext<ProposedFlowWorkflowState> {
-    private ProposedFlowWorkflowState previousState;
+public class ProposedFlowWorkflowContext extends WorkflowContext {
+    private ProposedFlowWorkflowState currentState;
     private boolean isSourceApprover;
-    private String userRole;
+    private boolean isTargetApprover;
 
-    public ProposedFlowWorkflowContext(long workflowId, long entityId, String entityKind, String userId, String reason) {
-        super(workflowId, entityId, entityKind, userId, reason);
+    public ProposedFlowWorkflowContext(long workflowId, EntityReference entityReference, String userId, String reason) {
+        super(workflowId, entityReference, userId, reason);
     }
 
-    public ProposedFlowWorkflowState getPreviousState() {
-        return previousState;
+    public ProposedFlowWorkflowState getCurrentState() {
+        return currentState;
     }
 
-    public void setPreviousState(ProposedFlowWorkflowState previousState) {
-        this.previousState = previousState;
+    public ProposedFlowWorkflowContext setCurrentState(ProposedFlowWorkflowState currentState) {
+        this.currentState = currentState;
+        return this;
+    }
+
+    public boolean isSourceApprover() {
+        return isSourceApprover;
+    }
+
+    public ProposedFlowWorkflowContext setSourceApprover(boolean sourceApprover) {
+        isSourceApprover = sourceApprover;
+        return this;
+    }
+
+    public boolean isTargetApprover() {
+        return isTargetApprover;
+    }
+
+    public ProposedFlowWorkflowContext setTargetApprover(boolean targetApprover) {
+        isTargetApprover = targetApprover;
+        return this;
     }
 }
