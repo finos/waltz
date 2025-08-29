@@ -151,7 +151,7 @@
                 <button class="btn btn-success"
                         disabled={incompleteRecord}
                         on:click={() => launchCommand()}>
-                    Create
+                    Propose
                 </button>
 
                 {#if incompleteRecord}

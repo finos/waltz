@@ -63,9 +63,12 @@
         }
     }
 
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === "true";
+
     $: logicalFlows = _
         .chain($logicalFlowsCall?.data)
-        .filter(f => _.includes(editableFlows, f.id))
+        // if proposals enabled show all non-read-only flows
+        .filter(f => (dataFlowProposalsEnabled && !f.isReadOnly) || _.includes(editableFlows, f.id))
         .orderBy([
             d => d.source.name.toLowerCase(),
             d => d.target.name.toLowerCase()
@@ -111,7 +114,7 @@
 
             {:else if activeMode === Modes.CREATE}
                 <!--setting can be undefined if the setting is not created-->
-                {#if dataFlowProposalSetting && dataFlowProposalSetting.value === "true"}
+                {#if dataFlowProposalsEnabled}
                     <LogicalFlowMocker {primaryEntityRef}
                                        bind:source
                                        bind:target
