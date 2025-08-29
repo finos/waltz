@@ -17,6 +17,7 @@ export let dataTypeIdToNameMap = {};
 export let statusPillDefs = {};
 export let changeTypePillDefs = {};
 export let proposerTypePillDefs = {};
+export let currentTabText;
 
 // works for only two sections if we add another than a new method may be required
 onMount(() => {
@@ -136,10 +137,10 @@ $: isDataFiltered = (!(filteredDataSize === gridData.length) || ($filters.change
 
 <div>
     {#if flows}
-        <small class="text-muted">Data flows that have been proposed to you or those that you may have proposed.</small>
+        <small class="text-muted">{currentTabText} data flows that have been proposed to you or those that you may have proposed.</small>
         {#if flows.length === 0}
             <NoData>
-                No actionable data flows found for {userName}
+                No data flows found for {userName}
             </NoData>
         {:else }
             <ProposedFlowFilters pillDefs={statusPillDefs}

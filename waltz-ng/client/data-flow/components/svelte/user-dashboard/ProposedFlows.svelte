@@ -7,10 +7,6 @@
     export let dataTypeIdToNameMap = {};
 
     const actionStatusPillDefs = {
-        PROPOSED_CREATE: {
-            name: "Proposed Create",
-            color: "#a77a52"
-        },
         PENDING_APPROVALS: {
             name: "Pending Approvals",
             color: "#8e8e56"
@@ -59,11 +55,11 @@
 
     const proposerTypePillDefs = {
         USER: {
-            name: "You",
+            name: "Proposed By You",
             color: "#000000"
         },
         OTHERS: {
-            name: "Others",
+            name: "For Approval",
             color: "#000000"
         }
     }
@@ -118,14 +114,16 @@
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
                              statusPillDefs={actionStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
-                             proposerTypePillDefs={proposerTypePillDefs}/>
+                             proposerTypePillDefs={proposerTypePillDefs}
+                             currentTabText={TABS.ACTION}/>
         { :else if selectedTab === TABS.HISTORY }
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
                              statusPillDefs={historicalStatusPilldefs}
                              changeTypePillDefs={changeTypePillDefs}
-                             proposerTypePillDefs={proposerTypePillDefs}/>
+                             proposerTypePillDefs={proposerTypePillDefs}
+                             currentTabText={TABS.HISTORY}/>
         {/if}
     </div>
 </div>

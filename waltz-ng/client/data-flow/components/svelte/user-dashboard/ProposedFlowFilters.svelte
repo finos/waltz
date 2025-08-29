@@ -85,7 +85,7 @@
             </div>
             <hr class="filter-divider" />
             <div class="filter-group">
-                <h4>Proposed By</h4>
+                <h4>Proposal Type</h4>
                 <div class="filter-pills">
                     {#each Object.keys(proposerPillDefs) as key}
                         <div
@@ -123,7 +123,7 @@
             </div>
             <hr class="filter-divider" />
             <div class="filter-group">
-                <h4>Change Type</h4>
+                <h4>Operation</h4>
                 <div class="filter-pills">
                     {#each Object.keys(changePillDefs) as key}
                     <div
