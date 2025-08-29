@@ -56,14 +56,16 @@
         }
     }
 
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === "true";
+
     $: {
         if (primaryEntityRef) {
             logicalFlowsCall = logicalFlowStore.findByEntityReference(primaryEntityRef);
-            editableFlowsCall = logicalFlowStore.findEditableFlowIdsForParentReference(primaryEntityRef);
+            if(!dataFlowProposalsEnabled) {
+                editableFlowsCall = logicalFlowStore.findEditableFlowIdsForParentReference(primaryEntityRef);
+            }
         }
     }
-
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === "true";
 
     $: logicalFlows = _
         .chain($logicalFlowsCall?.data)
