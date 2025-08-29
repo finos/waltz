@@ -210,7 +210,7 @@
                             id: $ctrl.selected.type === "source" ? $ctrl.selected.entity.id : $ctrl.entityRef.id,
                             targetLogicalFlowId: $ctrl.selected.logicalFlowId
                         })'
-                ng-if="$ctrl.dataFlowProposalsEnabled">
+                ng-if="$ctrl.dataFlowProposalsEnabled && !$ctrl.selected.logicalFlow.isReadOnly">
                 Propose Data Flow
             </a>
         </span>
