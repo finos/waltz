@@ -1,6 +1,6 @@
 <script>
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import ActionableFlows from "./ActionableFlows.svelte";
+    import ProposedFlowSection from "./ProposedFlowSection.svelte";
 
     export let userName;
     export let flows = [];
@@ -113,19 +113,19 @@
     </label>
     <div class="wt-tab wt-active">
         { #if selectedTab === TABS.ACTION }
-        <ActionableFlows userName={userName}
-            flows={actionableFlows}
-            dataTypeIdToNameMap={dataTypeIdToNameMap}
-            statusPillDefs={actionStatusPillDefs}
-            changeTypePillDefs={changeTypePillDefs}
-            proposerTypePillDefs={proposerTypePillDefs}/>
+        <ProposedFlowSection userName={userName}
+                             flows={actionableFlows}
+                             dataTypeIdToNameMap={dataTypeIdToNameMap}
+                             statusPillDefs={actionStatusPillDefs}
+                             changeTypePillDefs={changeTypePillDefs}
+                             proposerTypePillDefs={proposerTypePillDefs}/>
         { :else if selectedTab === TABS.HISTORY }
-        <ActionableFlows userName={userName}
-                         flows={historicalFlows}
-                         dataTypeIdToNameMap={dataTypeIdToNameMap}
-                         statusPillDefs={historicalStatusPilldefs}
-                         changeTypePillDefs={changeTypePillDefs}
-                         proposerTypePillDefs={proposerTypePillDefs}/>
+        <ProposedFlowSection userName={userName}
+                             flows={historicalFlows}
+                             dataTypeIdToNameMap={dataTypeIdToNameMap}
+                             statusPillDefs={historicalStatusPilldefs}
+                             changeTypePillDefs={changeTypePillDefs}
+                             proposerTypePillDefs={proposerTypePillDefs}/>
         {/if}
     </div>
 </div>

@@ -5,3 +5,9 @@ export const filters = writable({
     change: [],
     proposer: []
 });
+
+export const tempFilters = writable({
+    state: [],
+    change: [],
+    proposer: []
+});

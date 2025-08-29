@@ -4,7 +4,7 @@
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
-    import ActionableFlows from "./ActionableFlows.svelte";
+    import ProposedFlowSection from "./ProposedFlowSection.svelte";
     import UserFlows from "./UserFlows.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {personStore} from "../../../../svelte-stores/person-store";

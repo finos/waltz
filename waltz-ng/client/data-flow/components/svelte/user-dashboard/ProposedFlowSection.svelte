@@ -4,11 +4,12 @@ import ViewLinkLabelled from "../../../../common/svelte/ViewLinkLabelled.svelte"
 import GridWithCellRenderer from "../../../../common/svelte/GridWithCellRenderer.svelte";
 import Pill from "../../../../common/svelte/Pill.svelte";
 import ProposedFlowFilters from "./ProposedFlowFilters.svelte";
-import { filters } from "./filter-store";
+import { filters, tempFilters } from "./filter-store";
 import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
 import TextClipper from "../../../../common/svelte/TextClipper.svelte";
 import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
+import {onMount} from "svelte";
 
 export let userName;
 export let flows = [];
@@ -16,6 +17,13 @@ export let dataTypeIdToNameMap = {};
 export let statusPillDefs = {};
 export let changeTypePillDefs = {};
 export let proposerTypePillDefs = {};
+
+// works for only two sections if we add another than a new method may be required
+onMount(() => {
+   const ephemeralFilters = $tempFilters;
+   $tempFilters = $filters;
+   $filters = ephemeralFilters;
+});
 
 const columnDefs = [
     {
@@ -120,6 +128,10 @@ $: stateCounts = _.countBy(gridData, "status");
 $: changeTypeCounts = _.countBy(gridData, "changeType");
 $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "USER" : "OTHERS");
 
+$: filteredDataSize = filteredGridData.length;
+
+$: isDataFiltered = (!(filteredDataSize === gridData.length) || ($filters.change.length || $filters.proposer.length || $filters.state.length));
+
 </script>
 
 <div>
@@ -136,6 +148,7 @@ $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "U
                                  changeTypeCounts={changeTypeCounts}
                                  proposerPillDefs={proposerTypePillDefs}
                                  proposerPillCounts={proposerCounts}/>
+            <small class="text-muted">{isDataFiltered ? `Filtered: (${filteredDataSize})` : ``}</small>
             <GridWithCellRenderer columnDefs={columnDefs}
                                   rowData={filteredGridData}/>
         {/if}
