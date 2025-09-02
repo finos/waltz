@@ -36,11 +36,7 @@ import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +46,7 @@ import java.time.LocalDateTime;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
@@ -127,7 +121,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         try {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
+            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow("testUser", command);
             assertNotNull(response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,7 +178,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         try {
             ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
+            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow("testUser", command);
             assertNotNull(response);
 
             ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
@@ -246,7 +240,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = "testUser";
         ProposedFlowCommand proposedFlowCommand = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-        Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, username, proposedFlowCommand);
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
 
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
@@ -255,8 +249,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
         String description = "test description";
 
-        entityWorkflowStateDao.createWorkflowState(proposedFlowId, entityWorkflowDefId, username, entityReference.kind(), workflowState, description);
-
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), username,
+                workflowState.name(), description);
         // 2. Act --------------------------------------------------------------
         LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
 
@@ -317,7 +311,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = "testUser";
         ProposedFlowCommand proposedFlowCommand = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-        Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, username, proposedFlowCommand);
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
 
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
@@ -326,7 +320,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
         String description = "test description";
 
-        entityWorkflowStateDao.createWorkflowState(proposedFlowId, entityWorkflowDefId, username, entityReference.kind(), workflowState, description);
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), username,
+                workflowState.name(), description);
 
         ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
@@ -410,7 +405,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = "testUser";
         ProposedFlowCommand proposedFlowCommand = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-        Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, username, proposedFlowCommand);
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
 
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
@@ -419,7 +414,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
         String description = "test description";
 
-        entityWorkflowStateDao.createWorkflowState(proposedFlowId, entityWorkflowDefId, username, entityReference.kind(), workflowState, description);
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), username,
+                workflowState.name(), description);
 
         ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);

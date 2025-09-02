@@ -35,7 +35,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
     ProposedFlowDao proposedFlowDao;
 
     @Test
-    public void testSearchByName(){
+    public void testSearchByName() {
 
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
@@ -82,14 +82,14 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "    ]\n" +
                 "}";
 
-        try{
+        try {
             ProposedFlowCommand command = getJsonMapper().readValue(
                     requestBody,
                     ProposedFlowCommand.class);
 
-            Long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
+            Long proposedFlowId = proposedFlowDao.saveProposedFlow("testUser", command);
             assertNotNull(proposedFlowId);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -146,7 +146,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                     requestBody,
                     ProposedFlowCommand.class);
 
-            long proposedFlowId = proposedFlowDao.saveProposedFlow(requestBody, "testUser", command);
+            long proposedFlowId = proposedFlowDao.saveProposedFlow("testUser", command);
             assertTrue(proposedFlowId > 0);
 
             ProposedFlowRecord proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);

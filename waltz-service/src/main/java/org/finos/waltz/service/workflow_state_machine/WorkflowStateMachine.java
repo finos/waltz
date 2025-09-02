@@ -44,7 +44,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         S toState = transition.getToState();
 
         try {
-            //TODO.. currently the state machine will only return the next transition state and is not responsible for database updates
+            // Currently the state machine will only return the next transition state and is not responsible for database updates
             // 1. Log the transition
 //            transitionDao.createWorkflowTransition(
 //                    context.getWorkflowDefId(),
@@ -57,7 +57,7 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
 //                    "waltz"); // or some other provenance
 
             // 2. Update the current state; insert if it's a new state
-            //TODO.. should be insert or update
+            // Following would have to be either an insert for initial state or update for subsequent transitions
 //            stateDao.insertOrUpdate(
 //                    context.getWorkflowId(),
 //                    context.getEntityId(),
@@ -68,9 +68,9 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
 //                    context.getReason());
 
             // 3. Execute supplementary listener only after successful persistence
-            //TODO.. make listener work asynchronous?
+            // Listeners can be considered to work asynchronous, current implementation doesn't support that
             if (transition.getListener() != null) {
-                //TODO.. refresh context to reflect new changes?
+                // Refreshing context object can be considered to reflect new changes
                 transition.getListener().onTransition(currentState, toState, context);
             }
         } catch (Exception e) {

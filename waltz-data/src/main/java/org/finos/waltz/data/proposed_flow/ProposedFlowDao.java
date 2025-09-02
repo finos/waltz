@@ -1,5 +1,6 @@
 package org.finos.waltz.data.proposed_flow;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
@@ -22,9 +24,9 @@ public class ProposedFlowDao {
         this.dsl = dsl;
     }
 
-    public Long saveProposedFlow(String requestBody, String username, ProposedFlowCommand proposedFlowCommand) {
+    public Long saveProposedFlow(String username, ProposedFlowCommand proposedFlowCommand) throws JsonProcessingException {
         ProposedFlowRecord proposedFlowRecord = dsl.newRecord(PROPOSED_FLOW);
-        proposedFlowRecord.setFlowDef(requestBody);
+        proposedFlowRecord.setFlowDef(getJsonMapper().writeValueAsString(proposedFlowCommand));
         proposedFlowRecord.setCreatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         proposedFlowRecord.setCreatedBy(username);
         proposedFlowRecord.setSourceEntityId(proposedFlowCommand.source().id());

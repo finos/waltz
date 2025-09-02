@@ -23,13 +23,13 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -59,7 +59,7 @@ public class EntityWorkflowService {
                                                                        EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
-        return entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workflowId, ref);
+        return entityWorkflowStateDao.getWorkflowState(workflowId, ref);
     }
 
 
@@ -70,7 +70,42 @@ public class EntityWorkflowService {
         return entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workflowId, ref);
     }
 
-    public EntityWorkflowDefinition searchByName(String name){
+    public EntityWorkflowDefinition searchByName(String name) {
         return entityWorkflowDefinitionDao.searchByName(name);
+    }
+
+    public void updateEntityWorkflow(EntityReference ref, Long entityWorkflowDefinitionId, String username,
+                                     String prevState, String newState, String transitionReason) {
+        entityWorkflowStateDao.updateState(entityWorkflowDefinitionId, ref,
+                username, newState);
+        entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
+                username, prevState, newState, transitionReason);
+    }
+
+    public void createEntityWorkflow(EntityReference ref, Long entityWorkflowDefinitionId, String username,
+                                     String workFlowStateDesc,
+                                     String prevState, String newState, String transitionReason) {
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefinitionId, ref,
+                username, newState, workFlowStateDesc);
+        entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
+                username, prevState, newState, transitionReason);
+    }
+
+    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
+        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
+        checkNotNull(ref, "ref cannot be null");
+
+        EntityWorkflowDefinition entityWorkflowDefinition = searchByName(workFlowDefName);
+        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getWorkflowState(workFlowId, ref);
+        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
+
+        return ImmutableEntityWorkflowView.builder()
+                .workflowDefinition(entityWorkflowDefinition)
+                .workflowState(entityWorkflowState)
+                .workflowTransitionList(entityWorkflowTransitionList)
+                .build();
     }
 }

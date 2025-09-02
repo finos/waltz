@@ -48,7 +48,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
     private static final Predicate<ProposedFlowWorkflowContext> canTargetFullyApprove = isTargetApprover
             .and(ctx -> ctx.getCurrentState() == SOURCE_APPROVED);
 
-    // TODO.. might have to refresh the context object, the state values can be stale
+    // Refreshing the context object might be needed as the state values can be stale
     private static final WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
             System.out.printf(
                     "LISTENER: User '%s' was notified of transition from %s -> %s for entity %s%n",
