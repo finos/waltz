@@ -1,5 +1,6 @@
 package org.finos.waltz.model.proposed_flow;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.Nullable;
@@ -39,6 +40,19 @@ public abstract class ProposedFlowResponse {
 
     public abstract EntityWorkflowState workflowState();
 
+    @Nullable
+    @JsonIgnore()
     public abstract List<EntityWorkflowTransition> workflowTransitionList();
+
+    public abstract long workflowDefinitionId();
+    @Nullable
+
+    public abstract ProposedFlowTransitionState sourceApproved();
+    @Nullable
+
+    public abstract ProposedFlowTransitionState targetApproved();
+    @Nullable
+
+    public abstract ProposedFlowTransitionState fullyApproved();
 
 }

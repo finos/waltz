@@ -24,15 +24,7 @@ import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -51,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -69,6 +62,9 @@ public class MakerCheckerService {
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final EntityKind PROPOSED_FLOW_ENTITY_KIND = EntityKind.PROPOSED_FLOW;
+    private static final String SOURCE_APPROVED = "SOURCE_APPROVED";
+    private static final String TARGET_APPROVED = "TARGET_APPROVED";
+    private static final String FULLY_APPROVED = "FULLY_APPROVED";
 
     private final EntityWorkflowService entityWorkflowService;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
@@ -191,15 +187,19 @@ public class MakerCheckerService {
     /**
      * Retrieves a proposed flow by its primary key.
      *
-     * @param id the flow's primary key
+     * @param id
      * @return ProposedFlowResponse
      */
     public ProposedFlowResponse getProposedFlowById(long id) {
-        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+          ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+          return getProposedFlow(proposedFlowRecord);
+    }
+
+    private ProposedFlowResponse getProposedFlow(ProposedFlowRecord proposedFlowRecord) {
         if (proposedFlowRecord == null) {
-            throw new NoSuchElementException("ProposedFlow not found: " + id);
+            throw new NoSuchElementException("ProposedFlow not found: " + proposedFlowRecord.getId());
         }
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, id);
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
                 .flatMap(EntityWorkflowDefinition::id)
@@ -210,7 +210,7 @@ public class MakerCheckerService {
 
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
-            return ImmutableProposedFlowResponse.builder()
+            ImmutableProposedFlowResponse response = ImmutableProposedFlowResponse.builder()
                     .id(proposedFlowRecord.getId())
                     .sourceEntityId(proposedFlowRecord.getSourceEntityId())
                     .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
@@ -220,12 +220,82 @@ public class MakerCheckerService {
                     .createdBy(proposedFlowRecord.getCreatedBy())
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowState)
-                    .workflowTransitionList(entityWorkflowTransitionList)
+                    .workflowDefinitionId(workFlowId)
                     .build();
+
+            return getProposedFlowResponseWithTransitionStates(entityWorkflowTransitionList, response);
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
+    }
+
+    private ProposedFlowResponse getProposedFlowResponseWithTransitionStates(List<EntityWorkflowTransition> transitionList,
+                                                                            ProposedFlowResponse response)
+    {
+        boolean sourceUpdated = false;
+        boolean targetUpdated = false;
+        ImmutableProposedFlowTransitionState sourceApproved = null;
+        ImmutableProposedFlowTransitionState targetApproved = null;
+        ImmutableProposedFlowTransitionState fullyApproved = null;
+        for (EntityWorkflowTransition transitionRecord : transitionList) {
+            switch (transitionRecord.toState()) {
+                case SOURCE_APPROVED:
+                    sourceApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+
+                    sourceUpdated = true;
+                    break;
+                case TARGET_APPROVED:
+                    targetApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+
+                    targetUpdated = true;
+                    break;
+                case FULLY_APPROVED:
+                    fullyApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+                    if (!sourceUpdated) {
+                        sourceApproved = ImmutableProposedFlowTransitionState.builder()
+                                .reason(transitionRecord.reason())
+                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                                .build();
+                    } else if (!targetUpdated) {
+                        targetApproved = ImmutableProposedFlowTransitionState.builder()
+                                .reason(transitionRecord.reason())
+                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                                .build();
+                    }
+
+                    break;
+
+            }
+
+        }
+
+        ImmutableProposedFlowResponse builder = ImmutableProposedFlowResponse.copyOf(response)
+                .withSourceApproved(sourceApproved)
+                .withTargetApproved(targetApproved)
+                .withFullyApproved(fullyApproved);
+
+        return builder;
+    }
+    public List<ProposedFlowResponse> getProposedFlows(){
+        List<ProposedFlowRecord> proposedFlowRecords = proposedFlowDao.getProposedFlows();
+        return proposedFlowRecords.stream()
+                .map(record -> getProposedFlow(record))
+                .collect(Collectors.toList());
     }
 
     /**

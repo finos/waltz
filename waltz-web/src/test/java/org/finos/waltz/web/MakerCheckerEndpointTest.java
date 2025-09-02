@@ -286,6 +286,7 @@ class MakerCheckerEndpointTest {
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
+                .workflowDefinitionId(7)
                 .workflowTransitionList(workflowTransitionList)
                 .build();
 
