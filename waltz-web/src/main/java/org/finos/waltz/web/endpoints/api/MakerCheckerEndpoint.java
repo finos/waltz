@@ -22,6 +22,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
@@ -54,6 +55,9 @@ public class MakerCheckerEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, ":entityKind", ":entityId", "permissions", "user"), this::getUserPermissionsForEntityRef);
 
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
+
+        getForDatum(mkPath(BASE_URL, "propose-flow"), this::getProposedFlows);
+
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -65,6 +69,10 @@ public class MakerCheckerEndpoint implements Endpoint {
     public ProposedFlowResponse getProposedFlowById(Request request, Response response) {
         long proposedFlowId = WebUtilities.getLong(request, "id");
         return makerCheckerService.getProposedFlowById(proposedFlowId);
+    }
+
+    public List<ProposedFlowResponse> getProposedFlows(Request request, Response response) {
+        return makerCheckerService.getProposedFlows();
     }
 
     public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {

@@ -11,6 +11,7 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -61,6 +63,9 @@ public class MakerCheckerService {
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final EntityKind PROPOSED_FLOW_ENTITY_KIND = EntityKind.PROPOSED_FLOW;
+    private static final String SOURCE_APPROVED = "SOURCE_APPROVED";
+    private static final String TARGET_APPROVED = "TARGET_APPROVED";
+    private static final String FULLY_APPROVED = "FULLY_APPROVED";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowDao proposedFlowDao;
@@ -156,22 +161,28 @@ public class MakerCheckerService {
                 .build();
     }
 
+    public ProposedFlowResponse getProposedFlowById(long id) {
+        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
+        return getProposedFlow(proposedFlowRecord);
+    }
+
+
+
     /**
      * Retrieves a proposed flow by its primary key.
      *
-     * @param id the flow's primary key
+     * @param proposedFlowRecord the flow's primary key
      * @return ProposedFlowResponse
      */
-    public ProposedFlowResponse getProposedFlowById(long id) {
-        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
-        checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", id));
+    private ProposedFlowResponse getProposedFlow(ProposedFlowRecord proposedFlowRecord) {
+        checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
-        EntityReference entityReference = mkRef(PROPOSED_FLOW_ENTITY_KIND, id);
+        EntityReference entityReference = mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowRecord.getId());
         EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
-            return ImmutableProposedFlowResponse.builder()
+            ImmutableProposedFlowResponse response = ImmutableProposedFlowResponse.builder()
                     .id(proposedFlowRecord.getId())
                     .sourceEntityId(proposedFlowRecord.getSourceEntityId())
                     .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
@@ -181,12 +192,80 @@ public class MakerCheckerService {
                     .createdBy(proposedFlowRecord.getCreatedBy())
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
-                    .workflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .build();
+            return getProposedFlowResponseWithTransitionStates(entityWorkflowView.workflowTransitionList(), response);
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
+    }
+
+    private ProposedFlowResponse getProposedFlowResponseWithTransitionStates(List<EntityWorkflowTransition> transitionList,
+                                                                             ProposedFlowResponse response)
+    {
+        boolean sourceUpdated = false;
+        boolean targetUpdated = false;
+        ImmutableProposedFlowTransitionState sourceApproved = null;
+        ImmutableProposedFlowTransitionState targetApproved = null;
+        ImmutableProposedFlowTransitionState fullyApproved = null;
+        for (EntityWorkflowTransition transitionRecord : transitionList) {
+            switch (transitionRecord.toState()) {
+                case SOURCE_APPROVED:
+                    sourceApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+
+                    sourceUpdated = true;
+                    break;
+                case TARGET_APPROVED:
+                    targetApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+
+                    targetUpdated = true;
+                    break;
+                case FULLY_APPROVED:
+                    fullyApproved = ImmutableProposedFlowTransitionState.builder()
+                            .reason(transitionRecord.reason())
+                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                            .build();
+                    if (!sourceUpdated) {
+                        sourceApproved = ImmutableProposedFlowTransitionState.builder()
+                                .reason(transitionRecord.reason())
+                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                                .build();
+                    } else if (!targetUpdated) {
+                        targetApproved = ImmutableProposedFlowTransitionState.builder()
+                                .reason(transitionRecord.reason())
+                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
+                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
+                                .build();
+                    }
+
+                    break;
+
+            }
+
+        }
+
+        ImmutableProposedFlowResponse builder = ImmutableProposedFlowResponse.copyOf(response)
+                .withSourceApproved(sourceApproved)
+                .withTargetApproved(targetApproved)
+                .withFullyApproved(fullyApproved);
+
+        return builder;
+    }
+    public List<ProposedFlowResponse> getProposedFlows(){
+        List<ProposedFlowRecord> proposedFlowRecords = proposedFlowDao.getProposedFlows();
+        return proposedFlowRecords.stream()
+                .map(record -> getProposedFlow(record))
+                .collect(Collectors.toList());
     }
 
     /**
