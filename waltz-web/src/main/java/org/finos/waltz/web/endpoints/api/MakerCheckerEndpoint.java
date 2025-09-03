@@ -1,10 +1,13 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
@@ -23,8 +26,7 @@ import java.io.IOException;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.findByVerb;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
@@ -49,6 +51,7 @@ public class MakerCheckerEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, PROPOSE.getVerb()), this::proposeNewFlow);
 
         getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id"), this::getProposedFlowById);
+        getForDatum(mkPath(BASE_URL, ":entityKind", ":entityId", "permissions", "user"), this::getUserPermissionsForEntityRef);
 
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
     }
@@ -74,5 +77,11 @@ public class MakerCheckerEndpoint implements Endpoint {
                 proposedFlowAction,
                 WebUtilities.getUsername(request),
                 proposedFlowActionCommand);
+    }
+
+    public ProposeFlowPermission getUserPermissionsForEntityRef(Request request, Response response) throws IOException, InsufficientPrivelegeException {
+        String username = WebUtilities.getUsername(request);
+        EntityReference entityRef = getEntityReference(request, "entityKind", "entityId");
+        return makerCheckerService.getUserPermissionsForEntityRef(username, entityRef);
     }
 }

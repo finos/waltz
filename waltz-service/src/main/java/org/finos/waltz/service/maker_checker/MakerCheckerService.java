@@ -339,4 +339,15 @@ public class MakerCheckerService {
 
         return proposedFlowResponse.get();
     }
+
+    public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
+        if (EntityKind.PROPOSED_FLOW.equals(entityRef.kind())) {
+            ProposedFlowResponse flowResponse = getProposedFlowById(entityRef.id());
+            return permissionService.checkUserPermission(username,
+                    mkRef(EntityKind.valueOf(flowResponse.sourceEntityKind()), flowResponse.sourceEntityId()),
+                    mkRef(EntityKind.valueOf(flowResponse.targetEntityKind()), flowResponse.targetEntityId()));
+        } else {
+            throw new UnsupportedOperationException(String.format("%s is not supported", entityRef.kind()));
+        }
+    }
 }
