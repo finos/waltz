@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
@@ -51,4 +52,13 @@ public class ProposedFlowDao {
                 .where(PROPOSED_FLOW.ID.eq(id))
                 .fetchOneInto(ProposedFlowRecord.class);
     }
+
+    public List<ProposedFlowRecord> getProposedFlows() {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .fetchInto(ProposedFlowRecord.class);
+    }
 }
+
+
