@@ -7,7 +7,6 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
@@ -293,7 +292,12 @@ public class MakerCheckerService {
 
             LogicalPhysicalFlowCreationResponse response = null;
             ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
-                    .nextPossibleTransition(newState, transitionAction, workflowContext.setCurrentState(newState))
+                    .nextPossibleTransition(
+                            newState,
+                            transitionAction,
+                            workflowContext
+                                    .setCurrentState(newState)
+                                    .setPrevState(currentState))
                     .orElse(null);
 
             if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
@@ -328,7 +332,7 @@ public class MakerCheckerService {
                     mkRef(EntityKind.valueOf(flowResponse.sourceEntityKind()), flowResponse.sourceEntityId()),
                     mkRef(EntityKind.valueOf(flowResponse.targetEntityKind()), flowResponse.targetEntityId()));
         } else {
-            throw new UnsupportedOperationException(String.format("%s is not supported", entityRef.kind()));
+            throw new UnsupportedOperationException(format("%s is not supported", entityRef.kind()));
         }
     }
 }

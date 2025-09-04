@@ -43,10 +43,12 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
     // FILTERS
     private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> ctx.isSourceApprover();
     private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> ctx.isTargetApprover();
-    private static final Predicate<ProposedFlowWorkflowContext> canSourceFullyApprove = isSourceApprover
-            .and(ctx -> ctx.getCurrentState() == TARGET_APPROVED);
-    private static final Predicate<ProposedFlowWorkflowContext> canTargetFullyApprove = isTargetApprover
-            .and(ctx -> ctx.getCurrentState() == SOURCE_APPROVED);
+    private static final Predicate<ProposedFlowWorkflowContext> canGoFromTargetToFullyApprove = isSourceApprover
+            .and(ctx -> TARGET_APPROVED.equals(ctx.getCurrentState()))
+            .and(ctx -> SOURCE_APPROVED.equals(ctx.getPrevState()));
+    private static final Predicate<ProposedFlowWorkflowContext> canGoFromSourceToFullyApprove = isTargetApprover
+            .and(ctx -> SOURCE_APPROVED.equals(ctx.getCurrentState()))
+            .and(ctx -> TARGET_APPROVED.equals(ctx.getPrevState()));
 
     // Refreshing the context object might be needed as the state values can be stale
     private static final WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
@@ -83,7 +85,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
-                        canTargetFullyApprove, fullyApprovedTransitionListener)
+                        canGoFromSourceToFullyApprove, fullyApprovedTransitionListener)
                 .permit(SOURCE_APPROVED, TARGET_APPROVED, APPROVE,
                         isTargetApprover)
                 .permit(SOURCE_APPROVED, TARGET_REJECTED, REJECT,
@@ -91,7 +93,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
-                        canSourceFullyApprove, fullyApprovedTransitionListener)
+                        canGoFromTargetToFullyApprove, fullyApprovedTransitionListener)
                 .permit(TARGET_APPROVED, SOURCE_APPROVED, APPROVE,
                         isSourceApprover)
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,
