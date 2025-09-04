@@ -112,4 +112,16 @@
         </update>
     </changeSet>
 
+    <changeSet id="20250904-4388-1"
+               author="rohit-t.kumar">
+        <comment>4388: add proposal_type to proposed_flow table</comment>
+
+        <addColumn tableName="proposed_flow">
+            <column name="proposal_type"
+                    type="${proposal-type.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
