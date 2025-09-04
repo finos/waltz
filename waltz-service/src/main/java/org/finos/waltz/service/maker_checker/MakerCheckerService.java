@@ -55,9 +55,6 @@ public class MakerCheckerService {
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final EntityKind PROPOSED_FLOW_ENTITY_KIND = EntityKind.PROPOSED_FLOW;
-    private static final String SOURCE_APPROVED = "SOURCE_APPROVED";
-    private static final String TARGET_APPROVED = "TARGET_APPROVED";
-    private static final String FULLY_APPROVED = "FULLY_APPROVED";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowDao proposedFlowDao;
@@ -149,7 +146,7 @@ public class MakerCheckerService {
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
-            ImmutableProposedFlowResponse response = ImmutableProposedFlowResponse.builder()
+            return ImmutableProposedFlowResponse.builder()
                     .id(proposedFlowRecord.getId())
                     .sourceEntityId(proposedFlowRecord.getSourceEntityId())
                     .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
@@ -159,73 +156,13 @@ public class MakerCheckerService {
                     .createdBy(proposedFlowRecord.getCreatedBy())
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
+                    .workflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .build();
-            return getProposedFlowResponseWithTransitionStates(entityWorkflowView.workflowTransitionList(), response);
+
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
-    }
-
-    private ProposedFlowResponse getProposedFlowResponseWithTransitionStates(List<EntityWorkflowTransition> transitionList,
-                                                                             ProposedFlowResponse response) {
-        boolean sourceUpdated = false;
-        boolean targetUpdated = false;
-        ImmutableProposedFlowTransitionState sourceApproved = null;
-        ImmutableProposedFlowTransitionState targetApproved = null;
-        ImmutableProposedFlowTransitionState fullyApproved = null;
-        for (EntityWorkflowTransition transitionRecord : transitionList) {
-            switch (transitionRecord.toState()) {
-                case SOURCE_APPROVED:
-                    sourceApproved = ImmutableProposedFlowTransitionState.builder()
-                            .reason(transitionRecord.reason())
-                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
-                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
-                            .build();
-
-                    sourceUpdated = true;
-                    break;
-                case TARGET_APPROVED:
-                    targetApproved = ImmutableProposedFlowTransitionState.builder()
-                            .reason(transitionRecord.reason())
-                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
-                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
-                            .build();
-
-                    targetUpdated = true;
-                    break;
-                case FULLY_APPROVED:
-                    fullyApproved = ImmutableProposedFlowTransitionState.builder()
-                            .reason(transitionRecord.reason())
-                            .lastUpdatedAt(transitionRecord.lastUpdatedAt())
-                            .lastUpdatedBy(transitionRecord.lastUpdatedBy())
-                            .build();
-                    if (!sourceUpdated) {
-                        sourceApproved = ImmutableProposedFlowTransitionState.builder()
-                                .reason(transitionRecord.reason())
-                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
-                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
-                                .build();
-                    } else if (!targetUpdated) {
-                        targetApproved = ImmutableProposedFlowTransitionState.builder()
-                                .reason(transitionRecord.reason())
-                                .lastUpdatedAt(transitionRecord.lastUpdatedAt())
-                                .lastUpdatedBy(transitionRecord.lastUpdatedBy())
-                                .build();
-                    }
-
-                    break;
-
-            }
-
-        }
-
-        ImmutableProposedFlowResponse builder = ImmutableProposedFlowResponse.copyOf(response)
-                .withSourceApproved(sourceApproved)
-                .withTargetApproved(targetApproved)
-                .withFullyApproved(fullyApproved);
-
-        return builder;
     }
 
     public List<ProposedFlowResponse> getProposedFlows() {
