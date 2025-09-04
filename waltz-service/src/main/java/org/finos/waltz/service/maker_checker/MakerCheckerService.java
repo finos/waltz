@@ -5,10 +5,6 @@ import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.changelog.ChangeLog;
-import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
@@ -22,7 +18,6 @@ import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
@@ -38,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,8 +43,6 @@ import static java.util.Objects.requireNonNull;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.Operation.ADD;
-import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
@@ -69,7 +61,7 @@ public class MakerCheckerService {
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowDao proposedFlowDao;
-    private final ChangeLogService changeLogService;
+
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowService physicalFlowService;
@@ -81,7 +73,6 @@ public class MakerCheckerService {
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
                         ProposedFlowDao proposedFlowDao,
                         DSLContext dslContext,
-                        ChangeLogService changeLogService,
                         WorkflowDefinition proposedFlowWorkflowDefinition,
                         LogicalFlowService logicalFlowService,
                         PhysicalFlowService physicalFlowService,
@@ -89,13 +80,11 @@ public class MakerCheckerService {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
-        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(permissionService, "MakerCheckerPermissionService cannot be null");
 
-        this.changeLogService = changeLogService;
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
         this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
@@ -125,14 +114,6 @@ public class MakerCheckerService {
             ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(PROPOSED_CREATE, PROPOSE, workflowContext);
             entityWorkflowService.createEntityWorkflow(proposedFlowRef, workflowDefinition.id().get(),
                     username, "Proposed Flow Submitted", PROPOSED_CREATE.name(), newState.name(), "flow proposed");
-
-            List<ChangeLog> changeLogList = Arrays.asList(
-                    mkChangeLog(proposedFlowRef, username, ADD, "New Proposed Flow Created"),
-                    mkChangeLog(proposedFlowRef, username, ADD, format("Entity Workflow State changed to %s", newState)),
-                    mkChangeLog(proposedFlowRef, username, ADD,
-                            format("Entity Workflow Transition saved with from: %s to: %s State", PROPOSED_CREATE, newState))
-            );
-            changeLogService.write(changeLogList);
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = CommandOutcome.FAILURE.name();
@@ -148,24 +129,10 @@ public class MakerCheckerService {
                 .build();
     }
 
-    private ImmutableChangeLog mkChangeLog(EntityReference entityReference,
-                                           String userId,
-                                           Operation operation,
-                                           String message) {
-        return ImmutableChangeLog.builder()
-                .parentReference(entityReference)
-                .message(message)
-                .userId(userId)
-                .operation(operation)
-                .severity(Severity.INFORMATION)
-                .build();
-    }
-
     public ProposedFlowResponse getProposedFlowById(long id) {
         ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
         return getProposedFlow(proposedFlowRecord);
     }
-
 
 
     /**
@@ -201,8 +168,7 @@ public class MakerCheckerService {
     }
 
     private ProposedFlowResponse getProposedFlowResponseWithTransitionStates(List<EntityWorkflowTransition> transitionList,
-                                                                             ProposedFlowResponse response)
-    {
+                                                                             ProposedFlowResponse response) {
         boolean sourceUpdated = false;
         boolean targetUpdated = false;
         ImmutableProposedFlowTransitionState sourceApproved = null;
@@ -261,7 +227,8 @@ public class MakerCheckerService {
 
         return builder;
     }
-    public List<ProposedFlowResponse> getProposedFlows(){
+
+    public List<ProposedFlowResponse> getProposedFlows() {
         List<ProposedFlowRecord> proposedFlowRecords = proposedFlowDao.getProposedFlows();
         return proposedFlowRecords.stream()
                 .map(record -> getProposedFlow(record))
@@ -384,22 +351,20 @@ public class MakerCheckerService {
 
             // if the transition not found, not permitted or new state == current state happen, abort
             // Persist the new state.
-            entityWorkflowService.updateEntityWorkflow(
-                    proposedFlow.workflowState().entityReference(),
-                    proposedFlow.workflowState().workflowId(), username,
-                    currentState.name(), newState.name(), proposedFlowActionCommand.comment());
-
-            List<ChangeLog> changeLogList = Arrays.asList(
-                    mkChangeLog(proposedFlow.workflowState().entityReference(), username, UPDATE,
-                            format("Entity Workflow State changed to %s", newState)),
-                    mkChangeLog(proposedFlow.workflowState().entityReference(), username, UPDATE,
-                            format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
-            );
-            changeLogService.write(changeLogList);
+            entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
+                    proposedFlow.workflowState(), currentState, newState);
 
             LogicalPhysicalFlowCreationResponse response = null;
-            if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(newState)) {
+            ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
+                    .nextPossibleTransition(newState, transitionAction, workflowContext.setCurrentState(newState))
+                    .orElse(null);
+
+            if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
+                // auto switch to fully approved
                 response = createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
+
+                entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
+                        proposedFlow.workflowState(), newState, nextPossibleTransition);
             }
 
             // Refresh Return Object

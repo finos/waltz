@@ -23,27 +23,39 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_workflow.*;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.Operation.ADD;
+import static org.finos.waltz.model.Operation.UPDATE;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 
 @Service
 public class EntityWorkflowService {
-
+    private final ChangeLogService changeLogService;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
 
     @Autowired
-    public EntityWorkflowService(EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
+    public EntityWorkflowService(ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
                                  EntityWorkflowStateDao entityWorkflowStateDao,
                                  EntityWorkflowTransitionDao entityWorkflowTransitionDao) {
+        this.changeLogService = changeLogService;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
         this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
@@ -89,6 +101,30 @@ public class EntityWorkflowService {
                 username, newState, workFlowStateDesc);
         entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
                 username, prevState, newState, transitionReason);
+
+        List<ChangeLog> changeLogList = Arrays.asList(
+                mkChangeLog(ref, username, ADD, "New Workflow Created"),
+                mkChangeLog(ref, username, ADD, format("Entity Workflow State changed to %s", newState)),
+                mkChangeLog(ref, username, ADD,
+                        format("Entity Workflow Transition saved with from: %s to: %s State", PROPOSED_CREATE, newState))
+        );
+        changeLogService.write(changeLogList);
+    }
+
+    public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
+                                      ProposedFlowWorkflowState currentState, ProposedFlowWorkflowState newState) {
+        updateEntityWorkflow(
+                workflowState.entityReference(),
+                workflowState.workflowId(), username,
+                currentState.name(), newState.name(), reason);
+
+        List<ChangeLog> changeLogList = Arrays.asList(
+                mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                        format("Entity Workflow State changed to %s", newState)),
+                mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                        format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
+        );
+        changeLogService.write(changeLogList);
     }
 
     public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
@@ -106,6 +142,19 @@ public class EntityWorkflowService {
                 .workflowDefinition(entityWorkflowDefinition)
                 .workflowState(entityWorkflowState)
                 .workflowTransitionList(entityWorkflowTransitionList)
+                .build();
+    }
+
+    private ImmutableChangeLog mkChangeLog(EntityReference entityReference,
+                                           String userId,
+                                           Operation operation,
+                                           String message) {
+        return ImmutableChangeLog.builder()
+                .parentReference(entityReference)
+                .message(message)
+                .userId(userId)
+                .operation(operation)
+                .severity(Severity.INFORMATION)
                 .build();
     }
 }

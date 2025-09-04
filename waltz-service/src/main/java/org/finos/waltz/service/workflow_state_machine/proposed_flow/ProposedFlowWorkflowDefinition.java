@@ -83,13 +83,17 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
-                        canTargetFullyApprove, fullyApprovedTransitionListener)
+                        canSourceFullyApprove, fullyApprovedTransitionListener)
+                .permit(SOURCE_APPROVED, TARGET_APPROVED, APPROVE,
+                        isSourceApprover)
                 .permit(SOURCE_APPROVED, TARGET_REJECTED, REJECT,
                         isTargetApprover)
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
-                        canSourceFullyApprove, fullyApprovedTransitionListener)
+                        canTargetFullyApprove, fullyApprovedTransitionListener)
+                .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
+                        isTargetApprover)
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,
                         isSourceApprover);
 

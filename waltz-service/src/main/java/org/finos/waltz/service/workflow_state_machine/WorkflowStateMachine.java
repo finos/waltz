@@ -81,6 +81,16 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         return toState;
     }
 
+    public Optional<S> nextPossibleTransition(S currentState, A action, C context) {
+        return transitionsByState
+                .getOrDefault(currentState, Collections.emptySet())
+                .stream()
+                .filter(t -> t.getAction() == action)
+                .filter(t -> t.getCondition().test(context))
+                .findFirst()
+                .map(WorkflowStateTransition::getToState);
+    }
+
     private WorkflowStateTransition<S, A, C> findFirstMatchingTransition(S currentState, A action, C context) throws TransitionNotFoundException, TransitionPredicateFailedException {
         List<WorkflowStateTransition<S, A, C>> possibleTransitions = transitionsByState.getOrDefault(currentState, Collections.emptySet())
                 .stream()
