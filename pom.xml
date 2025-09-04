@@ -90,7 +90,7 @@
         <jbcrypt.version>0.4.3</jbcrypt.version>
         <jgrapht.version>1.4.0</jgrapht.version>
         <jool.version>0.9.15</jool.version>
-        <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
+        <jooq.version>3.18.29</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.10.0</junit.version>
         <jwt.version>4.3.0</jwt.version>
         <mockito.version>4.11.0</mockito.version>  <!-- 5.3.1 is 9+ -->
@@ -100,7 +100,7 @@
         <poi.version>5.2.4</poi.version>
         <slf4j.version>2.0.7</slf4j.version>
         <snakeyaml.version>1.33</snakeyaml.version>
-        <spark.version>2.9.4</spark.version> <!-- 2.9.3 causes issues with tomcat -->
+        <spark.version>2.9.4</spark.version>
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.30</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
