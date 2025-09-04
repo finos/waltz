@@ -33,6 +33,7 @@ import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.orgunit.OrganisationalUnitService;
 import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.roadmap.RoadmapService;
 import org.finos.waltz.service.server_information.ServerInformationService;
 import org.finos.waltz.service.software_catalog.SoftwareCatalogService;
@@ -71,6 +72,7 @@ public class EntitySearchService {
     private final OrganisationalUnitService organisationalUnitService;
     private final PersonService personService;
     private final PhysicalSpecificationService physicalSpecificationService;
+    private final PhysicalFlowService physicalFlowService;
     private final RoadmapService roadmapService;
     private final ServerInformationService serverInformationService;
     private final SoftwareCatalogService softwareCatalogService;
@@ -93,6 +95,7 @@ public class EntitySearchService {
                                OrganisationalUnitService organisationalUnitService,
                                PersonService personService,
                                PhysicalSpecificationService physicalSpecificationService,
+                               PhysicalFlowService physicalFlowService,
                                RoadmapService roadmapService,
                                ServerInformationService serverInformationService,
                                SoftwareCatalogService softwareCatalogService,
@@ -114,6 +117,7 @@ public class EntitySearchService {
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
         checkNotNull(personService, "personService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(roadmapService, "roadmapService cannot be null");
         checkNotNull(serverInformationService, "serverInformationService cannot be null");
         checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
@@ -134,6 +138,7 @@ public class EntitySearchService {
         this.organisationalUnitService = organisationalUnitService;
         this.personService = personService;
         this.physicalSpecificationService = physicalSpecificationService;
+        this.physicalFlowService = physicalFlowService;
         this.roadmapService = roadmapService;
         this.serverInformationService = serverInformationService;
         this.softwareCatalogService = softwareCatalogService;
@@ -198,6 +203,8 @@ public class EntitySearchService {
                 return () -> personService.search(options);
             case PHYSICAL_SPECIFICATION:
                 return () -> physicalSpecificationService.search(options);
+            case PHYSICAL_FLOW:
+                return () -> physicalFlowService.search(options);
             case ROADMAP:
                 return () -> roadmapService.search(options);
             case SERVER:

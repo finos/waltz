@@ -19,11 +19,14 @@
 package org.finos.waltz.data.physical_flow;
 
 import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.data.SearchUtilities;
 import org.finos.waltz.data.enum_value.EnumValueDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.enum_value.EnumValueKind;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
@@ -33,6 +36,7 @@ import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_flow.PhysicalFlowInfo;
 import org.finos.waltz.model.physical_flow.PhysicalFlowParsed;
 import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.PhysicalSpecDataType;
 import org.finos.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.Condition;
@@ -42,6 +46,7 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
+import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -67,8 +72,10 @@ import static org.finos.waltz.schema.Tables.DATA_TYPE;
 import static org.finos.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static org.finos.waltz.schema.Tables.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.jooq.impl.DSL.select;
 
 
 @Repository
@@ -485,8 +492,7 @@ public class PhysicalFlowDao {
 
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
-        return dsl.fetchCount(DSL
-                .select(PHYSICAL_FLOW.ID)
+        return dsl.fetchCount(select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
                 .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
@@ -554,4 +560,47 @@ public class PhysicalFlowDao {
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .execute();
     }
+
+    public List<PhysicalFlow> search(EntitySearchOptions options) {
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery());
+        if (terms.isEmpty()) {
+            return newArrayList();
+        }
+
+        Condition likeName = JooqUtilities.mkBasicTermSearch(PHYSICAL_FLOW.NAME, terms);
+        Condition likeDesc = JooqUtilities.mkBasicTermSearch(PHYSICAL_FLOW.DESCRIPTION, terms);
+        Condition likeExternalIdentifier = JooqUtilities.mkStartsWithTermSearch(PHYSICAL_FLOW.EXTERNAL_ID, terms)
+                .or(JooqUtilities.mkStartsWithTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
+
+        Condition searchFilter = likeName.or(likeDesc).or(likeExternalIdentifier);
+
+        boolean showRemoved = options
+                .entityLifecycleStatuses()
+                .contains(EntityLifecycleStatus.REMOVED);
+
+        Condition maybeFilterRemoved = showRemoved
+                ? DSL.trueCondition()  // match anything
+                : PHYSICAL_FLOW.IS_REMOVED.isFalse();
+
+        // Join with PHYSICAL_SPECIFICATION to access owning_entity_kind/id
+        SelectQuery<Record> query = dsl
+                .selectDistinct(PHYSICAL_FLOW.fields())
+                .from(PHYSICAL_FLOW)
+                .leftOuterJoin(EXTERNAL_IDENTIFIER)
+                .on(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())
+                        .and(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(Tables.PHYSICAL_FLOW.ID)))
+                .where(searchFilter)
+                .and(maybeFilterRemoved)
+                .orderBy(PHYSICAL_FLOW.NAME)
+                .limit(options.limit())
+                .getQuery();
+
+                return query.fetch(r -> {
+            PhysicalFlow flow = PhysicalFlowDao.TO_DOMAIN_MAPPER.map(r);
+            return ImmutablePhysicalFlow
+                    .copyOf(flow)
+                    .withDescription(flow.description());
+        });
+    }
+
 }
