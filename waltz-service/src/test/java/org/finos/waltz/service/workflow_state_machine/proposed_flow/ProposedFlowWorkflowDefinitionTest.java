@@ -89,6 +89,13 @@ class ProposedFlowWorkflowDefinitionTest {
     }
 
     @Test
+    void testSourceApprovedTransition_FromTargetApproved() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, APPROVE, context);
+        assertEquals(SOURCE_APPROVED, newState);
+    }
+
+    @Test
     void testTargetApprovedTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
         ProposedFlowWorkflowContext context = createContext(false, true, PENDING_APPROVALS);
         ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, context);
@@ -96,15 +103,26 @@ class ProposedFlowWorkflowDefinitionTest {
     }
 
     @Test
+    void testTargetApprovedTransition_FromSourceApproved() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, APPROVE, context);
+        assertEquals(TARGET_APPROVED, newState);
+    }
+
+    @Test
     void testFullyApprovedTransition_UserIsSourceApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED)
+                .setCurrentState(TARGET_APPROVED)
+                .setPrevState(SOURCE_APPROVED);
         ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, APPROVE, context);
         assertEquals(FULLY_APPROVED, newState);
     }
 
     @Test
     void testFullyApprovedTransition_UserIsTargetApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED);
+        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED)
+                .setCurrentState(SOURCE_APPROVED)
+                .setPrevState(TARGET_APPROVED);
         ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, APPROVE, context);
         assertEquals(FULLY_APPROVED, newState);
     }
