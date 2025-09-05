@@ -33,8 +33,8 @@ Getting started
 
 ### Server
 
-- Java 8
-- Embedded Jetty or WAR file (tested on Tomcat 7/8)
+- Java 17
+- Embedded Jetty or WAR file (tested on Tomcat 9/10)
 - Spark framework
 - JDBC via JOOQ
 
