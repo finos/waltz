@@ -6,11 +6,21 @@ import org.finos.waltz.service.workflow_state_machine.WorkflowContext;
 
 public class ProposedFlowWorkflowContext extends WorkflowContext {
     private ProposedFlowWorkflowState currentState;
+    private ProposedFlowWorkflowState prevState;
     private boolean isSourceApprover;
     private boolean isTargetApprover;
 
     public ProposedFlowWorkflowContext(long workflowId, EntityReference entityReference, String userId, String reason) {
         super(workflowId, entityReference, userId, reason);
+    }
+
+    public ProposedFlowWorkflowState getPrevState() {
+        return prevState;
+    }
+
+    public ProposedFlowWorkflowContext setPrevState(ProposedFlowWorkflowState prevState) {
+        this.prevState = prevState;
+        return this;
     }
 
     public ProposedFlowWorkflowState getCurrentState() {

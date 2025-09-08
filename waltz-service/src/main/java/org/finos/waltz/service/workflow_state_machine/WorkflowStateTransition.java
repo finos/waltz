@@ -16,7 +16,7 @@ public class WorkflowStateTransition<S extends Enum<S>, A extends Enum<A>, C ext
      * Transition happens only when the condition returns true
      */
     private final Predicate<C> condition;
-    //TODO.. multiple listeners? Future/Callback?
+    // Multiple listeners and/or Future/Callback implementation can be considered for future implementation
     private final WorkflowTransitionListener<S, C> listener;
 
     public WorkflowStateTransition(S fromState,
