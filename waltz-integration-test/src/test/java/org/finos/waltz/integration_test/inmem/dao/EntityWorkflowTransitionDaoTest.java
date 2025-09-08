@@ -20,6 +20,7 @@ package org.finos.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,8 @@ public class EntityWorkflowTransitionDaoTest extends BaseInMemoryIntegrationTest
 
     @Test
     public void testSearchByName() {
-        entityWorkflowTransitionDao.createWorkflowTransition(1L, 2L, "testUser",
-                PROPOSED_FLOW, PROPOSED_CREATE, PENDING_APPROVALS, "");
+        entityWorkflowTransitionDao.createWorkflowTransition(1L, EntityReference.mkRef(PROPOSED_FLOW, 2L), "testUser",
+                PROPOSED_CREATE.name(), PENDING_APPROVALS.name(), "");
         List<EntityWorkflowTransition> list = entityWorkflowTransitionDao.findForWorkflowId(2);
         assertNotNull(list);
     }

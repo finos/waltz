@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ProposedFlowWorkflowTransitionAction {
-
-    //TODO.. Remove verb?
     PROPOSE("Propose", "propose"),
     APPROVE("Approve", "approve"),
     REJECT("Reject", "reject");
@@ -17,14 +15,6 @@ public enum ProposedFlowWorkflowTransitionAction {
                                          String verb) {
         this.display = display;
         this.verb = verb;
-    }
-
-    public String getDisplay() {
-        return display;
-    }
-
-    public String getName() {
-        return name();
     }
 
     public static ProposedFlowWorkflowTransitionAction findByDisplay(String display) {
@@ -46,6 +36,10 @@ public enum ProposedFlowWorkflowTransitionAction {
             }
         }
         return null;
+    }
+
+    public String getDisplay() {
+        return display;
     }
 
     public String getVerb() {

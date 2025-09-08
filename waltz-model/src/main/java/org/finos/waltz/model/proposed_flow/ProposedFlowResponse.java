@@ -39,6 +39,7 @@ public abstract class ProposedFlowResponse {
 
     public abstract EntityWorkflowState workflowState();
 
+    @Nullable
     public abstract List<EntityWorkflowTransition> workflowTransitionList();
 
 }
