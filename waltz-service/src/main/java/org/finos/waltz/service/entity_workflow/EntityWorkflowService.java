@@ -28,7 +28,6 @@ import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_workflow.*;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,19 +85,11 @@ public class EntityWorkflowService {
         return entityWorkflowDefinitionDao.searchByName(name);
     }
 
-    public void updateEntityWorkflow(EntityReference ref, Long entityWorkflowDefinitionId, String username,
-                                     String prevState, String newState, String transitionReason) {
-        entityWorkflowStateDao.updateState(entityWorkflowDefinitionId, ref,
-                username, newState);
-        entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
-                username, prevState, newState, transitionReason);
-    }
-
     public void createEntityWorkflow(EntityReference ref, Long entityWorkflowDefinitionId, String username,
-                                     String workFlowStateDesc,
+                                     String workflowStateDesc,
                                      String prevState, String newState, String transitionReason) {
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefinitionId, ref,
-                username, newState, workFlowStateDesc);
+                username, newState, workflowStateDesc);
         entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
                 username, prevState, newState, transitionReason);
 
@@ -112,11 +103,11 @@ public class EntityWorkflowService {
     }
 
     public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
-                                      ProposedFlowWorkflowState currentState, ProposedFlowWorkflowState newState) {
-        updateEntityWorkflow(
-                workflowState.entityReference(),
-                workflowState.workflowId(), username,
-                currentState.name(), newState.name(), reason);
+                                      String currentState, String newState) {
+        entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
+                username, newState);
+        entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
+                username, currentState, newState, reason);
 
         List<ChangeLog> changeLogList = Arrays.asList(
                 mkChangeLog(workflowState.entityReference(), username, UPDATE,

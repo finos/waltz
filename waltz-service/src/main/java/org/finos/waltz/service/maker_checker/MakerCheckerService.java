@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -104,12 +103,12 @@ public class MakerCheckerService {
             // Get current state and build context
             ProposedFlowWorkflowContext workflowContext = new ProposedFlowWorkflowContext(
                     workflowDefinition.id().get(),
-                    proposedFlowRef, username, "reason");
+                    proposedFlowRef, username, proposedFlowCommand.reason().description());
 
             // Fire the action
             ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(PROPOSED_CREATE, PROPOSE, workflowContext);
             entityWorkflowService.createEntityWorkflow(proposedFlowRef, workflowDefinition.id().get(),
-                    username, "Proposed Flow Submitted", PROPOSED_CREATE.name(), newState.name(), "flow proposed");
+                    username, "Proposed Flow Submitted", PROPOSED_CREATE.name(), newState.name(), proposedFlowCommand.reason().description());
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = CommandOutcome.FAILURE.name();
@@ -130,13 +129,6 @@ public class MakerCheckerService {
         return getProposedFlow(proposedFlowRecord);
     }
 
-
-    /**
-     * Retrieves a proposed flow by its primary key.
-     *
-     * @param proposedFlowRecord the flow's primary key
-     * @return ProposedFlowResponse
-     */
     private ProposedFlowResponse getProposedFlow(ProposedFlowRecord proposedFlowRecord) {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
@@ -253,9 +245,8 @@ public class MakerCheckerService {
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
-        AtomicReference<ProposedFlowResponse> proposedFlowResponse = new AtomicReference<>();
+        ProposedFlowResponse proposedFlowResponse = null;
         final ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
-        proposedFlowResponse.set(proposedFlow);
 
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
@@ -288,7 +279,7 @@ public class MakerCheckerService {
             // if the transition not found, not permitted or new state == current state happen, abort
             // Persist the new state.
             entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
-                    proposedFlow.workflowState(), currentState, newState);
+                    proposedFlow.workflowState(), currentState.name(), newState.name());
 
             LogicalPhysicalFlowCreationResponse response = null;
             ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
@@ -305,24 +296,24 @@ public class MakerCheckerService {
                 response = createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
 
                 entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
-                        proposedFlow.workflowState(), newState, nextPossibleTransition);
+                        proposedFlow.workflowState(), newState.name(), nextPossibleTransition.name());
             }
 
             // Refresh Return Object
             EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(
                     PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
-            proposedFlowResponse.set(ImmutableProposedFlowResponse
-                    .copyOf(proposedFlowResponse.get())
+            proposedFlowResponse = ImmutableProposedFlowResponse
+                    .copyOf(proposedFlowResponse)
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null));
+                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;
         }
 
-        return proposedFlowResponse.get();
+        return proposedFlowResponse;
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
