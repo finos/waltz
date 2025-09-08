@@ -47,6 +47,7 @@ const initialState = {
         entity.MEASURABLE.key,
         entity.DATA_TYPE.key,
         entity.PHYSICAL_SPECIFICATION.key,
+        entity.PHYSICAL_FLOW.key,
         entity.END_USER_APPLICATION.key,
         entity.LEGAL_ENTITY.key,
         entity.SERVER.key,
@@ -150,7 +151,7 @@ function controller($element,
         handleSearch(query, [entity.APPLICATION.key, entity.PERSON.key])
             .then(() => handleSearch(query, [entity.APP_GROUP.key, entity.CHANGE_INITIATIVE.key, entity.ORG_UNIT.key]))
             .then(() => handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key, entity.LEGAL_ENTITY.key, entity.END_USER_APPLICATION.key]))
-            .then(() => handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key, entity.DATABASE.key]))
+            .then(() => handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.PHYSICAL_FLOW.key, entity.DATA_TYPE.key, entity.SERVER.key, entity.DATABASE.key]))
             .then(() => handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key, entity.LICENCE.key]))
             .catch(e => displayError("Failed to search"))
             .finally(() => vm.searching = false);
