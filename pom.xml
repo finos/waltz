@@ -99,7 +99,7 @@
         <pcollections.version>4.0.1</pcollections.version>
         <poi.version>5.2.4</poi.version>
         <slf4j.version>2.0.7</slf4j.version>
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
         <spark.version>2.9.1</spark.version> <!-- 2.9.3 causes issues with tomcat -->
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.30</spring.version>
@@ -322,7 +322,7 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-                        <dependency>
+            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
