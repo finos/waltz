@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
@@ -34,7 +35,7 @@ public class ProposedFlowDao {
         proposedFlowRecord.setSourceEntityKind(proposedFlowCommand.source().kind().name());
         proposedFlowRecord.setTargetEntityId(proposedFlowCommand.target().id());
         proposedFlowRecord.setTargetEntityKind(proposedFlowCommand.target().kind().name());
-        proposedFlowRecord.setProposalType(proposedFlowCommand.proposalType());
+        proposedFlowRecord.setProposalType(CREATE.name());
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
     }

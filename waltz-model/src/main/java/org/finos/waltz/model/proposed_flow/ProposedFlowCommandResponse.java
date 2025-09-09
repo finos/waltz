@@ -14,4 +14,5 @@ public abstract class ProposedFlowCommandResponse implements Command {
     public abstract String message();
     public abstract Long proposedFlowId();
     public abstract Long workflowDefinitionId();
+    public abstract String proposalType();
 }

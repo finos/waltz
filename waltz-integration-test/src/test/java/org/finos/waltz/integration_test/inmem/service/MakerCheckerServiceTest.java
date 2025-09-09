@@ -63,6 +63,7 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,8 +93,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     private static final String USER_NAME = "testUser";
 
-    private static final String PROPOSAL_TYPE_CREATE = "create";
-
     @Test
     public void testProposedNewFlow() {
 
@@ -113,7 +112,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -142,7 +140,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
@@ -174,7 +171,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -218,7 +214,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -283,7 +278,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -400,7 +394,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -408,7 +401,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(response);
-        assertNotNull(response.proposedFlowCommand().proposalType());
-        assertEquals(PROPOSAL_TYPE_CREATE, response.proposedFlowCommand().proposalType());
+        assertNotNull(response.proposedFlowCommand());
+        assertEquals(CREATE.name(), response.proposalType());
     }
 }

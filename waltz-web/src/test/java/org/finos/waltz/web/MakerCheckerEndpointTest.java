@@ -43,7 +43,12 @@ import java.util.Set;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -58,8 +63,6 @@ class MakerCheckerEndpointTest {
     private Request request;
     @Mock
     private Response response;
-
-    private static final String PROPOSAL_TYPE_CREATE = "create";
 
     @BeforeEach
     public void setUp() {
@@ -117,8 +120,6 @@ class MakerCheckerEndpointTest {
                 "  \"logicalFlowId\": null,\n" +
                 "\n" +
                 "  \"physicalFlowId\": null,\n" +
-                "\n" +
-                "  \"proposalType\": \"create\",\n" +
                 "\n" +
                 "  \"dataTypeIds\": [\n" +
                 "\n" +
@@ -182,6 +183,7 @@ class MakerCheckerEndpointTest {
                 .proposedFlowCommand(command)
                 .proposedFlowId(1L)
                 .workflowDefinitionId(1L)
+                .proposalType(CREATE.name())
                 .build();
         when(makerCheckerService.proposeNewFlow(any(), any())).thenReturn(proposedFlowCommandResponse);
         ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request, response);
@@ -289,7 +291,6 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
@@ -303,7 +304,7 @@ class MakerCheckerEndpointTest {
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
-                .proposalType(PROPOSAL_TYPE_CREATE)
+                .proposalType(CREATE.name())
                 .build();
 
         //When
