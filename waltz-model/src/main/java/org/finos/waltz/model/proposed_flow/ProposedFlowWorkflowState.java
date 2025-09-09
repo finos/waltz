@@ -16,17 +16,25 @@
  *
  */
 
-package org.finos.waltz.model;
+package org.finos.waltz.model.proposed_flow;
 
+public enum ProposedFlowWorkflowState {
 
-public enum Operation {
+    PROPOSED_CREATE("Proposed Create"),
+    PENDING_APPROVALS("Pending Approval"),
+    SOURCE_APPROVED("Source Approved"),
+    TARGET_APPROVED("Target Approved"),
+    FULLY_APPROVED("Fully Approved"),
+    SOURCE_REJECTED("Source Rejected"),
+    TARGET_REJECTED("Target Rejected");
 
-    ADD,
-    ATTEST,
-    LOCK,
-    REMOVE,
-    UPDATE,
-    UNKNOWN,
-    APPROVE,
-    REJECT
+    private final String prettyName;
+
+    ProposedFlowWorkflowState(String prettyName) {
+        this.prettyName = prettyName;
+    }
+
+    public String prettyName() {
+        return prettyName;
+    }
 }

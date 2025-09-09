@@ -23,7 +23,6 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.MakerCheckerState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
@@ -36,10 +35,18 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
 @Repository
 public class EntityWorkflowStateDao {
+    private final DSLContext dsl;
+
+    @Autowired
+    public EntityWorkflowStateDao(DSLContext dsl) {
+        this.dsl = dsl;
+    }
+
     private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
@@ -58,17 +65,7 @@ public class EntityWorkflowStateDao {
                 .build();
     };
 
-
-    private final DSLContext dsl;
-
-
-    @Autowired
-    public EntityWorkflowStateDao(DSLContext dsl) {
-        this.dsl = dsl;
-    }
-
-
-    public EntityWorkflowState getByEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
+    public EntityWorkflowState getWorkflowState(long workflowId, EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
         return dsl
@@ -80,17 +77,29 @@ public class EntityWorkflowStateDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username){
+    public void createWorkflowState(Long workflowDefId, EntityReference ref, String username,
+                                    String workflowState, String description) {
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
-        stateRecord.setWorkflowId(entityWorkflowDefId);
-        stateRecord.setEntityId(requestFlowId);
-        stateRecord.setEntityKind(EntityKind.PROPOSED_FLOW.name());
-        stateRecord.setState(MakerCheckerState.SUBMITTED.name());
-        stateRecord.setDescription("Proposed Flow Submitted");
+        stateRecord.setWorkflowId(workflowDefId);
+        stateRecord.setEntityId(ref.id());
+        stateRecord.setEntityKind(ref.kind().name());
+        stateRecord.setState(workflowState);
+        stateRecord.setDescription(description);
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
         stateRecord.insert();
+    }
 
+    public long updateState(Long workflowDefId, EntityReference ref, String user, String workflowState) {
+        return dsl
+                .update(ENTITY_WORKFLOW_STATE)
+                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
+                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
+                .execute();
     }
 }

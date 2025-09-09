@@ -22,13 +22,11 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
@@ -37,16 +35,13 @@ public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
     EntityWorkflowStateDao entityWorkflowStateDao;
 
     @Test
-    public void testSearchByName(){
-        entityWorkflowStateDao.createWorkflowState(1L, 2L, "testUser");
-        EntityReference entityReference = ImmutableEntityReference.builder()
-                .kind(EntityKind.PROPOSED_FLOW)
-                .id(1L)
-                .name(Optional.of("testName"))
-                .description("testDescription")
-                .externalId(Optional.of("externalId"))
-                .build();
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(2,entityReference);
+    public void testSearchByName() {
+        EntityKind entityKind = EntityKind.PROPOSED_FLOW;
+        String description = "testDescription";
+        EntityReference ref = EntityReference.mkRef(entityKind, 2L);
+        entityWorkflowStateDao.createWorkflowState(1L, ref, "testUser",
+                FULLY_APPROVED.name(), description);
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getWorkflowState(1L, ref);
         assertNotNull(entityWorkflowState);
     }
 
