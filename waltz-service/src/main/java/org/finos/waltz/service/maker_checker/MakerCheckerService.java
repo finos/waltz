@@ -3,8 +3,10 @@ package org.finos.waltz.service.maker_checker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
@@ -56,6 +58,7 @@ public class MakerCheckerService {
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowDao proposedFlowDao;
+    private final ProposedFlowIdSelectorFactory proposedFlowIdSelectorFactory = new ProposedFlowIdSelectorFactory();
 
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final LogicalFlowService logicalFlowService;
@@ -162,6 +165,14 @@ public class MakerCheckerService {
                 .map(record -> getProposedFlow(record))
                 .collect(Collectors.toList());
     }
+
+    public List<ProposedFlowResponse> getProposedFlowsBySelector(IdSelectionOptions options) {
+
+        return proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options)).stream()
+                .map(record -> getProposedFlow(record))
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * Creates logical and physical flows from the ProposedFlow.
