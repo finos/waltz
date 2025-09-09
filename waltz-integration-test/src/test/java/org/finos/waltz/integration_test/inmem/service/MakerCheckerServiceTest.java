@@ -92,6 +92,8 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     private static final String USER_NAME = "testUser";
 
+    private static final String PROPOSAL_TYPE_CREATE = "create";
+
     @Test
     public void testProposedNewFlow() {
 
@@ -111,6 +113,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -139,6 +142,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
@@ -170,6 +174,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -213,6 +218,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -277,6 +283,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -374,5 +381,34 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         dataTypeIdSet.add(41200L);
 
         return dataTypeIdSet;
+    }
+
+    @Test
+    void testPresenceOfCreateProposalTypeWhenCreatingNewProposedFlow(){
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(PROPOSAL_TYPE_CREATE)
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response);
+        assertNotNull(response.proposedFlowCommand().proposalType());
+        assertEquals(PROPOSAL_TYPE_CREATE, response.proposedFlowCommand().proposalType());
     }
 }

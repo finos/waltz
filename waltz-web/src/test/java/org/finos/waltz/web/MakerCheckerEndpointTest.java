@@ -14,14 +14,7 @@ import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +51,8 @@ class MakerCheckerEndpointTest {
     private Request request;
     @Mock
     private Response response;
+
+    private static final String PROPOSAL_TYPE_CREATE = "create";
 
     @BeforeEach
     public void setUp() {
@@ -115,6 +110,8 @@ class MakerCheckerEndpointTest {
                 "  \"logicalFlowId\": null,\n" +
                 "\n" +
                 "  \"physicalFlowId\": null,\n" +
+                "\n" +
+                "  \"proposalType\": \"create\",\n" +
                 "\n" +
                 "  \"dataTypeIds\": [\n" +
                 "\n" +
@@ -285,6 +282,7 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
@@ -298,6 +296,7 @@ class MakerCheckerEndpointTest {
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
+                .proposalType(PROPOSAL_TYPE_CREATE)
                 .build();
 
         //When
