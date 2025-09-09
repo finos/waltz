@@ -25,7 +25,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -66,7 +65,7 @@ public class EntityWorkflowStateDao {
                 .build();
     };
 
-    public EntityWorkflowState getByEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
+    public EntityWorkflowState getWorkflowState(long workflowId, EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
         return dsl
@@ -78,13 +77,13 @@ public class EntityWorkflowStateDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowState(Long requestFlowId, Long entityWorkflowDefId, String username, EntityKind entityKind,
-                                    ProposedFlowWorkflowState workflowState, String description) {
+    public void createWorkflowState(Long workflowDefId, EntityReference ref, String username,
+                                    String workflowState, String description) {
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
-        stateRecord.setWorkflowId(entityWorkflowDefId);
-        stateRecord.setEntityId(requestFlowId);
-        stateRecord.setEntityKind(entityKind.name());
-        stateRecord.setState(workflowState.name());
+        stateRecord.setWorkflowId(workflowDefId);
+        stateRecord.setEntityId(ref.id());
+        stateRecord.setEntityKind(ref.kind().name());
+        stateRecord.setState(workflowState);
         stateRecord.setDescription(description);
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
@@ -92,13 +91,13 @@ public class EntityWorkflowStateDao {
         stateRecord.insert();
     }
 
-    public long updateState(long workflowId, EntityReference ref, String user, String workflowState) {
+    public long updateState(Long workflowDefId, EntityReference ref, String user, String workflowState) {
         return dsl
                 .update(ENTITY_WORKFLOW_STATE)
                 .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
                 .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
-                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)
+                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
                 .execute();

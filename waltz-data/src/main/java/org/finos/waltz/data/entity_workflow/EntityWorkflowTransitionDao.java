@@ -25,7 +25,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -83,15 +82,14 @@ public class EntityWorkflowTransitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowTransition(Long proposedFlowId, Long entityWorkflowDefId, String username,
-                                         EntityKind entityKind, ProposedFlowWorkflowState from,
-                                         ProposedFlowWorkflowState to, String reason) {
+    public void createWorkflowTransition(Long entityWorkflowDefId, EntityReference ref, String username,
+                                         String from, String to, String reason) {
         EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
         transitionRecord.setWorkflowId(entityWorkflowDefId);
-        transitionRecord.setEntityId(proposedFlowId);
-        transitionRecord.setEntityKind(entityKind.name());
-        transitionRecord.setFromState(from.name());
-        transitionRecord.setToState(to.name());
+        transitionRecord.setEntityId(ref.id());
+        transitionRecord.setEntityKind(ref.kind().name());
+        transitionRecord.setFromState(from);
+        transitionRecord.setToState(to);
         transitionRecord.setReason(reason);
         transitionRecord.setProvenance("waltz");
         transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));

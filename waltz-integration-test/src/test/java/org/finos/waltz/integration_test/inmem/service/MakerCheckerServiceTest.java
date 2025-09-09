@@ -18,15 +18,52 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
+import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FlowAttributes;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,123 +73,306 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     MakerCheckerService makerCheckerService;
 
+    @Autowired
+    ProposedFlowDao proposedFlowDao;
+
+    @Autowired
+    LogicalFlowDao logicalFlowDao;
+
+    @Autowired
+    PhysicalSpecificationDao physicalSpecificationDao;
+
+    @Autowired
+    EntityWorkflowStateDao entityWorkflowStateDao;
+
+    @Autowired
+    EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
+
+    private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
+
+    private static final String USER_NAME = "testUser";
+
     @Test
     public void testProposedNewFlow() {
 
-        String requestBody = "{\n" +
-                "    \"source\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 101\n" +
-                "    },\n" +
-                "    \"target\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 202\n" +
-                "    },\n" +
-                "    \"reason\": {\n" +
-                "        \"description\": \"test\",\n" +
-                "          \"ratingId\": 1\n" +
-                "     },\n" +
-                "    \"logicalFlowId\": 12345,\n" +
-                "    \"physicalFlowId\": 12345,\n" +
-                "    \"specification\": {\n" +
-                "        \"owningEntity\": {\n" +
-                "            \"id\": 18703,\n" +
-                "            \"kind\": \"APPLICATION\",\n" +
-                "            \"name\": \"AMG\",\n" +
-                "            \"externalId\": \"60487-1\",\n" +
-                "            \"description\": \"Business IT Management with utilising core functions of: \\r\\nEnterprise Architecture Management tool for IT Planning\",\n" +
-                "            \"entityLifecycleStatus\": \"ACTIVE\"\n" +
-                "        },\n" +
-                "        \"name\": \"mc_specification\",\n" +
-                "        \"description\": \"mc_specification description\",\n" +
-                "        \"format\": \"DATABASE\",\n" +
-                "        \"lastUpdatedBy\": \"waltz\",\n" +
-                "        \"externalId\": \"mc-extId001\",\n" +
-                "        \"id\": null\n" +
-                "    },\n" +
-                "    \"flowAttributes\": {\n" +
-                "        \"name\": \"mc_deliverCharacterstics\",\n" +
-                "        \"transport\": \"DATABASE_CONNECTION\",\n" +
-                "        \"frequency\": \"BIANNUALLY\",\n" +
-                "        \"basisOffset\": -30,\n" +
-                "        \"criticality\": \"HIGH\",\n" +
-                "        \"description\": \"mc-deliver-description\",\n" +
-                "        \"externalId\": \"mc-deliver-ext001\"\n" +
-                "    },\n" +
-                "    \"dataTypeIds\": [\n" +
-                "        41200\n" +
-                "    ]\n" +
-                "}";
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
-        try {
-            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
-            assertNotNull(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .logicalFlowId(12345)
+                .physicalFlowId(12345)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response);
     }
 
     @Test
     public void testGetProposedFlowDefinition() {
 
-        String requestBody = "{\n" +
-                "    \"source\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 101\n" +
-                "    },\n" +
-                "    \"target\": {\n" +
-                "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 202\n" +
-                "    },\n" +
-                "    \"reason\": {\n" +
-                "        \"description\": \"test\",\n" +
-                "          \"ratingId\": 1\n" +
-                "     },\n" +
-                "    \"logicalFlowId\": 12345,\n" +
-                "    \"physicalFlowId\": 12345,\n" +
-                "    \"specification\": {\n" +
-                "        \"owningEntity\": {\n" +
-                "            \"id\": 18703,\n" +
-                "            \"kind\": \"APPLICATION\",\n" +
-                "            \"name\": \"AMG\",\n" +
-                "            \"externalId\": \"60487-1\",\n" +
-                "            \"description\": \"Business IT Management with utilising core functions of: \\r\\nEnterprise Architecture Management tool for IT Planning\",\n" +
-                "            \"entityLifecycleStatus\": \"ACTIVE\"\n" +
-                "        },\n" +
-                "        \"name\": \"mc_specification\",\n" +
-                "        \"description\": \"mc_specification description\",\n" +
-                "        \"format\": \"DATABASE\",\n" +
-                "        \"lastUpdatedBy\": \"waltz\",\n" +
-                "        \"externalId\": \"mc-extId001\",\n" +
-                "        \"id\": null\n" +
-                "    },\n" +
-                "    \"flowAttributes\": {\n" +
-                "        \"name\": \"mc_deliverCharacterstics\",\n" +
-                "        \"transport\": \"DATABASE_CONNECTION\",\n" +
-                "        \"frequency\": \"BIANNUALLY\",\n" +
-                "        \"basisOffset\": -30,\n" +
-                "        \"criticality\": \"HIGH\",\n" +
-                "        \"description\": \"mc-deliver-description\",\n" +
-                "        \"externalId\": \"mc-deliver-ext001\"\n" +
-                "    },\n" +
-                "    \"dataTypeIds\": [\n" +
-                "        41200\n" +
-                "    ]\n" +
-                "}";
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
-        try {
-            ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
-            ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(requestBody, "testUser", command);
-            assertNotNull(response);
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .logicalFlowId(12345)
+                .physicalFlowId(12345)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .build();
 
-            ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
-            assertNotNull(proposedFlowResponse);
-            assertNotNull((proposedFlowResponse.workflowState().workflowId()));
-            assertTrue(proposedFlowResponse.workflowTransitionList().size() > 0);
+        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // 2. Act --------------------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response);
+        assertNotNull(proposedFlowResponse);
+        assertNotNull((proposedFlowResponse.workflowState().workflowId()));
+        assertTrue(proposedFlowResponse.workflowTransitionList().size() > 0);
+    }
+
+    @Test
+    void testWhenLogicalFlowIdIsNotPresentThenCreatesBothLogicalAndPhysicalFlow() throws JsonProcessingException, FlowCreationException {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .build();
+
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
+
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+
+        Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        String description = "test description";
+
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
+                workflowState.name(), description);
+
+        // 2. Act --------------------------------------------------------------
+        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, USER_NAME);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(resp.logicalFlow());
+        assertNotNull(resp.logicalFlow().id());
+
+        assertNotNull(resp.physicalFlowCreateCommandResponse());
+        assertTrue(resp.physicalFlowCreateCommandResponse().entityReference().id() > 0);
+    }
+
+    @Test
+    void testWhenLogicalFlowAlreadyExistsThenOnlyPhysicalFlowIsCreated() throws JsonProcessingException, FlowCreationException {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .logicalFlowId(1)
+                .build();
+
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
+
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+
+        Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        String description = "test description";
+
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
+                workflowState.name(), description);
+
+        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
+
+        LocalDateTime now = nowUtc();
+        LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                .source(addCmd.source())
+                .target(addCmd.target())
+                .lastUpdatedAt(now)
+                .lastUpdatedBy(USER_NAME)
+                .created(UserTimestamp.mkForUser(USER_NAME, now))
+                .build();
+
+        logicalFlowDao.addFlow(flowToAdd);
+
+        // 2. Act --------------------------------------------------------------
+        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(resp.logicalFlow());
+        assertEquals(resp.logicalFlow().id().get(), command.logicalFlowId().get());
+
+        assertNotNull(resp.physicalFlowCreateCommandResponse());
+        assertTrue(resp.physicalFlowCreateCommandResponse().entityReference().id() > 0);
+    }
+
+    private AddLogicalFlowCommand mapProposedFlowToAddLogicalFlowCommand(ProposedFlowResponse proposedFlow) {
+        return ImmutableAddLogicalFlowCommand.builder()
+                .source(proposedFlow.flowDef().source())
+                .target(proposedFlow.flowDef().target())
+                .build();
+    }
+
+    @Test
+    void testPhysicalSpecificationCreationWhenPhysicalFlowIsCreated() throws FlowCreationException, JsonProcessingException {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .logicalFlowId(1)
+                .build();
+
+        Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
+
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+
+        Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        String description = "test description";
+
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
+                workflowState.name(), description);
+
+        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
+
+        LocalDateTime now = nowUtc();
+        LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                .source(addCmd.source())
+                .target(addCmd.target())
+                .lastUpdatedAt(now)
+                .lastUpdatedBy(USER_NAME)
+                .created(UserTimestamp.mkForUser(USER_NAME, now))
+                .build();
+
+        logicalFlowDao.addFlow(flowToAdd);
+
+        PhysicalSpecification specification = ImmutablePhysicalSpecification
+                .copyOf(proposedFlowResponse.flowDef().specification())
+                .withLastUpdatedBy(USER_NAME)
+                .withLastUpdatedAt(now)
+                .withCreated(UserTimestamp.mkForUser(USER_NAME, now));
+
+        long specId = physicalSpecificationDao.create(specification);
+        PhysicalSpecification physicalSpec = physicalSpecificationDao.getById(specId);
+
+        // 2. Act --------------------------------------------------------------
+        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(resp.logicalFlow());
+        assertEquals(resp.logicalFlow().id().get(), command.logicalFlowId().get());
+
+        assertNotNull(resp.physicalFlowCreateCommandResponse());
+        assertTrue(resp.physicalFlowCreateCommandResponse().entityReference().id() > 0);
+
+        assertNotNull(physicalSpec);
+        assertTrue(physicalSpec.id().get() > 0L);
+    }
+
+    private Reason getReason() {
+        return ImmutableReason.builder()
+                .description("test")
+                .ratingId(1)
+                .build();
+    }
+
+    private EntityReference getOwningEntity() {
+        return ImmutableEntityReference.builder()
+                .id(18703)
+                .kind(APPLICATION)
+                .name("AMG")
+                .externalId("60487-1")
+                .description("Testing")
+                .entityLifecycleStatus(ACTIVE)
+                .build();
+    }
+
+    private PhysicalSpecification getPhysicalSpecification(EntityReference owningEntity) {
+        return ImmutablePhysicalSpecification.builder()
+                .owningEntity(owningEntity)
+                .name("mc_specification")
+                .description("mc_specification description")
+                .format(DataFormatKindValue.of("DATABASE"))
+                .lastUpdatedBy("waltz")
+                .externalId("mc-extId001")
+                .build();
+    }
+
+    private FlowAttributes getFlowAttributes() {
+        return ImmutableFlowAttributes.builder()
+                .name("mc_deliverCharacterstics")
+                .transport(TransportKindValue.of("UNKNOWN"))
+                .frequency(FrequencyKindValue.of("QUARTERLY"))
+                .basisOffset(0)
+                .criticality(CriticalityValue.of("low"))
+                .description("testing")
+                .externalId("567s")
+                .build();
+    }
+
+    private Set<Long> getDataTypeIdSet() {
+        Set<Long> dataTypeIdSet = new HashSet<>();
+        dataTypeIdSet.add(41200L);
+
+        return dataTypeIdSet;
     }
 }
