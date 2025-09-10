@@ -26,12 +26,7 @@ import org.finos.waltz.model.accesslog.ImmutableAccessLog;
 import org.finos.waltz.model.accesslog.ImmutableAccessLogSummary;
 import org.finos.waltz.model.accesslog.ImmutableAccessTime;
 import org.finos.waltz.schema.tables.records.AccessLogRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.Record3;
-import org.jooq.RecordMapper;
-import org.jooq.SelectSeekStep2;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -123,16 +118,16 @@ public class AccessLogDao {
 
     public List<AccessLogSummary> findWeeklyAccessLogSummary(LocalDateTime dateTime) {
         // Use MSSQL DATEPART for year and week extraction
-        Field<Integer> yearCreated = DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year_created");
-        Field<Integer> weekCreated = DSL.field("DATEPART(week, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("week_created");
+        Field<Integer> yearCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).as("year_created");
+        Field<Integer> weekCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.WEEK).as("week_created");
         Field<Long> numberOfAccesses = DSL.count().cast(Long.class).as("num_accesses");
 
         SelectSeekStep2<Record3<Integer, Integer, Long>, Integer, Integer> qry = dsl
             .select(yearCreated, weekCreated, numberOfAccesses)
             .from(ACCESS_LOG)
             .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
-            .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT),
-                    DSL.field("DATEPART(week, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+            .groupBy(yearCreated,
+                    weekCreated)
             .orderBy(yearCreated.asc(), weekCreated.asc());
 
         return qry
@@ -162,11 +157,12 @@ public class AccessLogDao {
         Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
 
         Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
+        Field<Integer> yearField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).as("year");
 
         return dsl
-                .select(countsField, DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year"))
+                .select(countsField, yearField)
                 .from(ACCESS_LOG)
-                .groupBy(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+                .groupBy(yearField)
                 .fetch(r -> ImmutableAccessLogSummary
                         .builder()
                         .counts(r.get("counts", Long.class))
@@ -176,7 +172,7 @@ public class AccessLogDao {
 
     public List<Integer> findAccessLogYears() {
         return dsl
-                .selectDistinct(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("year"))
+                .selectDistinct(DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).as("year"))
                 .from(ACCESS_LOG)
                 .fetch(r -> r.get("year", Integer.class));
     }
@@ -186,12 +182,14 @@ public class AccessLogDao {
         Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
 
         Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
+        Field<Integer> monthField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.MONTH).as("month");
+
 
         return dsl
-                .select(countsField, DSL.field("DATEPART(month, {0})", Integer.class, ACCESS_LOG.CREATED_AT).as("month"))
+                .select(countsField, monthField)
                 .from(ACCESS_LOG)
-                .where(DSL.field("DATEPART(year, {0})", Integer.class, ACCESS_LOG.CREATED_AT).eq(currentYear))
-                .groupBy(DSL.field("DATEPART(month, {0})", Integer.class, ACCESS_LOG.CREATED_AT))
+                .where(DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).eq(currentYear))
+                .groupBy(monthField)
                 .fetch(r -> ImmutableAccessLogSummary
                         .builder()
                         .counts(r.get("counts", Long.class))
