@@ -38,6 +38,7 @@
     };
 
     let settingsCall = settingsStore.loadAll();
+    let commandLaunched = false;
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
@@ -53,6 +54,9 @@
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
 
     function launchCommand() {
+        // as soon as the user launches the command, the button gets disabled
+        commandLaunched = true;
+
         const specification = {
             owningEntity: toEntityRef(primaryEntityRef),
             name: $physicalSpecification.name,
@@ -149,7 +153,7 @@
 
             <span>
                 <button class="btn btn-success"
-                        disabled={incompleteRecord}
+                        disabled={incompleteRecord || commandLaunched}
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
