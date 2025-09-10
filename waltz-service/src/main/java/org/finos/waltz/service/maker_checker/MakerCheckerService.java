@@ -95,10 +95,8 @@ public class MakerCheckerService {
         String outcome = CommandOutcome.SUCCESS.name();
         Long proposedFlowId = null;
         EntityWorkflowDefinition workflowDefinition = null;
-        ProposedFlowRecord proposedFlowRecord = null;
         try {
             proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
-            proposedFlowRecord = proposedFlowDao.getProposedFlowById(proposedFlowId);
             EntityReference proposedFlowRef = mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowId);
             workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
@@ -123,7 +121,6 @@ public class MakerCheckerService {
                 .proposedFlowCommand(proposedFlowCommand)
                 .proposedFlowId(proposedFlowId)
                 .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
-                .proposalType(proposedFlowRecord != null ? proposedFlowRecord.getProposalType() : null)
                 .build();
     }
 

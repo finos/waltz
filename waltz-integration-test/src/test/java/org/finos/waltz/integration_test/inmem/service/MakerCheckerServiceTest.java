@@ -43,14 +43,7 @@ import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +105,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -140,6 +134,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
@@ -171,6 +166,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -214,6 +210,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -278,6 +275,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -394,6 +392,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -402,6 +401,6 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         // 3. Assert -----------------------------------------------------------
         assertNotNull(response);
         assertNotNull(response.proposedFlowCommand());
-        assertEquals(CREATE.name(), response.proposalType());
+        assertEquals(CREATE.name(), response.proposedFlowCommand().proposalType().name());
     }
 }

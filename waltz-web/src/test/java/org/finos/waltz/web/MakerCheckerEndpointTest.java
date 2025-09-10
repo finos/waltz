@@ -18,6 +18,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -137,6 +138,11 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "  },\n" +
                 "\n" +
+                "    \"proposalType\": {\n" +
+                "\n" +
+                "      \"key\": \"CREATE\"\n" +
+                "    },\n" +
+                "\n" +
                 "  \"source\": {\n" +
                 "\n" +
                 "    \"id\": 20506,\n" +
@@ -183,7 +189,6 @@ class MakerCheckerEndpointTest {
                 .proposedFlowCommand(command)
                 .proposedFlowId(1L)
                 .workflowDefinitionId(1L)
-                .proposalType(CREATE.name())
                 .build();
         when(makerCheckerService.proposeNewFlow(any(), any())).thenReturn(proposedFlowCommandResponse);
         ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request, response);
@@ -291,6 +296,7 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
