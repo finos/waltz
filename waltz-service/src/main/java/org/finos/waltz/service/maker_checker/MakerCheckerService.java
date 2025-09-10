@@ -159,20 +159,11 @@ public class MakerCheckerService {
         }
     }
 
-    public List<ProposedFlowResponse> getProposedFlows() {
-        List<ProposedFlowRecord> proposedFlowRecords = proposedFlowDao.getProposedFlows();
-        return proposedFlowRecords.stream()
-                .map(record -> getProposedFlow(record))
-                .collect(Collectors.toList());
-    }
-
-    public List<ProposedFlowResponse> getProposedFlowsBySelector(IdSelectionOptions options) {
-
+    public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) {
         return proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options)).stream()
                 .map(record -> getProposedFlow(record))
                 .collect(Collectors.toList());
     }
-
 
     /**
      * Creates logical and physical flows from the ProposedFlow.

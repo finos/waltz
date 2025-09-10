@@ -71,7 +71,7 @@ public class MakerCheckerEndpoint implements Endpoint {
     }
 
     public List<ProposedFlowResponse> getProposedFlows(Request request, Response response) throws IOException {
-        return makerCheckerService.getProposedFlowsBySelector(readIdSelectionOptionsFromBody(request));
+        return makerCheckerService.getProposedFlows(readIdSelectionOptionsFromBody(request));
     }
 
     public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {

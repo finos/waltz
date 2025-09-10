@@ -19,6 +19,7 @@
 package org.finos.waltz.data.proposed_flow;
 
 import org.finos.waltz.data.IdSelectorFactory;
+import org.finos.waltz.data.person.PersonIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -31,20 +32,26 @@ import static org.finos.waltz.schema.Tables.*;
 
 public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
 
+    private final PersonIdSelectorFactory personIdSelectorFactory = new PersonIdSelectorFactory();
+
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
-        return mkViaPersonJoinDerivedTableForApplication(options);
+        switch (options.scope()) {
+            case CHILDREN:
+                return idSelectorForUserWithHierarchy(options);
+            case EXACT:
+                return idSelectorForUser(options);
+            default:
+                throw new UnsupportedOperationException("Cannot create propose flow id selector from options: " + options);
+        }
     }
 
-    private Select<Record1<Long>> mkViaPersonJoinDerivedTableForApplication(IdSelectionOptions options) {
-        SelectConditionStep<Record1<String>> employeeIdForPerson = DSL
-                .select(PERSON.EMPLOYEE_ID)
-                .from(PERSON)
-                .where(PERSON.ID.eq(options.entityReference().id()));
+    private Select<Record1<Long>> idSelectorForUserWithHierarchy(IdSelectionOptions options) {
+        SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
 
-        Select<Record1<Long>> proposedFlowIds = DSL
+        return DSL
                 .select(PROPOSED_FLOW.ID)
                 .from(PERSON)
                 .join(PERSON_HIERARCHY)
@@ -61,20 +68,25 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
                 .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
                 .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND))
                 .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
-                .unionAll(
-                        DSL
-                                .select(PROPOSED_FLOW.ID)
-                                .from(PERSON)
-                                .join(INVOLVEMENT)
-                                .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
-                                .join(PROPOSED_FLOW)
-                                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
-                                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                        .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
+                .unionAll(idSelectorForUser(options)
                 );
+    }
 
-
-        return proposedFlowIds;
+    private Select<Record1<Long>> idSelectorForUser(IdSelectionOptions options) {
+        SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
+        return
+                        DSL
+                            .select(PROPOSED_FLOW.ID)
+                            .from(PERSON)
+                            .join(INVOLVEMENT)
+                            .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
+                            .join(PROPOSED_FLOW)
+                            .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                            .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                                    .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
+                );
     }
 }
+
+
