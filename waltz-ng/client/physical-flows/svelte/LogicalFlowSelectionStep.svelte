@@ -56,7 +56,7 @@
         }
     }
 
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === "true";
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting?.value && dataFlowProposalSetting.value.toLowerCase() === "true";
 
     $: {
         if (primaryEntityRef) {
