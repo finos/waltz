@@ -26,7 +26,14 @@ import org.finos.waltz.model.accesslog.ImmutableAccessLog;
 import org.finos.waltz.model.accesslog.ImmutableAccessLogSummary;
 import org.finos.waltz.model.accesslog.ImmutableAccessTime;
 import org.finos.waltz.schema.tables.records.AccessLogRecord;
-import org.jooq.*;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.RecordMapper;
+import org.jooq.SelectSeekStep2;
+import org.jooq.DSLContext;
+import org.jooq.DatePart;
+
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,7 +44,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
-import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
 @Repository
