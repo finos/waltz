@@ -124,12 +124,12 @@ public class AccessLogDao {
 
     public List<AccessLogSummary> findWeeklyAccessLogSummary(LocalDateTime dateTime) {
         // Use MSSQL DATEPART for year and week extraction
-        Field<Integer> yearCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).as("year_created");
-        Field<Integer> weekCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.WEEK).as("week_created");
-        Field<Long> numberOfAccesses = DSL.count().cast(Long.class).as("num_accesses");
+        Field<Integer> yearCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR);
+        Field<Integer> weekCreated = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.WEEK);
+        Field<Long> numberOfAccesses = DSL.count().cast(Long.class);
 
         SelectSeekStep2<Record3<Integer, Integer, Long>, Integer, Integer> qry = dsl
-            .select(yearCreated, weekCreated, numberOfAccesses)
+            .select(yearCreated.as("year_created"), weekCreated.as("week_created"), numberOfAccesses.as("num_accesses"))
             .from(ACCESS_LOG)
             .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
             .groupBy(yearCreated,
@@ -163,10 +163,10 @@ public class AccessLogDao {
         Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
 
         Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
-        Field<Integer> yearField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).as("year");
+        Field<Integer> yearField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR);
 
         return dsl
-                .select(countsField, yearField)
+                .select(countsField, yearField.as("year"))
                 .from(ACCESS_LOG)
                 .groupBy(yearField)
                 .fetch(r -> ImmutableAccessLogSummary
@@ -188,11 +188,11 @@ public class AccessLogDao {
         Field<Integer> allCountsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
 
         Field<Integer> countsField = StringUtilities.safeEq(mode, "distinct") ? distinctCountsField : allCountsField;
-        Field<Integer> monthField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.MONTH).as("month");
+        Field<Integer> monthField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.MONTH);
 
 
         return dsl
-                .select(countsField, monthField)
+                .select(countsField, monthField.as("month"))
                 .from(ACCESS_LOG)
                 .where(DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR).eq(currentYear))
                 .groupBy(monthField)

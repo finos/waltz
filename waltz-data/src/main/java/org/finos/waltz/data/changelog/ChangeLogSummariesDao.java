@@ -37,7 +37,7 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectHavingStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
-import org.jooq.DatePart; // for DatePart.YEAR
+import org.jooq.DatePart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -152,10 +152,10 @@ public class ChangeLogSummariesDao {
         Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
                 : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
 
-        Field<Integer> yearField = DSL.extract(CHANGE_LOG.CREATED_AT, DatePart.YEAR).as("year");
+        Field<Integer> yearField = DSL.extract(CHANGE_LOG.CREATED_AT, DatePart.YEAR);
 
         SelectHavingStep<Record2<Integer, Integer>> qry = dsl
-                .select(DSL.count(CHANGE_LOG.ID).as("counts"), yearField)
+                .select(DSL.count(CHANGE_LOG.ID).as("counts"), yearField.as("year"))
                 .from(CHANGE_LOG)
                 .where(parentEntityKindSelector.and(childEntityKindSelector))
                 .groupBy(yearField);
@@ -188,10 +188,10 @@ public class ChangeLogSummariesDao {
         Condition childEntityKindSelector = childEntityKind == null ? DSL.trueCondition()
                 : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
 
-        Field<Integer> monthField = DSL.extract(CHANGE_LOG.CREATED_AT, DatePart.MONTH).as("month");
+        Field<Integer> monthField = DSL.extract(CHANGE_LOG.CREATED_AT, DatePart.MONTH);
 
         SelectHavingStep<Record2<Integer, Integer>> qry = dsl
-                .select(DSL.count(CHANGE_LOG.ID).as("counts"), monthField)
+                .select(DSL.count(CHANGE_LOG.ID).as("counts"), monthField.as("month"))
                 .from(CHANGE_LOG)
                 .where(parentEntityKindSelector
                         .and(childEntityKindSelector)
