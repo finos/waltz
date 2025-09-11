@@ -112,6 +112,8 @@
                     goToWorkflow(response.proposedFlowId);
                 } else {
                     toasts.error("Error proposing data flow");
+                    commandLaunched=false;
+                    // reset in case of error so that user is able to re-submit
                 }
             })
             .catch(e => {
