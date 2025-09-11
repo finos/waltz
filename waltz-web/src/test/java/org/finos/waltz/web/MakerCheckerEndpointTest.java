@@ -138,10 +138,7 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "  },\n" +
                 "\n" +
-                "    \"proposalType\": {\n" +
-                "\n" +
-                "      \"key\": \"CREATE\"\n" +
-                "    },\n" +
+                "    \"proposalType\": \"CREATE\",\n" +
                 "\n" +
                 "  \"source\": {\n" +
                 "\n" +

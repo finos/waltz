@@ -96,4 +96,90 @@
 
     </changeSet>
 
+    <changeSet id="20250911-4388-1" author="kumarohb">
+        <dropTable tableName="proposed_flow" />
+    </changeSet>
+
+    <!-- 4388 Create Table - ProposedFlow Table -->
+    <changeSet id="220250911-4388-2"
+               author="kumarohb">
+        <createTable tableName="proposed_flow"
+                     remarks="details about proposed flow by requesters ">
+
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="proposed_flow_pkey"/>
+            </column>
+
+            <column name="source_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="source_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="flow_def"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="proposal_type"
+                    type="${proposal-type.type}">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="220250911-4388-3"
+               author="kumarohb">
+        <comment>4388: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_source_entity_id_source_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="source_entity_id"/>
+            <column name="source_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="220250911-4388-4"
+               author="kumarohb">
+        <comment>4388: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_target_entity_id_target_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="target_entity_id"/>
+            <column name="target_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
