@@ -11,6 +11,8 @@
     import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
     import RatingPicker from "../../../../common/svelte/RatingPicker.svelte";
 
+    export let ratingSchemeExtId;
+
     const Modes = {
         SELECT: "SELECT",
         SELECTED: "SELECTED"
@@ -53,11 +55,11 @@
     }
 
     // placeholder for when we 'create' the feature.maker-checker.config
-    $: ratingSchemeCall = ratingSchemeStore.getById(23779);
+    $: ratingSchemeCall = ratingSchemeStore.loadAll();
     $: done = workingCopy.rating[0] && true;
 
     $: expanded = _.includes($expandedSections, sections.REASON);
-    $: ratingScheme = $ratingSchemeCall.data;
+    $: ratingScheme = $ratingSchemeCall?.data.filter(t => t.externalId === ratingSchemeExtId)[0];
 
     function onRatingsSelect(evt) {
         workingCopy.rating = evt.detail;
@@ -103,11 +105,14 @@
                 </div>
 
                 <form on:submit|preventDefault={save}>
-
-                    <RatingPicker scheme={ratingScheme}
-                                  isMultiSelect={false}
-                                  selectedRatings={workingCopy.rating}
-                                  on:select={onRatingsSelect}/>
+                    {#if ratingScheme}
+                        <RatingPicker scheme={ratingScheme}
+                                      isMultiSelect={false}
+                                      selectedRatings={workingCopy.rating}
+                                      on:select={onRatingsSelect}/>
+                    {:else}
+                        <div>Loading reasons...</div>
+                    {/if}
 
                     <button class="btn btn-skinny"
                             disabled={!done}
