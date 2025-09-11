@@ -31,10 +31,16 @@
             </ol>
         </breadcrumbs>
     </waltz-page-header>
-
+    
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="$ctrl.proposedFlow">
-            <!-- VIEW MODE -->
+            <waltz-section-actions>
+                <button class="btn btn-xs btn-primary"
+                        ng-click="$ctrl.goToDashboard()">
+                    <waltz-icon name="display"></waltz-icon>
+                    Go to Dashboard
+                </button>
+            </waltz-section-actions>
             <div class="row">
                 <!-- OVERVIEW -->
                 <div class="col-md-7">

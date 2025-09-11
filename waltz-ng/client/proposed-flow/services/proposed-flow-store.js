@@ -25,15 +25,8 @@ export function store($http) {
             .then(r => r.data);
     };
 
-    const checkFlowPermissions = (command) => {
-        return $http
-            .get(`${base}/checkUserPermission`, {params: {...command}})
-            .then(r => r.data);
-    }
-
     return {
-        getById,
-        checkFlowPermissions
+        getById
     };
 }
 

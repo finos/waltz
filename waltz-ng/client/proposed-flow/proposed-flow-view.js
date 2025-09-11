@@ -64,7 +64,10 @@ function controller($q,
     vm.refreshState = () => {
         $state.reload();
     }
-    
+
+    vm.goToDashboard = () => {
+        $window.open("data-flow/dashboard/user", "_self");
+    }
 }
 
 

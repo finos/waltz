@@ -13,12 +13,12 @@
 
     const stepTypes = {
         SOURCE: {
-            label: "Source owner approval",
+            label: "Source approval",
             approved: STATES.SOURCE_APPROVED,
             rejected: STATES.SOURCE_REJECTED
         },
         TARGET: {
-            label: "Target owner approval",
+            label: "Target approval",
             approved: STATES.TARGET_APPROVED,
             rejected: STATES.TARGET_REJECTED
         },
