@@ -96,10 +96,6 @@
 
     </changeSet>
 
-    <changeSet id="20250911-4388-1" author="kumarohb">
-        <dropTable tableName="proposed_flow" />
-    </changeSet>
-
     <!-- 4388 Create Table - ProposedFlow Table -->
     <changeSet id="220250911-4388-2"
                author="kumarohb">
