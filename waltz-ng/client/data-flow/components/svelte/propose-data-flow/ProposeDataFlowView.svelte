@@ -20,22 +20,24 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
     import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
-    import {settingsStore} from "../../../../svelte-stores/settings-store";
+    import { settingsStore } from "../../../../svelte-stores/settings-store";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
 
     const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
+    const DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
 
     const PROPOSAL_OUTCOMES = {
         SUCCESS: "SUCCESS",
         FAILURE: "FAILURE"
     }
 
-    const PROPOSAL_OUTCOME_MESSAGES = {
-        PROPOSED_FLOW_CREATED_WITH_SUCCESS: "PROPOSED_FLOW_CREATED_WITH_SUCCESS",
-        PROPOSED_FLOW_CREATED_WITH_FAILURE: "PROPOSED_FLOW_CREATED_WITH_FAILURE"
-    };
+    const PROPOSAL_TYPES = {
+        CREATE: "CREATE",
+        EDIT: "EDIT",
+        DELETE: "DELETE"
+    }
 
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
@@ -44,6 +46,9 @@
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
     $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
+    $: dataFlowProposalsRatingSchemeSetting = $settingsCall.data
+        .filter(t => t.name === DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME)[0];
+    $: dataFlowProposalsRatingSchemeExtId = dataFlowProposalsRatingSchemeSetting?.value;
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -52,6 +57,10 @@
 
     $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
+
+    function goToWorkflow(id) {
+        window.location.href = `/proposed-flow/${id}`;
+    }
 
     function launchCommand() {
         // as soon as the user launches the command, the button gets disabled
@@ -89,18 +98,18 @@
             logicalFlowId: $logicalFlow.id ?? null,
             physicalFlowId: null,
             dataTypeIds: $dataTypes,
-            reason: $proposalReason.rating[0] ? mkReason($proposalReason.rating[0]) : null
+            reason: $proposalReason.rating[0] ? mkReason($proposalReason.rating[0]) : null,
+            source: $logicalFlow.source ?? null,
+            target: $logicalFlow.target ?? null,
+            proposalType: PROPOSAL_TYPES.CREATE
         }
-
-        _.set(command, 'source', $logicalFlow.source ?? null);
-        _.set(command, 'target', $logicalFlow.target ?? null);
 
         proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
                     toasts.success("Data Flow Proposed");
-                    //TODO: route to the created workflow on success
+                    goToWorkflow(response.proposedFlowId);
                 } else {
                     toasts.error("Error proposing data flow");
                 }
@@ -147,7 +156,7 @@
             </div>
 
             <div class="selection-step">
-                <ReasonSelectionStep/>
+                <ReasonSelectionStep ratingSchemeExtId={dataFlowProposalsRatingSchemeExtId}/>
             </div>
             <br>
 
