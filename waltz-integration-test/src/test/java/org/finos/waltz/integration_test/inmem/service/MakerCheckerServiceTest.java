@@ -46,6 +46,7 @@ import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableReason;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -63,6 +64,7 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -111,6 +113,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         // 2. Act --------------------------------------------------------------
@@ -139,6 +142,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
@@ -170,6 +174,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -213,6 +218,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -277,6 +283,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
                 .logicalFlowId(1)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
@@ -374,5 +381,34 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         dataTypeIdSet.add(41200L);
 
         return dataTypeIdSet;
+    }
+
+    @Test
+    void testPresenceOfCreateProposalTypeWhenCreatingNewProposedFlow(){
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response);
+        assertNotNull(response.proposedFlowCommand());
+        assertEquals(CREATE.name(), response.proposedFlowCommand().proposalType().name());
     }
 }

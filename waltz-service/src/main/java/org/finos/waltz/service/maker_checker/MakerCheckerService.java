@@ -148,6 +148,7 @@ public class MakerCheckerService {
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
                     .workflowTransitionList(entityWorkflowView.workflowTransitionList())
+                    .proposalType(proposedFlowRecord.getProposalType())
                     .build();
 
         } catch (JsonProcessingException e) {

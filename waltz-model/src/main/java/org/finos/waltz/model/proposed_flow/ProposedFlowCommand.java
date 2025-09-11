@@ -28,5 +28,5 @@ public abstract class ProposedFlowCommand implements Command {
     public Set<Long> dataTypeIds() {
         return emptySet();
     }
-
+    public abstract ProposalType proposalType();
 }

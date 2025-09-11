@@ -34,6 +34,7 @@ public class ProposedFlowDao {
         proposedFlowRecord.setSourceEntityKind(proposedFlowCommand.source().kind().name());
         proposedFlowRecord.setTargetEntityId(proposedFlowCommand.target().id());
         proposedFlowRecord.setTargetEntityKind(proposedFlowCommand.target().kind().name());
+        proposedFlowRecord.setProposalType(proposedFlowCommand.proposalType().name());
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
     }
