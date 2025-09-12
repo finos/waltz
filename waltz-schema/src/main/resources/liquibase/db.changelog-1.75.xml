@@ -20,84 +20,13 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.75.xml">
 
-    <changeSet id="20250822-4301-1"
-               author="jindkul">
-        <comment>
-            adding PROPOSED_FLOW to permission_group_involvement table with their operations
-            for APPLICATION , END_USER_APPLICATION, ACTOR
-        </comment>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-            <sql>
-                    INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
-                    select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-                    from involvement_group ig where name = 'Flow Approvers'
-            </sql>
-
-    </changeSet>
-
-    <changeSet id="20250822-4301-2"
-               author="jindkul">
-        <comment>
-            adding Asset Owner of End_User_Application to involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Asset Owner'
-        </sql>
-
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Administrative'
-        </sql>
-
-    </changeSet>
-
-    <changeSet id="20250822-4301-3"
-               author="jindkul">
-        <comment>
-            deleting Data Office Member of END_USER_APPLICATION from involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            DELETE FROM involvement_group_entry
-            WHERE involvement_kind_id in (select id from involvement_kind ik
-                                          where subject_kind = 'END_USER_APPLICATION'
-                                            and name  =  'Data Office Member')
-        </sql>
-
+    <changeSet id="v1-74-0-tag"
+               author="guptmayb">
+        <tagDatabase tag="v1.74.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
     <!-- 4388 Create Table - ProposedFlow Table -->
-    <changeSet id="220250911-4388-2"
+    <changeSet id="20251010-7345-1"
                author="kumarohb">
         <createTable tableName="proposed_flow"
                      remarks="details about proposed flow by requesters ">
@@ -154,7 +83,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="220250911-4388-3"
+    <changeSet id="20251010-7345-2"
                author="kumarohb">
         <comment>4388: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
 
@@ -166,7 +95,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="220250911-4388-4"
+    <changeSet id="20251010-7345-3"
                author="kumarohb">
         <comment>4388: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
 
@@ -176,6 +105,111 @@
             <column name="target_entity_id"/>
             <column name="target_entity_kind"/>
         </createIndex>
+    </changeSet>
+
+    <changeSet author="jindkul"
+               id="20251010-7345-4">
+
+        <sql>
+            insert into entity_workflow_definition
+                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
+        </sql>
+    </changeSet>
+
+    <changeSet id="20251010-7345-5"
+               author="jindkul">
+        <insert tableName="role">
+            <column name="key" value="FLOW_PROPOSER"/>
+            <column name="name" value="FLOW PROPOSER"/>
+            <column name="description" value="FLOW PROPOSER"/>
+            <column name="is_custom" valueBoolean="true"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20251010-7345-6"
+               author="jindkul">
+        <update tableName="settings">
+            <column name="value"
+                    value="BOOKMARK_EDITOR,FLOW_PROPOSER"/>
+            <where>name='server.authentication.roles.default'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20251010-7345-7"
+               author="jindkul">
+        <comment>
+            adding PROPOSED_FLOW to permission_group_involvement table with their operations
+            for APPLICATION , END_USER_APPLICATION, ACTOR
+        </comment>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="20251010-7345-8"
+               author="jindkul">
+        <comment>
+            adding Asset Owner of End_User_Application to involvement_group_entry
+            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
+        </comment>
+        <sql>
+            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
+            select 1, id from involvement_kind ik
+            where subject_kind = 'END_USER_APPLICATION'
+              and name = 'Asset Owner'
+        </sql>
+
+        <sql>
+            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
+            select 1, id from involvement_kind ik
+            where subject_kind = 'END_USER_APPLICATION'
+              and name = 'Administrative'
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="20251010-7345-9"
+               author="jindkul">
+        <comment>
+            deleting Data Office Member of END_USER_APPLICATION from involvement_group_entry
+            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
+        </comment>
+        <sql>
+            DELETE FROM involvement_group_entry
+            WHERE involvement_kind_id in (select id from involvement_kind ik
+                                          where subject_kind = 'END_USER_APPLICATION'
+                                            and name  =  'Data Office Member')
+        </sql>
+
     </changeSet>
 
 </databaseChangeLog>
