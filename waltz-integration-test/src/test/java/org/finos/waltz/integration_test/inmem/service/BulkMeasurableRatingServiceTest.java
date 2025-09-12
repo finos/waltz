@@ -1,6 +1,7 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -14,12 +15,7 @@ import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_rating.BulkMeasurableItemParser;
 import org.finos.waltz.service.measurable_rating.BulkMeasurableRatingService;
-import org.finos.waltz.test_common.helpers.AppHelper;
-import org.finos.waltz.test_common.helpers.MeasurableHelper;
-import org.finos.waltz.test_common.helpers.MeasurableRatingHelper;
-import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
-import org.finos.waltz.test_common.helpers.AllocationSchemeHelper;
-import org.finos.waltz.test_common.helpers.UserHelper;
+import org.finos.waltz.test_common.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +25,12 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static org.finos.waltz.common.CollectionUtilities.all;
-import static org.finos.waltz.common.CollectionUtilities.first;
-import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
@@ -155,14 +147,17 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
 
         assertNotNull(result, "Expected a result");
         assertEquals(3, result.validatedItems().size(), "Only one parsed row expected");
-        assertEquals(
-                asList(ChangeOperation.ADD, ChangeOperation.UPDATE, ChangeOperation.NONE),
-                map(result.validatedItems(), BulkMeasurableRatingValidatedItem::changeOperation));
-        assertEquals(
-                asList(emptySet(), asSet(ValidationError.MULTIPLE_PRIMARY_FOUND), asSet(ValidationError.APPLICATION_NOT_FOUND)),
-                map(result.validatedItems(), BulkMeasurableRatingValidatedItem::errors));
+        assertTrue(
+                CollectionUtils.isEqualCollection(
+                        asList(ChangeOperation.ADD, ChangeOperation.UPDATE, ChangeOperation.NONE),
+                        map(result.validatedItems(), BulkMeasurableRatingValidatedItem::changeOperation)
+                ));
+        assertTrue(
+                CollectionUtils.isEqualCollection(
+                        asList(emptySet(), asSet(ValidationError.MULTIPLE_PRIMARY_FOUND), asSet(ValidationError.APPLICATION_NOT_FOUND)),
+                        map(result.validatedItems(), BulkMeasurableRatingValidatedItem::errors)
+                ));
     }
-
 
 
     @Test
@@ -185,21 +180,21 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(result, "Expected a result");
 
         result
-            .validatedItems()
-            .forEach(d -> {
-                if (d.parsedItem().assetCode().equals("badApp")) {
-                    assertTrue(d.errors().contains(ValidationError.APPLICATION_NOT_FOUND), "Should be complaining about the bad app (assetCode)");
-                }
-                if (d.parsedItem().taxonomyExternalId().equals("badMeasurable")) {
-                    assertTrue(d.errors().contains(ValidationError.MEASURABLE_NOT_FOUND), "Should be complaining about the bad measurable ref (taxonomyExtId)");
-                }
-                if (d.parsedItem().ratingCode() == '_') {
-                    assertTrue(d.errors().contains(ValidationError.RATING_NOT_FOUND), "Should be complaining about the bad rating code");
-                }
-            });
+                .validatedItems()
+                .forEach(d -> {
+                    if (d.parsedItem().assetCode().equals("badApp")) {
+                        assertTrue(d.errors().contains(ValidationError.APPLICATION_NOT_FOUND), "Should be complaining about the bad app (assetCode)");
+                    }
+                    if (d.parsedItem().taxonomyExternalId().equals("badMeasurable")) {
+                        assertTrue(d.errors().contains(ValidationError.MEASURABLE_NOT_FOUND), "Should be complaining about the bad measurable ref (taxonomyExtId)");
+                    }
+                    if (d.parsedItem().ratingCode() == '_') {
+                        assertTrue(d.errors().contains(ValidationError.RATING_NOT_FOUND), "Should be complaining about the bad rating code");
+                    }
+                });
 
         assertEquals(5, result.validatedItems().size(), "Expected 5 items");
-        assertTrue(CollectionUtilities.all(result.validatedItems(), d -> ! d.errors().isEmpty()));
+        assertTrue(CollectionUtilities.all(result.validatedItems(), d -> !d.errors().isEmpty()));
     }
 
     @Test
@@ -223,13 +218,13 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
                     if (d.parsedItem().assetCode().equals("assetCode1")) {
                         assertTrue(d.errors().contains(ValidationError.ALLOCATION_EXCEEDING), "Should be complaining about the allocation exceeding");
                     }
-                    if(d.parsedItem().allocation().equals("bad_scheme")) {
+                    if (d.parsedItem().allocation().equals("bad_scheme")) {
                         assertTrue(d.errors().contains(ValidationError.ALLOCATION_SCHEME_NOT_FOUND), "Should be complaining about the bad allocation scheme");
                     }
                 });
 
         assertEquals(3, result.validatedItems().size(), "Expected 3 items");
-        assertTrue(CollectionUtilities.all(result.validatedItems(), d -> ! d.errors().isEmpty()));
+        assertTrue(CollectionUtilities.all(result.validatedItems(), d -> !d.errors().isEmpty()));
     }
 
     // --- helpers -------------------
@@ -248,7 +243,7 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
 
 
     private void assertTaxonomyExternalIdMatch(BulkMeasurableRatingValidationResult result,
-                                        List<String> taxonomyExternalId) {
+                                               List<String> taxonomyExternalId) {
         assertEquals(
                 taxonomyExternalId,
                 map(result.validatedItems(), d -> d.parsedItem().taxonomyExternalId()),
@@ -275,9 +270,9 @@ public class BulkMeasurableRatingServiceTest extends BaseInMemoryIntegrationTest
     }
 
     private String mkBadAllocationRefsTsv(String goodApp,
-                                String goodMeasurable,
-                                String goodScheme,
-                                char goodRating) {
+                                          String goodMeasurable,
+                                          String goodScheme,
+                                          char goodRating) {
         return "assetCode\ttaxonomyExternalId\tratingCode\tisPrimary\tallocation\tscheme\tcomment\n" +
                 format("%s\t%s\t%s\ttrue\t100\t%s\tcomment\n", goodApp, goodMeasurable, goodRating, goodScheme) +
                 format("%s\t%s\t%s\ttrue\t10\t%s\tcomment\n", goodApp, goodMeasurable, goodRating, goodScheme) +
