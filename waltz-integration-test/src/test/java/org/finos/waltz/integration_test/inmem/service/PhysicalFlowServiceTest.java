@@ -483,6 +483,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -527,6 +528,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -565,6 +567,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -617,6 +620,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(newSpec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -662,6 +666,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(specOnceRemoved.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -699,6 +704,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
+                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
@@ -865,6 +871,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .basisOffset(1)
                 .frequency(FrequencyKindValue.of("DAILY"))
                 .criticality(CriticalityValue.of("MEDIUM"))
+                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCmd = ImmutablePhysicalFlowCreateCommand.builder()
