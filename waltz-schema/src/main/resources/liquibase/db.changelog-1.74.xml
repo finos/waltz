@@ -112,4 +112,40 @@
         </update>
     </changeSet>
 
+    <changeSet id="20250904-4388-1"
+               author="rohit-t.kumar">
+        <comment>4388: add proposal_type to proposed_flow table</comment>
+
+        <addColumn tableName="proposed_flow">
+            <column name="proposal_type"
+                    type="${proposal-type.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20250905-4388-2"
+               author="rohit-t.kumar">
+        <comment>4388: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_source_entity_id_source_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="source_entity_id"/>
+            <column name="source_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20250905-4388-3"
+               author="rohit-t.kumar">
+        <comment>4388: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_target_entity_id_target_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="target_entity_id"/>
+            <column name="target_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

@@ -18,6 +18,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -43,7 +44,12 @@ import java.util.Set;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -131,6 +137,8 @@ class MakerCheckerEndpointTest {
                 "    \"description\": \"Approved data flow in an external system\"\n" +
                 "\n" +
                 "  },\n" +
+                "\n" +
+                "    \"proposalType\": \"CREATE\",\n" +
                 "\n" +
                 "  \"source\": {\n" +
                 "\n" +
@@ -285,6 +293,7 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
@@ -298,6 +307,7 @@ class MakerCheckerEndpointTest {
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
+                .proposalType(CREATE.name())
                 .build();
 
         //When
