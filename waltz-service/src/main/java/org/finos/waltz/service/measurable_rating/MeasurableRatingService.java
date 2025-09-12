@@ -394,7 +394,7 @@ public class MeasurableRatingService {
 
         Condition itemCondition = RATING_SCHEME_ITEM.SCHEME_ID.eq(category.ratingSchemeId());
         List<RatingSchemeItem> ratingSchemeItems = ratingSchemeDAO.fetchItems(itemCondition);
-        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId, measurableCategoryId, ratingSchemeItems);
+        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId, category.ratingSchemeId(), ratingSchemeItems);
     }
 
 

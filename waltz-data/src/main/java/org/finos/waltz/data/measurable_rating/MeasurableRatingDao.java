@@ -45,7 +45,6 @@ import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -54,9 +53,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -68,12 +72,32 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
-import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.CHANGE_LOG;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
-import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
+import org.jooq.Query;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Record3;
+import org.jooq.Record9;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectHavingStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectOrderByStep;
+import org.jooq.UpdateConditionStep;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -490,10 +514,10 @@ public class MeasurableRatingDao {
      * @param measurableId         the source measurable from which to migrate data
      * @param targetId             the target measurable to inherit the data (where possible)
      * @param userId               the user responsible for the change
-     * @param measurableCategoryId
+     * @param ratingSchemeId
      * @param ratingSchemeItems
      */
-    public void migrateRatings(Long measurableId, Long targetId, String userId, long measurableCategoryId, List<RatingSchemeItem> ratingSchemeItems) {
+    public void migrateRatings(Long measurableId, Long targetId, String userId, long ratingSchemeId, List<RatingSchemeItem> ratingSchemeItems) {
 
         if (targetId == null) {
             throw new IllegalArgumentException("Cannot migrate ratings without specifying a new target");
@@ -512,14 +536,11 @@ public class MeasurableRatingDao {
 
             // RATINGS
 
+            // direct allowable migration
             SelectOrderByStep<Record2<Long, String>> allowableMigrations = selectRatingsThatCanBeModified(measurableId, targetId);
-            // Do not update the measurable where an existing mapping already exists
 
-            //////Smita
-            //Get intersection of source & target entities
+            //target having ratings
             List<Long> entityIdList = getSharedRatingsEntityIds(measurableId, targetId);
-
-            //////////Smita
 
             SelectConditionStep<Record9<Long, String, Long, String, String, Timestamp, String, String, Boolean>> ratingsToInsert = select(Tables.MEASURABLE_RATING.ENTITY_ID,
                     Tables.MEASURABLE_RATING.ENTITY_KIND,
@@ -563,8 +584,8 @@ public class MeasurableRatingDao {
                         tx,
                         targetId,
                         EntityKind.MEASURABLE_RATING,
-                        Operation.REMOVE,
-                        format("Failed to migrate %d ratings from measurable: %d to %d due to existing ratings on the target", sharedRatingCount, measurableId, targetId),
+                        Operation.UPDATE,
+                        format("Validation of rating precedence required for %d ratings from measurable: %d to %d due to existing ratings on the target", sharedRatingCount, measurableId, targetId),
                         userId);
             }
 
@@ -753,12 +774,12 @@ public class MeasurableRatingDao {
 
             LOG.info("Migrated primary flag for intersecting rating, {}", migratedPrimary);
 
-            ////////////Smita
+            //migrate overlapping measurable ratings
             //get source entries
-            Map<Long, Integer> sourceEntries = getMappedEntries(measurableId, tx, entityIdList, measurableCategoryId);
+            Map<Long, Integer> sourceEntries = getMappedEntries(measurableId, tx, entityIdList, ratingSchemeId);
 
             //get target entries
-            Map<Long, Integer> targetEntries = getMappedEntries(targetId, tx, entityIdList, measurableCategoryId);
+            Map<Long, Integer> targetEntries = getMappedEntries(targetId, tx, entityIdList, ratingSchemeId);
 
             //collect the entities with higher rating
             Map<Long, Integer> filteredEntities = targetEntries.entrySet().stream()
@@ -772,6 +793,7 @@ public class MeasurableRatingDao {
             Map<Integer, String> ratingCodeMap = ratingSchemeItems.stream()
                     .collect(Collectors.toMap(RatingSchemeItem::position, RatingSchemeItem::rating));
 
+            //update rating with higher precedence
             List<Query> updateQueries = filteredEntities.entrySet().stream().map(r ->
                     tx.update(Tables.MEASURABLE_RATING)
                             .set(Tables.MEASURABLE_RATING.RATING, ratingCodeMap.get(r.getValue()))
@@ -784,8 +806,6 @@ public class MeasurableRatingDao {
                 LOG.info("ratings updatedCount : {}", updatedCount);
             }
 
-            //////////////Smita
-
             int removedRatings = tx
                     .deleteFrom(Tables.MEASURABLE_RATING)
                     .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))
@@ -796,8 +816,8 @@ public class MeasurableRatingDao {
                         tx,
                         targetId,
                         EntityKind.ALLOCATION,
-                        Operation.UPDATE,
-                        format("Removed %d ratings from measurable: %d where they could not be migrated due to an existing rating on the target (%d)",
+                        Operation.REMOVE,
+                        format("Removed %d ratings from measurable: with source measurable id as %d, migrated to target measurable id (%d)",
                                 removedRatings,
                                 measurableId,
                                 targetId),
@@ -809,27 +829,16 @@ public class MeasurableRatingDao {
         });
     }
 
-    private static Map<Long, Integer> getMappedEntries(Long id, DSLContext tx, List<Long> entityIdList, long measurableCategoryId) {
-        org.finos.waltz.schema.tables.MeasurableCategory measCat = MEASURABLE_CATEGORY.as("measCat");
-        Field<Long> schemeIdField = measCat.RATING_SCHEME_ID.as("scheme_id");
-
-        CommonTableExpression<Record1<Long>> schemeCTE = DSL.name("schemeCTE").as(
-                select(schemeIdField)
-                        .from(measCat)
-                        .where(measCat.ID.eq(measurableCategoryId))
-        );
-
-
-        return tx.with(schemeCTE)
+    private static Map<Long, Integer> getMappedEntries(Long id, DSLContext tx, List<Long> entityIdList, long ratingSchemeId) {
+        return tx
                 .select(
                         MEASURABLE_RATING.ENTITY_ID,
                         RATING_SCHEME_ITEM.POSITION
                 )
                 .from(MEASURABLE_RATING)
-                .crossJoin(schemeCTE)
                 .leftJoin(RATING_SCHEME_ITEM)
                 .on(MEASURABLE_RATING.RATING.eq(RATING_SCHEME_ITEM.CODE))
-                .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(schemeCTE.field(schemeIdField)))
+                .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(ratingSchemeId))
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(id))
                 .and(RATING_SCHEME_ITEM.POSITION.isNotNull())
                 .and(MEASURABLE_RATING.ENTITY_ID.in(entityIdList))
