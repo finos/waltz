@@ -201,6 +201,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 import {UserPreferenceStore_API as UserPreferenceStore} from "../../user/services/user-preference-store";
 import {RoleStore_API as RoleStore} from "../../role/services/role-store";
 import {VulnerabilityStore_API as VulnerabilityStore} from "../../software-catalog/services/vulnerability-store";
+import {ProposedFlowStore_API as ProposedFlowStore} from "../../proposed-flow/services/proposed-flow-store";
 
 
 export const CORE_API = {
@@ -308,7 +309,8 @@ export const CORE_API = {
     UserStore,
     UserPreferenceStore,
     RoleStore,
-    VulnerabilityStore
+    VulnerabilityStore,
+    ProposedFlowStore
 };
 
 

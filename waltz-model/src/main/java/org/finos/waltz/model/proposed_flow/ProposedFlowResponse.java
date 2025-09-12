@@ -42,4 +42,6 @@ public abstract class ProposedFlowResponse {
     @Nullable
     public abstract List<EntityWorkflowTransition> workflowTransitionList();
 
+    public abstract String proposalType();
+
 }
