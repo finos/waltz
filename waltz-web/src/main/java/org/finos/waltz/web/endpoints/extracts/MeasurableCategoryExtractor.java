@@ -28,8 +28,9 @@ import org.finos.waltz.schema.tables.Measurable;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Select;
+import org.jooq.SelectJoinStep;
 import org.jooq.SelectConditionStep;
-import org.jooq.SelectOnConditionStep;
 import org.jooq.SelectSeekStepN;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
@@ -84,63 +85,118 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                             .and(m.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))))
                     .fetchOne(maxLevelField);
 
-            ArrayList<Tuple3<Integer, EntityHierarchy, Measurable>> ehAndMeasurableTablesForLevel = new ArrayList<>(maxLevel);
-
-            for (int i = 0; i < maxLevel; i++) {
-                ehAndMeasurableTablesForLevel.add(
-                        i,
-                        tuple(
-                            i + 1,
-                            ENTITY_HIERARCHY.as("eh" + i),
-                            Tables.MEASURABLE.as("l" + i)));
+            if (maxLevel == null || maxLevel < 1) {
+                return writeExtract(
+                        mkSuggestedFilename(categoryId),
+                        dsl.select().where(DSL.falseCondition()),  // Empty select
+                        request,
+                        response
+                );
             }
 
-            List<Tuple3<Field<String>, Field<String>, Field<Long>>> levelFields = ehAndMeasurableTablesForLevel
-                    .stream()
+            // Prepare tuples for each hierarchy level
+            ArrayList<Tuple3<Integer, EntityHierarchy, Measurable>> levelTuples = new ArrayList<>(maxLevel);
+            for (int i = 0; i < maxLevel; i++) {
+                levelTuples.add(
+                        tuple(
+                                i + 1,
+                                ENTITY_HIERARCHY.as("eh" + i),
+                                Tables.MEASURABLE.as("l" + i)
+                        )
+                );
+            }
+
+            // Prepare select fields for each level
+            List<Tuple3<Field<String>, Field<String>, Field<Long>>> levelFields = levelTuples.stream()
                     .map(t -> tuple(
                             _m(t).NAME.as("Level " + t.v1 + " Name"),
                             _m(t).EXTERNAL_ID.as("Level " + t.v1 + " External Id"),
-                            _m(t).ID.as("Level " + t.v1 + " Waltz Id")))
-                    .collect(Collectors.toList());
-
-            List<Field<?>> selectionFields = levelFields
-                    .stream()
-                    .flatMap(t -> Stream.of(t.v1, t.v2, t.v3))
+                            _m(t).ID.as("Level " + t.v1 + " Waltz Id")
+                    ))
                     .collect(Collectors.toList());
 
             List<Field<String>> orderingFields = ListUtilities.map(levelFields, t -> t.v1);
 
-            Tuple3<Integer, EntityHierarchy, Measurable> l1 = ehAndMeasurableTablesForLevel.get(0);
+            // Build queries for all leaf node levels
+            List<Select<Record>> leafNodeQueries = new ArrayList<>();
 
-            SelectOnConditionStep<Record> workingQry = dsl
-                    .select(selectionFields)
-                    .from(_m(l1))
-                    .innerJoin(_eh(l1))
-                    .on(_eh(l1).ID.eq(_m(l1).ID)
-                            .and(_eh(l1).KIND.eq(EntityKind.MEASURABLE.name()))
-                            .and(_eh(l1).DESCENDANT_LEVEL.eq(_lvl(l1)))
-                            .and(_m(l1).MEASURABLE_CATEGORY_ID.eq(categoryId))
-                            .and(_m(l1).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
+            for (int leafLevel = 1; leafLevel <= maxLevel; leafLevel++) {
+                List<Field<?>> selectFields = new ArrayList<>();
+                for (int i = 0; i < maxLevel; i++) {
+                    if (i < leafLevel) {
+                        selectFields.add(levelFields.get(i).v1);
+                        selectFields.add(levelFields.get(i).v2);
+                        selectFields.add(levelFields.get(i).v3);
+                    } else {
+                        selectFields.add(DSL.val("").as("Level " + (i+1) + " Name"));
+                        selectFields.add(DSL.val("").as("Level " + (i+1) + " External Id"));
+                        selectFields.add(DSL.val(null, Long.class).as("Level " + (i+1) + " Waltz Id"));
+                    }
+                }
 
-            for (int i = 1; i < maxLevel; i++) {
-                Tuple3<Integer, EntityHierarchy, Measurable> curr = ehAndMeasurableTablesForLevel.get(i);
-                Tuple3<Integer, EntityHierarchy, Measurable> prev = ehAndMeasurableTablesForLevel.get(i - 1);
-                workingQry = workingQry
-                        .leftJoin(_eh(curr))
-                        .on(_eh(curr).ANCESTOR_ID.eq(_eh(prev).ID)
-                                .and(_eh(curr).KIND.eq(EntityKind.MEASURABLE.name())
-                                        .and(_eh(curr).DESCENDANT_LEVEL.eq(_lvl(curr)))))
-                        .leftJoin(_m(curr))
-                        .on(_m(curr).ID.eq(_eh(curr).ID)
-                                .and(_m(curr).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
+                // Build join path up to current leaf level
+                SelectJoinStep<Record> joinStep = dsl.select(selectFields)
+                        .from(_m(levelTuples.get(0)))
+                        .innerJoin(_eh(levelTuples.get(0)))
+                        .on(_eh(levelTuples.get(0)).ID.eq(_m(levelTuples.get(0)).ID)
+                                .and(_eh(levelTuples.get(0)).KIND.eq(EntityKind.MEASURABLE.name()))
+                                .and(_eh(levelTuples.get(0)).DESCENDANT_LEVEL.eq(_lvl(levelTuples.get(0))))
+                                .and(_m(levelTuples.get(0)).MEASURABLE_CATEGORY_ID.eq(categoryId))
+                                .and(_m(levelTuples.get(0)).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                        );
+
+                // Chain left joins for deeper levels
+                for (int i = 1; i < leafLevel; i++) {
+                    Tuple3<Integer, EntityHierarchy, Measurable> curr = levelTuples.get(i);
+                    Tuple3<Integer, EntityHierarchy, Measurable> prev = levelTuples.get(i - 1);
+
+                    joinStep = joinStep
+                            .leftJoin(_eh(curr))
+                            .on(_eh(curr).ANCESTOR_ID.eq(_eh(prev).ID)
+                                    .and(_eh(curr).KIND.eq(EntityKind.MEASURABLE.name()))
+                                    .and(_eh(curr).DESCENDANT_LEVEL.eq(_lvl(curr)))
+                            )
+                            .leftJoin(_m(curr))
+                            .on(_m(curr).ID.eq(_eh(curr).ID)
+                                    .and(_m(curr).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                            );
+                }
+
+                SelectConditionStep<Record> query;
+                // For leaf levels less than max, filter to leaf nodes (no child at next level)
+                if (leafLevel < maxLevel) {
+                    Tuple3<Integer, EntityHierarchy, Measurable> curr = levelTuples.get(leafLevel - 1);
+                    Tuple3<Integer, EntityHierarchy, Measurable> next = levelTuples.get(leafLevel);
+
+                    query = joinStep.where(_m(curr).ID.isNotNull())
+                            .andNotExists(
+                                    DSL.selectOne()
+                                            .from(_eh(next))
+                                            .where(_eh(next).ANCESTOR_ID.eq(_eh(curr).ID)
+                                                    .and(_eh(next).KIND.eq(EntityKind.MEASURABLE.name()))
+                                                    .and(_eh(next).DESCENDANT_LEVEL.eq(_lvl(next)))
+                                            )
+                            );
+                } else {
+                    Tuple3<Integer, EntityHierarchy, Measurable> curr = levelTuples.get(maxLevel - 1);
+                    query = joinStep.where(_m(curr).ID.isNotNull());
+                }
+
+                leafNodeQueries.add(query);
             }
 
-            SelectSeekStepN<Record> qry = workingQry
+            // Union all queries
+            Select<Record> unionQuery = leafNodeQueries.get(0);
+            for (int i = 1; i < leafNodeQueries.size(); i++) {
+                unionQuery = unionQuery.unionAll(leafNodeQueries.get(i));
+            }
+            SelectSeekStepN<Record> finalQry = dsl
+                    .selectFrom(unionQuery.asTable("leafNodePaths"))
                     .orderBy(orderingFields);
 
             return writeExtract(
                     mkSuggestedFilename(categoryId),
-                    qry,
+                    finalQry,
                     request,
                     response);
         });
