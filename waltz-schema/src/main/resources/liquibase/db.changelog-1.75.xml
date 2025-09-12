@@ -20,6 +20,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.75.xml">
 
+    <changeSet id="v1-74-0-tag"
+               author="guptmayb">
+        <tagDatabase tag="v1.74.0"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
     <!-- 4388 Create Table - ProposedFlow Table -->
     <changeSet id="20251010-7345-1"
                author="kumarohb">
