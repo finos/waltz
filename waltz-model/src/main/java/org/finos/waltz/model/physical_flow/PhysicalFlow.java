@@ -101,7 +101,7 @@ public abstract class PhysicalFlow implements
                 .id(id().get())
                 .description(description())
                 .externalId(externalId())
-                .name(name())
+                .name(name() != null ? name() : "")
                 .build();
     }
 
