@@ -538,14 +538,18 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         logicalFlowDao.addFlow(flowToAdd);
 
-        PhysicalSpecification specification = ImmutablePhysicalSpecification
+        //Below commented lines are not required when physical flow is
+        //created by selecting the existing physical specifications
+        //Need to test and then remove or keep the below commented lines
+
+    /*    PhysicalSpecification specification = ImmutablePhysicalSpecification
                 .copyOf(proposedFlowResponse.flowDef().specification())
                 .withLastUpdatedBy(USER_NAME)
                 .withLastUpdatedAt(now)
                 .withCreated(UserTimestamp.mkForUser(USER_NAME, now));
 
         long specId = physicalSpecificationDao.create(specification);
-        physicalSpecificationDao.getById(specId);
+        physicalSpecificationDao.getById(specId);*/
 
         // 2. Act --------------------------------------------------------------
         LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
