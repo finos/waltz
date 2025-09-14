@@ -288,6 +288,7 @@ public class PhysicalFlowService {
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
                 .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
+                .specificationId(specId)
                 .build();
     }
 
