@@ -789,23 +789,28 @@ public class MeasurableRatingDao {
                     })
                     .collect(Collectors.toMap(Map.Entry::getKey, targetEntry -> sourceEntries.get(targetEntry.getKey())));
 
+            if (null != filteredEntities && filteredEntities.size() > 0) {
 
-            Map<Integer, String> ratingCodeMap = ratingSchemeItems.stream()
-                    .collect(Collectors.toMap(RatingSchemeItem::position, RatingSchemeItem::rating));
+                Map<Integer, String> ratingCodeMap = ratingSchemeItems.stream()
+                        .collect(Collectors.toMap(
+                                RatingSchemeItem::position,
+                                RatingSchemeItem::rating,
+                                (existingValue, newValue) -> existingValue // ignores the new value
+                        ));
 
-            //update rating with higher precedence
-            List<Query> updateQueries = filteredEntities.entrySet().stream().map(r ->
-                    tx.update(Tables.MEASURABLE_RATING)
-                            .set(Tables.MEASURABLE_RATING.RATING, ratingCodeMap.get(r.getValue()))
-                            .where(Tables.MEASURABLE_RATING.ENTITY_ID.eq(r.getKey()))
-                            .and(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(targetId))
-            ).collect(Collectors.toList());
+                //update rating with higher precedence
+                List<Query> updateQueries = filteredEntities.entrySet().stream().map(r ->
+                        tx.update(Tables.MEASURABLE_RATING)
+                                .set(Tables.MEASURABLE_RATING.RATING, ratingCodeMap.get(r.getValue()))
+                                .where(Tables.MEASURABLE_RATING.ENTITY_ID.eq(r.getKey()))
+                                .and(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(targetId))
+                ).collect(Collectors.toList());
 
-            if (!updateQueries.isEmpty() && updateQueries.size() > 0) {
-                int updatedCount = tx.batch(updateQueries).execute().length;
-                LOG.info("ratings updatedCount : {}", updatedCount);
+                if (!updateQueries.isEmpty() && updateQueries.size() > 0) {
+                    int updatedCount = tx.batch(updateQueries).execute().length;
+                    LOG.info("ratings updatedCount : {}", updatedCount);
+                }
             }
-
             int removedRatings = tx
                     .deleteFrom(Tables.MEASURABLE_RATING)
                     .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))
