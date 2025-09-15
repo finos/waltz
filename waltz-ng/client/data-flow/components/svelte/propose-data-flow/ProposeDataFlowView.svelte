@@ -118,12 +118,12 @@
                     setTimeout(goToWorkflow, 500, response.proposedFlowId);
                 } else {
                     toasts.error("Error proposing data flow");
-                    commandLaunched = false;
-                    // reset in case of error so that user is able to re-submit
+                    commandLaunched = false; // reset in case of error so that user is able to re-submit
                 }
             })
             .catch(e => {
                 displayError("Error proposing data flow", e);
+                commandLaunched = false; // reset in case of error so that user is able to re-submit
             });
     }
 
