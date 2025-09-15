@@ -115,7 +115,7 @@
                 const response = r.data;
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
                     toasts.success("Data Flow Proposed");
-                    setTimeout(goToWorkflow, 500, response.proposedFlowId);
+                    setTimeout(goToWorkflow, 500, response.proposedFlowId ?? null);
                 } else {
                     toasts.error("Error proposing data flow");
                     commandLaunched = false; // reset in case of error so that user is able to re-submit
