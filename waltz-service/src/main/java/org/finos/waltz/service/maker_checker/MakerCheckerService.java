@@ -247,6 +247,7 @@ public class MakerCheckerService {
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
         ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+        checkNotNull(proposedFlow, "No proposed flow found");
 
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
