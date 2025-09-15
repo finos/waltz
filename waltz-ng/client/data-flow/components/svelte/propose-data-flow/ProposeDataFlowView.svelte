@@ -21,6 +21,7 @@
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
     import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
     import { settingsStore } from "../../../../svelte-stores/settings-store";
+    import pageInfo from "../../../../svelte-stores/page-navigation-store";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
@@ -58,8 +59,13 @@
     $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
 
-    function goToWorkflow(id) {
-        window.location.href = `/proposed-flow/${id}`;
+    function goToWorkflow(proposedFlowId) {
+        $pageInfo = {
+            state: "main.proposed-flow.view",
+            params: {
+                id: proposedFlowId
+            }
+        }
     }
 
     function launchCommand() {
@@ -109,7 +115,7 @@
                 const response = r.data;
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
                     toasts.success("Data Flow Proposed");
-                    goToWorkflow(response.proposedFlowId);
+                    setTimeout(goToWorkflow, 500, response.proposedFlowId);
                 } else {
                     toasts.error("Error proposing data flow");
                     commandLaunched = false;
