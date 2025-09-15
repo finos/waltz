@@ -37,7 +37,6 @@ public class PhysicalFlowHelper {
                 .basisOffset(1)
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .frequency(FrequencyKindValue.of("DAILY"))
-                .name(spec.name())
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCmd = ImmutablePhysicalFlowCreateCommand.builder()

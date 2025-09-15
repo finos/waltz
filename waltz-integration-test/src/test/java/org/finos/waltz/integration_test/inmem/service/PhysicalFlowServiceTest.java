@@ -991,8 +991,6 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     void check_entityReference_whenNameIsNotNull() {
-        String username = mkName("createWillCreateSpecIfRequired");
-
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -1001,7 +999,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
-                .lastUpdatedBy(username)
+                .lastUpdatedBy("username")
                 .description("test PhysicalFlow")
                 .name("test")
                 .build();
@@ -1015,8 +1013,6 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     void check_entityReference_shouldUseEmptyStringWhenNameIsNull() {
-        String username = mkName("createWillCreateSpecIfRequired");
-
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -1025,9 +1021,31 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
-                .lastUpdatedBy(username)
+                .lastUpdatedBy("username")
                 .description("test PhysicalFlow")
-                // do NOT call .name(), omit it to leave as empty
+                .name(null)
+                .build();
+
+        EntityReference ref = flow.entityReference();
+
+        // name should = "" as we did not assign in builder and should not return NULL
+        assertEquals("", ref.name().orElse(""),
+                "EntityReference.name() should be '' when PhysicalFlow.name() is null");
+    }
+
+    @Test
+    void check_entityReference_shouldUseEmptyStringWhenNameIsNotSpecified() {
+        ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
+                .id(100L)
+                .logicalFlowId(200L)
+                .specificationId(300L)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .lastUpdatedBy("username")
+                .description("test PhysicalFlow")
+                // do NOT call .externalId(), omit it to leave as empty
                 .build();
 
         EntityReference ref = flow.entityReference();
@@ -1039,8 +1057,6 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     void check_entityReference_externalIdIsNotNull() {
-        String username = mkName("createWillCreateSpecIfRequired");
-
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -1049,7 +1065,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
-                .lastUpdatedBy(username)
+                .lastUpdatedBy("username")
                 .description("test PhysicalFlow")
                 .externalId("test")
                 .build();
@@ -1062,9 +1078,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    void check_entityReference_externalIdIsNull() {
-        String username = mkName("createWillCreateSpecIfRequired");
-
+    void check_entityReference_externalIdIsEmpty() {
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -1073,7 +1087,29 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
-                .lastUpdatedBy(username)
+                .lastUpdatedBy("username")
+                .description("test PhysicalFlow")
+                .externalId(Optional.empty())
+                .build();
+
+        EntityReference ref = flow.entityReference();
+
+        // externalId should be empty Optional when PhysicalFlow.externalId is null
+        assertFalse(ref.externalId().isPresent(),
+                "EntityReference.externalId should be empty when PhysicalFlow.externalId is empty");
+    }
+
+    @Test
+    void check_entityReference_externalIdIsNotSpecified() {
+        ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
+                .id(100L)
+                .logicalFlowId(200L)
+                .specificationId(300L)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .lastUpdatedBy("username")
                 .description("test PhysicalFlow")
                 // do NOT call .externalId(), omit it to leave as empty
                 .build();
