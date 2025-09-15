@@ -2,6 +2,8 @@ package org.finos.waltz.service.maker_checker;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
@@ -9,7 +11,9 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -29,13 +33,14 @@ import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredic
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -45,6 +50,7 @@ import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
+import static org.finos.waltz.schema.Tables.PROPOSED_FLOW;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 
 
@@ -66,6 +72,8 @@ public class MakerCheckerService {
     private final MakerCheckerPermissionService permissionService;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
+    private final EntityWorkflowStateDao entityWorkflowStateDao;
+    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
 
     @Autowired
     MakerCheckerService(EntityWorkflowService entityWorkflowService,
@@ -74,7 +82,9 @@ public class MakerCheckerService {
                         WorkflowDefinition proposedFlowWorkflowDefinition,
                         LogicalFlowService logicalFlowService,
                         PhysicalFlowService physicalFlowService,
-                        MakerCheckerPermissionService permissionService) {
+                        MakerCheckerPermissionService permissionService,
+                        EntityWorkflowStateDao entityWorkflowStateDao,
+                        EntityWorkflowTransitionDao entityWorkflowTransitionDao) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
@@ -82,6 +92,8 @@ public class MakerCheckerService {
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(permissionService, "MakerCheckerPermissionService cannot be null");
+        checkNotNull(entityWorkflowStateDao, "entityWorkflowStateDao cannot be null");
+        checkNotNull(entityWorkflowTransitionDao, "entityWorkflowTransitionDao cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -91,6 +103,8 @@ public class MakerCheckerService {
 //        Get the state machine from the definition
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
+        this.entityWorkflowStateDao = entityWorkflowStateDao;
+        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -129,10 +143,6 @@ public class MakerCheckerService {
 
     public ProposedFlowResponse getProposedFlowById(long id) {
         ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
-        return getProposedFlow(proposedFlowRecord);
-    }
-
-    private ProposedFlowResponse getProposedFlow(ProposedFlowRecord proposedFlowRecord) {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
         EntityReference entityReference = mkRef(PROPOSED_FLOW_ENTITY_KIND, proposedFlowRecord.getId());
@@ -160,10 +170,46 @@ public class MakerCheckerService {
         }
     }
 
-    public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) {
-        return proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options)).stream()
-                .map(record -> getProposedFlow(record))
-                .collect(Collectors.toList());
+    public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
+        EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        return getProposedFlowResponse(
+                proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options), workflowDefinition.id().get()));
+    }
+
+    private List<ProposedFlowResponse> getProposedFlowResponse(Result<Record> result) throws JsonProcessingException {
+        Map<Long, ProposedFlowResponse> flowMap = new HashMap<>();
+        for (Record record : result) {
+            Long flowId = record.get(PROPOSED_FLOW.ID, Long.class);
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(record.get(PROPOSED_FLOW.FLOW_DEF), ProposedFlowCommand.class);
+            flowMap.compute(flowId, (id, existingFlowResponse) -> {
+                List<EntityWorkflowTransition> updatedTransitions = new ArrayList<>();
+                if (existingFlowResponse != null) {
+                    updatedTransitions.addAll(existingFlowResponse.workflowTransitionList());
+                    updatedTransitions.add(entityWorkflowTransitionDao.getWorkflowTransition(record));
+                    return ImmutableProposedFlowResponse.copyOf(existingFlowResponse)
+                            .withWorkflowTransitionList(updatedTransitions);
+                } else {
+                    ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowRecord(record);
+                    ImmutableEntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getEntityWorkFlowState(record);
+                    updatedTransitions.add(entityWorkflowTransitionDao.getWorkflowTransition(record));
+                    return ImmutableProposedFlowResponse.builder()
+                            .id(proposedFlowRecord.getId())
+                            .sourceEntityId(proposedFlowRecord.getSourceEntityId())
+                            .sourceEntityKind(proposedFlowRecord.getSourceEntityKind())
+                            .targetEntityId(proposedFlowRecord.getTargetEntityId())
+                            .targetEntityKind(proposedFlowRecord.getTargetEntityKind())
+                            .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                            .createdBy(proposedFlowRecord.getCreatedBy())
+                            .proposalType(proposedFlowRecord.getProposalType())
+                            .flowDef(flowDefinition)
+                            .workflowState(entityWorkflowState)
+                            .workflowTransitionList(updatedTransitions)
+                            .build();
+                }
+
+            });
+        }
+        return  new ArrayList<>(flowMap.values());
     }
 
     /**

@@ -26,10 +26,7 @@ import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
@@ -58,12 +55,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -156,6 +156,41 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         assertNotNull((proposedFlowResponse.workflowState().workflowId()));
         assertTrue(proposedFlowResponse.workflowTransitionList().size() > 0);
     }
+
+    @Test
+    public void testGetProposedFlowList() throws JsonProcessingException {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command1 = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 201))
+                .logicalFlowId(12345)
+                .physicalFlowId(12345)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
+                .build();
+        ProposedFlowCommandResponse response1 = makerCheckerService.proposeNewFlow(USER_NAME, command1);
+        // 2. Act --------------------------------------------------------------
+       List<ProposedFlowResponse> proposedFlowResponses = makerCheckerService.getProposedFlows(
+                       mkOpts(
+                               mkRef(EntityKind.PROPOSED_FLOW, ouIds.root),
+                               CHILDREN));
+
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response1);
+        assertNotNull(proposedFlowResponses);
+    }
+
 
     @Test
     void testWhenLogicalFlowIdIsNotPresentThenCreatesBothLogicalAndPhysicalFlow() throws JsonProcessingException, FlowCreationException {
