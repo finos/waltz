@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import  org.jooq.Record;
+import  org.jooq.Result;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
