@@ -14,6 +14,9 @@ import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -251,9 +254,8 @@ public class MakerCheckerService {
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowResponse proposedFlowResponse = null;
-        final ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
-
+        ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+        checkNotNull(proposedFlow, "No proposed flow found");
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
                 username,
@@ -308,19 +310,19 @@ public class MakerCheckerService {
             // Refresh Return Object
             EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(
                     PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
-            proposedFlowResponse = ImmutableProposedFlowResponse
-                    .copyOf(proposedFlowResponse)
+            proposedFlow = ImmutableProposedFlowResponse
+                    .copyOf(proposedFlow)
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
                     .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
-                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : 0);
+                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;
         }
 
-        return proposedFlowResponse;
+        return proposedFlow;
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {

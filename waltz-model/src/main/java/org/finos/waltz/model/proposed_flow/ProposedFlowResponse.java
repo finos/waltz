@@ -44,6 +44,7 @@ public abstract class ProposedFlowResponse {
 
     public abstract String proposalType();
 
-    public abstract long specificationId();
+    @Nullable
+    public abstract Long specificationId();
 
 }
