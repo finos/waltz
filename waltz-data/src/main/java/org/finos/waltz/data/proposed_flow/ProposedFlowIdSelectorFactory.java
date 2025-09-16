@@ -74,6 +74,7 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> idSelectorForUser(IdSelectionOptions options) {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
+
         return
                         DSL
                             .select(PROPOSED_FLOW.ID)

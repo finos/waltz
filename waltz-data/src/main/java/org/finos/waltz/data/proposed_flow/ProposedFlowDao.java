@@ -2,6 +2,7 @@ package org.finos.waltz.data.proposed_flow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.DSLContext;
@@ -70,15 +71,15 @@ public class ProposedFlowDao {
                 .from(PROPOSED_FLOW)
                 .join(ENTITY_WORKFLOW_STATE)
                 .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(PROPOSED_FLOW_ENTITY_KIND))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
                 .join(ENTITY_WORKFLOW_TRANSITION)
                 .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(PROPOSED_FLOW_ENTITY_KIND))
+                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
                 .where(dsl.renderInlined(PROPOSED_FLOW.ID.in(flowIdSelector)))
                 .fetch();
     }
 
-    public ProposedFlowRecord getProposedFlowRecord(Record record) {
+    public static ProposedFlowRecord TO_DOMAIN_MAPPER(Record record) {
         ProposedFlowRecord proposedFlowRecord = new ProposedFlowRecord();
         proposedFlowRecord.setId(record.get(PROPOSED_FLOW.ID));
         proposedFlowRecord.setSourceEntityId(record.get(PROPOSED_FLOW.SOURCE_ENTITY_ID));

@@ -108,7 +108,7 @@ public class EntityWorkflowTransitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public ImmutableEntityWorkflowTransition getWorkflowTransition(Record record){
+    public static EntityWorkflowTransition TO_DOMAIN_MAPPER(Record record){
         return ImmutableEntityWorkflowTransition
                 .builder()
                 .workflowId(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID))

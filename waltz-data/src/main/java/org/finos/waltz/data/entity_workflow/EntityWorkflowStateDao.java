@@ -104,7 +104,7 @@ public class EntityWorkflowStateDao {
                 .execute();
     }
 
-    public ImmutableEntityWorkflowState getEntityWorkFlowState(Record record){
+    public static EntityWorkflowState TO_DOMAIN_MAPPER(Record record){
 
         return ImmutableEntityWorkflowState
                 .builder()
