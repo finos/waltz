@@ -1,5 +1,4 @@
 <script>
-    import _ from 'lodash';
     import Icon from "../../common/svelte/Icon.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import { formatDate, stateMeta, sortByField } from "../utils";

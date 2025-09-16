@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const STATES = {
     PENDING_APPROVALS: "PENDING_APPROVALS",
     SUBMITTED: "SUBMITTED",
