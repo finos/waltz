@@ -1,10 +1,12 @@
 <script>
     import Icon from "../../common/svelte/Icon.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
-    import { formatDate, stateMeta } from "../utils";
+    import { formatDate, stateMeta, sortByField } from "../utils";
 
     export let proposedFlow;
-    $: workflowTransitionList = proposedFlow?.workflowTransitionList || [];
+    $: workflowTransitionList = proposedFlow?.workflowTransitionList
+    ? sortByField(proposedFlow.workflowTransitionList, 'lastUpdatedAt', 'asc')
+    : [];
 
     let openIdx = null;
 </script>
