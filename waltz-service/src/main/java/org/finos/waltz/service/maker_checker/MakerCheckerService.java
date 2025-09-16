@@ -14,7 +14,15 @@ import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -308,7 +316,8 @@ public class MakerCheckerService {
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null);
+                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
+                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;

@@ -260,6 +260,7 @@ public class PhysicalFlowService {
                     .outcome(CommandOutcome.FAILURE)
                     .message("Duplicate with existing flow")
                     .entityReference(mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
+                    .specificationId(specId)
                     .build();
         }
 
@@ -288,6 +289,7 @@ public class PhysicalFlowService {
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
                 .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
+                .specificationId(specId)
                 .build();
     }
 
