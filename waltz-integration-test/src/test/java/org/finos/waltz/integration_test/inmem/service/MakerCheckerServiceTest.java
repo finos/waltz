@@ -49,8 +49,13 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -59,12 +64,16 @@ import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.finos.waltz.schema.tables.EntityWorkflowDefinition.ENTITY_WORKFLOW_DEFINITION;
+import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -89,10 +98,16 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
+    @Autowired
+    DSLContext dsl;
+    @Autowired
+    EntityWorkflowService entityWorkflowService;
 
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
 
     private static final String USER_NAME = "testUser";
+    @Autowired
+    private AppHelper appHelper;
 
     @Test
     public void testProposedNewFlow() {
@@ -160,16 +175,19 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void testGetProposedFlowList() throws JsonProcessingException {
 
+
         // 1. Arrange ----------------------------------------------------------
         Reason reason = getReason();
         EntityReference owningEntity = getOwningEntity();
         PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
         FlowAttributes flowAttributes = getFlowAttributes();
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
-
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
         ProposedFlowCommand command1 = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 201))
+                .source(a)
+                .target(b)
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -178,12 +196,28 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .dataTypeIds(dataTypeIdSet)
                 .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
+        ProposedFlowCommand command2 = ImmutableProposedFlowCommand.builder()
+                .source(a)
+                .target(c)
+                .logicalFlowId(12346)
+                .physicalFlowId(12346)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
+                .build();
         ProposedFlowCommandResponse response1 = makerCheckerService.proposeNewFlow(USER_NAME, command1);
+        ProposedFlowCommandResponse response2 = makerCheckerService.proposeNewFlow(USER_NAME, command2);
         // 2. Act --------------------------------------------------------------
-       List<ProposedFlowResponse> proposedFlowResponses = makerCheckerService.getProposedFlows(
-                       mkOpts(
-                               mkRef(EntityKind.PROPOSED_FLOW, ouIds.root),
-                               CHILDREN));
+
+       //TODO  dsl.newRecord(ENTITY_WORKFLOW_DEFINITION).set(7l,);
+       // entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+
+        List<ProposedFlowResponse> proposedFlowResponses = makerCheckerService.getProposedFlows(
+                mkOpts(
+                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                        CHILDREN));
 
 
         // 3. Assert -----------------------------------------------------------
@@ -234,6 +268,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         assertNotNull(resp.physicalFlowCreateCommandResponse());
         assertTrue(resp.physicalFlowCreateCommandResponse().entityReference().id() > 0);
     }
+
 
     @Test
     void testWhenLogicalFlowAlreadyExistsThenOnlyPhysicalFlowIsCreated() throws JsonProcessingException, FlowCreationException {

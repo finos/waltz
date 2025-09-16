@@ -1,7 +1,6 @@
 package org.finos.waltz.web;
 
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
@@ -44,6 +43,8 @@ import java.util.Set;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -306,7 +307,6 @@ class MakerCheckerEndpointTest {
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
-                .workflowDefinitionId(7)
                 .workflowTransitionList(workflowTransitionList)
                 .proposalType(CREATE.name())
                 .build();
@@ -320,6 +320,149 @@ class MakerCheckerEndpointTest {
         //Then
         assertEquals(expected, actual);
     }
+
+    @Test
+    void getProposedFlows() throws IOException {
+
+        //Given
+        long id = 42L;
+
+        EntityReference entityReference = ImmutableEntityReference.builder()
+                .kind(APPLICATION)
+                .id(33L)
+                .name("test")
+                .externalId("456-1")
+                .build();
+
+        Reason reason = ImmutableReason.builder()
+                .description("test")
+                .ratingId(3)
+                .build();
+
+        TransportKindValue transportKindValue = TransportKindValue.of("UNKNOWN");
+        FrequencyKindValue frequencyKindValue = FrequencyKindValue.of("QUARTERLY");
+        CriticalityValue criticalityValue = CriticalityValue.of("low");
+
+        Set<Long> dataTypeIdSet = new HashSet<>();
+        dataTypeIdSet.add(2222L);
+        dataTypeIdSet.add(3333L);
+
+        FlowAttributes flowAttributes = ImmutableFlowAttributes.builder()
+                .name("sss")
+                .transport(transportKindValue)
+                .frequency(frequencyKindValue)
+                .basisOffset(0)
+                .criticality(criticalityValue)
+                .description("testing")
+                .externalId("567s")
+                .build();
+
+        EntityReference owningEntity = ImmutableEntityReference.builder()
+                .id(18703L)
+                .kind(APPLICATION)
+                .name("AMG")
+                .externalId("60487-1")
+                .description("Testing")
+                .build();
+
+        PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
+                .owningEntity(owningEntity)
+                .name("mc_specification")
+                .description("mc_specification description")
+                .format(DataFormatKindValue.of("DATABASE"))
+                .lastUpdatedBy("waltz")
+                .id(567)
+                .build();
+        EntityReference proposedFlowEntity = ImmutableEntityReference.builder()
+                .id(1L)
+                .kind(PROPOSED_FLOW)
+                .name("Proposed Flow")
+                .externalId("487-1")
+                .description("Testing")
+                .build();
+        EntityWorkflowState workflowState = ImmutableEntityWorkflowState.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .state("PENDING_APPROVALS")
+                .build();
+        EntityWorkflowTransition workflowTransition = ImmutableEntityWorkflowTransition.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .fromState("PROPOSED_CREATE")
+                .toState("PENDING_APPROVALS")
+                .reason("flow proposed")
+                .build();
+        EntityWorkflowTransition workflowTransition2 = ImmutableEntityWorkflowTransition.builder()
+                .lastUpdatedAt(LocalDateTime.now())
+                .lastUpdatedBy("rajendra.rai@db.com")
+                .provenance("waltz")
+                .workflowId(7L)
+                .entityReference(proposedFlowEntity)
+                .fromState("PENDING_APPROVALS")
+                .toState("SOURCE_APPROVED")
+                .reason("source approved")
+                .build();
+        List<EntityWorkflowTransition> workflowTransitionList = new ArrayList<>();
+        workflowTransitionList.add(workflowTransition);
+        workflowTransitionList.add(workflowTransition2);
+        ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
+                .source(entityReference)
+                .target(entityReference)
+                .reason(reason)
+                .logicalFlowId(123L)
+                .physicalFlowId(234L)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
+                .build();
+
+        ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
+                .id(1L)
+                .sourceEntityId(601L)
+                .sourceEntityKind("APPLICATION")
+                .targetEntityId(602L)
+                .targetEntityKind("APPLICATION")
+                .createdAt(LocalDateTime.now())
+                .createdBy("anonymous")
+                .flowDef(proposedFlowcommand)
+                .workflowState(workflowState)
+                .workflowTransitionList(workflowTransitionList)
+                .proposalType(CREATE.name())
+                .build();
+        List<ProposedFlowResponse> expectedList = new ArrayList<>();
+        expectedList.add(expected);
+        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
+                .entityReference(mkRef(EntityKind.PERSON,3025761))
+                        .scope(CHILDREN)
+                                .build();
+
+        String requestBody = "{\n" +
+
+                "  \"entityReference\": {\n" +
+                "    \"id\": 3025761,\n" +
+                "    \"kind\": \"PERSON\"\n" +
+                "  },\n" +
+                "  \"filters\": {},\n" +
+                "  \"scope\": \"CHILDREN\"\n" +
+                "}";
+        //When
+        when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
+        when(makerCheckerService.getProposedFlows(options)).thenReturn(expectedList);
+
+        List<ProposedFlowResponse> actual = makerCheckerEndpoint.getProposedFlows(request, response);
+
+        //Then
+        assertEquals(expectedList, actual);
+        assertTrue(expectedList.size() > 0);
+    }
+
 
     /* ----------Missing id Parameter ---------- */
     @Test
