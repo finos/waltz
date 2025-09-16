@@ -6,13 +6,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static java.util.Optional.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalFlowTests {
 
     @Test
-    void check_entityReference_whenNameIsNotNull() {
+    void check_entityReference_whenNameIsSpecified() {
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -28,13 +27,97 @@ public class PhysicalFlowTests {
 
         EntityReference ref = flow.entityReference();
 
-        // name should = "TEST" as we assigned in builder
-        assertEquals("test", ref.name().orElse(""),
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertTrue(ref.name().isPresent());
+        assertEquals("test", ref.name().get(),
                 "EntityReference.name() should be 'test' when PhysicalFlow.name() is set to 'test'");
     }
 
     @Test
-    void check_entityReference_shouldUseEmptyStringWhenNameIsNull() {
+    void check_entityReference_whenNameIsEmpty() {
+        ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
+                .id(100L)
+                .logicalFlowId(200L)
+                .specificationId(300L)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .lastUpdatedBy("username")
+                .description("test PhysicalFlow")
+                .name("")
+                .build();
+
+        EntityReference ref = flow.entityReference();
+
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertTrue(ref.name().isPresent());
+        assertEquals("", ref.name().get(),
+                "EntityReference.name() should be '' when PhysicalFlow.name() is set to ''");
+    }
+
+    @Test
+    void check_entityReference_WhenNameIsNotSpecified() {
+        ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
+                .id(100L)
+                .logicalFlowId(200L)
+                .specificationId(300L)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .lastUpdatedBy("username")
+                .description("test PhysicalFlow")
+                // do NOT call .name(), omit it to leave as empty
+                .build();
+
+        EntityReference ref = flow.entityReference();
+
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertFalse(ref.name().isPresent(), "Name should not be present");
+    }
+
+    @Test
+    void check_entityReference_WhenNameIsNull() {
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -50,35 +133,25 @@ public class PhysicalFlowTests {
 
         EntityReference ref = flow.entityReference();
 
-        // name should = "" as we did not assign in builder and should not return NULL
-        assertEquals("", ref.name().orElse(""),
-                "EntityReference.name() should be '' when PhysicalFlow.name() is null");
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertFalse(ref.name().isPresent(), "Name should not be present");
     }
 
     @Test
-    void check_entityReference_shouldUseEmptyStringWhenNameIsNotSpecified() {
-        ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
-                .id(100L)
-                .logicalFlowId(200L)
-                .specificationId(300L)
-                .frequency(FrequencyKindValue.of("DAILY"))
-                .criticality(CriticalityValue.of("MEDIUM"))
-                .transport(TransportKindValue.UNKNOWN)
-                .basisOffset(0)
-                .lastUpdatedBy("username")
-                .description("test PhysicalFlow")
-                // do NOT call .externalId(), omit it to leave as empty
-                .build();
-
-        EntityReference ref = flow.entityReference();
-
-        // name should = "" as we did not assign in builder and should not return NULL
-        assertEquals("", ref.name().orElse(""),
-                "EntityReference.name() should be '' when PhysicalFlow.name() is not set");
-    }
-
-    @Test
-    void check_entityReference_externalIdIsNotNull() {
+    void check_entityReference_externalIdIsSpecified() {
         ImmutablePhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .id(100L)
                 .logicalFlowId(200L)
@@ -94,9 +167,23 @@ public class PhysicalFlowTests {
 
         EntityReference ref = flow.entityReference();
 
-        // externalId should = "TEST" as we assigned in builder
-        assertEquals("test", ref.externalId().orElse(""),
-                "EntityReference.externalId() should be 'test' when PhysicalFlow.externalId() is set  to 'test'");
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertTrue(ref.externalId().isPresent());
+        assertEquals("test", ref.externalId().get(),
+                "EntityReference.externalId() should be 'test' when PhysicalFlow.externalId() is set to 'test'");
     }
 
     @Test
@@ -111,14 +198,28 @@ public class PhysicalFlowTests {
                 .basisOffset(0)
                 .lastUpdatedBy("username")
                 .description("test PhysicalFlow")
-                .externalId(Optional.empty())
+                .externalId("")
                 .build();
 
         EntityReference ref = flow.entityReference();
 
-        // externalId should be empty Optional when PhysicalFlow.externalId is null
-        assertFalse(ref.externalId().isPresent(),
-                "EntityReference.externalId should be empty when PhysicalFlow.externalId is empty");
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertTrue(ref.externalId().isPresent());
+        assertEquals("", ref.externalId().get(),
+                "EntityReference.externalId() should be '' when PhysicalFlow.externalId() is set to ''");
     }
 
     @Test
@@ -138,8 +239,20 @@ public class PhysicalFlowTests {
 
         EntityReference ref = flow.entityReference();
 
-        // externalId should be empty Optional when PhysicalFlow.externalId is null
-        assertFalse(ref.externalId().isPresent(),
-                "EntityReference.externalId should be empty when PhysicalFlow.externalId is not specified");
+        assertEquals(100L, flow.id().get(), "id should = 100 Long");
+        assertEquals(200L, flow.logicalFlowId(), "logicalFlowId should = 200 Long");
+        assertEquals(300L, flow.specificationId(), "specificationId should = 300 Long");
+        assertEquals(FrequencyKindValue.of("DAILY"), flow.frequency(), "frequency should = 'DAILY'");
+        assertEquals(CriticalityValue.of("MEDIUM"), flow.criticality(), "criticality should = 'MEDIUM'");
+        assertEquals(TransportKindValue.UNKNOWN, flow.transport(), "criticality should = 'UNKNOWN'");
+        assertEquals(0, flow.basisOffset(), "basisOffset should = 0");
+        assertEquals("test PhysicalFlow", flow.description(), "description should = 'test PhysicalFlow'");
+
+        assertEquals(100,ref.id(),"ID should = 100");
+
+        assertEquals("test PhysicalFlow", ref.description(),
+                "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
+
+        assertFalse(ref.externalId().isPresent(), "externalId should not be present");
     }
 }
