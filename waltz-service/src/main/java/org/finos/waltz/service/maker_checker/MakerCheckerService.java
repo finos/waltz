@@ -316,7 +316,8 @@ public class MakerCheckerService {
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null);
+                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
+                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;
