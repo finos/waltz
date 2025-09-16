@@ -23,7 +23,6 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
-    private static final String PROPOSED_FLOW_ENTITY_KIND = "PROPOSED_FLOW";
     private final DSLContext dsl;
 
     @Autowired
