@@ -3,7 +3,11 @@
     export let proposedFlow;
 
     $: workflowState = proposedFlow?.workflowState || {};
-    $: workflowTransitionList = proposedFlow?.workflowTransitionList || [];
+    $: workflowTransitionList = proposedFlow?.workflowTransitionList ? _.orderBy(
+        proposedFlow.workflowTransitionList,
+        ['lastUpdatedAt'],
+        ['asc']
+    ) : [];
 
     const initialStep = {
         key: "request",

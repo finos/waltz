@@ -1,10 +1,15 @@
 <script>
+    import _ from 'lodash';
     import Icon from "../../common/svelte/Icon.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import { formatDate, stateMeta } from "../utils";
 
     export let proposedFlow;
-    $: workflowTransitionList = proposedFlow?.workflowTransitionList || [];
+    $: workflowTransitionList = proposedFlow?.workflowTransitionList ? _.orderBy(
+        proposedFlow.workflowTransitionList,
+        ['lastUpdatedAt'],
+        ['asc']
+    ) : [];
 
     let openIdx = null;
 </script>

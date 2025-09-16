@@ -66,7 +66,7 @@ function controller($q,
     }
 
     vm.goToDashboard = () => {
-        $window.open("data-flow/dashboard/user", "_self");
+        $state.go("main.data-flow.dashboard");
     }
 }
 
