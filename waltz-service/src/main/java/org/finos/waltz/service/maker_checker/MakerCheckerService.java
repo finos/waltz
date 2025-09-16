@@ -246,8 +246,8 @@ public class MakerCheckerService {
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowResponse proposedFlowResponse = null;
-        final ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+        ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
+        checkNotNull(proposedFlow, "No proposed flow found");
 
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
@@ -303,8 +303,8 @@ public class MakerCheckerService {
             // Refresh Return Object
             EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(
                     PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
-            proposedFlowResponse = ImmutableProposedFlowResponse
-                    .copyOf(proposedFlowResponse)
+            proposedFlow = ImmutableProposedFlowResponse
+                    .copyOf(proposedFlow)
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
@@ -314,7 +314,7 @@ public class MakerCheckerService {
             throw e;
         }
 
-        return proposedFlowResponse;
+        return proposedFlow;
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
