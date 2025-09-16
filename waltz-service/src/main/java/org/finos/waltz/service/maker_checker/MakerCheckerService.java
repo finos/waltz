@@ -256,6 +256,7 @@ public class MakerCheckerService {
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
         ProposedFlowResponse proposedFlow = getProposedFlowById(proposedFlowId);
         checkNotNull(proposedFlow, "No proposed flow found");
+
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
                 username,
@@ -315,8 +316,7 @@ public class MakerCheckerService {
                     .withWorkflowState(entityWorkflowView.workflowState())
                     .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
                     .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
-                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
+                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;
