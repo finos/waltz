@@ -36,7 +36,7 @@ export function formatDate(dateStr) {
  * Sorts an array of objects by a given field.
  * @param {Array} arr - The array to sort.
  * @param {string|Array} field - The field or path to sort by.
- * @param {'asc'|'desc'} - Sort order.
+ * @param {'asc'|'desc'} order - Sort order.
  * @returns {Array} Sorted array.
  */
 export function sortByField(arr, field, order = 'asc') {
