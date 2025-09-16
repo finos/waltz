@@ -76,17 +76,17 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
 
         return
-                        DSL
-                            .select(PROPOSED_FLOW.ID)
-                            .from(PERSON)
-                            .join(INVOLVEMENT)
-                            .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
-                            .join(PROPOSED_FLOW)
-                            .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
-                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                            .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                    .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
-                );
+                DSL
+                    .select(PROPOSED_FLOW.ID)
+                    .from(PERSON)
+                    .join(INVOLVEMENT)
+                    .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
+                    .join(PROPOSED_FLOW)
+                    .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
+                    .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                    .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
+                    );
     }
 }
 
