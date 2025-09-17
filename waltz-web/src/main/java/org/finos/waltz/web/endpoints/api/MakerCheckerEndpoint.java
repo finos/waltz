@@ -28,8 +28,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.findByVerb;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -56,7 +55,7 @@ public class MakerCheckerEndpoint implements Endpoint {
 
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
 
-        getForDatum(mkPath(BASE_URL, "propose-flow"), this::getProposedFlows);
+        postForList(mkPath(BASE_URL, "propose-flow"), this::getProposedFlows);
 
     }
 
@@ -71,8 +70,8 @@ public class MakerCheckerEndpoint implements Endpoint {
         return makerCheckerService.getProposedFlowById(proposedFlowId);
     }
 
-    public List<ProposedFlowResponse> getProposedFlows(Request request, Response response) {
-        return makerCheckerService.getProposedFlows();
+    public List<ProposedFlowResponse> getProposedFlows(Request request, Response response) throws IOException {
+        return makerCheckerService.getProposedFlows(readIdSelectionOptionsFromBody(request));
     }
 
     public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
