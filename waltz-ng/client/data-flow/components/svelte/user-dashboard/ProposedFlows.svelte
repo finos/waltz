@@ -1,9 +1,9 @@
 <script>
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ProposedFlowSection from "./ProposedFlowSection.svelte";
+    import {proposeDataFlowRemoteStore} from "../../../../svelte-stores/propose-data-flow-remote-store";
 
     export let userName;
-    export let flows = [];
     export let dataTypeIdToNameMap = {};
 
     const actionStatusPillDefs = {
@@ -39,15 +39,15 @@
     const historicalStatuses = Object.keys(historicalStatusPilldefs)
 
     const changeTypePillDefs = {
-        ADD: {
+        CREATE: {
             name: "Create",
             color: "#267dda"
         },
         EDIT: {
-            name: "Modify",
+            name: "Edit",
             color: "#716b9e"
         },
-        REMOVE: {
+        DELETE: {
             name: "Delete",
             color: "#da524b"
         }
@@ -71,17 +71,15 @@
 
     let selectedTab = TABS.ACTION;
 
-    $: fetch("http://localhost:3456/api/get/prop-flows", {method: "GET"})
-        .then(r => r.json())
-        .then(r => flows = r)
-        .catch(e => flows = []);
+    $: getProposedFlowsCall = proposeDataFlowRemoteStore.getProposedFlowsForUser();
+    $: flows = $getProposedFlowsCall?.data;
 
     $: actionableFlows = flows && flows.length
-        ? flows.filter(f => actionStatuses.includes(f.status))
+        ? flows.filter(f => actionStatuses.includes(f.workflowState.state))
         : [];
 
     $: historicalFlows = flows && flows.length
-        ? flows.filter(f => historicalStatuses.includes(f.status))
+        ? flows.filter(f => historicalStatuses.includes(f.workflowState.state))
         : [];
 </script>
 

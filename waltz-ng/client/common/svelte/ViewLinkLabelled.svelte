@@ -134,6 +134,10 @@
             path: ctx => `process-diagram/${ctx.id}`,
             title: "Process Diagram View"
         },
+        "main.proposed-flow.view": {
+            path: ctx => `proposed-flow/${ctx.id}`,
+            title: "Proposed Flow"
+        },
         "main.server.view": {
             path: ctx => `server/${ctx.id}`,
             title: "Server View"

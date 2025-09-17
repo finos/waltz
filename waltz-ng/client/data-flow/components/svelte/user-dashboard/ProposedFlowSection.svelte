@@ -26,48 +26,54 @@ onMount(() => {
    $filters = ephemeralFilters;
 });
 
+const approvalType = {
+    SOURCE_APPROVED: "SOURCE_APPROVED",
+    TARGET_APPROVED: "TARGET_APPROVED",
+    FULLY_APPROVED: "FULLY_APPROVED"
+}
+
 const columnDefs = [
     {
-        field: "proposedFlowId",
+        field: "id",
         name: "Flow",
         cellRendererComponent: ViewLinkLabelled,
         cellRendererProps: row => ({
-            state: "main.logical-flow.view",
-            label: `${row.proposedFlowCommand.source.name} → ${row.proposedFlowCommand.target.name}`,
+            state: "main.proposed-flow.view",
+            label: `${row.flowDef.source.name} → ${row.flowDef.target.name}`,
             ctx: {
-                id: row.proposedFlowId
+                id: row.id
             },
             openInNewTab: true
         })
     },
     {
-        field: "proposedFlowCommand.source.name",
+        field: "flowDef.source.name",
         name: "Source",
         cellRendererComponent: ViewLinkLabelled,
         cellRendererProps: row => ({
-            state: getEntityState(row.proposedFlowCommand.source),
-            label: `${row.proposedFlowCommand.source.name}`,
+            state: getEntityState(row.flowDef.source),
+            label: `${row.flowDef.source.name}`,
             ctx: {
-                id: row.proposedFlowCommand.source.id
+                id: row.flowDef.source.id
             },
             openInNewTab: true,
             isEntityLink: true,
-            entityKind: row.proposedFlowCommand.source.kind
+            entityKind: row.flowDef.source.kind
         })
     },
     {
-        field: "proposedFlowCommand.target.name",
+        field: "flowDef.target.name",
         name: "Target",
         cellRendererComponent: ViewLinkLabelled,
         cellRendererProps: row => ({
-            state: getEntityState(row.proposedFlowCommand.target),
-            label: `${row.proposedFlowCommand.target.name}`,
+            state: getEntityState(row.flowDef.target),
+            label: `${row.flowDef.target.name}`,
             ctx: {
-                id: row.proposedFlowCommand.target.id
+                id: row.flowDef.target.id
             },
             openInNewTab: true,
             isEntityLink: true,
-            entityKind: row.proposedFlowCommand.target.kind
+            entityKind: row.flowDef.target.kind
         })
     },
     {
@@ -79,26 +85,26 @@ const columnDefs = [
         })
     },
     {
-        field: "status",
+        field: "workflowState.state",
         name: "Status",
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
-            pillKey: row.status,
+            pillKey: row.workflowState.state,
             pillDefs: statusPillDefs
         })
     },
     {
-        field: "changeType",
+        field: "proposalType",
         name: "Change",
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
-            pillKey: row.changeType,
+            pillKey: row.proposalType,
             pillDefs: changeTypePillDefs
         })
     },
-    { field: "proposedFlowCommand.reason.description", name: "Proposal Reason" },
+    { field: "flowDef.reason.description", name: "Proposal Reason" },
     { field: "createdBy", name: "Created By" },
-    { field: "created_at", name: "Created At" },
+    { field: "createdAt", name: "Created At" },
     { field: "sourceApprovedBy", name: "Source Approver"},
     { field: "sourceApprovedAt", name: "Source Approved At"},
     { field: "targetApprovedBy", name: "Target Approver"},
@@ -106,27 +112,49 @@ const columnDefs = [
 ];
 
 $: gridData = flows && flows.length
-    ? flows.map(flow => ({
+    ? flows.map(flow => {
+        let transformedSourceApproved = {at: "", by: ""};
+        let transformedTargetApproved = {at: "", by: ""};
+
+        flow.workflowTransitionList.map(t => {
+                if(t.toState === approvalType.SOURCE_APPROVED) {
+                    transformedSourceApproved.at = new Date(t.lastUpdatedAt).toLocaleString();
+                    transformedSourceApproved.by = t.lastUpdatedBy
+                } else if(t.toState === approvalType.TARGET_APPROVED) {
+                    transformedTargetApproved.at = new Date(t.lastUpdatedAt).toLocaleString();
+                    transformedTargetApproved.by = t.lastUpdatedBy
+                }
+            }
+        );
+
+        return {
         ...flow,
-        dataTypes: flow.proposedFlowCommand.dataTypeIds
-            ? flow.proposedFlowCommand.dataTypeIds.map(id => dataTypeIdToNameMap[id]).join(", ")
-            : ""
-    }))
+        dataTypes: flow.flowDef.dataTypeIds.length !== 0
+            ? flow.flowDef.dataTypeIds.map(id => dataTypeIdToNameMap[id]).join(", ")
+            : "-",
+        createdAt: new Date(flow.createdAt).toLocaleString(),
+        sourceApprovedAt: transformedSourceApproved.at,
+        sourceApprovedBy: transformedSourceApproved.by,
+        targetApprovedAt: transformedTargetApproved.at,
+        targetApprovedBy: transformedTargetApproved.by
+    }})
     : [];
+
+$: console.log(gridData);
 
 $: filteredGridData = gridData
     ? gridData
-        .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.status))
-        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.changeType))
+        .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.workflowState.state))
+        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.proposalType))
         .filter(d => ($filters.proposer.length === 0) || $filters.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
-        .sort((a, b) => $filters.state.indexOf(a.status) - $filters.state.indexOf(b.status))
-        .sort((a, b) => $filters.change.indexOf(a.changeType) - $filters.change.indexOf(b.changeType))
+        .sort((a, b) => $filters.state.indexOf(a.workflowState.state) - $filters.state.indexOf(b.workflowState.state))
+        .sort((a, b) => $filters.change.indexOf(a.proposalType) - $filters.change.indexOf(b.proposalType))
         .sort((a, b) => $filters.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
             - $filters.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
     : [];
 
-$: stateCounts = _.countBy(gridData, "status");
-$: changeTypeCounts = _.countBy(gridData, "changeType");
+$: stateCounts = _.countBy(gridData, "workflowState.state");
+$: changeTypeCounts = _.countBy(gridData, "proposalType");
 $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "USER" : "OTHERS");
 
 $: filteredDataSize = filteredGridData.length;
