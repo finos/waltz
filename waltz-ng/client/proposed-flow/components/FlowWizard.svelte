@@ -1,9 +1,11 @@
 <script>
-    import { STATES } from "../utils";
+    import { sortByField, STATES } from "../utils";
     export let proposedFlow;
 
     $: workflowState = proposedFlow?.workflowState || {};
-    $: workflowTransitionList = proposedFlow?.workflowTransitionList || [];
+    $: workflowTransitionList = proposedFlow?.workflowTransitionList
+    ? sortByField(proposedFlow.workflowTransitionList, 'lastUpdatedAt', 'asc')
+    : [];
 
     const initialStep = {
         key: "request",

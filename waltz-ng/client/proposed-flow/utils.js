@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const STATES = {
     PENDING_APPROVALS: "PENDING_APPROVALS",
     SUBMITTED: "SUBMITTED",
@@ -30,4 +32,15 @@ export function formatDate(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     return d.toLocaleString();
+}
+
+/**
+ * Sorts an array of objects by a given field.
+ * @param {Array} arr - The array to sort.
+ * @param {string|Array} field - The field or path to sort by.
+ * @param {'asc'|'desc'} order - Sort order.
+ * @returns {Array} Sorted array.
+ */
+export function sortByField(arr, field, order = 'asc') {
+    return _.orderBy(arr, [field], [order]);
 }

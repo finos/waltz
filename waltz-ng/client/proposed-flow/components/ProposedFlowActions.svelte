@@ -12,17 +12,25 @@
     const Modes = {
         LIST: "LIST",
         CONFIRMATION: "CONFIRMATION",
+        LOADING: "LOADING",
     };
 
     let mode = Modes.LIST;
     let reason = "";
     let activeAction = null;
     let validationMessage = "";
+    let notification = "You do not have permission to approve or reject this proposed flow.";
     export let proposedFlow = {};
 
     $: currentState = proposedFlow?.workflowState?.state || {};
 
     $: canApproveOrReject = function() {
+        if(currentState === STATES.SOURCE_REJECTED || currentState === STATES.TARGET_REJECTED) {
+            // No further actions possible
+            notification = "This proposed flow has been rejected and can no longer be acted upon.";
+            return false;
+        }
+
         if (currentState === STATES.PENDING_APPROVALS) {
             // Either source or target approver can act
             return (permissions.sourceApprover && permissions.sourceApprover.length > 0) ||
@@ -36,7 +44,7 @@
             // Only source approver can act
             return permissions.sourceApprover && permissions.sourceApprover.length > 0;
         }
-
+        
         return false;
     }
 
@@ -76,23 +84,29 @@
             validationMessage = "Reason is required when rejecting a proposed flow";
             return;
         }
+        
         // SHOW MESSAGE
         const updateCmd = { action: name, payload: { comment: reason } };
-
+        
+        mode = Modes.LOADING;
         return Promise
             .resolve(proposedFlowStore.transitionProposedFlow(proposedFlow.id, updateCmd))
             .then(() => {
+                mode = Modes.LIST;
                 toasts.success("Proposed flow " + verb + " successfully");
                 if(refreshState) {
                     refreshState();
                 }
                 onCancelAction();
             })
-            .catch(e => displayError("Failed to " + name + " proposed flow."));
+            .catch(e => {
+                mode = Modes.LIST;
+                displayError("Failed to " + name + " proposed flow.")
+            });
     }
 
     $: isFullyApproved = currentState === STATES.FULLY_APPROVED;
-    $: canAct = canApproveOrReject();
+    $: canAct = proposedFlow && canApproveOrReject();
     
     $: actionList = [
         {
@@ -126,7 +140,6 @@
     }
 
     $: permissions = $permissionsCall?.data || defaultPermissions;
-
 </script>
 
 {#if mode === Modes.LIST}
@@ -157,7 +170,7 @@
             <div style="padding-top: 0.5em" class="small">
                 <NoData type="warning">
                     <Icon name="exclamation-triangle" />
-                    You do not have permission to approve or reject this proposed flow.
+                    {notification}
                 </NoData>
             </div>
         {/if}
@@ -204,6 +217,11 @@
             </NoData>
         </div>
     {/if}
+{:else if mode === Modes.LOADING}
+    <div class="actions text-muted">
+        <Icon spin="true" name="spinner"/>
+        <span>Processing...</span>
+    </div>
 {:else}
     <h4>Unknown Mode: {mode}</h4>
 {/if}

@@ -25,8 +25,9 @@ Getting started
 
 | Org                                                                                       |                 | Notes                                                                                                                    |
 |-------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------|
-| ![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank")    | Deutsche Bank   | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) |
+| ![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank")    | Deutsche Bank   | [press release](https://www.db.com/news/detail/20180207-deutsche-bank-takes-next-step-in-open-source-journey) |
 | ![NWM Logo](https://avatars2.githubusercontent.com/u/54027700?s=30&v=4 "NatWest Markets") | NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)                |
+| ![HMx Logo](https://avatars.githubusercontent.com/u/29101549?s=30&v=4 "HMx Labs")        | HMx Labs        | [press release](https://cloudhpc.news/hmx-labs-waltz/)                |
 
 ## Technology Stack
 

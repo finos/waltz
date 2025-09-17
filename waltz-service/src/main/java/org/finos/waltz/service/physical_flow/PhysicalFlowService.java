@@ -21,6 +21,7 @@ package org.finos.waltz.service.physical_flow;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
@@ -259,6 +260,7 @@ public class PhysicalFlowService {
                     .outcome(CommandOutcome.FAILURE)
                     .message("Duplicate with existing flow")
                     .entityReference(mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
+                    .specificationId(specId)
                     .build();
         }
 
@@ -287,6 +289,7 @@ public class PhysicalFlowService {
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
                 .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
+                .specificationId(specId)
                 .build();
     }
 
@@ -453,4 +456,8 @@ public class PhysicalFlowService {
         checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, physFlow.logicalFlowId()), username);
     }
 
+    public List<PhysicalFlow> search(EntitySearchOptions options) {
+        checkNotNull(options, "Search options cannot be null");
+        return physicalFlowDao.search(options);
+    }
 }
