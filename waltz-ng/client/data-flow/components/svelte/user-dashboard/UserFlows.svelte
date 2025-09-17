@@ -7,7 +7,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let userName;
-    export let flows;
+    export let flows = [];
 
     const columnDefs = [
         {

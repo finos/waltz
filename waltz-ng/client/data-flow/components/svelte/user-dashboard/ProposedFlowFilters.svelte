@@ -1,6 +1,7 @@
 <script>
     import { filters } from "./filter-store";
     import Pill from "../../../../common/svelte/Pill.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let pillDefs = {};
     export let stateCounts = {};
@@ -70,6 +71,8 @@
         $filters.change = [];
         $filters.state = [];
     }
+
+    $: clearFiltersDisabled = !($filters.state.length || $filters.proposer.length || $filters.change.length);
 </script>
 
 <div class="filter-dropdown">
@@ -79,8 +82,10 @@
     {#if showFilters}
         <div class="filter-groups single-section">
             <div class="filter-group">
-                <button class="btn btn-skinny" on:click={resetFilters}>
-                    ✕ Clear filters
+                <button class="btn btn-skinny"
+                        on:click={resetFilters}
+                        disabled={clearFiltersDisabled}>
+                    <Icon name="xmark"/>Clear filters
                 </button>
             </div>
             <hr class="filter-divider" />
@@ -199,8 +204,8 @@
     background: #0c335a;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
+    border-radius: 0px;
+    padding: 0.25rem 0.5rem;
     font-size: 1.25rem;
     cursor: pointer;
     margin-bottom: 0.5rem;

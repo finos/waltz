@@ -39,7 +39,7 @@ const columnDefs = [
         cellRendererComponent: ViewLinkLabelled,
         cellRendererProps: row => ({
             state: "main.proposed-flow.view",
-            label: `${row.flowDef.source.name} → ${row.flowDef.target.name}`,
+            label: `${row.flowDef.source?.name} → ${row.flowDef.target?.name}`,
             ctx: {
                 id: row.id
             },
@@ -54,11 +54,11 @@ const columnDefs = [
             state: getEntityState(row.flowDef.source),
             label: `${row.flowDef.source.name}`,
             ctx: {
-                id: row.flowDef.source.id
+                id: row.flowDef.source?.id
             },
             openInNewTab: true,
             isEntityLink: true,
-            entityKind: row.flowDef.source.kind
+            entityKind: row.flowDef.source?.kind
         })
     },
     {
@@ -67,9 +67,9 @@ const columnDefs = [
         cellRendererComponent: ViewLinkLabelled,
         cellRendererProps: row => ({
             state: getEntityState(row.flowDef.target),
-            label: `${row.flowDef.target.name}`,
+            label: `${row.flowDef.target?.name}`,
             ctx: {
-                id: row.flowDef.target.id
+                id: row.flowDef.target?.id
             },
             openInNewTab: true,
             isEntityLink: true,
@@ -89,7 +89,7 @@ const columnDefs = [
         name: "Status",
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
-            pillKey: row.workflowState.state,
+            pillKey: row.workflowState?.state,
             pillDefs: statusPillDefs
         })
     },
@@ -129,7 +129,7 @@ $: gridData = flows && flows.length
 
         return {
         ...flow,
-        dataTypes: flow.flowDef.dataTypeIds.length !== 0
+        dataTypes: flow.flowDef?.dataTypeIds?.length !== 0
             ? flow.flowDef.dataTypeIds.map(id => dataTypeIdToNameMap[id]).join(", ")
             : "-",
         createdAt: new Date(flow.createdAt).toLocaleString(),
@@ -139,8 +139,6 @@ $: gridData = flows && flows.length
         targetApprovedBy: transformedTargetApproved.by
     }})
     : [];
-
-$: console.log(gridData);
 
 $: filteredGridData = gridData
     ? gridData

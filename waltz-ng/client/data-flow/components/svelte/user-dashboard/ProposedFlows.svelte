@@ -22,7 +22,7 @@
     }
     const actionStatuses = Object.keys(actionStatusPillDefs);
 
-    const historicalStatusPilldefs = {
+    const historicalStatusPillDefs = {
         FULLY_APPROVED: {
             name: "Fully Approved",
             color: "#5bb65d"
@@ -36,7 +36,7 @@
             color: "#c1664f"
         }
     }
-    const historicalStatuses = Object.keys(historicalStatusPilldefs)
+    const historicalStatuses = Object.keys(historicalStatusPillDefs)
 
     const changeTypePillDefs = {
         CREATE: {
@@ -90,7 +90,7 @@
            id={TABS.ACTION}>
     <label class="wt-label"
            for={TABS.ACTION}>
-            <span><Icon name="pencil-square-o"/>{TABS.ACTION} Flows
+            <span><Icon name="pencil-square-o"/> {TABS.ACTION} Flows -
                 <small class="text-muted">{actionableFlows.length ?? 0}</small>
             </span>
     </label>
@@ -101,7 +101,7 @@
            id={TABS.HISTORY}>
     <label class="wt-label"
            for={TABS.HISTORY}>
-        <span><Icon name="pencil-square-o"/>{TABS.HISTORY} Flows
+        <span><Icon name="clock"/> {TABS.HISTORY} Flows -
             <small class="text-muted">{historicalFlows.length ?? 0}</small>
         </span>
     </label>
@@ -118,7 +118,7 @@
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
-                             statusPillDefs={historicalStatusPilldefs}
+                             statusPillDefs={historicalStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
                              currentTabText={TABS.HISTORY}/>

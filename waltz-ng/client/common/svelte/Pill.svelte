@@ -5,8 +5,8 @@
     // color: "#126372"
     // }, ....
     export let pillDefs;
-    export let pillKey = undefined;
-    export let smallText = undefined;
+    export let pillKey;
+    export let smallText;
     export let cleanPill = false; // toggles between dark and light text
 
     $: pillColor = pillDefs[pillKey].color;
@@ -27,8 +27,8 @@
 <style>
     .pill {
         background: var(--pillColor);
-        border: 0.25rem solid var(--pillColor);
-        border-radius: 0.5rem;
+        border: 0.15rem solid var(--pillColor);
+        border-radius: 0rem;
         padding: 0.25rem 0.5rem;
         width: max-content;
         color: white;
@@ -41,8 +41,8 @@
 
     .pill-clean {
         background: white;
-        border: 0.25rem solid var(--pillColor);
-        border-radius: 0.5rem;
+        border: 0.15rem solid var(--pillColor);
+        border-radius: 0rem;
         padding: 0.25rem 0.5rem;
         width: max-content;
         color: var(--pillColor);
