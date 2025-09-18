@@ -57,16 +57,13 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.test_common.helpers.AppHelper;
-import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static java.time.LocalDateTime.now;
@@ -101,10 +98,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
-    @Autowired
-    DSLContext dsl;
-
-    @Autowired
+   @Autowired
     ChangeLogService changeLogService;
 
     @Autowired
