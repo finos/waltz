@@ -65,14 +65,14 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
                 .and(INVOLVEMENT_KIND.TRANSITIVE.isTrue())
                 .join(PROPOSED_FLOW)
-                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
-                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND))
-                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
-                .unionAll(idSelectorForPerson(employeeIdForPerson)
-                       .union(idSelectorUsingCreatedByWithHierarchy(employeeIdForPerson, emailIdForPerson))
-                        .union(idSelectorUsingCreatedBy(emailIdForPerson))
-                );
+                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
+                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
+                .union(idSelectorForPerson(employeeIdForPerson))
+                .union(idSelectorUsingCreatedByWithHierarchy(employeeIdForPerson, emailIdForPerson))
+                .union(idSelectorUsingCreatedBy(emailIdForPerson));
+
     }
 
     private Select<Record1<Long>> idSelectorForUser(IdSelectionOptions options) {
@@ -94,8 +94,8 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
                 .join(INVOLVEMENT)
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
                 .join(PROPOSED_FLOW)
-                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
-                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
                 .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
                         .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)));
     }
