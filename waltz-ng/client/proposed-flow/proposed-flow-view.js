@@ -47,10 +47,8 @@ function controller($q,
         kind: "PROPOSED_FLOW"
     };
 
-     vm.$onInit = () => {
-            vm.parentEntityRef = entityReference;
-            
-            serviceBroker
+    const loadProposedFlow = () => {
+        serviceBroker
                 .loadViewData(
                     CORE_API.ProposedFlowStore.getById,
                     [vm.parentEntityRef.id])
@@ -59,14 +57,19 @@ function controller($q,
                     vm.usedDataTypes = (vm.proposedFlow?.flowDef?.dataTypeIds || []).map(id => ({ dataTypeId: id }));
                     vm.dataTypeHelpText = "Data types used by this flow.";
                 });
+    }
+
+     vm.$onInit = () => {
+        vm.parentEntityRef = entityReference;
+        loadProposedFlow();
     };
 
     vm.refreshState = () => {
-        $state.reload();
+        loadProposedFlow();
     }
 
     vm.goToDashboard = () => {
-        $window.open("data-flow/dashboard/user", "_self");
+        $state.go("main.data-flow.dashboard");
     }
 }
 

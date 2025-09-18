@@ -26,8 +26,28 @@ export function mkStore()  {
         `${BASE_URL}/propose`,
         command);
 
+    const findProposedFlowsBySelector = (command) => remote
+        .execute("POST",
+        `${BASE_URL}/propose-flow`,
+        command);
+
+    const findFlowPermissions = (proposedFlowId, force = false) => remote
+        .fetchViewData(
+                "GET",
+                `${BASE_URL}/PROPOSED_FLOW/${proposedFlowId}/permissions/user`,
+                [],
+                null,
+                {force});
+
+    
+    const transitionProposedFlow = (proposedFlowId, command) => remote
+        .execute("POST", `${BASE_URL}/${proposedFlowId}/${command.action}`, command.payload);
+
     return {
-        proposeDataFlow
+        proposeDataFlow,
+        findProposedFlowsBySelector,
+        transitionProposedFlow,
+        findFlowPermissions
     }
 }
 

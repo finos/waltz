@@ -15,28 +15,6 @@
  * See the License for the specific
  *
  */
+import { writable } from "svelte/store";
 
-import { remote } from "../../../svelte-stores/remote";
-
-export function mkProposedFlowStore() {
-
-    const findFlowPermissions = (proposedFlowId, force = false) => remote
-        .fetchViewData(
-                "GET",
-                `api/mc/PROPOSED_FLOW/${proposedFlowId}/permissions/user`,
-                [],
-                null,
-                {force});
-
-    
-    const transitionProposedFlow = (proposedFlowId, command) => remote
-        .execute("POST", `api/mc/${proposedFlowId}/${command.action}`, command.payload);
-
-
-    return {
-      transitionProposedFlow,
-      findFlowPermissions
-    };
-}
-
-export const proposedFlowStore = mkProposedFlowStore();
+export const lastProposedFlowId = writable(null);

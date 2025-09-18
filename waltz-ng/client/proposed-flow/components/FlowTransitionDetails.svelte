@@ -1,10 +1,12 @@
 <script>
     import Icon from "../../common/svelte/Icon.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
-    import { formatDate, stateMeta } from "../utils";
+    import { formatDate, stateMeta, sortByField } from "../utils";
 
     export let proposedFlow;
-    $: workflowTransitionList = proposedFlow?.workflowTransitionList || [];
+    $: workflowTransitionList = proposedFlow?.workflowTransitionList
+    ? sortByField(proposedFlow.workflowTransitionList, 'lastUpdatedAt', 'asc')
+    : [];
 
     let openIdx = null;
 </script>
@@ -13,7 +15,7 @@
   {#if workflowTransitionList.length === 0}
     <NoData type="warning">
         <Icon name="exclamation-triangle" />
-        No workflow transitions.
+        No workflow approvals.
     </NoData>
   {:else}
     {#each workflowTransitionList as transition, idx}
@@ -59,7 +61,7 @@
 .accordion-container {
     width: 100%;
     max-width: 500px;
-    margin: 0 auto;
+    margin: 5px auto;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 1px 8px rgba(0,0,0,0.04);
