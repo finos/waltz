@@ -165,12 +165,17 @@ public class MakerCheckerService {
     }
 
     public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
+       long startTime = System.currentTimeMillis();
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
-        return proposedFlowResponseMapper(
+        List<ProposedFlowResponse> responses = proposedFlowResponseMapper(
                 proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options), workflowDefinition.id().get()));
+        long endTime = System.currentTimeMillis();
+        LOG.info("complete execution time : {} ms", endTime-startTime);
+        return  responses;
     }
 
     private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) throws JsonProcessingException {
+        LOG.info(" record count : {} ", result.size());
         Map<Long, ProposedFlowResponse> flowMap = new HashMap<>();
         for (Record record : result) {
             Long flowId = record.get(PROPOSED_FLOW.ID, Long.class);
@@ -191,6 +196,7 @@ public class MakerCheckerService {
 
             });
         }
+        LOG.info(" proposed flow response count : {} ", flowMap.size());
         return  new ArrayList<>(flowMap.values());
     }
 

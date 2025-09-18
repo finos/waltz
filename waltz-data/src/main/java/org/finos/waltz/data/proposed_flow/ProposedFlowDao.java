@@ -74,7 +74,7 @@ public class ProposedFlowDao {
                 .join(ENTITY_WORKFLOW_TRANSITION)
                 .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
                 .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .where(dsl.renderInlined(PROPOSED_FLOW.ID.in(flowIdSelector)))
+                .where(PROPOSED_FLOW.ID.in(flowIdSelector))
                 .fetch();
     }
 

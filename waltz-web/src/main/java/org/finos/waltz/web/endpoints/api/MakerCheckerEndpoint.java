@@ -55,7 +55,7 @@ public class MakerCheckerEndpoint implements Endpoint {
 
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
 
-        postForList(mkPath(BASE_URL, "propose-flow"), this::getProposedFlows);
+        postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
 
     }
 
@@ -70,7 +70,7 @@ public class MakerCheckerEndpoint implements Endpoint {
         return makerCheckerService.getProposedFlowById(proposedFlowId);
     }
 
-    public List<ProposedFlowResponse> getProposedFlows(Request request, Response response) throws IOException {
+    public List<ProposedFlowResponse> findProposedFlows(Request request, Response response) throws IOException {
         return makerCheckerService.getProposedFlows(readIdSelectionOptionsFromBody(request));
     }
 

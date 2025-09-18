@@ -50,6 +50,7 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> idSelectorForUserWithHierarchy(IdSelectionOptions options) {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
+        SelectConditionStep<Record1<String>> emailIdForPerson = personIdSelectorFactory.getEmailForPerson(options);
 
         return DSL
                 .select(PROPOSED_FLOW.ID)
@@ -68,25 +69,58 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
                 .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
                 .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND))
                 .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
-                .unionAll(idSelectorForUser(options)
+                .unionAll(idSelectorForPerson(employeeIdForPerson)
+                       .union(idSelectorUsingCreatedByWithHierarchy(employeeIdForPerson, emailIdForPerson))
+                        .union(idSelectorUsingCreatedBy(emailIdForPerson))
                 );
     }
 
     private Select<Record1<Long>> idSelectorForUser(IdSelectionOptions options) {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
+        SelectConditionStep<Record1<String>> emailIdForPerson = personIdSelectorFactory.getEmailForPerson(options);
 
         return
-                DSL
-                    .select(PROPOSED_FLOW.ID)
-                    .from(PERSON)
-                    .join(INVOLVEMENT)
-                    .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
-                    .join(PROPOSED_FLOW)
-                    .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
-                    .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                    .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))
-                    );
+                idSelectorForPerson(employeeIdForPerson)
+                        .union(DSL.select(PROPOSED_FLOW.ID)
+                                .from(PROPOSED_FLOW)
+                                .where(PROPOSED_FLOW.CREATED_BY.eq(emailIdForPerson)));
+    }
+
+    private Select<Record1<Long>> idSelectorForPerson(SelectConditionStep<Record1<String>> employeeIdForPerson) {
+
+        return DSL
+                .select(PROPOSED_FLOW.ID)
+                .from(PERSON)
+                .join(INVOLVEMENT)
+                .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeIdForPerson))
+                .join(PROPOSED_FLOW)
+                .on(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND))
+                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                        .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)));
+    }
+
+    private Select<Record1<Long>> idSelectorUsingCreatedByWithHierarchy(SelectConditionStep<Record1<String>> employeeIdForPerson,
+                                                                        SelectConditionStep<Record1<String>> emailIdForPerson) {
+
+        return DSL
+                .select(PROPOSED_FLOW.ID)
+                .from(PROPOSED_FLOW)
+                .join(PERSON)
+                .on(PROPOSED_FLOW.CREATED_BY.eq(emailIdForPerson))
+                .join(PERSON_HIERARCHY)
+                .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .and(PERSON_HIERARCHY.MANAGER_ID.eq(employeeIdForPerson))
+                .where(PERSON.IS_REMOVED.isFalse());
+
+    }
+
+    private Select<Record1<Long>> idSelectorUsingCreatedBy(SelectConditionStep<Record1<String>> emailIdForPerson){
+        return DSL
+                .select(PROPOSED_FLOW.ID)
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.CREATED_BY.eq(emailIdForPerson));
+
     }
 }
 
