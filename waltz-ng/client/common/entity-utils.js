@@ -173,3 +173,13 @@ export function loadByExtId(serviceBroker, kind, extId) {
 export function isRemoved(entity) {
     return entity.isRemoved || entity.entityLifecycleStatus === "REMOVED";
 }
+
+export function getEntityState(entityRef) {
+    if(entityRef.kind === "APPLICATION") {
+        return "main.app.view";
+    } else if(entityRef.kind === "END_USER_APPLICATION") {
+        return "main.end-user-application.view";
+    } else if(entityRef.kind === "ACTOR") {
+        return "main.actor.view";
+    }
+}
