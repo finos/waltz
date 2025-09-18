@@ -52,7 +52,7 @@
             </div>
             <div slot="summary">
                 { #if user }
-                <ProposedFlows userName={user.userName} dataTypeIdToNameMap={dataTypeIdToNameMap}/>
+                <ProposedFlows userName={user.userName} dataTypeIdToNameMap={dataTypeIdToNameMap} person={person}/>
                 <br/>
                 <hr/>
                 <UserFlows userName={user.userName} flows={involvedFlows}/>

@@ -2,9 +2,11 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ProposedFlowSection from "./ProposedFlowSection.svelte";
     import {proposeDataFlowRemoteStore} from "../../../../svelte-stores/propose-data-flow-remote-store";
+    import {displayError} from "../../../../common/error-utils";
 
     export let userName;
     export let dataTypeIdToNameMap = {};
+    export let person;
 
     const actionStatusPillDefs = {
         PENDING_APPROVALS: {
@@ -71,8 +73,27 @@
 
     let selectedTab = TABS.ACTION;
 
-    $: getProposedFlowsCall = proposeDataFlowRemoteStore.getProposedFlowsForUser();
-    $: flows = $getProposedFlowsCall?.data;
+    let flows = [];
+
+    $: selectionOptions = {
+        entityLifecycleStatuses: ["ACTIVE"],
+        entityReference: {
+            id: person ? person.id : null,
+            kind: person ? person.kind : null
+        },
+        filters : {},
+        scope: "EXACT"
+    }
+
+    $ : {
+        proposeDataFlowRemoteStore.findProposedFlowsBySelector(selectionOptions)
+        .then(r => {
+            flows = r.data;
+        })
+        .catch(e => {
+            displayError("Something went wrong, please try again.");
+        })
+    }
 
     $: actionableFlows = flows && flows.length
         ? flows.filter(f => actionStatuses.includes(f.workflowState.state))

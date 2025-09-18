@@ -26,11 +26,10 @@ export function mkStore()  {
         `${BASE_URL}/propose`,
         command);
 
-    const getProposedFlowsForUser = (force=true) => remote
-        .fetchViewList("GET",
-            `${BASE_URL}/propose-flow`,
-            [],
-            {force})
+    const findProposedFlowsBySelector = (command) => remote
+        .execute("POST",
+        `${BASE_URL}/propose-flow`,
+        command);
 
     const findFlowPermissions = (proposedFlowId, force = false) => remote
         .fetchViewData(
@@ -46,7 +45,7 @@ export function mkStore()  {
 
     return {
         proposeDataFlow,
-        getProposedFlowsForUser,
+        findProposedFlowsBySelector,
         transitionProposedFlow,
         findFlowPermissions
     }
