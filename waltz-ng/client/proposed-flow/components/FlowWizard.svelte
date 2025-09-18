@@ -1,5 +1,6 @@
 <script>
     import { sortByField, STATES } from "../utils";
+    import Icon from "../../common/svelte/Icon.svelte";
     export let proposedFlow;
 
     $: workflowState = proposedFlow?.workflowState || {};
@@ -152,8 +153,10 @@
                                 <rect x="9" y="5" width="2" height="6" fill="#ffc107"/>
                                 <rect x="9" y="13" width="2" height="2" fill="#ffc107"/>
                             </svg>
-                        {:else}
-                            {idx + 1}
+                        {:else if step.status === "pending" && step.key !== "final"}
+                            <Icon name="person-circle-check" size="22" color="#d9d9d9" />
+                        {:else if step.status === "pending" && step.key === "final"}
+                            <Icon name="rocket" size="22" color="#d9d9d9" />
                         {/if}
                     </span>
                     <div class="label">{step.label}</div>
