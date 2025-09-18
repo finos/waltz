@@ -86,7 +86,7 @@
     }
 
     $ : {
-        proposeDataFlowRemoteStore.getProposedFlowsForUser(selectionOptions)
+        proposeDataFlowRemoteStore.findProposedFlowsBySelector(selectionOptions)
         .then(r => {
             flows = r.data;
         })
