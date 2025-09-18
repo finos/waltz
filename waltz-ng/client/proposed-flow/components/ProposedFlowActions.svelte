@@ -3,10 +3,12 @@
     import toasts from "../../svelte-stores/toast-store";
     import { displayError } from "../../common/error-utils";
     import Icon from "../../common/svelte/Icon.svelte";
-    import {proposedFlowStore} from "../services/svelte-stores/proposed-flow-store";
     import NoData from "../../common/svelte/NoData.svelte";
     import { defaultPermissions, STATES } from "../utils";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import { lastProposedFlowId } from "../services/svelte-stores/proposed-flow-store";
+    import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
+    import { get } from "svelte/store";
     
     export let refreshState;
     const Modes = {
@@ -90,7 +92,7 @@
         
         mode = Modes.LOADING;
         return Promise
-            .resolve(proposedFlowStore.transitionProposedFlow(proposedFlow.id, updateCmd))
+            .resolve(proposeDataFlowRemoteStore.transitionProposedFlow(proposedFlow.id, updateCmd))
             .then(() => {
                 mode = Modes.LIST;
                 toasts.success("Proposed flow " + verb + " successfully");
@@ -132,10 +134,10 @@
     ];
 
     let permissionsCall;
-
     $: {
-        if (proposedFlow) {
-            permissionsCall = proposedFlowStore.findFlowPermissions(proposedFlow.id, true);
+        if (proposedFlow?.id && proposedFlow.id !== get(lastProposedFlowId)) {
+            lastProposedFlowId.set(proposedFlow.id);
+            permissionsCall = proposeDataFlowRemoteStore.findFlowPermissions(proposedFlow.id, true);
         }
     }
 

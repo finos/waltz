@@ -15,7 +15,7 @@
   {#if workflowTransitionList.length === 0}
     <NoData type="warning">
         <Icon name="exclamation-triangle" />
-        No workflow transitions.
+        No workflow approvals.
     </NoData>
   {:else}
     {#each workflowTransitionList as transition, idx}
