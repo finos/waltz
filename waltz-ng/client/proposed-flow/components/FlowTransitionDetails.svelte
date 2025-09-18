@@ -61,7 +61,7 @@
 .accordion-container {
     width: 100%;
     max-width: 500px;
-    margin: 0 auto;
+    margin: 5px auto;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 1px 8px rgba(0,0,0,0.04);

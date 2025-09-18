@@ -34,14 +34,14 @@ export function mkStore()  {
     const findFlowPermissions = (proposedFlowId, force = false) => remote
         .fetchViewData(
                 "GET",
-                `api/mc/PROPOSED_FLOW/${proposedFlowId}/permissions/user`,
+                `${BASE_URL}/PROPOSED_FLOW/${proposedFlowId}/permissions/user`,
                 [],
                 null,
                 {force});
 
     
     const transitionProposedFlow = (proposedFlowId, command) => remote
-        .execute("POST", `api/mc/${proposedFlowId}/${command.action}`, command.payload);
+        .execute("POST", `${BASE_URL}/${proposedFlowId}/${command.action}`, command.payload);
 
     return {
         proposeDataFlow,
