@@ -30,6 +30,7 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
@@ -56,13 +57,11 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.maker_checker.MakerCheckerService;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -73,16 +72,12 @@ import java.util.Set;
 import static java.time.LocalDateTime.now;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.finos.waltz.schema.tables.EntityWorkflowDefinition.ENTITY_WORKFLOW_DEFINITION;
-import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -107,10 +102,9 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
+
     @Autowired
     DSLContext dsl;
-    @Autowired
-    EntityWorkflowService entityWorkflowService;
 
     @Autowired
     ChangeLogService changeLogService;
@@ -120,9 +114,11 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
     private static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
 
-    private static final String USER_NAME = "testUser";
     @Autowired
     private AppHelper appHelper;
+
+    private static final String USER_NAME = "testUser";
+
 
     @Test
     public void testProposedNewFlow() {
