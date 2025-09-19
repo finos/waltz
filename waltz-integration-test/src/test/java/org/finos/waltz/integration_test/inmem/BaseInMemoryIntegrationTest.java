@@ -13,7 +13,7 @@ import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -26,7 +26,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DIInMemoryTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = DIZonkyTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public abstract class BaseInMemoryIntegrationTest {
 
     static {
@@ -43,14 +43,18 @@ public abstract class BaseInMemoryIntegrationTest {
 
     protected static final AtomicLong counter = new AtomicLong(1_000_000);
 
-    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
-
     protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
     protected static final String LAST_UPDATE_USER = "last";
     protected static final String PROVENANCE = "test";
+
+    @Autowired
+    protected DSLContext dsl;
+
+    @Autowired
+    protected EntityHierarchyService entityHierarchyService;
 
     protected OuIds ouIds;
 
@@ -61,7 +65,7 @@ public abstract class BaseInMemoryIntegrationTest {
      *   -- b
      */
     private OuIds setupOuTree() {
-        getDsl().deleteFrom(ORGANISATIONAL_UNIT).execute();
+        dsl.deleteFrom(ORGANISATIONAL_UNIT).execute();
         OuIds ids = new OuIds();
         ids.root = createOrgUnit("root", null);
         ids.a = createOrgUnit("a", ids.root);
@@ -80,7 +84,7 @@ public abstract class BaseInMemoryIntegrationTest {
 
 
     protected DSLContext getDsl() {
-        return ctx.getBean(DSLContext.class);
+        return dsl;
     }
 
 
@@ -92,13 +96,12 @@ public abstract class BaseInMemoryIntegrationTest {
 
 
     protected void rebuildHierarchy(EntityKind kind) {
-        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
-        ehSvc.buildFor(kind);
+        entityHierarchyService.buildFor(kind);
     }
 
 
     public Long createOrgUnit(String nameStem, Long parentId) {
-        OrganisationalUnitRecord record = getDsl().newRecord(ORGANISATIONAL_UNIT);
+        OrganisationalUnitRecord record = dsl.newRecord(ORGANISATIONAL_UNIT);
         record.setId(counter.incrementAndGet());
         record.setName(nameStem + "Name");
         record.setDescription(nameStem + "Desc");

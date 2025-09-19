@@ -79,6 +79,37 @@
             <version>${spring.version}</version>
         </dependency>
 
+
+        <!-- Zonky -->
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-database-spring-test</artifactId>
+            <version>2.6.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Embedded Postgres - for non docker available environments -->
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>2.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
+
+    <dependencyManagement>
+        <!-- Also for Embedded Postgres - for non docker available environments -->
+        <dependencies>
+            <dependency>
+                <groupId>io.zonky.test.postgres</groupId>
+                <artifactId>embedded-postgres-binaries-bom</artifactId>
+                <version>16.9.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
 </project>
