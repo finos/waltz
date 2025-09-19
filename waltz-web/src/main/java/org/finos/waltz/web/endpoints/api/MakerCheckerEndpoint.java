@@ -1,8 +1,10 @@
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
@@ -71,7 +73,8 @@ public class MakerCheckerEndpoint implements Endpoint {
     }
 
     public List<ProposedFlowResponse> findProposedFlows(Request request, Response response) throws IOException {
-        return makerCheckerService.getProposedFlows(readIdSelectionOptionsFromBody(request));
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+        return FunctionUtilities.time(" findProposedFlows ", ()-> makerCheckerService.getProposedFlows(options));
     }
 
     public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
@@ -79,11 +82,17 @@ public class MakerCheckerEndpoint implements Endpoint {
         ProposedFlowWorkflowTransitionAction proposedFlowAction = checkNotNull(findByVerb(action), "Invalid action");
         ProposedFlowActionCommand proposedFlowActionCommand = readBody(request, ProposedFlowActionCommand.class);
 
-        return makerCheckerService.proposedFlowAction(
-                WebUtilities.getLong(request, "id"),
-                proposedFlowAction,
-                WebUtilities.getUsername(request),
-                proposedFlowActionCommand);
+        return FunctionUtilities.time(" proposedFlowAction ", ()-> {
+            try {
+                return makerCheckerService.proposedFlowAction(
+                        WebUtilities.getLong(request, "id"),
+                        proposedFlowAction,
+                        WebUtilities.getUsername(request),
+                        proposedFlowActionCommand);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(Request request, Response response) throws IOException, InsufficientPrivelegeException {

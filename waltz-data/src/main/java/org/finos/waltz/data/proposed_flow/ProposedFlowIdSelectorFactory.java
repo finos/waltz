@@ -40,15 +40,15 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
         checkNotNull(options, "options cannot be null");
         switch (options.scope()) {
             case CHILDREN:
-                return idSelectorForUserWithHierarchy(options);
+                return idSelectorForPersonWithHierarchy(options);
             case EXACT:
-                return idSelectorForUser(options);
+                return idSelectorForPerson(options);
             default:
                 throw new UnsupportedOperationException("Cannot create propose flow id selector from options: " + options);
         }
     }
 
-    private Select<Record1<Long>> idSelectorForUserWithHierarchy(IdSelectionOptions options) {
+    private Select<Record1<Long>> idSelectorForPersonWithHierarchy(IdSelectionOptions options) {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
         SelectConditionStep<Record1<String>> emailIdForPerson = personIdSelectorFactory.getEmailForPerson(options);
 
@@ -75,7 +75,7 @@ public class ProposedFlowIdSelectorFactory implements IdSelectorFactory {
 
     }
 
-    private Select<Record1<Long>> idSelectorForUser(IdSelectionOptions options) {
+    private Select<Record1<Long>> idSelectorForPerson(IdSelectionOptions options) {
         SelectConditionStep<Record1<String>> employeeIdForPerson = personIdSelectorFactory.getEmployeeIdForPerson(options);
         SelectConditionStep<Record1<String>> emailIdForPerson = personIdSelectorFactory.getEmailForPerson(options);
 
