@@ -172,17 +172,17 @@ public class MakerCheckerService {
         }
     }
 
-    public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) {
+    public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         return proposedFlowResponseMapper(
                 proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options), workflowDefinition.id().get()));
     }
 
-    private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) {
+    private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) throws JsonProcessingException{
         Map<Long, ProposedFlowResponse> flowMap = new HashMap<>();
         for (Record record : result) {
             Long flowId = record.get(PROPOSED_FLOW.ID, Long.class);
-            ProposedFlowCommand flowDefinition = getFlowDefinition(record.get(PROPOSED_FLOW.FLOW_DEF));
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(record.get(PROPOSED_FLOW.FLOW_DEF), ProposedFlowCommand.class);
             flowMap.compute(flowId, (id, existingFlowResponse) -> {
                 List<EntityWorkflowTransition> updatedTransitions = new ArrayList<>();
                 if (existingFlowResponse != null) {
@@ -200,15 +200,6 @@ public class MakerCheckerService {
             });
         }
         return  new ArrayList<>(flowMap.values());
-    }
-
-    private ProposedFlowCommand getFlowDefinition(String flowDef) {
-        try {
-            return getJsonMapper().readValue(flowDef, ProposedFlowCommand.class);
-        } catch (JsonProcessingException e) {
-            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
-            throw new IllegalArgumentException("Invalid flow definition JSON", e);
-        }
     }
 
     private ProposedFlowResponse TO_DOMAIN_MAPPER(ProposedFlowCommand flowDefinition, List<EntityWorkflowTransition> updatedTransitions, ProposedFlowRecord proposedFlowRecord, EntityWorkflowState entityWorkflowState) {
