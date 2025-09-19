@@ -51,7 +51,8 @@ function controller($q,
         serviceBroker
                 .loadViewData(
                     CORE_API.ProposedFlowStore.getById,
-                    [vm.parentEntityRef.id])
+                    [vm.parentEntityRef.id],
+                    {force: true})
                 .then(r => {
                     vm.proposedFlow = r.data;
                     vm.usedDataTypes = (vm.proposedFlow?.flowDef?.dataTypeIds || []).map(id => ({ dataTypeId: id }));
@@ -65,6 +66,7 @@ function controller($q,
     };
 
     vm.refreshState = () => {
+        console.log("Refresh angulra")
         loadProposedFlow();
     }
 
