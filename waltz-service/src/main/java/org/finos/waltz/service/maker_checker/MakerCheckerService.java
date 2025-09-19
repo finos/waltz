@@ -179,7 +179,6 @@ public class MakerCheckerService {
     }
 
     private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) {
-        LOG.info(" record count : {} ", result.size());
         Map<Long, ProposedFlowResponse> flowMap = new HashMap<>();
         for (Record record : result) {
             Long flowId = record.get(PROPOSED_FLOW.ID, Long.class);
@@ -200,7 +199,6 @@ public class MakerCheckerService {
 
             });
         }
-        LOG.info(" proposed flow response count : {} ", flowMap.size());
         return  new ArrayList<>(flowMap.values());
     }
 
