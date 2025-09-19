@@ -66,7 +66,6 @@ function controller($q,
     };
 
     vm.refreshState = () => {
-        console.log("Refresh angulra")
         loadProposedFlow();
     }
 
