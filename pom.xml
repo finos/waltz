@@ -496,7 +496,7 @@
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>mssql-jdbc</jdbc.artifact>
-                <jdbc.version>6.1.0.jre8</jdbc.version>
+                <jdbc.version>13.2.0.jre8</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jooq.group>org.jooq.pro-java-8</jooq.group>
                 <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
@@ -698,5 +698,18 @@
         </plugins>
     </reporting>
 
+    <!-- Specify the jOOQ repository last -->
+    <repositories>
+        <repository>
+            <id>jooq-pro</id>
+            <url>https://repo.jooq.org/repo</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jooq-pro</id>
+            <url>https://repo.jooq.org/repo</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

@@ -1,0 +1,21 @@
+services:
+#  waltz:
+#    image: ghcr.io/finos/waltz:latest
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - sqlserver
+
+  sqlserver:
+    container_name: sqlserver
+    build:
+      dockerfile: docker/Dockerfile_MSSQL
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Some4Complex#Password"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+
+#  -e "MSSQL_PID=Express"
+#  docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Some4Complex#Password"  -p 1433:1433 -d --name=sql mcr.microsoft.com/mssql/server:latest

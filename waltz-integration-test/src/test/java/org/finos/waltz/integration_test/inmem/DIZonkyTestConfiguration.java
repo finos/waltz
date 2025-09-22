@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -64,8 +65,8 @@ public class DIZonkyTestConfiguration {
     public DataSource dataSource() throws SQLException, IOException {
         System.out.println("Setting up Hikari wrapping Zonky DS");
 
-        final String target = System.getProperty("target.db", "postgres").toLowerCase();    // postgres | sqlserver
-        final String provider  = System.getProperty("db.provider", "auto");                 // docker | embedded | auto
+        final String target = System.getProperty("target.db", "sqlserver").toLowerCase();    // postgres | sqlserver
+        final String provider  = System.getProperty("db.provider", "embedded");                 // docker | embedded | auto
         final boolean wantDocker = "docker".equalsIgnoreCase(provider) ||
                 ("auto".equalsIgnoreCase(provider) && dockerAvailable());
 
@@ -95,10 +96,35 @@ public class DIZonkyTestConfiguration {
             case "sqlserver":
                 if (wantDocker) {
                     System.out.println("==> Using Testcontainers: mssql/server:2022-latest");
-                    mssql = new MSSQLServerContainer<>("mcr.microsoft.com/mssql/server:2022-latest")
-                            .acceptLicense(); // sets ACCEPT_EULA=Y
-                    mssql.start();
-                    cfg.setJdbcUrl(mssql.getJdbcUrl());
+                    DockerImageName sqlServerWithFTS = DockerImageName
+                            .parse("waltz-sqlserver")
+                            .asCompatibleSubstituteFor("mcr.microsoft.com/mssql/server:2022-latest");
+                    mssql = new MSSQLServerContainer<>(sqlServerWithFTS)
+                            .acceptLicense() // sets ACCEPT_EULA=Y
+                            .withEnv("MSSQL_PID", "Developer") // todo: change to express depending on jooq licence level
+                            .withStartupAttempts(100)
+                            .withStartupTimeoutSeconds(120)
+                            .withConnectTimeoutSeconds(120)
+                            .withInitScript("init-mssql.sql");
+
+
+                    try {
+                        mssql.start();
+                    } catch (Throwable t) {
+                        System.err.println("=== MSSQL CONTAINER LOGS (startup failure) ===");
+                        System.err.println(mssql.getLogs());
+                        throw t;
+                    }
+
+                    String url = mssql.getJdbcUrl();
+                    if (!url.contains("encrypt=")) {
+                        url += ";encrypt=true;trustServerCertificate=true";
+                    }
+
+                    url +=";databaseName=waltz";
+
+                    System.out.println("URL for SqlServer: " + url);
+                    cfg.setJdbcUrl(url);
                     cfg.setUsername(mssql.getUsername()); // "sa"
                     cfg.setPassword(mssql.getPassword());
                 } else {
