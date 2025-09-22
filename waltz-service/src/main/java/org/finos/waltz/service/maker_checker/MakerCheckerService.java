@@ -178,7 +178,7 @@ public class MakerCheckerService {
                 proposedFlowDao.getProposedFlowsBySelector(proposedFlowIdSelectorFactory.apply(options), workflowDefinition.id().get()));
     }
 
-    private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) throws JsonProcessingException {
+    private List<ProposedFlowResponse> proposedFlowResponseMapper(Result<Record> result) throws JsonProcessingException{
         Map<Long, ProposedFlowResponse> flowMap = new HashMap<>();
         for (Record record : result) {
             Long flowId = record.get(PROPOSED_FLOW.ID, Long.class);

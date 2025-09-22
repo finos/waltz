@@ -460,7 +460,7 @@ class MakerCheckerEndpointTest {
         when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
         when(makerCheckerService.getProposedFlows(options)).thenReturn(expectedList);
 
-        List<ProposedFlowResponse> actual = makerCheckerEndpoint.getProposedFlows(request, response);
+        List<ProposedFlowResponse> actual = makerCheckerEndpoint.findProposedFlows(request, response);
 
         //Then
         assertEquals(expectedList, actual);
