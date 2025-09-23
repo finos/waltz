@@ -32,7 +32,7 @@ jobs:
 #          --health-retries 5
 
       mssql:
-        image: vibs2006/sql_server_fts:latest #mcr.microsoft.com/mssql/server:2022-latest
+        image: mcr.microsoft.com/mssql/server:2022-latest
         ports:
           - 1433:1433
         env:
