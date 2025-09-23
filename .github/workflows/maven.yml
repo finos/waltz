@@ -46,8 +46,14 @@ jobs:
           --health-timeout=10s
           --health-retries=30
 
+    steps:
+    - name: Ensure MSSQL database exists (tools container)
+      if: ${{ matrix.db == 'mssql' }}
+      run: |
+        docker run --rm --network host mcr.microsoft.com/mssql-tools
+          /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -C \
+          -Q "IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];"
 
-    steps:     
     - uses: actions/checkout@v4
 
     - name: Set up JDK 11
