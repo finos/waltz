@@ -60,4 +60,12 @@
             </properties>
         </profile>
     </profiles>
+
+    <servers>
+        <server>
+            <id>jooq-pro</id>
+            <username>${env.JOOQ_USERNAME}</username>
+            <password>${env.JOOQ_PASSWORD}</password>
+        </server>
+    </servers>
 </settings>

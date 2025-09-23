@@ -56,9 +56,6 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: maven
-        server-id: jooq-pro
-        server-username: ${{ secrets.JOOQ_USERNAME }}
-        server-password: ${{ secrets.JOOQ_PASSWORD }}
 
 
     - name: Cache Maven packages    
@@ -73,6 +70,9 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Build with Maven (DB = ${{ matrix.db }})
+      env:
+        JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
+        JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
       run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
 
     - name: Publish build
