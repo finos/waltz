@@ -41,18 +41,20 @@ jobs:
           MSSQL_PID: "Express"
         # basic health check (tools are present on this image)
         options: >-
+          --name mssql
           --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Some4Complex#Password -C -Q 'SELECT 1'"
           --health-interval=10s
           --health-timeout=10s
           --health-retries=30
 
     steps:
-    - name: Ensure MSSQL database exists (tools container)
+    - name: Ensure MSSQL database exists
       if: ${{ matrix.db == 'mssql' }}
       run: |
-        docker run --rm --network host mcr.microsoft.com/mssql-tools
-          /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -C \
-          -Q "IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];"
+        set -e
+        # try tools18, fall back to tools17 path
+        docker exec mssql bash -lc "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -C -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\" \
+        || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\""
 
     - uses: actions/checkout@v4
 
