@@ -7,9 +7,9 @@ services:
 #      - sqlserver
 
   sqlserver:
-    container_name: sqlserver
-    build:
-      dockerfile: docker/Dockerfile_MSSQL
+    image: hmxlabs/mssql-fts:2022-latest
+#    build:
+#      dockerfile: docker/Dockerfile_MSSQL
     ports:
       - "1433:1433"
     environment:

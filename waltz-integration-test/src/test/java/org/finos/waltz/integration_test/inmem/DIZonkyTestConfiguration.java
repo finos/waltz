@@ -95,9 +95,9 @@ public class DIZonkyTestConfiguration {
 
             case "mssql":
                 if (wantDocker) {
-                    System.out.println("==> Using Testcontainers: vibs2006/sql_server_fts:latest");
+                    System.out.println("==> Using Testcontainers: hmxlabs/mssql-fts:2022-latest");
                     DockerImageName sqlServerWithFTS = DockerImageName
-                            .parse("vibs2006/sql_server_fts:latest")
+                            .parse("hmxlabs/mssql-fts:2022-latest")
                             .asCompatibleSubstituteFor("mcr.microsoft.com/mssql/server:2022-latest");
                     mssql = new MSSQLServerContainer<>(sqlServerWithFTS)
                             .acceptLicense() // sets ACCEPT_EULA=Y
