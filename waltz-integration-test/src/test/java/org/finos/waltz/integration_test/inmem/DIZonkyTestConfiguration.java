@@ -65,7 +65,7 @@ public class DIZonkyTestConfiguration {
     public DataSource dataSource() throws SQLException, IOException {
         System.out.println("Setting up Hikari wrapping Zonky DS");
 
-        final String target = System.getProperty("target.db", "sqlserver").toLowerCase();    // postgres | sqlserver
+        final String target = System.getProperty("target.db", "mssql").toLowerCase();    // postgres | mssql
         final String provider  = System.getProperty("db.provider", "embedded");                 // docker | embedded | auto
         final boolean wantDocker = "docker".equalsIgnoreCase(provider) ||
                 ("auto".equalsIgnoreCase(provider) && dockerAvailable());
@@ -93,7 +93,7 @@ public class DIZonkyTestConfiguration {
                 }
                 break;
 
-            case "sqlserver":
+            case "mssql":
                 if (wantDocker) {
                     System.out.println("==> Using Testcontainers: vibs2006/sql_server_fts:latest");
                     DockerImageName sqlServerWithFTS = DockerImageName
