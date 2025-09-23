@@ -386,7 +386,10 @@ public class MeasurableRatingService {
     }
 
 
-    public void migrateRatings(Long measurableId, Long targetMeasurableId, String userId, long measurableCategoryId) {
+    public void migrateRatings(Long measurableId,
+                               Long targetMeasurableId,
+                               String userId,
+                               long measurableCategoryId) {
 
         MeasurableCategory category = checkNotNull(
                 measurableCategoryDao.getById(measurableCategoryId),
@@ -394,6 +397,7 @@ public class MeasurableRatingService {
 
         Condition itemCondition = RATING_SCHEME_ITEM.SCHEME_ID.eq(category.ratingSchemeId());
         List<RatingSchemeItem> ratingSchemeItems = ratingSchemeDAO.fetchItems(itemCondition);
+
         measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId, category.ratingSchemeId(), ratingSchemeItems);
     }
 

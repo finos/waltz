@@ -517,7 +517,11 @@ public class MeasurableRatingDao {
      * @param ratingSchemeId
      * @param ratingSchemeItems
      */
-    public void migrateRatings(Long measurableId, Long targetId, String userId, long ratingSchemeId, List<RatingSchemeItem> ratingSchemeItems) {
+    public void migrateRatings(Long measurableId,
+                               Long targetId,
+                               String userId,
+                               long ratingSchemeId,
+                               List<RatingSchemeItem> ratingSchemeItems) {
 
         if (targetId == null) {
             throw new IllegalArgumentException("Cannot migrate ratings without specifying a new target");
