@@ -438,7 +438,7 @@
                 Note: this profile requires a professional license for JOOQ,
                 see: http://www.jooq.org/download/
             -->
-            <id>waltz-mssql</id>
+            <id>waltz-mssql-alt</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>sqljdbc4</jdbc.artifact>
@@ -492,7 +492,7 @@
                 Note: this profile requires a professional license for JOOQ,
                 see: http://www.jooq.org/download/
             -->
-            <id>waltz-mssql-alt</id>
+            <id>waltz-mssql</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>mssql-jdbc</jdbc.artifact>

@@ -13,12 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db: [ postgres ]
+        db: [ postgres, mssql ]
 
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: waltz
@@ -30,6 +30,22 @@ jobs:
           --health-interval 10s 
           --health-timeout 5s 
           --health-retries 5
+
+      mssql:
+        image: vibs2006/sql_server_fts:latest #mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Some4Complex#Password
+          MSSQL_PID: "Express"
+        # basic health check (tools are present on this image)
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Some4Complex#Password -C -Q 'SELECT 1'"
+          --health-interval=15s
+          --health-timeout=10s
+          --health-retries=20
+
 
     steps:     
     - uses: actions/checkout@v4
@@ -52,7 +68,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Build with Maven (DB = ${{ matrix.db }})
-      run: mvn -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
+      run: mvn -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
 
     - name: Publish build
       uses: actions/upload-artifact@v4
@@ -110,6 +126,6 @@ jobs:
       if: ${{ github.ref_type == 'tag' }}
       with:
         files: |
-          waltz-schema/target/liquibase-scripts-${{ matrix.db }}.zip
+          waltz-schema/target/liquibase-scripts.zip
           waltz-web/target/waltz-web-${{ matrix.db }}.war
           waltz-web/target/waltz-web-jar-with-dependencies-${{ matrix.db }}.jar

@@ -95,13 +95,13 @@ public class DIZonkyTestConfiguration {
 
             case "sqlserver":
                 if (wantDocker) {
-                    System.out.println("==> Using Testcontainers: mssql/server:2022-latest");
+                    System.out.println("==> Using Testcontainers: vibs2006/sql_server_fts:latest");
                     DockerImageName sqlServerWithFTS = DockerImageName
-                            .parse("waltz-sqlserver")
+                            .parse("vibs2006/sql_server_fts:latest")
                             .asCompatibleSubstituteFor("mcr.microsoft.com/mssql/server:2022-latest");
                     mssql = new MSSQLServerContainer<>(sqlServerWithFTS)
                             .acceptLicense() // sets ACCEPT_EULA=Y
-                            .withEnv("MSSQL_PID", "Developer") // todo: change to express depending on jooq licence level
+                            .withEnv("MSSQL_PID", "EXPRESS")
                             .withStartupAttempts(100)
                             .withStartupTimeoutSeconds(120)
                             .withConnectTimeoutSeconds(120)
