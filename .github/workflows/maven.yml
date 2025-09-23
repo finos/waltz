@@ -13,38 +13,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db: [ postgres ]
+        db: [ mssql ]
 
 
     services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: waltz
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 5
-
-#      mssql:
-#        image: vibs2006/sql_server_fts:latest #mcr.microsoft.com/mssql/server:2022-latest
-#        ports:
-#          - 1433:1433
+#      postgres:
+#        image: postgres:16
 #        env:
-#          ACCEPT_EULA: Y
-#          SA_PASSWORD: Some4Complex#Password
-#          MSSQL_PID: "Express"
-#        # basic health check (tools are present on this image)
+#          POSTGRES_USER: postgres
+#          POSTGRES_DB: waltz
+#          POSTGRES_PASSWORD: postgres
+#        ports:
+#          - 5432:5432
 #        options: >-
-#          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Some4Complex#Password -C -Q 'SELECT 1'"
-#          --health-interval=15s
-#          --health-timeout=10s
-#          --health-retries=20
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+
+      mssql:
+        image: vibs2006/sql_server_fts:latest #mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Some4Complex#Password
+          MSSQL_PID: "Express"
+        # basic health check (tools are present on this image)
+        options: >-
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Some4Complex#Password -C -Q 'SELECT 1'"
+          --health-interval=120s
+          --health-timeout=120s
+          --health-retries=100
 
 
     steps:     
