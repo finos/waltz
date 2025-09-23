@@ -102,9 +102,9 @@ public class DIZonkyTestConfiguration {
                     mssql = new MSSQLServerContainer<>(sqlServerWithFTS)
                             .acceptLicense() // sets ACCEPT_EULA=Y
                             .withEnv("MSSQL_PID", "EXPRESS")
-                            .withStartupAttempts(100)
-                            .withStartupTimeoutSeconds(120)
-                            .withConnectTimeoutSeconds(120)
+                            .withStartupAttempts(30)
+                            .withStartupTimeoutSeconds(10)
+                            .withConnectTimeoutSeconds(10)
                             .withInitScript("init-mssql.sql");
 
 
