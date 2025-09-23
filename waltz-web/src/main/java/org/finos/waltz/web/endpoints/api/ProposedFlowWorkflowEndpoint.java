@@ -3,12 +3,8 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.utils.ProposeFlowPermission;
-import org.finos.waltz.service.maker_checker.MakerCheckerService;
+import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.service.maker_checker.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
@@ -32,18 +28,15 @@ import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
-public class MakerCheckerEndpoint implements Endpoint {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MakerCheckerEndpoint.class);
+public class ProposedFlowWorkflowEndpoint implements Endpoint {
+    private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowWorkflowEndpoint.class);
     private static final String BASE_URL = mkPath("api", "mc");
-    private final MakerCheckerService makerCheckerService;
-
+    private final ProposedFlowWorkflowService proposedFlowWorkflowService;
 
     @Autowired
-    public MakerCheckerEndpoint(MakerCheckerService makerCheckerService) {
-        this.makerCheckerService = makerCheckerService;
+    public ProposedFlowWorkflowEndpoint(ProposedFlowWorkflowService proposedFlowWorkflowService) {
+        this.proposedFlowWorkflowService = proposedFlowWorkflowService;
     }
-
 
     @Override
     public void register() {
@@ -62,16 +55,16 @@ public class MakerCheckerEndpoint implements Endpoint {
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
         String username = WebUtilities.getUsername(request);
         ProposedFlowCommand proposedFlowCommand = readBody(request, ProposedFlowCommand.class);
-        return makerCheckerService.proposeNewFlow(username, proposedFlowCommand);
+        return proposedFlowWorkflowService.proposeNewFlow(username, proposedFlowCommand);
     }
 
     public ProposedFlowResponse getProposedFlowById(Request request, Response response) {
         long proposedFlowId = WebUtilities.getLong(request, "id");
-        return makerCheckerService.getProposedFlowById(proposedFlowId);
+        return proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
     }
 
     public List<ProposedFlowResponse> findProposedFlows(Request request, Response response) throws IOException {
-        return makerCheckerService.getProposedFlows(readIdSelectionOptionsFromBody(request));
+        return proposedFlowWorkflowService.getProposedFlows(readIdSelectionOptionsFromBody(request));
     }
 
     public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
@@ -79,16 +72,16 @@ public class MakerCheckerEndpoint implements Endpoint {
         ProposedFlowWorkflowTransitionAction proposedFlowAction = checkNotNull(findByVerb(action), "Invalid action");
         ProposedFlowActionCommand proposedFlowActionCommand = readBody(request, ProposedFlowActionCommand.class);
 
-        return makerCheckerService.proposedFlowAction(
-                        WebUtilities.getLong(request, "id"),
-                        proposedFlowAction,
-                        WebUtilities.getUsername(request),
-                        proposedFlowActionCommand);
+        return proposedFlowWorkflowService.proposedFlowAction(
+                WebUtilities.getLong(request, "id"),
+                proposedFlowAction,
+                WebUtilities.getUsername(request),
+                proposedFlowActionCommand);
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(Request request, Response response) throws IOException, InsufficientPrivelegeException {
         String username = WebUtilities.getUsername(request);
         EntityReference entityRef = getEntityReference(request, "entityKind", "entityId");
-        return makerCheckerService.getUserPermissionsForEntityRef(username, entityRef);
+        return proposedFlowWorkflowService.getUserPermissionsForEntityRef(username, entityRef);
     }
 }

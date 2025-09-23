@@ -5,11 +5,7 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import  org.jooq.Record;
-import  org.jooq.Result;
-import org.jooq.Select;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +19,21 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
+    public static ProposedFlowRecord TO_DOMAIN_MAPPER(Record record) {
+        ProposedFlowRecord proposedFlowRecord = new ProposedFlowRecord();
+        proposedFlowRecord.setId(record.get(PROPOSED_FLOW.ID));
+        proposedFlowRecord.setSourceEntityId(record.get(PROPOSED_FLOW.SOURCE_ENTITY_ID));
+        proposedFlowRecord.setSourceEntityKind(record.get(PROPOSED_FLOW.SOURCE_ENTITY_KIND));
+        proposedFlowRecord.setTargetEntityId(record.get(PROPOSED_FLOW.TARGET_ENTITY_ID));
+        proposedFlowRecord.setTargetEntityKind(record.get(PROPOSED_FLOW.TARGET_ENTITY_KIND));
+        proposedFlowRecord.setCreatedAt(record.get(PROPOSED_FLOW.CREATED_AT));
+        proposedFlowRecord.setCreatedBy(record.get(PROPOSED_FLOW.CREATED_BY));
+        proposedFlowRecord.setFlowDef(record.get(PROPOSED_FLOW.FLOW_DEF));
+        proposedFlowRecord.setProposalType(record.get(PROPOSED_FLOW.PROPOSAL_TYPE));
+
+        return proposedFlowRecord;
+    }
+
     private final DSLContext dsl;
 
     @Autowired
@@ -77,22 +88,6 @@ public class ProposedFlowDao {
                 .where(PROPOSED_FLOW.ID.in(flowIdSelector))
                 .fetch();
     }
-
-    public static ProposedFlowRecord TO_DOMAIN_MAPPER(Record record) {
-        ProposedFlowRecord proposedFlowRecord = new ProposedFlowRecord();
-        proposedFlowRecord.setId(record.get(PROPOSED_FLOW.ID));
-        proposedFlowRecord.setSourceEntityId(record.get(PROPOSED_FLOW.SOURCE_ENTITY_ID));
-        proposedFlowRecord.setSourceEntityKind(record.get(PROPOSED_FLOW.SOURCE_ENTITY_KIND));
-        proposedFlowRecord.setTargetEntityId(record.get(PROPOSED_FLOW.TARGET_ENTITY_ID));
-        proposedFlowRecord.setTargetEntityKind(record.get(PROPOSED_FLOW.TARGET_ENTITY_KIND));
-        proposedFlowRecord.setCreatedAt(record.get(PROPOSED_FLOW.CREATED_AT));
-        proposedFlowRecord.setCreatedBy(record.get(PROPOSED_FLOW.CREATED_BY));
-        proposedFlowRecord.setFlowDef(record.get(PROPOSED_FLOW.FLOW_DEF));
-        proposedFlowRecord.setProposalType(record.get(PROPOSED_FLOW.PROPOSAL_TYPE));
-
-        return proposedFlowRecord;
-    }
-
 }
 
 

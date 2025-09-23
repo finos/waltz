@@ -6,7 +6,6 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
-import org.finos.waltz.service.workflow_state_machine.WorkflowTransitionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,8 +37,6 @@ import static org.finos.waltz.service.workflow_state_machine.proposed_flow.Propo
  */
 @Component
 public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext> {
-    private final EntityWorkflowStateDao stateDao;
-    private final EntityWorkflowTransitionDao transitionDao;
     // FILTERS
     private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> ctx.isSourceApprover();
     private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> ctx.isTargetApprover();
@@ -50,13 +47,8 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
             .and(ctx -> SOURCE_APPROVED.equals(ctx.getCurrentState()))
             .and(ctx -> TARGET_APPROVED.equals(ctx.getPrevState()));
 
-    // Refreshing the context object might be needed as the state values can be stale
-    private static final WorkflowTransitionListener<ProposedFlowWorkflowState, ProposedFlowWorkflowContext> fullyApprovedTransitionListener = (from, to, ctx) ->
-            System.out.printf(
-                    "LISTENER: User '%s' was notified of transition from %s -> %s for entity %s%n",
-                    ctx.getUserId(), from, to, ctx.getEntityReference()
-            );
-
+    private final EntityWorkflowStateDao stateDao;
+    private final EntityWorkflowTransitionDao transitionDao;
     private WorkflowStateMachine workflowStateMachine;
 
     @Autowired
@@ -85,7 +77,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
-                        canGoFromSourceToFullyApprove, fullyApprovedTransitionListener)
+                        canGoFromSourceToFullyApprove)
                 .permit(SOURCE_APPROVED, TARGET_APPROVED, APPROVE,
                         isTargetApprover)
                 .permit(SOURCE_APPROVED, TARGET_REJECTED, REJECT,
@@ -93,7 +85,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
-                        canGoFromTargetToFullyApprove, fullyApprovedTransitionListener)
+                        canGoFromTargetToFullyApprove)
                 .permit(TARGET_APPROVED, SOURCE_APPROVED, APPROVE,
                         isSourceApprover)
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,

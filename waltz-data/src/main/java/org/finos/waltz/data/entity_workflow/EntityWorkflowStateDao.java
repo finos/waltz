@@ -41,13 +41,6 @@ import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_
 
 @Repository
 public class EntityWorkflowStateDao {
-    private final DSLContext dsl;
-
-    @Autowired
-    public EntityWorkflowStateDao(DSLContext dsl) {
-        this.dsl = dsl;
-    }
-
     private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
@@ -66,7 +59,30 @@ public class EntityWorkflowStateDao {
                 .build();
     };
 
-    public EntityWorkflowState getWorkflowState(long workflowId, EntityReference ref) {
+    public static EntityWorkflowState toDomainObject(Record r) {
+        return ImmutableEntityWorkflowState
+                .builder()
+                .workflowId(r.get(Tables.ENTITY_WORKFLOW_STATE.WORKFLOW_ID))
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.valueOf(r.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_KIND)))
+                        .id(r.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_ID))
+                        .build())
+                .state(r.get(Tables.ENTITY_WORKFLOW_STATE.STATE))
+                .description(r.get(Tables.ENTITY_WORKFLOW_STATE.DESCRIPTION))
+                .lastUpdatedAt(r.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT).toLocalDateTime())
+                .lastUpdatedBy(r.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY))
+                .provenance(r.get(Tables.ENTITY_WORKFLOW_STATE.PROVENANCE))
+                .build();
+    }
+
+    private final DSLContext dsl;
+
+    @Autowired
+    public EntityWorkflowStateDao(DSLContext dsl) {
+        this.dsl = dsl;
+    }
+
+    public EntityWorkflowState getByEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
         return dsl
@@ -78,8 +94,11 @@ public class EntityWorkflowStateDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowState(Long workflowDefId, EntityReference ref, String username,
-                                    String workflowState, String description) {
+    public void createWorkflowState(Long workflowDefId,
+                                    EntityReference ref,
+                                    String username,
+                                    String workflowState,
+                                    String description) {
         EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(workflowDefId);
         stateRecord.setEntityId(ref.id());
@@ -102,22 +121,5 @@ public class EntityWorkflowStateDao {
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
                 .execute();
-    }
-
-    public static EntityWorkflowState TO_DOMAIN_MAPPER(Record record){
-
-        return ImmutableEntityWorkflowState
-                .builder()
-                .workflowId(record.get(Tables.ENTITY_WORKFLOW_STATE.WORKFLOW_ID))
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(record.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_KIND)))
-                        .id(record.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_ID))
-                        .build())
-                .state(record.get(Tables.ENTITY_WORKFLOW_STATE.STATE))
-                .description(record.get(Tables.ENTITY_WORKFLOW_STATE.DESCRIPTION))
-                .lastUpdatedAt(record.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT).toLocalDateTime())
-                .lastUpdatedBy(record.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY))
-                .provenance(record.get(Tables.ENTITY_WORKFLOW_STATE.PROVENANCE))
-                .build();
     }
 }

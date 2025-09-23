@@ -61,6 +61,22 @@ public class EntityWorkflowTransitionDao {
                 .build();
     };
 
+    public static EntityWorkflowTransition toDomainObject(Record record) {
+        return ImmutableEntityWorkflowTransition
+                .builder()
+                .workflowId(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID))
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.valueOf(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND)))
+                        .id(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_ID))
+                        .build())
+                .fromState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.FROM_STATE))
+                .toState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.TO_STATE))
+                .reason(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.REASON))
+                .lastUpdatedAt(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT).toLocalDateTime())
+                .lastUpdatedBy(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY))
+                .provenance(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.PROVENANCE))
+                .build();
+    }
 
     private final DSLContext dsl;
 
@@ -106,22 +122,5 @@ public class EntityWorkflowTransitionDao {
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
                 .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-    public static EntityWorkflowTransition TO_DOMAIN_MAPPER(Record record){
-        return ImmutableEntityWorkflowTransition
-                .builder()
-                .workflowId(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID))
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND)))
-                        .id(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_ID))
-                        .build())
-                .fromState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.FROM_STATE))
-                .toState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.TO_STATE))
-                .reason(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.REASON))
-                .lastUpdatedAt(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT).toLocalDateTime())
-                .lastUpdatedBy(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY))
-                .provenance(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.PROVENANCE))
-                .build();
     }
 }

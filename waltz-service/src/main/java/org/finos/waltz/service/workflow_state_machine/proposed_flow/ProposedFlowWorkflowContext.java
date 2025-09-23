@@ -5,48 +5,49 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.workflow_state_machine.WorkflowContext;
 
 public class ProposedFlowWorkflowContext extends WorkflowContext {
-    private ProposedFlowWorkflowState currentState;
-    private ProposedFlowWorkflowState prevState;
-    private boolean isSourceApprover;
-    private boolean isTargetApprover;
+  private ProposedFlowWorkflowState currentState;
+  private ProposedFlowWorkflowState prevState;
+  private boolean isSourceApprover;
+  private boolean isTargetApprover;
 
-    public ProposedFlowWorkflowContext(long workflowId, EntityReference entityReference, String userId, String reason) {
-        super(workflowId, entityReference, userId, reason);
-    }
+  public ProposedFlowWorkflowContext(
+      long workflowId, EntityReference entityReference, String userId, String reason) {
+    super(workflowId, entityReference, userId, reason);
+  }
 
-    public ProposedFlowWorkflowState getPrevState() {
-        return prevState;
-    }
+  public ProposedFlowWorkflowState getPrevState() {
+    return prevState;
+  }
 
-    public ProposedFlowWorkflowContext setPrevState(ProposedFlowWorkflowState prevState) {
-        this.prevState = prevState;
-        return this;
-    }
+  public ProposedFlowWorkflowContext setPrevState(ProposedFlowWorkflowState prevState) {
+    this.prevState = prevState;
+    return this;
+  }
 
-    public ProposedFlowWorkflowState getCurrentState() {
-        return currentState;
-    }
+  public ProposedFlowWorkflowState getCurrentState() {
+    return currentState;
+  }
 
-    public ProposedFlowWorkflowContext setCurrentState(ProposedFlowWorkflowState currentState) {
-        this.currentState = currentState;
-        return this;
-    }
+  public ProposedFlowWorkflowContext setCurrentState(ProposedFlowWorkflowState currentState) {
+    this.currentState = currentState;
+    return this;
+  }
 
-    public boolean isSourceApprover() {
-        return isSourceApprover;
-    }
+  public boolean isSourceApprover() {
+    return isSourceApprover;
+  }
 
-    public ProposedFlowWorkflowContext setSourceApprover(boolean sourceApprover) {
-        isSourceApprover = sourceApprover;
-        return this;
-    }
+  public ProposedFlowWorkflowContext setSourceApprover(boolean sourceApprover) {
+    isSourceApprover = sourceApprover;
+    return this;
+  }
 
-    public boolean isTargetApprover() {
-        return isTargetApprover;
-    }
+  public boolean isTargetApprover() {
+    return isTargetApprover;
+  }
 
-    public ProposedFlowWorkflowContext setTargetApprover(boolean targetApprover) {
-        isTargetApprover = targetApprover;
-        return this;
-    }
+  public ProposedFlowWorkflowContext setTargetApprover(boolean targetApprover) {
+    isTargetApprover = targetApprover;
+    return this;
+  }
 }

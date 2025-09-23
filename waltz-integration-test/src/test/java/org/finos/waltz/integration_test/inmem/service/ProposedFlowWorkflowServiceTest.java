@@ -20,14 +20,12 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.Operation;
@@ -37,27 +35,14 @@ import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
-import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
-import org.finos.waltz.model.physical_flow.PhysicalFlow;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.maker_checker.MakerCheckerService;
+import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.maker_checker.ProposedFlowWorkflowService;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,18 +55,18 @@ import static java.time.LocalDateTime.now;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
+public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
-    MakerCheckerService makerCheckerService;
+    ProposedFlowWorkflowService proposedFlowWorkflowService;
 
     @Autowired
     ProposedFlowDao proposedFlowDao;
@@ -96,9 +81,9 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     EntityWorkflowStateDao entityWorkflowStateDao;
 
     @Autowired
-    EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
+    EntityWorkflowService entityWorkflowService;
 
-   @Autowired
+    @Autowired
     ChangeLogService changeLogService;
 
     @Autowired
@@ -135,7 +120,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         // 2. Act --------------------------------------------------------------
-        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+        ProposedFlowCommandResponse response = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, command);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(response);
@@ -163,10 +148,10 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .proposalType(ProposalType.valueOf("CREATE"))
                 .build();
 
-        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+        ProposedFlowCommandResponse response = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, command);
 
         // 2. Act --------------------------------------------------------------
-        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(response.proposedFlowId());
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(response.proposedFlowId());
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(response);
@@ -197,18 +182,18 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
 
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
         Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
-        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = FULLY_APPROVED;
         String description = "test description";
 
-        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
+        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, entityReference, USER_NAME,
                 workflowState.name(), description);
 
         // 2. Act --------------------------------------------------------------
-        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, USER_NAME);
+        LogicalPhysicalFlowCreationResponse resp = proposedFlowWorkflowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(resp.logicalFlow());
@@ -242,17 +227,17 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
 
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
         Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
-        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = FULLY_APPROVED;
         String description = "test description";
 
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
                 workflowState.name(), description);
 
-        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
 
         LocalDateTime now = nowUtc();
@@ -267,7 +252,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         logicalFlowDao.addFlow(flowToAdd);
 
         // 2. Act --------------------------------------------------------------
-        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+        LogicalPhysicalFlowCreationResponse resp = proposedFlowWorkflowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(resp.logicalFlow());
@@ -307,17 +292,17 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
 
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
         Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
-        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = FULLY_APPROVED;
         String description = "test description";
 
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
                 workflowState.name(), description);
 
-        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
 
         LocalDateTime now = nowUtc();
@@ -341,7 +326,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         PhysicalSpecification physicalSpec = physicalSpecificationDao.getById(specId);
 
         // 2. Act --------------------------------------------------------------
-        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+        LogicalPhysicalFlowCreationResponse resp = proposedFlowWorkflowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(resp.logicalFlow());
@@ -395,7 +380,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
     }
 
-    private PhysicalSpecification createPhysicalSpecification(EntityReference owningEntity){
+    private PhysicalSpecification createPhysicalSpecification(EntityReference owningEntity) {
         return ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
                 .name("mc_specification")
@@ -427,7 +412,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    void testPresenceOfCreateProposalTypeWhenCreatingNewProposedFlow(){
+    void testPresenceOfCreateProposalTypeWhenCreatingNewProposedFlow() {
 
         // 1. Arrange ----------------------------------------------------------
         Reason reason = getReason();
@@ -447,7 +432,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         // 2. Act --------------------------------------------------------------
-        ProposedFlowCommandResponse response = makerCheckerService.proposeNewFlow(USER_NAME, command);
+        ProposedFlowCommandResponse response = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, command);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(response);
@@ -478,17 +463,17 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
 
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
         Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
-        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = FULLY_APPROVED;
         String description = "test description";
 
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
                 workflowState.name(), description);
 
-        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
 
         LocalDateTime now = nowUtc();
@@ -512,7 +497,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
         physicalSpecificationDao.getById(specId);
 
         // 2. Act --------------------------------------------------------------
-        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+        LogicalPhysicalFlowCreationResponse resp = proposedFlowWorkflowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(resp.logicalFlow());
@@ -544,14 +529,14 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         Long proposedFlowId = proposedFlowDao.saveProposedFlow(USER_NAME, command);
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         Long entityWorkflowDefId = entityWorkflowDefinition.id().get();
-        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowId);
-        ProposedFlowWorkflowState workflowState = ProposedFlowWorkflowState.FULLY_APPROVED;
+        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowId);
+        ProposedFlowWorkflowState workflowState = FULLY_APPROVED;
         String description = "test description";
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefId, EntityReference.mkRef(entityReference.kind(), proposedFlowId), USER_NAME,
                 workflowState.name(), description);
-        ProposedFlowResponse proposedFlowResponse = makerCheckerService.getProposedFlowById(proposedFlowId);
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlowResponse);
         LocalDateTime now = nowUtc();
         LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
@@ -595,7 +580,7 @@ public class MakerCheckerServiceTest extends BaseInMemoryIntegrationTest {
                 Operation.ADD);
 
         // 2. Act --------------------------------------------------------------
-        LogicalPhysicalFlowCreationResponse resp = makerCheckerService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
+        LogicalPhysicalFlowCreationResponse resp = proposedFlowWorkflowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowResponse.id(), USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(resp.logicalFlow());

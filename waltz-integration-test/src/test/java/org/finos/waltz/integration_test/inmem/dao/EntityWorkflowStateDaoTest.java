@@ -41,7 +41,7 @@ public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
         EntityReference ref = EntityReference.mkRef(entityKind, 2L);
         entityWorkflowStateDao.createWorkflowState(1L, ref, "testUser",
                 FULLY_APPROVED.name(), description);
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getWorkflowState(1L, ref);
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(1L, ref);
         assertNotNull(entityWorkflowState);
     }
 

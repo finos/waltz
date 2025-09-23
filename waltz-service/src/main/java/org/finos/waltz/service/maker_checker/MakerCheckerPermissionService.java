@@ -4,8 +4,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.permission_group.Permission;
+import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
 import org.finos.waltz.model.utils.ImmutableProposeFlowPermission;
-import org.finos.waltz.model.utils.ProposeFlowPermission;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 public class MakerCheckerPermissionService {
     private static final Logger LOG = LoggerFactory.getLogger(MakerCheckerPermissionService.class);
@@ -25,25 +24,26 @@ public class MakerCheckerPermissionService {
 
     @Autowired
     MakerCheckerPermissionService(InvolvementService involvementService,
-                                  PermissionGroupService permissionGroupService){
+                                  PermissionGroupService permissionGroupService) {
         this.involvementService = involvementService;
         this.permissionGroupService = permissionGroupService;
     }
 
-    public ProposeFlowPermission checkUserPermission(String username, EntityReference sourceEntityReference , EntityReference targetEntityReference) {
-        Set<Operation> sourceOperationSet = validatePermission(username, sourceEntityReference);
-        LOG.info("sourceOperationSet : {}", sourceOperationSet);
-        Set<Operation> targetOperationSet = validatePermission(username, targetEntityReference);
-        LOG.info("targetOperationSet : {}", targetOperationSet);
+    public ProposeFlowPermission checkUserPermission(String username, EntityReference sourceEntityReference, EntityReference targetEntityReference) {
+        Set<Operation> sourceOperationSet = fetchPermittedOperationsForUser(username, sourceEntityReference);
+        LOG.debug("For user {}, permitted operations are: {} for source {}",
+                username, sourceOperationSet, sourceEntityReference);
+        Set<Operation> targetOperationSet = fetchPermittedOperationsForUser(username, targetEntityReference);
+        LOG.debug("For user {}, permitted operations are: {} for target {}",
+                username, targetOperationSet, targetEntityReference);
         return ImmutableProposeFlowPermission.builder()
                 .sourceApprover(sourceOperationSet)
                 .targetApprover(targetOperationSet)
                 .build();
     }
 
-    public Set<Operation> validatePermission(String username,EntityReference entityReference ){
+    private Set<Operation> fetchPermittedOperationsForUser(String username, EntityReference entityReference) {
         Set<Long> listOfInvKinds = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
-        LOG.info("listOfInvKinds : {}", listOfInvKinds);
         return permissionGroupService
                 .findPermissionsForParentReference(entityReference, username)
                 .stream()

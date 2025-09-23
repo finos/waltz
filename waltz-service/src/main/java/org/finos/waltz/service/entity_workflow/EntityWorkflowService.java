@@ -71,7 +71,7 @@ public class EntityWorkflowService {
                                                                        EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
-        return entityWorkflowStateDao.getWorkflowState(workflowId, ref);
+        return entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workflowId, ref);
     }
 
 
@@ -127,7 +127,7 @@ public class EntityWorkflowService {
         Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
                 .flatMap(EntityWorkflowDefinition::id)
                 .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getWorkflowState(workFlowId, ref);
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, ref);
         List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
 
         return ImmutableEntityWorkflowView.builder()
@@ -150,11 +150,11 @@ public class EntityWorkflowService {
                 .build();
     }
 
-    public EntityWorkflowState workflowStateMapper(Record record){
-        return entityWorkflowStateDao.TO_DOMAIN_MAPPER(record);
+    public EntityWorkflowState workflowStateMapper(Record record) {
+        return entityWorkflowStateDao.toDomainObject(record);
     }
 
-    public EntityWorkflowTransition workflowTransitionMapper(Record record){
-        return entityWorkflowTransitionDao.TO_DOMAIN_MAPPER(record);
+    public EntityWorkflowTransition workflowTransitionMapper(Record record) {
+        return entityWorkflowTransitionDao.toDomainObject(record);
     }
 }

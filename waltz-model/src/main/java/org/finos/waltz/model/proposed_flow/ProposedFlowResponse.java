@@ -2,6 +2,7 @@ package org.finos.waltz.model.proposed_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
@@ -17,32 +18,31 @@ public abstract class ProposedFlowResponse {
 
     public abstract Long id();
 
-    public abstract Long sourceEntityId();
-
-    public abstract String sourceEntityKind();
-
-    public abstract Long targetEntityId();
-
-    public abstract String targetEntityKind();
-
     public abstract LocalDateTime createdAt();
 
     public abstract String createdBy();
 
     public abstract ProposedFlowCommand flowDef();
 
-    @Nullable
-    public abstract Long logicalFlowId();
-
-    @Nullable
-    public abstract Long physicalFlowId();
-
     public abstract EntityWorkflowState workflowState();
 
     @Nullable
     public abstract List<EntityWorkflowTransition> workflowTransitionList();
 
-    public abstract String proposalType();
+    @Deprecated
+    public abstract EntityReference sourceEntity();
+
+    @Deprecated
+    public abstract EntityReference targetEntity();
+
+    @Deprecated
+    public abstract ProposalType proposalType();
+
+    @Nullable
+    public abstract Long logicalFlowId();
+
+    @Nullable
+    public abstract Long physicalFlowId();
 
     @Nullable
     public abstract Long specificationId();

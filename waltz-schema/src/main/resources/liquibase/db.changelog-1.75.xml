@@ -25,7 +25,7 @@
         <tagDatabase tag="v1.74.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-    <!-- 4388 Create Table - ProposedFlow Table -->
+    <!-- 7345 Create Table - ProposedFlow Table -->
     <changeSet id="20251010-7345-1"
                author="kumarohb">
         <createTable tableName="proposed_flow"
@@ -85,7 +85,7 @@
 
     <changeSet id="20251010-7345-2"
                author="kumarohb">
-        <comment>4388: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
+        <comment>7345: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
 
         <createIndex indexName="idx_proposed_flow_source_entity_id_source_entity_kind"
                      tableName="proposed_flow"
@@ -97,7 +97,7 @@
 
     <changeSet id="20251010-7345-3"
                author="kumarohb">
-        <comment>4388: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
+        <comment>7345: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
 
         <createIndex indexName="idx_proposed_flow_target_entity_id_target_entity_kind"
                      tableName="proposed_flow"
@@ -112,7 +112,8 @@
 
         <sql>
             insert into entity_workflow_definition
-                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
+                (name, description)
+            values ('Propose Flow Lifecycle Workflow', 'Propose Flow Lifecycle Workflow');
         </sql>
     </changeSet>
 
@@ -143,34 +144,46 @@
             for APPLICATION , END_USER_APPLICATION, ACTOR
         </comment>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
+                                                      subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig where name = 'Flow Approvers'
+            from involvement_group ig
+            where name = 'Flow Approvers'
         </sql>
 
     </changeSet>
@@ -183,14 +196,16 @@
         </comment>
         <sql>
             insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
+            select 1, id
+            from involvement_kind ik
             where subject_kind = 'END_USER_APPLICATION'
               and name = 'Asset Owner'
         </sql>
 
         <sql>
             insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
+            select 1, id
+            from involvement_kind ik
             where subject_kind = 'END_USER_APPLICATION'
               and name = 'Administrative'
         </sql>
@@ -204,10 +219,12 @@
             against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
         </comment>
         <sql>
-            DELETE FROM involvement_group_entry
-            WHERE involvement_kind_id in (select id from involvement_kind ik
+            DELETE
+            FROM involvement_group_entry
+            WHERE involvement_kind_id in (select id
+                                          from involvement_kind ik
                                           where subject_kind = 'END_USER_APPLICATION'
-                                            and name  =  'Data Office Member')
+                                            and name = 'Data Office Member')
         </sql>
 
     </changeSet>

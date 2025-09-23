@@ -44,31 +44,14 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         S toState = transition.getToState();
 
         try {
-            // Currently the state machine will only return the next transition state and is not responsible for database updates
-            // 1. Log the transition
-//            transitionDao.createWorkflowTransition(
-//                    context.getWorkflowDefId(),
-//                    context.getEntityId(),
-//                    context.getEntityKind(),
-//                    currentState.name(),
-//                    toState.name(),
-//                    context.getReason(),
-//                    context.getUserId(),
-//                    "waltz"); // or some other provenance
-
-            // 2. Update the current state; insert if it's a new state
-            // Following would have to be either an insert for initial state or update for subsequent transitions
-//            stateDao.insertOrUpdate(
-//                    context.getWorkflowId(),
-//                    context.getEntityId(),
-//                    context.getEntityKind(),
-//                    toState.name(),
-//                    context.getUserId(),
-//                    "waltz",
-//                    context.getReason());
-
+            // Currently the state machine will only return the next transition state and is not
+            // responsible for database updates. The following steps can be considered to be taken from within
+            // 1. Log the transition; transitionDao.createWorkflowTransition
+            // 2. Update the current state; insert if it's a new state; stateDao.insertOrUpdate
+            // It would have to be either an insert for initial state or update for subsequent
+            // transitions.
             // 3. Execute supplementary listener only after successful persistence
-            // Listeners can be considered to work asynchronous, current implementation doesn't support that
+            // Listeners can be considered to work asynchronous, current implementation would have to be enhanced
             if (transition.getListener() != null) {
                 // Refreshing context object can be considered to reflect new changes
                 transition.getListener().onTransition(currentState, toState, context);
@@ -81,6 +64,15 @@ public class WorkflowStateMachine<S extends Enum<S>, A extends Enum<A>, C extend
         return toState;
     }
 
+    /**
+     * This gives out the next transition possible for the state machine with the given context.
+     * Unlike the fire() method, this doesn't throw an exception if no next transition is found.
+     *
+     * @param currentState
+     * @param action
+     * @param context
+     * @return
+     */
     public Optional<S> nextPossibleTransition(S currentState, A action, C context) {
         return transitionsByState
                 .getOrDefault(currentState, Collections.emptySet())
