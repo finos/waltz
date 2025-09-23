@@ -112,8 +112,7 @@
 
         <sql>
             insert into entity_workflow_definition
-                (name, description)
-            values ('Propose Flow Lifecycle Workflow', 'Propose Flow Lifecycle Workflow');
+                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
         </sql>
     </changeSet>
 
@@ -144,46 +143,34 @@
             for APPLICATION , END_USER_APPLICATION, ACTOR
         </comment>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
         <sql>
-            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind,
-                                                      subject_kind, qualifier_kind, qualifier_id)
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
-            from involvement_group ig
-            where name = 'Flow Approvers'
+            from involvement_group ig where name = 'Flow Approvers'
         </sql>
 
     </changeSet>

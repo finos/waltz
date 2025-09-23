@@ -47,6 +47,7 @@ import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
+import static org.finos.waltz.model.command.CommandOutcome.SUCCESS;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
@@ -100,7 +101,7 @@ public class ProposedFlowWorkflowService {
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
         String msg = PROPOSED_FLOW_CREATED_WITH_SUCCESS;
-        String outcome = CommandOutcome.SUCCESS.name();
+        CommandOutcome outcome = SUCCESS;
         Long proposedFlowId = null;
         EntityWorkflowDefinition workflowDefinition = null;
         try {
@@ -119,7 +120,7 @@ public class ProposedFlowWorkflowService {
                     username, PROPOSED_FLOW_SUBMITTED, PROPOSED_CREATE.name(), newState.name(), proposedFlowCommand.reason().description());
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
-            outcome = FAILURE.name();
+            outcome = FAILURE;
             LOG.error("Error Occurred : {} ", e.getMessage());
         }
 

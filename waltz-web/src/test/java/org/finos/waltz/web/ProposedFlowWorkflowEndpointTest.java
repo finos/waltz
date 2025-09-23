@@ -142,7 +142,7 @@ class ProposedFlowWorkflowEndpointTest {
                 "\n" +
                 "  \"target\": {\n" +
                 "\n" +
-                "    \"description\": \"App Description\"" +
+                "    \"description\": \"App Description\",\n" +
                 "\n" +
                 "    \"kind\": \"APPLICATION\",\n" +
                 "\n" +
@@ -166,7 +166,7 @@ class ProposedFlowWorkflowEndpointTest {
 
         ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
                 .message(SUCCESS.name())
-                .outcome(SUCCESS.name())
+                .outcome(SUCCESS)
                 .proposedFlowCommand(command)
                 .proposedFlowId(1L)
                 .workflowDefinitionId(1L)
