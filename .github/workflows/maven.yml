@@ -90,7 +90,7 @@ jobs:
       env:
         JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
         JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
-      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests clean package test site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
 
     - name: Publish build
       uses: actions/upload-artifact@v4
