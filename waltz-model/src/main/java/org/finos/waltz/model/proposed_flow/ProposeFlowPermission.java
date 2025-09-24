@@ -1,4 +1,4 @@
-package org.finos.waltz.model.utils;
+package org.finos.waltz.model.proposed_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,5 +12,6 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableProposeFlowPermission.class)
 public abstract class ProposeFlowPermission {
     public abstract Set<Operation> sourceApprover();
+
     public abstract Set<Operation> targetApprover();
 }

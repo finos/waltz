@@ -1,33 +1,19 @@
 package org.finos.waltz.web;
 
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
-import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.Reason;
-import org.finos.waltz.service.maker_checker.MakerCheckerService;
-import org.finos.waltz.web.endpoints.api.MakerCheckerEndpoint;
+import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.finos.waltz.web.endpoints.api.ProposedFlowWorkflowEndpoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,33 +24,26 @@ import spark.Response;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
-import static org.finos.waltz.model.EntityKind.APPLICATION;
-import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
+import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
+import static org.finos.waltz.model.command.CommandOutcome.SUCCESS;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MakerCheckerEndpointTest {
+class ProposedFlowWorkflowEndpointTest {
 
-    MakerCheckerEndpoint makerCheckerEndpoint;
+    ProposedFlowWorkflowEndpoint proposedFlowWorkflowEndpoint;
 
     @Mock
-    MakerCheckerService makerCheckerService;
+    ProposedFlowWorkflowService proposedFlowWorkflowService;
     @Mock
     private Request request;
     @Mock
@@ -72,7 +51,7 @@ class MakerCheckerEndpointTest {
 
     @BeforeEach
     public void setUp() {
-        makerCheckerEndpoint = new MakerCheckerEndpoint(makerCheckerService);
+        proposedFlowWorkflowEndpoint = new ProposedFlowWorkflowEndpoint(proposedFlowWorkflowService);
     }
 
     @Test
@@ -91,7 +70,7 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "    },\n" +
                 "\n" +
-                "    \"name\": \"Shreyans Jain\",\n" +
+                "    \"name\": \"XYZ\",\n" +
                 "\n" +
                 "    \"description\": \"\",\n" +
                 "\n" +
@@ -155,7 +134,7 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "    \"externalId\": \"109235-1\",\n" +
                 "\n" +
-                "    \"description\": \"Architecture tool to aggregate information from different source. To provide reporting and visualization across CT for applications, tech and data for both senior management and the architecture community.\",\n" +
+                "    \"description\": \"App Description\",\n" +
                 "\n" +
                 "    \"entityLifecycleStatus\": \"ACTIVE\"\n" +
                 "\n" +
@@ -163,7 +142,7 @@ class MakerCheckerEndpointTest {
                 "\n" +
                 "  \"target\": {\n" +
                 "\n" +
-                "    \"description\": \"db-GHS I(Geneos Hosting Services) s a Redhat virtualised platform that will host Geneos Gateway  instances to provide Hardware and Application monitoring throughout the bank. Geneos is the standard tool within Deutsche Bank for application monitoring. It is a full featured and fully customizable application monitoring tool. A powerful and customisable console enables real-time and historical metrics from application and infrastructure components to be visualised in an application, infrastructure or business centric way.  Notification of threshold breaches to support teams is automated though email, SMS, Symphony and dbUnity incident ticket as well as visually in the console.  Automated corrective actions, links to knowledge articles, operator commands and dashboards are just a few more of its many features.\\r\\n\\r\\nConfluence Link  -  https://confluence.intranet.db.com/display/GENEOS/Home\",\n" +
+                "    \"description\": \"App Description\",\n" +
                 "\n" +
                 "    \"kind\": \"APPLICATION\",\n" +
                 "\n" +
@@ -186,14 +165,14 @@ class MakerCheckerEndpointTest {
         ProposedFlowCommand command = getJsonMapper().readValue(requestBody, ProposedFlowCommand.class);
 
         ProposedFlowCommandResponse proposedFlowCommandResponse = ImmutableProposedFlowCommandResponse.builder()
-                .message("SUCCESS")
-                .outcome("SUCCESS")
+                .message(SUCCESS.name())
+                .outcome(SUCCESS)
                 .proposedFlowCommand(command)
                 .proposedFlowId(1L)
                 .workflowDefinitionId(1L)
                 .build();
-        when(makerCheckerService.proposeNewFlow(any(), any())).thenReturn(proposedFlowCommandResponse);
-        ProposedFlowCommandResponse result = makerCheckerEndpoint.proposeNewFlow(request, response);
+        when(proposedFlowWorkflowService.proposeNewFlow(any(), any())).thenReturn(proposedFlowCommandResponse);
+        ProposedFlowCommandResponse result = proposedFlowWorkflowEndpoint.proposeNewFlow(request, response);
 
         //Then
         assertNotNull(result);
@@ -205,12 +184,7 @@ class MakerCheckerEndpointTest {
         //Given
         long id = 42L;
 
-        EntityReference entityReference = ImmutableEntityReference.builder()
-                .kind(APPLICATION)
-                .id(33L)
-                .name("test")
-                .externalId("456-1")
-                .build();
+        EntityReference entityReference = mkRef(APPLICATION, 33L, "test");
 
         Reason reason = ImmutableReason.builder()
                 .description("test")
@@ -235,13 +209,7 @@ class MakerCheckerEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = ImmutableEntityReference.builder()
-                .id(18703L)
-                .kind(APPLICATION)
-                .name("AMG")
-                .externalId("60487-1")
-                .description("Testing")
-                .build();
+        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
@@ -251,39 +219,34 @@ class MakerCheckerEndpointTest {
                 .lastUpdatedBy("waltz")
                 .id(567)
                 .build();
-        EntityReference proposedFlowEntity = ImmutableEntityReference.builder()
-                .id(1L)
-                .kind(PROPOSED_FLOW)
-                .name("Proposed Flow")
-                .externalId("487-1")
-                .description("Testing")
-                .build();
+        EntityReference proposedFlowEntity = mkRef(PROPOSED_FLOW, 1L, PROPOSED_FLOW.prettyName(), "Testing", "487-1");
+
         EntityWorkflowState workflowState = ImmutableEntityWorkflowState.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
-                .state("PENDING_APPROVALS")
+                .state(PENDING_APPROVALS.name())
                 .build();
         EntityWorkflowTransition workflowTransition = ImmutableEntityWorkflowTransition.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
-                .fromState("PROPOSED_CREATE")
-                .toState("PENDING_APPROVALS")
+                .fromState(PROPOSED_CREATE.name())
+                .toState(PENDING_APPROVALS.name())
                 .reason("flow proposed")
                 .build();
         EntityWorkflowTransition workflowTransition2 = ImmutableEntityWorkflowTransition.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
-                .fromState("PENDING_APPROVALS")
-                .toState("SOURCE_APPROVED")
+                .fromState(PENDING_APPROVALS.name())
+                .toState(SOURCE_APPROVED.name())
                 .reason("source approved")
                 .build();
         List<EntityWorkflowTransition> workflowTransitionList = new ArrayList<>();
@@ -298,28 +261,26 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(ProposalType.valueOf("CREATE"))
+                .proposalType(CREATE)
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
                 .id(1L)
-                .sourceEntityId(601L)
-                .sourceEntityKind("APPLICATION")
-                .targetEntityId(602L)
-                .targetEntityKind("APPLICATION")
+                .sourceEntity(mkRef(APPLICATION, 601L))
+                .targetEntity(mkRef(APPLICATION, 602L))
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
-                .proposalType(CREATE.name())
+                .proposalType(CREATE)
                 .build();
 
         //When
         when(request.params("id")).thenReturn("42");
-        when(makerCheckerService.getProposedFlowById(id)).thenReturn(expected);
+        when(proposedFlowWorkflowService.getProposedFlowResponseById(id)).thenReturn(expected);
 
-        ProposedFlowResponse actual = makerCheckerEndpoint.getProposedFlowById(request, response);
+        ProposedFlowResponse actual = proposedFlowWorkflowEndpoint.getProposedFlowById(request, response);
 
         //Then
         assertEquals(expected, actual);
@@ -331,12 +292,7 @@ class MakerCheckerEndpointTest {
         //Given
         long id = 42L;
 
-        EntityReference entityReference = ImmutableEntityReference.builder()
-                .kind(APPLICATION)
-                .id(33L)
-                .name("test")
-                .externalId("456-1")
-                .build();
+        EntityReference entityReference = mkRef(APPLICATION, 33L, "test");
 
         Reason reason = ImmutableReason.builder()
                 .description("test")
@@ -361,13 +317,7 @@ class MakerCheckerEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = ImmutableEntityReference.builder()
-                .id(18703L)
-                .kind(APPLICATION)
-                .name("AMG")
-                .externalId("60487-1")
-                .description("Testing")
-                .build();
+        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
@@ -377,39 +327,34 @@ class MakerCheckerEndpointTest {
                 .lastUpdatedBy("waltz")
                 .id(567)
                 .build();
-        EntityReference proposedFlowEntity = ImmutableEntityReference.builder()
-                .id(1L)
-                .kind(PROPOSED_FLOW)
-                .name("Proposed Flow")
-                .externalId("487-1")
-                .description("Testing")
-                .build();
+        EntityReference proposedFlowEntity = mkRef(PROPOSED_FLOW, 1L, PROPOSED_FLOW.prettyName(), "Testing", "487-1");
+
         EntityWorkflowState workflowState = ImmutableEntityWorkflowState.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
-                .state("PENDING_APPROVALS")
+                .state(PENDING_APPROVALS.name())
                 .build();
         EntityWorkflowTransition workflowTransition = ImmutableEntityWorkflowTransition.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
                 .fromState("PROPOSED_CREATE")
-                .toState("PENDING_APPROVALS")
+                .toState(PENDING_APPROVALS.name())
                 .reason("flow proposed")
                 .build();
         EntityWorkflowTransition workflowTransition2 = ImmutableEntityWorkflowTransition.builder()
                 .lastUpdatedAt(LocalDateTime.now())
-                .lastUpdatedBy("rajendra.rai@db.com")
+                .lastUpdatedBy("xyz@pqr.com")
                 .provenance("waltz")
                 .workflowId(7L)
                 .entityReference(proposedFlowEntity)
-                .fromState("PENDING_APPROVALS")
-                .toState("SOURCE_APPROVED")
+                .fromState(PENDING_APPROVALS.name())
+                .toState(SOURCE_APPROVED.name())
                 .reason("source approved")
                 .build();
         List<EntityWorkflowTransition> workflowTransitionList = new ArrayList<>();
@@ -424,28 +369,26 @@ class MakerCheckerEndpointTest {
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(ProposalType.valueOf("CREATE"))
+                .proposalType(CREATE)
                 .build();
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
                 .id(1L)
-                .sourceEntityId(601L)
-                .sourceEntityKind("APPLICATION")
-                .targetEntityId(602L)
-                .targetEntityKind("APPLICATION")
+                .sourceEntity(mkRef(APPLICATION, 601L))
+                .targetEntity(mkRef(APPLICATION, 602L))
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
-                .proposalType(CREATE.name())
+                .proposalType(CREATE)
                 .build();
         List<ProposedFlowResponse> expectedList = new ArrayList<>();
         expectedList.add(expected);
         IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
-                .entityReference(mkRef(EntityKind.PERSON,3025761))
-                        .scope(CHILDREN)
-                                .build();
+                .entityReference(mkRef(PERSON, 3025761))
+                .scope(CHILDREN)
+                .build();
 
         String requestBody = "{\n" +
 
@@ -458,9 +401,9 @@ class MakerCheckerEndpointTest {
                 "}";
         //When
         when(request.bodyAsBytes()).thenReturn(requestBody.getBytes());
-        when(makerCheckerService.getProposedFlows(options)).thenReturn(expectedList);
+        when(proposedFlowWorkflowService.getProposedFlows(options)).thenReturn(expectedList);
 
-        List<ProposedFlowResponse> actual = makerCheckerEndpoint.findProposedFlows(request, response);
+        List<ProposedFlowResponse> actual = proposedFlowWorkflowEndpoint.findProposedFlows(request, response);
 
         //Then
         assertEquals(expectedList, actual);
@@ -477,7 +420,7 @@ class MakerCheckerEndpointTest {
 
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
-                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+                () -> proposedFlowWorkflowEndpoint.getProposedFlowById(request, response)
         );
 
         //Then
@@ -492,7 +435,7 @@ class MakerCheckerEndpointTest {
         when(request.params("id")).thenThrow(new NumberFormatException("For input string: \"abc\""));
         NumberFormatException ex = assertThrows(
                 NumberFormatException.class,
-                () -> makerCheckerEndpoint.getProposedFlowById(request, response)
+                () -> proposedFlowWorkflowEndpoint.getProposedFlowById(request, response)
         );
 
         //Then
@@ -508,9 +451,9 @@ class MakerCheckerEndpointTest {
 
         //When
         when(request.params("id")).thenReturn("99");
-        when(makerCheckerService.getProposedFlowById(id)).thenReturn(null);
+        when(proposedFlowWorkflowService.getProposedFlowResponseById(id)).thenReturn(null);
 
-        ProposedFlowResponse result = makerCheckerEndpoint.getProposedFlowById(request, response);
+        ProposedFlowResponse result = proposedFlowWorkflowEndpoint.getProposedFlowById(request, response);
 
         //Then
         assertNull(result);
@@ -525,11 +468,11 @@ class MakerCheckerEndpointTest {
 
         //When
         when(request.params("id")).thenReturn("77");
-        when(makerCheckerService.getProposedFlowById(id))
+        when(proposedFlowWorkflowService.getProposedFlowResponseById(id))
                 .thenThrow(new NoSuchElementException("ProposedFlow not found: 77"));
 
         NoSuchElementException ex = assertThrows(NoSuchElementException.class,
-                () -> makerCheckerEndpoint.getProposedFlowById(request, response));
+                () -> proposedFlowWorkflowEndpoint.getProposedFlowById(request, response));
 
         //Then
         assertEquals("ProposedFlow not found: 77", ex.getMessage());

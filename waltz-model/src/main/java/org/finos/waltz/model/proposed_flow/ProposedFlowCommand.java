@@ -18,15 +18,23 @@ import static java.util.Collections.emptySet;
 @JsonDeserialize(as = ImmutableProposedFlowCommand.class)
 public abstract class ProposedFlowCommand implements Command {
     public abstract EntityReference source();
+
     public abstract EntityReference target();
+
     public abstract Reason reason();
+
     public abstract Optional<Long> logicalFlowId();
+
     public abstract Optional<Long> physicalFlowId();
+
     public abstract PhysicalSpecification specification();
+
     public abstract FlowAttributes flowAttributes();
+
     @Value.Default
     public Set<Long> dataTypeIds() {
         return emptySet();
     }
+
     public abstract ProposalType proposalType();
 }

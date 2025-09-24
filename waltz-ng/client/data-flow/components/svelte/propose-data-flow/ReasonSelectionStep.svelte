@@ -2,10 +2,7 @@
     import _ from "lodash";
     import StepHeader from "../../../../physical-flows/svelte/StepHeader.svelte";
     import {expandedSections, proposalReason} from "./propose-data-flow-store";
-    import {
-        determineExpandedSections,
-        sections
-    } from "./propose-data-flow-utils";
+    import {determineExpandedSections, sections} from "./propose-data-flow-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
     import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
@@ -55,7 +52,6 @@
         activeMode = Modes.SELECT;
     }
 
-    // placeholder for when we 'create' the feature.maker-checker.config
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
     $: done = workingCopy.rating[0] && true;
 

@@ -25,7 +25,7 @@
         <tagDatabase tag="v1.74.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-    <!-- 4388 Create Table - ProposedFlow Table -->
+    <!-- 7345 Create Table - ProposedFlow Table -->
     <changeSet id="20251010-7345-1"
                author="kumarohb">
         <createTable tableName="proposed_flow"
@@ -85,7 +85,7 @@
 
     <changeSet id="20251010-7345-2"
                author="kumarohb">
-        <comment>4388: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
+        <comment>7345: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
 
         <createIndex indexName="idx_proposed_flow_source_entity_id_source_entity_kind"
                      tableName="proposed_flow"
@@ -97,7 +97,7 @@
 
     <changeSet id="20251010-7345-3"
                author="kumarohb">
-        <comment>4388: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
+        <comment>7345: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
 
         <createIndex indexName="idx_proposed_flow_target_entity_id_target_entity_kind"
                      tableName="proposed_flow"
@@ -122,18 +122,9 @@
             <column name="key" value="FLOW_PROPOSER"/>
             <column name="name" value="FLOW PROPOSER"/>
             <column name="description" value="FLOW PROPOSER"/>
-            <column name="is_custom" valueBoolean="true"/>
+            <column name="is_custom" valueBoolean="false"/>
             <column name="user_selectable" valueBoolean="true"/>
         </insert>
-    </changeSet>
-
-    <changeSet id="20251010-7345-6"
-               author="jindkul">
-        <update tableName="settings">
-            <column name="value"
-                    value="BOOKMARK_EDITOR,FLOW_PROPOSER"/>
-            <where>name='server.authentication.roles.default'</where>
-        </update>
     </changeSet>
 
     <changeSet id="20251010-7345-7"
@@ -175,44 +166,7 @@
 
     </changeSet>
 
-    <changeSet id="20251010-7345-8"
-               author="jindkul">
-        <comment>
-            adding Asset Owner of End_User_Application to involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Asset Owner'
-        </sql>
-
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Administrative'
-        </sql>
-
-    </changeSet>
-
-    <changeSet id="20251010-7345-9"
-               author="jindkul">
-        <comment>
-            deleting Data Office Member of END_USER_APPLICATION from involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            DELETE FROM involvement_group_entry
-            WHERE involvement_kind_id in (select id from involvement_kind ik
-                                          where subject_kind = 'END_USER_APPLICATION'
-                                            and name  =  'Data Office Member')
-        </sql>
-
-    </changeSet>
-    
-    <changeSet id="20251010-7345-11" author="shreyans.jain@db.com">
+    <changeSet id="20251010-7345-8" author="shreyans.jain@db.com">
         <insert tableName="settings">
             <column name="name" value="feature.data-flow-proposals.enabled"/>
             <column name="value" value="false"/>
