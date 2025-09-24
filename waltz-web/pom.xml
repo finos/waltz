@@ -160,7 +160,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <archiveClasses>true</archiveClasses>
                     <webResources>
@@ -171,7 +171,7 @@
                 <!-- Build the front end -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <id>install</id>
@@ -211,7 +211,7 @@
             <plugin>
                 <!-- Copy the front end into the static folder for JARs-->
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>copy-js</id>
