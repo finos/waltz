@@ -119,7 +119,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: surefire-results-${{ matrix.db }}.html
-        path: target/site/surefire-report.html
+        path: target/site/surefire.html
   
     - name: Login to GitHub Registry
       if: ${{ github.ref_type == 'tag' }}
