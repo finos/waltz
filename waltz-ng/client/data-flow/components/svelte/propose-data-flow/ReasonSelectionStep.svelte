@@ -62,8 +62,6 @@
     $: expanded = _.includes($expandedSections, sections.REASON);
     $: ratingScheme = $ratingSchemeCall?.data.filter(t => t.externalId === ratingSchemeExtId)[0];
 
-    $: console.log(ratingScheme);
-
     function onRatingsSelect(evt) {
         workingCopy.rating = evt.detail;
         const emittedEvent = {ratingSchemeItems: workingCopy.rating};
