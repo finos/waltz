@@ -211,5 +211,22 @@
         </sql>
 
     </changeSet>
+    
+    <changeSet id="20251010-7345-11" author="shreyans.jain@db.com">
+        <insert tableName="settings">
+            <column name="name" value="feature.data-flow-proposals.enabled"/>
+            <column name="value" value="false"/>
+            <column name="description" value="Toggles data flow proposal workflow. Can be true or false."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="settings">
+            <column name="name" value="feature.data-flow-proposals.rating-scheme"/>
+            <column name="value" value=""/>
+            <column name="description" value="	The External Identifier of the rating scheme that is configured as the data flow proposal reason.
+            This MUST be configured and the Rating Scheme MUST be defined for data flow proposals to work."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>
