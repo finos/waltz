@@ -25,7 +25,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
-import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -42,7 +41,7 @@ import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORK
 @Repository
 public class EntityWorkflowTransitionDao {
 
-    private static final RecordMapper<? super Record, EntityWorkflowTransition> TO_DOMAIN_MAPPER = record -> {
+    public static final RecordMapper<? super Record, EntityWorkflowTransition> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowTransitionRecord r = record.into(ENTITY_WORKFLOW_TRANSITION);
 
         return ImmutableEntityWorkflowTransition
@@ -60,7 +59,6 @@ public class EntityWorkflowTransitionDao {
                 .provenance(r.getProvenance())
                 .build();
     };
-
 
     private final DSLContext dsl;
 
@@ -106,22 +104,5 @@ public class EntityWorkflowTransitionDao {
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
                 .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-    public static EntityWorkflowTransition TO_DOMAIN_MAPPER(Record record){
-        return ImmutableEntityWorkflowTransition
-                .builder()
-                .workflowId(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID))
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND)))
-                        .id(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.ENTITY_ID))
-                        .build())
-                .fromState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.FROM_STATE))
-                .toState(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.TO_STATE))
-                .reason(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.REASON))
-                .lastUpdatedAt(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT).toLocalDateTime())
-                .lastUpdatedBy(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY))
-                .provenance(record.get(Tables.ENTITY_WORKFLOW_TRANSITION.PROVENANCE))
-                .build();
     }
 }

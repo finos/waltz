@@ -214,6 +214,7 @@ const dependencies = [
     Playpen5(),
     ProcessDiagram(),
     Profile(),
+    ProposedFlow(),
     Ratings(),
     ReportGrid(),
     Roadmap(),
@@ -232,8 +233,7 @@ const dependencies = [
     UserContribution(),
     TaxonomyManagement(),
     Welcome(),
-    Widgets(),
-    ProposedFlow()
+    Widgets()
 ];
 
 

@@ -27,16 +27,15 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
-import org.finos.waltz.model.entity_workflow.*;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.jooq.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -71,7 +70,7 @@ public class EntityWorkflowService {
                                                                        EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
-        return entityWorkflowStateDao.getWorkflowState(workflowId, ref);
+        return entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workflowId, ref);
     }
 
 
@@ -119,24 +118,6 @@ public class EntityWorkflowService {
         changeLogService.write(changeLogList);
     }
 
-    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
-        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
-        checkNotNull(ref, "ref cannot be null");
-
-        EntityWorkflowDefinition entityWorkflowDefinition = searchByName(workFlowDefName);
-        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
-                .flatMap(EntityWorkflowDefinition::id)
-                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getWorkflowState(workFlowId, ref);
-        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
-
-        return ImmutableEntityWorkflowView.builder()
-                .workflowDefinition(entityWorkflowDefinition)
-                .workflowState(entityWorkflowState)
-                .workflowTransitionList(entityWorkflowTransitionList)
-                .build();
-    }
-
     private ImmutableChangeLog mkChangeLog(EntityReference entityReference,
                                            String userId,
                                            Operation operation,
@@ -148,13 +129,5 @@ public class EntityWorkflowService {
                 .operation(operation)
                 .severity(Severity.INFORMATION)
                 .build();
-    }
-
-    public EntityWorkflowState workflowStateMapper(Record record){
-        return entityWorkflowStateDao.TO_DOMAIN_MAPPER(record);
-    }
-
-    public EntityWorkflowTransition workflowTransitionMapper(Record record){
-        return entityWorkflowTransitionDao.TO_DOMAIN_MAPPER(record);
     }
 }
