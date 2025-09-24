@@ -1,4 +1,4 @@
-package org.finos.waltz.service.maker_checker;
+package org.finos.waltz.service.proposed_flow_workflow;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -17,14 +17,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class MakerCheckerPermissionService {
-    private static final Logger LOG = LoggerFactory.getLogger(MakerCheckerPermissionService.class);
+public class ProposedFlowWorkflowPermissionService {
+    private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowWorkflowPermissionService.class);
     private final InvolvementService involvementService;
     private final PermissionGroupService permissionGroupService;
 
     @Autowired
-    MakerCheckerPermissionService(InvolvementService involvementService,
-                                  PermissionGroupService permissionGroupService) {
+    ProposedFlowWorkflowPermissionService(InvolvementService involvementService,
+                                          PermissionGroupService permissionGroupService) {
         this.involvementService = involvementService;
         this.permissionGroupService = permissionGroupService;
     }

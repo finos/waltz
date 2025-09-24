@@ -25,7 +25,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
-import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -41,7 +40,7 @@ import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_
 
 @Repository
 public class EntityWorkflowStateDao {
-    private static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
+    public static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
         return ImmutableEntityWorkflowState
@@ -58,22 +57,6 @@ public class EntityWorkflowStateDao {
                 .provenance(r.getProvenance())
                 .build();
     };
-
-    public static EntityWorkflowState toDomainObject(Record r) {
-        return ImmutableEntityWorkflowState
-                .builder()
-                .workflowId(r.get(Tables.ENTITY_WORKFLOW_STATE.WORKFLOW_ID))
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(r.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_KIND)))
-                        .id(r.get(Tables.ENTITY_WORKFLOW_STATE.ENTITY_ID))
-                        .build())
-                .state(r.get(Tables.ENTITY_WORKFLOW_STATE.STATE))
-                .description(r.get(Tables.ENTITY_WORKFLOW_STATE.DESCRIPTION))
-                .lastUpdatedAt(r.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT).toLocalDateTime())
-                .lastUpdatedBy(r.get(Tables.ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY))
-                .provenance(r.get(Tables.ENTITY_WORKFLOW_STATE.PROVENANCE))
-                .build();
-    }
 
     private final DSLContext dsl;
 

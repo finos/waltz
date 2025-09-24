@@ -122,18 +122,9 @@
             <column name="key" value="FLOW_PROPOSER"/>
             <column name="name" value="FLOW PROPOSER"/>
             <column name="description" value="FLOW PROPOSER"/>
-            <column name="is_custom" valueBoolean="true"/>
+            <column name="is_custom" valueBoolean="false"/>
             <column name="user_selectable" valueBoolean="true"/>
         </insert>
-    </changeSet>
-
-    <changeSet id="20251010-7345-6"
-               author="jindkul">
-        <update tableName="settings">
-            <column name="value"
-                    value="BOOKMARK_EDITOR,FLOW_PROPOSER"/>
-            <where>name='server.authentication.roles.default'</where>
-        </update>
     </changeSet>
 
     <changeSet id="20251010-7345-7"
@@ -171,47 +162,6 @@
             INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
             select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
             from involvement_group ig where name = 'Flow Approvers'
-        </sql>
-
-    </changeSet>
-
-    <changeSet id="20251010-7345-8"
-               author="jindkul">
-        <comment>
-            adding Asset Owner of End_User_Application to involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id
-            from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Asset Owner'
-        </sql>
-
-        <sql>
-            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
-            select 1, id
-            from involvement_kind ik
-            where subject_kind = 'END_USER_APPLICATION'
-              and name = 'Administrative'
-        </sql>
-
-    </changeSet>
-
-    <changeSet id="20251010-7345-9"
-               author="jindkul">
-        <comment>
-            deleting Data Office Member of END_USER_APPLICATION from involvement_group_entry
-            against involvement_group_id ( involvement_group_id : 1 belongs to Flow Approvers )
-        </comment>
-        <sql>
-            DELETE
-            FROM involvement_group_entry
-            WHERE involvement_kind_id in (select id
-                                          from involvement_kind ik
-                                          where subject_kind = 'END_USER_APPLICATION'
-                                            and name = 'Data Office Member')
         </sql>
 
     </changeSet>

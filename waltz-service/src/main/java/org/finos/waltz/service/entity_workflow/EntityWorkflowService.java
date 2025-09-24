@@ -29,7 +29,6 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_workflow.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.jooq.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -148,13 +147,5 @@ public class EntityWorkflowService {
                 .operation(operation)
                 .severity(Severity.INFORMATION)
                 .build();
-    }
-
-    public EntityWorkflowState workflowStateMapper(Record record) {
-        return entityWorkflowStateDao.toDomainObject(record);
-    }
-
-    public EntityWorkflowTransition workflowTransitionMapper(Record record) {
-        return entityWorkflowTransitionDao.toDomainObject(record);
     }
 }

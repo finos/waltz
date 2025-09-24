@@ -4,7 +4,7 @@ import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.proposed_flow.*;
-import org.finos.waltz.service.maker_checker.ProposedFlowWorkflowService;
+import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
