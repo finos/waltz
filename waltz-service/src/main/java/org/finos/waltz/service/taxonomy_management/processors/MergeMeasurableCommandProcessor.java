@@ -105,8 +105,9 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
 
         String targetName = getTargetName(cmd);
         IdSelectionOptions selectionOptions = mkOpts(measurableToMerge.entityReference(), HierarchyQueryScope.EXACT); // children are migrated, do not want to delete their data
+        Long measurableCategoryId = cmd.changeDomain().id(); //get the measurable category id
 
-        taxonomyManagementHelper.migrateMeasurable(selectionOptions, target, userId);
+        taxonomyManagementHelper.migrateMeasurable(selectionOptions, target, userId, measurableCategoryId);
 
         int removedBookmarks = taxonomyManagementHelper.removeBookmarks(selectionOptions);
         int removedInvolvements = taxonomyManagementHelper.removeInvolvements(selectionOptions);
