@@ -77,6 +77,15 @@ jobs:
       if: ${{ github.ref_type == 'tag' }}
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
+    - name: Generate effective POM
+      run: mvn help:effective-pom -Dverbose -Doutput=effective-pom.xml
+
+    - name: Upload effective POM
+      uses: actions/upload-artifact@v4
+      with:
+        name: effective-pom
+        path: effective-pom.xml
+
     - name: Build with Maven (DB = ${{ matrix.db }})
       env:
         JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
