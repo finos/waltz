@@ -78,13 +78,13 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Generate effective POM
-      run: mvn help:effective-pom -Dverbose -Doutput=effective-pom.xml
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests -Dverbose -Doutput=effective-pom-${{ matrix.db }}.xml
 
     - name: Upload effective POM
       uses: actions/upload-artifact@v4
       with:
-        name: effective-pom
-        path: effective-pom.xml
+        name: effective-pom-${{ matrix.db }}
+        path: effective-pom-${{ matrix.db }}.xml
 
     - name: Build with Maven (DB = ${{ matrix.db }})
       env:
