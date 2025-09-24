@@ -266,14 +266,11 @@ class ProposedFlowWorkflowEndpointTest {
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
                 .id(1L)
-                .sourceEntity(mkRef(APPLICATION, 601L))
-                .targetEntity(mkRef(APPLICATION, 602L))
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
-                .proposalType(CREATE)
                 .build();
 
         //When
@@ -374,14 +371,11 @@ class ProposedFlowWorkflowEndpointTest {
 
         ProposedFlowResponse expected = ImmutableProposedFlowResponse.builder()
                 .id(1L)
-                .sourceEntity(mkRef(APPLICATION, 601L))
-                .targetEntity(mkRef(APPLICATION, 602L))
                 .createdAt(LocalDateTime.now())
                 .createdBy("anonymous")
                 .flowDef(proposedFlowcommand)
                 .workflowState(workflowState)
                 .workflowTransitionList(workflowTransitionList)
-                .proposalType(CREATE)
                 .build();
         List<ProposedFlowResponse> expectedList = new ArrayList<>();
         expectedList.add(expected);
