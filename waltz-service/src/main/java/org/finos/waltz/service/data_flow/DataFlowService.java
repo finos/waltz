@@ -1,6 +1,7 @@
 package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -12,9 +13,9 @@ import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
-import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -24,12 +25,13 @@ import java.util.Optional;
 public class DataFlowService {
     private static final Logger LOG = LoggerFactory.getLogger(DataFlowService.class);
 
-    private final ProposedFlowWorkflowService proposedFlowWorkflowService;
+    private final ProposedFlowDao proposedFlowDao;
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
 
-    public DataFlowService(ProposedFlowWorkflowService proposedFlowWorkflowService, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService) {
-        this.proposedFlowWorkflowService = proposedFlowWorkflowService;
+    @Autowired
+    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService) {
+        this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
     }
@@ -48,7 +50,7 @@ public class DataFlowService {
         PhysicalFlowCreateCommandResponse physicalFlow;
         LogicalFlow logicalFlow;
 
-        ProposedFlowResponse proposedFlow = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
+        ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         LOG.info("Proposed flow definition : {}", proposedFlow);
 
         Optional<Long> logicalFlowId = proposedFlow.flowDef().logicalFlowId();

@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.*;
-import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
@@ -30,7 +28,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
@@ -42,8 +39,6 @@ import static org.finos.waltz.service.workflow_state_machine.proposed_flow.Propo
 
 @Service
 public class ProposedFlowWorkflowService {
-    public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
-
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowWorkflowService.class);
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
@@ -88,7 +83,7 @@ public class ProposedFlowWorkflowService {
         try {
             proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
             EntityReference proposedFlowRef = mkRef(PROPOSED_FLOW, proposedFlowId);
-            workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+            workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
             // Get current state and build context
             ProposedFlowWorkflowContext workflowContext = new ProposedFlowWorkflowContext(
@@ -114,46 +109,23 @@ public class ProposedFlowWorkflowService {
                 .build();
     }
 
-    public ProposedFlowResponse getProposedFlowResponseById(long id) {
-        ProposedFlowRecord proposedFlowRecord = proposedFlowDao.getProposedFlowById(id);
-        checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
-
-        EntityReference entityReference = mkRef(PROPOSED_FLOW, proposedFlowRecord.getId());
-        EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
-        try {
-            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
-
-            return ImmutableProposedFlowResponse.builder()
-                    .id(proposedFlowRecord.getId())
-                    .sourceEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getSourceEntityKind()), proposedFlowRecord.getSourceEntityId()))
-                    .targetEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getTargetEntityKind()), proposedFlowRecord.getTargetEntityId()))
-                    .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
-                    .createdBy(proposedFlowRecord.getCreatedBy())
-                    .flowDef(flowDefinition)
-                    .workflowState(entityWorkflowView.workflowState())
-                    .workflowTransitionList(entityWorkflowView.workflowTransitionList())
-                    .proposalType(ProposalType.valueOf(proposedFlowRecord.getProposalType()))
-                    .build();
-
-        } catch (JsonProcessingException e) {
-            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
-            throw new IllegalArgumentException("Invalid flow definition JSON", e);
-        }
-    }
-
     public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
-        EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         return proposedFlowDao.getProposedFlowsBySelector(
                 proposedFlowIdSelectorFactory.apply(options),
                 workflowDefinition.id().get()
         );
     }
 
+    public ProposedFlowResponse getProposedFlowResponseById(long id) {
+        return proposedFlowDao.getProposedFlowResponseById(id);
+    }
+
     public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowResponse proposedFlow = getProposedFlowResponseById(proposedFlowId);
+        ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         checkNotNull(proposedFlow, "No proposed flow found");
 
         // Check for approval/rejection permissions
@@ -208,8 +180,8 @@ public class ProposedFlowWorkflowService {
             }
 
             // Refresh Return Object
-            EntityWorkflowView entityWorkflowView = entityWorkflowService.getEntityWorkflowView(
-                    PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
+            EntityWorkflowView entityWorkflowView = proposedFlowDao.getEntityWorkflowView(
+                    ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
             proposedFlow = ImmutableProposedFlowResponse
                     .copyOf(proposedFlow)
                     .withWorkflowState(entityWorkflowView.workflowState())
@@ -227,7 +199,7 @@ public class ProposedFlowWorkflowService {
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
         if (PROPOSED_FLOW.equals(entityRef.kind())) {
-            ProposedFlowResponse flowResponse = getProposedFlowResponseById(entityRef.id());
+            ProposedFlowResponse flowResponse = proposedFlowDao.getProposedFlowResponseById(entityRef.id());
             return permissionService.checkUserPermission(username,
                     flowResponse.sourceEntity(),
                     flowResponse.targetEntity()

@@ -36,12 +36,12 @@ import java.util.Set;
 import static java.time.LocalDateTime.now;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
-import static org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {

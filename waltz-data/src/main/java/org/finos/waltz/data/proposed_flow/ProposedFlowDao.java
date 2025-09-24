@@ -2,11 +2,12 @@ package org.finos.waltz.data.proposed_flow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_workflow.*;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -22,8 +23,11 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -33,6 +37,7 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 
 @Repository
 public class ProposedFlowDao {
+    public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
 
     public static ProposedFlowRecord TO_DOMAIN_MAPPER(Record record) {
@@ -53,13 +58,15 @@ public class ProposedFlowDao {
     private final DSLContext dsl;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
+    private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
     @Autowired
-    public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao) {
+    public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
         checkNotNull(dsl, "dsl cannot be null");
 
         this.entityWorkflowStateDao = entityWorkflowStateDao;
         this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
+        this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.dsl = dsl;
     }
 
@@ -92,6 +99,50 @@ public class ProposedFlowDao {
                 .fetchOneInto(ProposedFlowRecord.class);
     }
 
+    public ProposedFlowResponse getProposedFlowResponseById(long id) {
+        ProposedFlowRecord proposedFlowRecord = getProposedFlowById(id);
+        checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
+
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
+        EntityWorkflowView entityWorkflowView = getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
+        try {
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+
+            return ImmutableProposedFlowResponse.builder()
+                    .id(proposedFlowRecord.getId())
+                    .sourceEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getSourceEntityKind()), proposedFlowRecord.getSourceEntityId()))
+                    .targetEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getTargetEntityKind()), proposedFlowRecord.getTargetEntityId()))
+                    .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                    .createdBy(proposedFlowRecord.getCreatedBy())
+                    .flowDef(flowDefinition)
+                    .workflowState(entityWorkflowView.workflowState())
+                    .workflowTransitionList(entityWorkflowView.workflowTransitionList())
+                    .proposalType(ProposalType.valueOf(proposedFlowRecord.getProposalType()))
+                    .build();
+
+        } catch (JsonProcessingException e) {
+            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
+            throw new IllegalArgumentException("Invalid flow definition JSON", e);
+        }
+    }
+
+    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
+        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
+        checkNotNull(ref, "ref cannot be null");
+
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(workFlowDefName);
+        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, ref);
+        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
+
+        return ImmutableEntityWorkflowView.builder()
+                .workflowDefinition(entityWorkflowDefinition)
+                .workflowState(entityWorkflowState)
+                .workflowTransitionList(entityWorkflowTransitionList)
+                .build();
+    }
 
     public List<ProposedFlowResponse> getProposedFlowsBySelector(Select<Record1<Long>> flowIdSelector, Long workflowId) throws JsonProcessingException {
         Result<Record> flatResults = dsl
