@@ -80,6 +80,11 @@ jobs:
     - name: Generate effective POM
       run: mvn help:effective-pom -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests -Dverbose -Doutput=effective-pom-${{ matrix.db }}.xml
 
+    - name: Search for illegal <status> tag
+      run: |
+        grep -Rni --include="pom.xml" "<status>" . || true
+        grep -Rni --include="pom.xml" "<distributionManagement>" . || true
+
     - name: Upload effective POM
       uses: actions/upload-artifact@v4
       with:
