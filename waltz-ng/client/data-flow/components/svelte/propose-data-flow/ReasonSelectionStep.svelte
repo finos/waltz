@@ -7,6 +7,7 @@
     import {createEventDispatcher, onMount} from "svelte";
     import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
     import RatingPicker from "../../../../common/svelte/RatingPicker.svelte";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let ratingSchemeExtId;
 
@@ -102,12 +103,20 @@
 
                 <form on:submit|preventDefault={save}>
                     {#if ratingScheme}
+                        {#if ratingScheme.ratings?.length}
                         <RatingPicker scheme={ratingScheme}
                                       isMultiSelect={false}
                                       selectedRatings={workingCopy.rating}
                                       on:select={onRatingsSelect}/>
+                        {:else}
+                            <NoData>Reasons have not been defined.</NoData>
+                        {/if}
                     {:else}
-                        <div>Loading reasons...</div>
+                        {#if ratingSchemeExtId}
+                            <div>Loading reasons...</div>
+                        {:else}
+                            <NoData>Reasons have not been defined.</NoData>
+                        {/if}
                     {/if}
 
                     <button class="btn btn-skinny"

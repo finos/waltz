@@ -94,11 +94,11 @@ const columnDefs = [
         })
     },
     {
-        field: "proposalType",
+        field: "flowDef.proposalType",
         name: "Change",
         cellRendererComponent: Pill,
         cellRendererProps: row => ({
-            pillKey: row.proposalType,
+            pillKey: row.flowDef.proposalType,
             pillDefs: changeTypePillDefs
         })
     },
@@ -143,16 +143,16 @@ $: gridData = flows && flows.length
 $: filteredGridData = gridData
     ? gridData
         .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.workflowState.state))
-        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.proposalType))
+        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.flowDef.proposalType))
         .filter(d => ($filters.proposer.length === 0) || $filters.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
         .sort((a, b) => $filters.state.indexOf(a.workflowState.state) - $filters.state.indexOf(b.workflowState.state))
-        .sort((a, b) => $filters.change.indexOf(a.proposalType) - $filters.change.indexOf(b.proposalType))
+        .sort((a, b) => $filters.change.indexOf(a.flowDef.proposalType) - $filters.change.indexOf(b.flowDef.proposalType))
         .sort((a, b) => $filters.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
             - $filters.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
     : [];
 
 $: stateCounts = _.countBy(gridData, "workflowState.state");
-$: changeTypeCounts = _.countBy(gridData, "proposalType");
+$: changeTypeCounts = _.countBy(gridData, "flowDef.proposalType");
 $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "USER" : "OTHERS");
 
 $: filteredDataSize = filteredGridData.length;
