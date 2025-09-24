@@ -21,7 +21,7 @@ package org.finos.waltz.integration_test.inmem.dao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -149,7 +149,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
             long proposedFlowId = proposedFlowDao.saveProposedFlow("testUser", command);
             assertTrue(proposedFlowId > 0);
 
-            ProposedFlowRecord proposedFlow = proposedFlowDao.getProposedFlowById(proposedFlowId);
+            ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
             assertNotNull(proposedFlow);
         } catch (Exception e) {
             e.printStackTrace();

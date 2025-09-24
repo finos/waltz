@@ -68,21 +68,6 @@ public class ProposedFlowDao {
         return proposedFlowRecord.getId();
     }
 
-    /**
-     * Fetches the single ProposedFlow row whose primary-key equals the given id.
-     *
-     * @param id primary key of the row (e.g. 1)
-     * @return ProposedFlowRecord and null if no record found for the given id
-     */
-
-    public ProposedFlowRecord getProposedFlowById(long id) {
-        return dsl
-                .select(PROPOSED_FLOW.fields())
-                .from(PROPOSED_FLOW)
-                .where(PROPOSED_FLOW.ID.eq(id))
-                .fetchOneInto(ProposedFlowRecord.class);
-    }
-
     public ProposedFlowResponse getProposedFlowResponseById(long id) {
         ProposedFlowRecord proposedFlowRecord = getProposedFlowById(id);
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
@@ -193,6 +178,14 @@ public class ProposedFlowDao {
                 .workflowState(entityWorkflowState)
                 .workflowTransitionList(updatedTransitions)
                 .build();
+    }
+
+    private ProposedFlowRecord getProposedFlowById(long id) {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOneInto(ProposedFlowRecord.class);
     }
 }
 
