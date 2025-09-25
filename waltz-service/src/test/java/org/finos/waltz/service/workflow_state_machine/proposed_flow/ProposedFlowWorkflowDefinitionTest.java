@@ -111,19 +111,21 @@ class ProposedFlowWorkflowDefinitionTest {
 
     @Test
     void testFullyApprovedTransition_UserIsSourceApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED)
-                .setCurrentState(TARGET_APPROVED)
-                .setPrevState(SOURCE_APPROVED);
-        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, APPROVE, context);
+        ProposedFlowWorkflowState currentState = SOURCE_APPROVED;
+        ProposedFlowWorkflowContext context = createContext(true, false, currentState)
+                .setCurrentState(currentState)
+                .setPrevState(TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(currentState, APPROVE, context);
         assertEquals(FULLY_APPROVED, newState);
     }
 
     @Test
     void testFullyApprovedTransition_UserIsTargetApprover() throws TransitionNotFoundException, TransitionPredicateFailedException {
-        ProposedFlowWorkflowContext context = createContext(false, true, SOURCE_APPROVED)
-                .setCurrentState(SOURCE_APPROVED)
-                .setPrevState(TARGET_APPROVED);
-        ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, APPROVE, context);
+        ProposedFlowWorkflowState currentState = TARGET_APPROVED;
+        ProposedFlowWorkflowContext context = createContext(false, true, currentState)
+                .setCurrentState(currentState)
+                .setPrevState(SOURCE_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(currentState, APPROVE, context);
         assertEquals(FULLY_APPROVED, newState);
     }
 
@@ -155,10 +157,10 @@ class ProposedFlowWorkflowDefinitionTest {
         assertEquals(TARGET_REJECTED, newState);
     }
 
-    private ProposedFlowWorkflowContext createContext(boolean isSourceApprover, boolean isTargetApprover, ProposedFlowWorkflowState state) {
+    private ProposedFlowWorkflowContext createContext(boolean isSourceApprover, boolean isTargetApprover, ProposedFlowWorkflowState currentState) {
         return new ProposedFlowWorkflowContext(1L, entityRef, "test_user", "test reason")
                 .setSourceApprover(isSourceApprover)
                 .setTargetApprover(isTargetApprover)
-                .setCurrentState(state);
+                .setCurrentState(currentState);
     }
 }

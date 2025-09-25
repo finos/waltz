@@ -40,10 +40,10 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
     // FILTERS
     private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> ctx.isSourceApprover();
     private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> ctx.isTargetApprover();
-    private static final Predicate<ProposedFlowWorkflowContext> canGoFromTargetToFullyApprove = isSourceApprover
+    private static final Predicate<ProposedFlowWorkflowContext> canGoFromTargetToFullyApprove = isTargetApprover
             .and(ctx -> TARGET_APPROVED.equals(ctx.getCurrentState()))
             .and(ctx -> SOURCE_APPROVED.equals(ctx.getPrevState()));
-    private static final Predicate<ProposedFlowWorkflowContext> canGoFromSourceToFullyApprove = isTargetApprover
+    private static final Predicate<ProposedFlowWorkflowContext> canGoFromSourceToFullyApprove = isSourceApprover
             .and(ctx -> SOURCE_APPROVED.equals(ctx.getCurrentState()))
             .and(ctx -> TARGET_APPROVED.equals(ctx.getPrevState()));
 
