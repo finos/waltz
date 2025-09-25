@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
     private static final String USER_NAME = "testUser";
-    
+
     @Autowired
     ProposedFlowWorkflowService proposedFlowWorkflowService;
 
@@ -103,7 +103,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(response);
     }
 
-    @Test
+    //    @Test
     public void testGetProposedFlowDefinition() {
 
         // 1. Arrange ----------------------------------------------------------

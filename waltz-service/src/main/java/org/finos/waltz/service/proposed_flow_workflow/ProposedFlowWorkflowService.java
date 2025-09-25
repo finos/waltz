@@ -131,8 +131,8 @@ public class ProposedFlowWorkflowService {
         // Check for approval/rejection permissions
         ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
                 username,
-                proposedFlow.sourceEntity(),
-                proposedFlow.targetEntity()
+                proposedFlow.flowDef().source(),
+                proposedFlow.flowDef().target()
         );
         boolean isSourceApprover = !flowPermission.sourceApprover().isEmpty();
         boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
@@ -201,8 +201,8 @@ public class ProposedFlowWorkflowService {
         if (PROPOSED_FLOW.equals(entityRef.kind())) {
             ProposedFlowResponse flowResponse = proposedFlowDao.getProposedFlowResponseById(entityRef.id());
             return permissionService.checkUserPermission(username,
-                    flowResponse.sourceEntity(),
-                    flowResponse.targetEntity()
+                    flowResponse.flowDef().source(),
+                    flowResponse.flowDef().target()
             );
         } else {
             throw new UnsupportedOperationException(format("%s is not supported", entityRef.kind()));

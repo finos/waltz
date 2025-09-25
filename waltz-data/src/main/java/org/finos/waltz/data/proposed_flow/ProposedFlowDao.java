@@ -9,7 +9,6 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_workflow.*;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.schema.Tables;
@@ -40,21 +39,6 @@ public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
 
-    public static ProposedFlowRecord TO_DOMAIN_MAPPER(Record record) {
-        ProposedFlowRecord proposedFlowRecord = new ProposedFlowRecord();
-        proposedFlowRecord.setId(record.get(PROPOSED_FLOW.ID));
-        proposedFlowRecord.setSourceEntityId(record.get(PROPOSED_FLOW.SOURCE_ENTITY_ID));
-        proposedFlowRecord.setSourceEntityKind(record.get(PROPOSED_FLOW.SOURCE_ENTITY_KIND));
-        proposedFlowRecord.setTargetEntityId(record.get(PROPOSED_FLOW.TARGET_ENTITY_ID));
-        proposedFlowRecord.setTargetEntityKind(record.get(PROPOSED_FLOW.TARGET_ENTITY_KIND));
-        proposedFlowRecord.setCreatedAt(record.get(PROPOSED_FLOW.CREATED_AT));
-        proposedFlowRecord.setCreatedBy(record.get(PROPOSED_FLOW.CREATED_BY));
-        proposedFlowRecord.setFlowDef(record.get(PROPOSED_FLOW.FLOW_DEF));
-        proposedFlowRecord.setProposalType(record.get(PROPOSED_FLOW.PROPOSAL_TYPE));
-
-        return proposedFlowRecord;
-    }
-
     private final DSLContext dsl;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
@@ -84,21 +68,6 @@ public class ProposedFlowDao {
         return proposedFlowRecord.getId();
     }
 
-    /**
-     * Fetches the single ProposedFlow row whose primary-key equals the given id.
-     *
-     * @param id primary key of the row (e.g. 1)
-     * @return ProposedFlowRecord and null if no record found for the given id
-     */
-
-    public ProposedFlowRecord getProposedFlowById(long id) {
-        return dsl
-                .select(PROPOSED_FLOW.fields())
-                .from(PROPOSED_FLOW)
-                .where(PROPOSED_FLOW.ID.eq(id))
-                .fetchOneInto(ProposedFlowRecord.class);
-    }
-
     public ProposedFlowResponse getProposedFlowResponseById(long id) {
         ProposedFlowRecord proposedFlowRecord = getProposedFlowById(id);
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
@@ -110,14 +79,11 @@ public class ProposedFlowDao {
 
             return ImmutableProposedFlowResponse.builder()
                     .id(proposedFlowRecord.getId())
-                    .sourceEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getSourceEntityKind()), proposedFlowRecord.getSourceEntityId()))
-                    .targetEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getTargetEntityKind()), proposedFlowRecord.getTargetEntityId()))
                     .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
                     .createdBy(proposedFlowRecord.getCreatedBy())
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
                     .workflowTransitionList(entityWorkflowView.workflowTransitionList())
-                    .proposalType(ProposalType.valueOf(proposedFlowRecord.getProposalType()))
                     .build();
 
         } catch (JsonProcessingException e) {
@@ -174,7 +140,7 @@ public class ProposedFlowDao {
                     Record firstRecord = recordsForOneFlow.get(0);
 
                     // Extract the common objects.
-                    ProposedFlowRecord proposedFlowRecord = TO_DOMAIN_MAPPER(firstRecord);
+                    ProposedFlowRecord proposedFlowRecord = firstRecord.into(ProposedFlowRecord.class);
                     EntityWorkflowState entityWorkflowState = EntityWorkflowStateDao.TO_DOMAIN_MAPPER.map(firstRecord);
 
                     // Now, iterate over all records in the group to build the complete list of transitions.
@@ -206,15 +172,20 @@ public class ProposedFlowDao {
     private ProposedFlowResponse createProposedFlowView(ProposedFlowCommand flowDefinition, List<EntityWorkflowTransition> updatedTransitions, ProposedFlowRecord proposedFlowRecord, EntityWorkflowState entityWorkflowState) {
         return ImmutableProposedFlowResponse.builder()
                 .id(proposedFlowRecord.getId())
-                .sourceEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getSourceEntityKind()), proposedFlowRecord.getSourceEntityId()))
-                .targetEntity(mkRef(EntityKind.valueOf(proposedFlowRecord.getTargetEntityKind()), proposedFlowRecord.getTargetEntityId()))
                 .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
                 .createdBy(proposedFlowRecord.getCreatedBy())
-                .proposalType(ProposalType.valueOf(proposedFlowRecord.getProposalType()))
                 .flowDef(flowDefinition)
                 .workflowState(entityWorkflowState)
                 .workflowTransitionList(updatedTransitions)
                 .build();
+    }
+
+    private ProposedFlowRecord getProposedFlowById(long id) {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOneInto(ProposedFlowRecord.class);
     }
 }
 
