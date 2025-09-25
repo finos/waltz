@@ -116,17 +116,6 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20251010-7345-5"
-               author="jindkul">
-        <insert tableName="role">
-            <column name="key" value="FLOW_PROPOSER"/>
-            <column name="name" value="FLOW PROPOSER"/>
-            <column name="description" value="FLOW PROPOSER"/>
-            <column name="is_custom" valueBoolean="false"/>
-            <column name="user_selectable" valueBoolean="true"/>
-        </insert>
-    </changeSet>
-
     <changeSet id="20251010-7345-7"
                author="jindkul">
         <comment>
