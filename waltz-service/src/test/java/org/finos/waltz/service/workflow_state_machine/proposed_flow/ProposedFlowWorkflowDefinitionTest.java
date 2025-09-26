@@ -96,6 +96,14 @@ class ProposedFlowWorkflowDefinitionTest {
     }
 
     @Test
+    void testCancelledTransition_FromTargetApproved() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, CANCEL, context);
+        assertEquals(CANCELLED, newState);
+    }
+
+
+    @Test
     void testTargetApprovedTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
         ProposedFlowWorkflowContext context = createContext(false, true, PENDING_APPROVALS);
         ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, context);
@@ -161,6 +169,7 @@ class ProposedFlowWorkflowDefinitionTest {
         return new ProposedFlowWorkflowContext(1L, entityRef, "test_user", "test reason")
                 .setSourceApprover(isSourceApprover)
                 .setTargetApprover(isTargetApprover)
+                .setMaker(true)
                 .setCurrentState(currentState);
     }
 }
