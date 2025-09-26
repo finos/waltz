@@ -8,6 +8,7 @@
     export let pillKey;
     export let smallText;
     export let cleanPill = false; // toggles between dark and light text
+    export let clickable = false;
 
     $: pillColor = pillDefs[pillKey].color;
     $: pillText = pillDefs[pillKey].name;
@@ -16,7 +17,9 @@
 {#if pillDefs && pillKey}
     <div class:pill={!cleanPill}
          class:pill-clean={cleanPill}
-         style="--pillColor: {pillColor}">
+         class:clickable={clickable}
+         style="--pillColor: {pillColor}"
+         title={pillText}>
         {pillText}
         <small>
             { smallText ?? '' }
@@ -32,7 +35,6 @@
         padding: 0.25rem 0.5rem;
         width: max-content;
         color: white;
-        cursor: pointer;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -46,7 +48,6 @@
         padding: 0.25rem 0.5rem;
         width: max-content;
         color: var(--pillColor);
-        cursor: pointer;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;

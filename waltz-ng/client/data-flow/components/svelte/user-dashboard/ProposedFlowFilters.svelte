@@ -102,6 +102,7 @@
                                   pillKey={key}
                                   cleanPill={!$filters.proposer.includes(key)}
                                   smallText={proposerPillCounts[key]}
+                                  clickable={true}
                             />
                         </div>
                     {/each}
