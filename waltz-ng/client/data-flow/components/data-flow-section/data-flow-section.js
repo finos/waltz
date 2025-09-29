@@ -76,7 +76,10 @@ const initialState = {
     },
     tabs,
     activeMode: modes.VIEW,
-    lastTabId: tabs[0].id
+    lastTabId: tabs[0].id,
+    canEdit: false,
+    dataFlowProposalsEnabled: false,
+    bulkLoaderVisible: false
 };
 
 const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
@@ -174,6 +177,7 @@ function controller(serviceBroker) {
             .then(r => {
                 const dataFlowProposalSetting = r.data.filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
                 vm.dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value === 'true';
+                vm.dataFlowProposalsEnabled ? vm.bulkLoaderVisible = false : vm.bulkLoaderVisible = true;
             });
     }
 

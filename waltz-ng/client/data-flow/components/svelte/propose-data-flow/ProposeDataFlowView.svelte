@@ -68,6 +68,15 @@
         }
     }
 
+    function resetStore() {
+        $dataTypes = [];
+        $logicalFlow = null;
+        $physicalFlow = null;
+        $physicalSpecification = null
+        $skipDataTypes = false;
+        $proposalReason = null;
+    }
+
     function launchCommand() {
         // as soon as the user launches the command, the button gets disabled
         commandLaunched = true;
@@ -116,6 +125,7 @@
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
                     if(response.proposedFlowId) {
                         toasts.success("Data Flow Proposed");
+                        resetStore(); // only on success we want to reset the state
                         setTimeout(goToWorkflow, 500, response.proposedFlowId);
                     } else {
                         toasts.error("Error proposing data flow");

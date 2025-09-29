@@ -22,7 +22,7 @@
     <waltz-section-actions>
         <!-- Edit Logical Split button -->
         <div style="display: inline-block"
-             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.canEdit && !$ctrl.dataFlowProposalsEnabled && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -57,7 +57,7 @@
         </div>
 
         <div style="display: inline-block"
-             ng-if="!$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+             ng-if="!$ctrl.canEdit && $ctrl.bulkLoaderVisible && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
                 <button type="button"
