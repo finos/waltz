@@ -177,7 +177,8 @@ $: isDataFiltered = (!(filteredDataSize === gridData.length) || ($filters.change
                                  proposerPillCounts={proposerCounts}/>
             <small class="text-muted">{isDataFiltered ? `Filtered: (${filteredDataSize})` : ``}</small>
             <GridWithCellRenderer columnDefs={columnDefs}
-                                  rowData={filteredGridData}/>
+                                  rowData={filteredGridData}
+                                  clickable={false}/>
         {/if}
     {:else}
         <LoadingPlaceholder/>

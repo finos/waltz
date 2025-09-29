@@ -7,7 +7,8 @@
 
     export let columnDefs = [];
     export let rowData = [];
-    export let onSelectRow = () => console.log("selecting row")
+    export let onSelectRow = () => console.log("selecting row");
+    export let clickable = true;
 
     let qry = null;
 
@@ -82,7 +83,7 @@
 
                 <tbody>
                 {#each filteredRows as row}
-                    <tr class="clickable"
+                    <tr class:clickable={clickable}
                         on:click={() => onSelectRow(row)}>
                         {#each columnDefs as col}
                             <td title={getColTitle(col, row)}>
@@ -92,7 +93,7 @@
                                     {@html col.cellRenderer(row)}
                                 {:else}
                                     {getColVal(col, row)}
-                                {/if}  
+                                {/if}
                             </td>
                         {/each}
                     </tr>
