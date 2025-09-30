@@ -40,8 +40,13 @@ Owners (DOs) and DQ standards.
 
 All state transitions are handled by a state machine, validating actions and determining allowed next states.
 
-![Possible Transitions](images\proposed_flow_transitions.png)
+![Possible Transitions](images\proposed_flow_workflow.png)
 
+## State Machine & Transitions
+
+All state transitions are handled by a state machine, validating actions and determining allowed next states.
+
+![Possible Transitions](images\proposed_flow_transitions.png)
 ---
 
 ## Benefits
