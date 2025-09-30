@@ -262,8 +262,8 @@
     .connector {
         position: absolute;
         top: 18px;
-        left: calc(100% - 40px);
-        width: calc(100% - 56px);
+        left: calc(100% - 30%);
+        width: calc(100% - 40%);
         height: 2px;
         background: #d9d9d9;
         border-radius: 2px;
