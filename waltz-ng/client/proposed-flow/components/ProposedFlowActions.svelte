@@ -94,16 +94,16 @@
         return Promise
             .resolve(proposeDataFlowRemoteStore.transitionProposedFlow(proposedFlow.id, updateCmd))
             .then(() => {
-                mode = Modes.LIST;
                 toasts.success("Proposed flow " + verb + " successfully");
                 if(refreshState) {
                     refreshState();
                 }
                 onCancelAction();
+                mode = Modes.LIST;
             })
             .catch(e => {
+                displayError("Failed to " + name + " proposed flow.");
                 mode = Modes.LIST;
-                displayError("Failed to " + name + " proposed flow.")
             });
     }
 
@@ -116,7 +116,7 @@
             verb: "approved",
             icon: "thumbs-up",
             style: "success",
-            description: "Approve and provision the survey",
+            description: "Approve and provision the flow",
             confirmationRequirement: "CONFIRM_REQUIRED",
             name: "approve",
             disabled: !canAct
@@ -126,7 +126,7 @@
             verb: "",
             icon: "thumbs-down",
             style: "danger",
-            description: "Reject the survey",
+            description: "Reject the flow",
             confirmationRequirement: "CONFIRM_AND_COMMENT_REQUIRED",
             name: "reject",
             disabled: !canAct
