@@ -12,6 +12,7 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -43,10 +44,13 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSED_FLOW_SUBMITTED = "Proposed Flow Submitted";
+    private static final String EDIT = "EDIT";
+    private static final String DELETE = "DELETE";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
     private final DataFlowService dataFlowService;
+    private final PhysicalFlowService physicalFlowService;
     private final ProposedFlowDao proposedFlowDao;
     private final ProposedFlowIdSelectorFactory proposedFlowIdSelectorFactory = new ProposedFlowIdSelectorFactory();
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
@@ -59,12 +63,14 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService) {
+                                DataFlowService dataFlowService,
+                                PhysicalFlowService physicalFlowService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(permissionService, "ProposedFlowWorkflowPermissionService cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -73,6 +79,7 @@ public class ProposedFlowWorkflowService {
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
+        this.physicalFlowService = physicalFlowService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -210,4 +217,30 @@ public class ProposedFlowWorkflowService {
             throw new UnsupportedOperationException(format("%s is not supported", entityRef.kind()));
         }
     }
+
+    public Long validateDuplicates(ProposedFlowCommand proposedFlowCommand, String username) {
+
+            switch (proposedFlowCommand.proposalType()){
+                case CREATE:
+                    return validateDuplicatesForCreate(proposedFlowCommand, username);
+                case EDIT:
+                    return proposedFlowDao.isProposedFlowExist(proposedFlowCommand, DELETE);
+                case DELETE:
+                    return proposedFlowDao.isProposedFlowExist(proposedFlowCommand, EDIT);
+                default:
+                    throw new UnsupportedOperationException(
+                            "proposalType not supported: " + proposedFlowCommand.proposalType()
+                    );
+            }
+        }
+
+        private Long validateDuplicatesForCreate(ProposedFlowCommand command, String username){
+            return command.logicalFlowId()
+                    .map(id ->physicalFlowService.isPhysicalFlowExist(command, username))
+                    .filter(id ->id != null)
+                    .orElseGet(() -> proposedFlowDao.isProposedFlowExist(command, command.proposalType().name()));
+        }
+
+
+
 }
