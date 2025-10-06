@@ -11,6 +11,7 @@ import org.finos.waltz.model.entity_workflow.*;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.*;
@@ -186,6 +187,32 @@ public class ProposedFlowDao {
                 .from(PROPOSED_FLOW)
                 .where(PROPOSED_FLOW.ID.eq(id))
                 .fetchOneInto(ProposedFlowRecord.class);
+    }
+
+    public Long isProposedFlowExist(ProposedFlowCommand proposedFlowCommand, String proposalType) {
+        Long workflowId = fetchWorkflowID();
+
+        Optional<Long> proposedFlowId =
+                dsl
+                .select(PROPOSED_FLOW.ID)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .where(PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(proposedFlowCommand.source().id()))
+                .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(proposedFlowCommand.source().kind().name()))
+                .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
+                .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
+                        .and(PROPOSED_FLOW.PROPOSAL_TYPE.eq(proposalType))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.getEndStates())).fetchOptional(PROPOSED_FLOW.ID);
+        return proposedFlowId.orElse(null);
+    }
+
+    private Long fetchWorkflowID() {
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        return Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
     }
 }
 

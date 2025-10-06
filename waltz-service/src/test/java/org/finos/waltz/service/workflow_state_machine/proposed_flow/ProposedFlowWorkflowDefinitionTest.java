@@ -96,6 +96,46 @@ class ProposedFlowWorkflowDefinitionTest {
     }
 
     @Test
+    void testCancelledTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, PENDING_APPROVALS);
+        ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, CANCEL, context);
+        assertEquals(CANCELLED, newState);
+    }
+
+    @Test
+    void testCancelledTransition_FromSourceApproved() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, SOURCE_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(SOURCE_APPROVED, CANCEL, context);
+        assertEquals(CANCELLED, newState);
+    }
+
+    @Test
+    void testCancelledTransition_FromTargetApproved() throws TransitionNotFoundException, TransitionPredicateFailedException {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_APPROVED);
+        ProposedFlowWorkflowState newState = machine.fire(TARGET_APPROVED, CANCEL, context);
+        assertEquals(CANCELLED, newState);
+    }
+
+    @Test
+    void testCancelledTransition_FromFullyApprovedShouldThrowsException() {
+        ProposedFlowWorkflowContext context = createContext(true, false, FULLY_APPROVED);
+        assertThrows(
+                TransitionNotFoundException.class,
+                () -> machine.fire(FULLY_APPROVED, CANCEL, context),
+                "This transition is not supported");
+    }
+
+    @Test
+    void testCancelledTransition_FromRejectedShouldThrowsException() {
+        ProposedFlowWorkflowContext context = createContext(true, false, TARGET_REJECTED);
+        assertThrows(
+                TransitionNotFoundException.class,
+                () -> machine.fire(TARGET_REJECTED, CANCEL, context),
+                "This transition is not supported");
+    }
+
+
+    @Test
     void testTargetApprovedTransition_FromPendingApprovals() throws TransitionNotFoundException, TransitionPredicateFailedException {
         ProposedFlowWorkflowContext context = createContext(false, true, PENDING_APPROVALS);
         ProposedFlowWorkflowState newState = machine.fire(PENDING_APPROVALS, APPROVE, context);
@@ -161,6 +201,7 @@ class ProposedFlowWorkflowDefinitionTest {
         return new ProposedFlowWorkflowContext(1L, entityRef, "test_user", "test reason")
                 .setSourceApprover(isSourceApprover)
                 .setTargetApprover(isTargetApprover)
+                .setMaker(true)
                 .setCurrentState(currentState);
     }
 }

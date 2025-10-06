@@ -40,6 +40,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
     // FILTERS
     private static final Predicate<ProposedFlowWorkflowContext> isSourceApprover = ctx -> ctx.isSourceApprover();
     private static final Predicate<ProposedFlowWorkflowContext> isTargetApprover = ctx -> ctx.isTargetApprover();
+    private static final Predicate<ProposedFlowWorkflowContext> isMaker = ctx -> ctx.isMaker();
     private static final Predicate<ProposedFlowWorkflowContext> canGoFromTargetToFullyApprove = isTargetApprover
             .and(ctx -> TARGET_APPROVED.equals(ctx.getCurrentState()))
             .and(ctx -> SOURCE_APPROVED.equals(ctx.getPrevState()));
@@ -74,6 +75,8 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                         isSourceApprover)
                 .permit(PENDING_APPROVALS, TARGET_REJECTED, REJECT,
                         isTargetApprover)
+                .permit(PENDING_APPROVALS, CANCELLED, CANCEL,
+                        isMaker)
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
@@ -82,6 +85,8 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                         isTargetApprover)
                 .permit(SOURCE_APPROVED, TARGET_REJECTED, REJECT,
                         isTargetApprover)
+                .permit(SOURCE_APPROVED, CANCELLED, CANCEL,
+                        isMaker)
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
@@ -89,7 +94,9 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                 .permit(TARGET_APPROVED, SOURCE_APPROVED, APPROVE,
                         isSourceApprover)
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,
-                        isSourceApprover);
+                        isSourceApprover)
+                .permit(TARGET_APPROVED, CANCELLED, CANCEL,
+                        isMaker);
 
         return builder.build();
     }
