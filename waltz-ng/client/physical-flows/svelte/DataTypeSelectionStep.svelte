@@ -1,8 +1,8 @@
 <script>
     import _ from "lodash";
     import StepHeader from "./StepHeader.svelte";
-    import {dataTypes, expandedSections, physicalSpecification, skipDataTypes} from "./physical-flow-editor-store";
-    import {determineExpandedSections, sections} from "./physical-flow-registration-utils";
+    import {dataTypes, expandedSections, physicalSpecification, skipDataTypes} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+    import {determineExpandedSections, sections} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import Icon from "../../common/svelte/Icon.svelte";
     import DataTypeTreeSelector from "../../common/svelte/DataTypeTreeSelector.svelte";
     import {dataTypeStore} from "../../svelte-stores/data-type-store";

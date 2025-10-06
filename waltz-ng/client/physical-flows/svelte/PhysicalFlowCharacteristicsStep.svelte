@@ -8,9 +8,9 @@
         determineExpandedSections,
         sections, toCriticalityName, toFrequencyKindName,
         toOptions, toTransportKindName
-    } from "./physical-flow-registration-utils";
+    } from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import BasisOffsetSelect from "./BasisOffsetSelect.svelte";
-    import {expandedSections, nestedEnums, physicalFlow} from "./physical-flow-editor-store";
+    import {expandedSections, nestedEnums, physicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import Icon from "../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
     import Markdown from "../../common/svelte/Markdown.svelte";
