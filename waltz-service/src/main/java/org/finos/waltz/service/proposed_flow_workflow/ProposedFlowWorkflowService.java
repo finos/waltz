@@ -10,6 +10,7 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
@@ -220,27 +222,51 @@ public class ProposedFlowWorkflowService {
 
     public Long validateDuplicates(ProposedFlowCommand proposedFlowCommand, String username) {
 
-            switch (proposedFlowCommand.proposalType()){
-                case CREATE:
-                    return validateDuplicatesForCreate(proposedFlowCommand, username);
-                case EDIT:
-                    return proposedFlowDao.isProposedFlowExist(proposedFlowCommand, DELETE);
-                case DELETE:
-                    return proposedFlowDao.isProposedFlowExist(proposedFlowCommand, EDIT);
-                default:
-                    throw new UnsupportedOperationException(
-                            "proposalType not supported: " + proposedFlowCommand.proposalType()
-                    );
-            }
+        switch (proposedFlowCommand.proposalType()){
+            case CREATE:
+                return validateDuplicatesForCreate(proposedFlowCommand, username);
+            case EDIT:
+            case DELETE:
+                return validateDuplicatesForEditOrDelete(proposedFlowCommand);
+            default:
+                throw new UnsupportedOperationException(
+                        "proposalType not supported: " + proposedFlowCommand.proposalType()
+                );
+        }
+    }
+
+    private Long validateDuplicatesForCreate(ProposedFlowCommand command, String username){
+        return command.logicalFlowId()
+                .map(id ->physicalFlowService.isPhysicalFlowExist(command, username))
+                .filter(id ->id != null)
+                .orElseGet(() -> proposedFlowDao.proposedFlowRecordsByProposalType(command)
+                        .stream().findFirst()
+                        .map(ProposedFlowRecord :: getId)
+                        .orElse(null));
+    }
+
+    private Long validateDuplicatesForEditOrDelete(ProposedFlowCommand command){
+
+        return proposedFlowDao.proposedFlowRecordsByProposalType(command).stream()
+                .filter(record -> {
+                    ProposedFlowCommand flow = getFlowDefinition(record);
+                    return flow.logicalFlowId().isPresent() && flow.physicalFlowId().isPresent()
+                            && flow.logicalFlowId().get().equals(command.logicalFlowId().orElse(null))
+                            && flow.physicalFlowId().get().equals(command.physicalFlowId().orElse(null));
+                })
+                .map(ProposedFlowRecord :: getId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private ProposedFlowCommand getFlowDefinition(ProposedFlowRecord record) {
+        try {
+            return getJsonMapper()
+                    .readValue(record.getFlowDef(), ProposedFlowCommand.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
-        private Long validateDuplicatesForCreate(ProposedFlowCommand command, String username){
-            return command.logicalFlowId()
-                    .map(id ->physicalFlowService.isPhysicalFlowExist(command, username))
-                    .filter(id ->id != null)
-                    .orElseGet(() -> proposedFlowDao.isProposedFlowExist(command, command.proposalType().name()));
-        }
-
-
+    }
 
 }

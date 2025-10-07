@@ -7,14 +7,24 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.entity_workflow.*;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,23 +199,36 @@ public class ProposedFlowDao {
                 .fetchOneInto(ProposedFlowRecord.class);
     }
 
-    public Long isProposedFlowExist(ProposedFlowCommand proposedFlowCommand, String proposalType) {
+    public List<ProposedFlowRecord> proposedFlowRecordsByProposalType(ProposedFlowCommand proposedFlowCommand) {
         Long workflowId = fetchWorkflowID();
+        Condition proposalTypeCondition = getProposalTypeCondition(proposedFlowCommand.proposalType());
 
-        Optional<Long> proposedFlowId =
+        List<ProposedFlowRecord> records =
                 dsl
-                .select(PROPOSED_FLOW.ID)
-                .from(PROPOSED_FLOW)
-                .join(ENTITY_WORKFLOW_STATE)
-                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .where(PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(proposedFlowCommand.source().id()))
-                .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(proposedFlowCommand.source().kind().name()))
-                .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
-                .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
-                        .and(PROPOSED_FLOW.PROPOSAL_TYPE.eq(proposalType))
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.getEndStates())).fetchOptional(PROPOSED_FLOW.ID);
-        return proposedFlowId.orElse(null);
+                        .selectDistinct(PROPOSED_FLOW.fields())
+                        .from(PROPOSED_FLOW)
+                        .join(ENTITY_WORKFLOW_STATE)
+                        .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                        .where(PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(proposedFlowCommand.source().id()))
+                        .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(proposedFlowCommand.source().kind().name()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
+                        .and(proposalTypeCondition)
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.getEndStates()))
+                        .fetchInto(ProposedFlowRecord.class);
+        return records;
+    }
+
+    private Condition getProposalTypeCondition(ProposalType proposalType) {
+        Condition proposalTypeCondition;
+        if(proposalType == ProposalType.CREATE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(ProposalType.CREATE.name());
+        else if(proposalType == ProposalType.EDIT || proposalType == ProposalType.DELETE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(ProposalType.EDIT.name(), ProposalType.DELETE.name());
+        else
+            throw new IllegalArgumentException("Unexpected proposal type: "+ proposalType);
+        return proposalTypeCondition;
     }
 
     private Long fetchWorkflowID() {
