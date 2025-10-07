@@ -1,0 +1,175 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.75.xml">
+
+    <changeSet id="v1-74-0-tag"
+               author="guptmayb">
+        <tagDatabase tag="v1.74.0"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <!-- 7345 Create Table - ProposedFlow Table -->
+    <changeSet id="20251010-7345-1"
+               author="kumarohb">
+        <createTable tableName="proposed_flow"
+                     remarks="details about proposed flow by requesters ">
+
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="proposed_flow_pkey"/>
+            </column>
+
+            <column name="source_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="source_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="target_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="flow_def"
+                    type="${longvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="proposal_type"
+                    type="${proposal-type.type}">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20251010-7345-2"
+               author="kumarohb">
+        <comment>7345: Index to speed-up lookups on proposed_flow by source_entity_id + source_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_source_entity_id_source_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="source_entity_id"/>
+            <column name="source_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20251010-7345-3"
+               author="kumarohb">
+        <comment>7345: Index to speed-up lookups on proposed_flow by target_entity_id + target_entity_kind</comment>
+
+        <createIndex indexName="idx_proposed_flow_target_entity_id_target_entity_kind"
+                     tableName="proposed_flow"
+                     unique="false">
+            <column name="target_entity_id"/>
+            <column name="target_entity_kind"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="jindkul"
+               id="20251010-7345-4">
+
+        <sql>
+            insert into entity_workflow_definition
+                (name, description) values ('Propose Flow Lifecycle Workflow','Propose Flow Lifecycle Workflow');
+        </sql>
+    </changeSet>
+
+    <changeSet id="20251010-7345-7"
+               author="jindkul">
+        <comment>
+            adding PROPOSED_FLOW to permission_group_involvement table with their operations
+            for APPLICATION , END_USER_APPLICATION, ACTOR
+        </comment>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'END_USER_APPLICATION', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'APPROVE', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+        <sql>
+            INSERT INTO permission_group_involvement (permission_group_id, involvement_group_id, operation, parent_kind, subject_kind, qualifier_kind, qualifier_id)
+            select 1, id, 'REJECT', 'ACTOR', 'PROPOSED_FLOW', NULL, NULL
+            from involvement_group ig where name = 'Flow Approvers'
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="20251010-7345-8" author="shreyans.jain@db.com">
+        <insert tableName="settings">
+            <column name="name" value="feature.data-flow-proposals.enabled"/>
+            <column name="value" value="false"/>
+            <column name="description" value="Toggles data flow proposal workflow. Can be true or false."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="settings">
+            <column name="name" value="feature.data-flow-proposals.rating-scheme"/>
+            <column name="value" value=""/>
+            <column name="description" value="	The External Identifier of the rating scheme that is configured as the data flow proposal reason.
+            This MUST be configured and the Rating Scheme MUST be defined for data flow proposals to work."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

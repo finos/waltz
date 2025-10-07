@@ -8,8 +8,6 @@
     import {termSearch} from "../../common";
     import _ from "lodash";
 
-    import {expandedSections, logicalFlow} from "./physical-flow-editor-store";
-    import {sections} from "./physical-flow-registration-utils";
     import {createEventDispatcher} from "svelte";
 
     export let flows = [];

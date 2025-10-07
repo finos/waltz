@@ -84,6 +84,7 @@ public enum EntityKind {
     PHYSICAL_SPEC_DEFN_FIELD("Physical spec definition field"),
     PHYSICAL_FLOW("Physical flow"),
     PROCESS_DIAGRAM("Process Diagram"),
+    PROPOSED_FLOW("Proposed Flow"),
     RELATIONSHIP_KIND("Relationship Kind"),
     REPORT_GRID("Report Grid"),
     REPORT_GRID_DERIVED_COLUMN_DEFINITION("Report Grid Derived Column Definition"),
@@ -109,18 +110,21 @@ public enum EntityKind {
     CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
 
     @Deprecated
-    AUTHORITATIVE_SOURCE("Authoritative source"); // TO BE REMOVED IN 1.36
+    AUTHORITATIVE_SOURCE("Authoritative source"), // TO BE REMOVED IN 1.36
+    ;
 
 
     private final String prettyName;
 
 
-    EntityKind(String prettyName){
+    EntityKind(String prettyName) {
 
         this.prettyName = prettyName;
 
     }
 
-    public String prettyName(){ return prettyName; }
+    public String prettyName() {
+        return prettyName;
+    }
 
 }

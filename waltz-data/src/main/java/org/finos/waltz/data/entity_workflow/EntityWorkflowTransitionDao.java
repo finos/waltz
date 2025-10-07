@@ -19,27 +19,29 @@
 package org.finos.waltz.data.entity_workflow;
 
 
-import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
+import org.finos.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
 
 @Repository
 public class EntityWorkflowTransitionDao {
 
-    private static final RecordMapper<? super Record, EntityWorkflowTransition> TO_DOMAIN_MAPPER = record -> {
+    public static final RecordMapper<? super Record, EntityWorkflowTransition> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowTransitionRecord r = record.into(ENTITY_WORKFLOW_TRANSITION);
 
         return ImmutableEntityWorkflowTransition
@@ -57,7 +59,6 @@ public class EntityWorkflowTransitionDao {
                 .provenance(r.getProvenance())
                 .build();
     };
-
 
     private final DSLContext dsl;
 
@@ -77,6 +78,31 @@ public class EntityWorkflowTransitionDao {
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
                 .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(ref.id()))
                 .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(ref.kind().name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public void createWorkflowTransition(Long entityWorkflowDefId, EntityReference ref, String username,
+                                         String from, String to, String reason) {
+        EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
+        transitionRecord.setWorkflowId(entityWorkflowDefId);
+        transitionRecord.setEntityId(ref.id());
+        transitionRecord.setEntityKind(ref.kind().name());
+        transitionRecord.setFromState(from);
+        transitionRecord.setToState(to);
+        transitionRecord.setReason(reason);
+        transitionRecord.setProvenance("waltz");
+        transitionRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        transitionRecord.setLastUpdatedBy(username);
+        transitionRecord.insert();
+    }
+
+    public List<EntityWorkflowTransition> findForWorkflowId(long workflowId) {
+
+        return dsl
+                .select(ENTITY_WORKFLOW_TRANSITION.fields())
+                .from(ENTITY_WORKFLOW_TRANSITION)
+                .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

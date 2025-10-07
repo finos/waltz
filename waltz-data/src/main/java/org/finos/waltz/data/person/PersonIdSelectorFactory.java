@@ -21,8 +21,11 @@ package org.finos.waltz.data.person;
 
 import org.finos.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.schema.Tables;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 
 import static org.finos.waltz.model.EntityKind.PERSON;
 
@@ -39,5 +42,19 @@ public class PersonIdSelectorFactory extends AbstractIdSelectorFactory {
             default:
                 throw new UnsupportedOperationException("Cannot create person selector from kind: " + options.entityReference().kind());
         }
+    }
+
+    public SelectConditionStep<Record1<String>> getEmployeeIdForPerson(IdSelectionOptions options) {
+        return DSL
+                .select(Tables.PERSON.EMPLOYEE_ID)
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.ID.eq(options.entityReference().id()));
+    }
+
+    public SelectConditionStep<Record1<String>> getEmailForPerson(IdSelectionOptions options) {
+        return DSL
+                .select(Tables.PERSON.EMAIL)
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.ID.eq(options.entityReference().id()));
     }
 }

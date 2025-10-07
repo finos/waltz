@@ -522,9 +522,9 @@
                 <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE</database.url>
                 <database.user>sa</database.user>
                 <database.password>sa</database.password>
-<!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
-<!--                <database.user>root</database.user>-->
-<!--                <database.password></database.password>-->
+                <!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
+                <!--                <database.user>root</database.user>-->
+                <!--                <database.password></database.password>-->
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
@@ -661,22 +661,22 @@
     <reporting>
         <plugins>
             <!-- DISABLING: causes a build failure with message: "Unable to download NVD CVE 2022" -->
-<!--            <plugin>-->
-<!--                <groupId>org.owasp</groupId>-->
-<!--                <artifactId>dependency-check-maven</artifactId>-->
-<!--                <configuration>-->
-<!--                    <cveValidForHours>48</cveValidForHours>-->
-<!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
-<!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
-<!--                </configuration>-->
-<!--                <reportSets>-->
-<!--                    <reportSet>-->
-<!--                        <reports>-->
-<!--                            <report>aggregate</report>-->
-<!--                        </reports>-->
-<!--                    </reportSet>-->
-<!--                </reportSets>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.owasp</groupId>-->
+            <!--                <artifactId>dependency-check-maven</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <cveValidForHours>48</cveValidForHours>-->
+            <!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
+            <!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
+            <!--                </configuration>-->
+            <!--                <reportSets>-->
+            <!--                    <reportSet>-->
+            <!--                        <reports>-->
+            <!--                            <report>aggregate</report>-->
+            <!--                        </reports>-->
+            <!--                    </reportSet>-->
+            <!--                </reportSets>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>

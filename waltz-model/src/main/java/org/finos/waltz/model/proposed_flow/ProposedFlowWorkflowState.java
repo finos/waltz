@@ -16,19 +16,25 @@
  *
  */
 
-import {writable} from "svelte/store";
+package org.finos.waltz.model.proposed_flow;
 
-export const ViewMode = {
-    SECTION: "SECTION",
-    FLOW: "FLOW"
+public enum ProposedFlowWorkflowState {
+
+    PROPOSED_CREATE("Proposed Create"),
+    PENDING_APPROVALS("Pending Approval"),
+    SOURCE_APPROVED("Source Approved"),
+    TARGET_APPROVED("Target Approved"),
+    FULLY_APPROVED("Fully Approved"),
+    SOURCE_REJECTED("Source Rejected"),
+    TARGET_REJECTED("Target Rejected");
+
+    private final String prettyName;
+
+    ProposedFlowWorkflowState(String prettyName) {
+        this.prettyName = prettyName;
+    }
+
+    public String prettyName() {
+        return prettyName;
+    }
 }
-
-export const logicalFlow = writable(null);
-export const physicalFlow = writable(null);
-export const physicalSpecification = writable(null);
-export const dataTypes = writable([]);
-export const expandedSections = writable([]);
-export const nestedEnums = writable({});
-export const skipDataTypes = writable(false);
-export const viewMode = writable(ViewMode.SECTION)
-
