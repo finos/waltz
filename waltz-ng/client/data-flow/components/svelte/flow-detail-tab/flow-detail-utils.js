@@ -5,7 +5,7 @@ import tippy from "tippy.js";
 import {
     toCriticalityName,
     toFrequencyKindName, toTransportKindName
-} from "../../../../physical-flows/svelte/physical-flow-registration-utils";
+} from "../propose-data-flow/propose-data-flow-utils";
 import {entity as EntityKind} from "../../../../common/services/enums/entity";
 
 export const Directions = {

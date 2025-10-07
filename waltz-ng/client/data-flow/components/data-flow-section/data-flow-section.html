@@ -22,7 +22,7 @@
     <waltz-section-actions>
         <!-- Edit Logical Split button -->
         <div style="display: inline-block"
-             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.canEdit && !$ctrl.dataFlowProposalsEnabled && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -57,7 +57,7 @@
         </div>
 
         <div style="display: inline-block"
-             ng-if="!$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+             ng-if="!$ctrl.canEdit && $ctrl.bulkLoaderVisible && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
                 <button type="button"
@@ -79,10 +79,18 @@
             Done
         </a>
 
+        <div style="display: inline-block">
+            <a class="btn btn-xs btn-primary"
+               ui-sref="main.data-flow.create ($ctrl.parentEntityRef)"
+                ng-if="$ctrl.dataFlowProposalsEnabled">
+                Propose Data Flow
+            </a>
+        </div>
 
         <!-- Edit Physical Split button -->
+        <!-- should only show if proposals are not enabled -->
         <div style="display: inline-block"
-             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'FLOW_DETAIL' && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'FLOW_DETAIL' && !$ctrl.isAnyEditorVisible() && !$ctrl.dataFlowProposalsEnabled">
             <div class="btn-group"
                  uib-dropdown>
 

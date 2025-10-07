@@ -1,5 +1,5 @@
 <script>
-    import {basisOffsetDefaultOptions} from "./physical-flow-registration-utils";
+    import {basisOffsetDefaultOptions} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
 
     export let value;
     export let customValue;

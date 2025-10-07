@@ -120,6 +120,7 @@ import User from "./user";
 import UserContribution from "./user-contribution";
 import Welcome from "./welcome";
 import Widgets from "./widgets";
+import ProposedFlow from "./proposed-flow"
 
 
 const dependencies = [
@@ -213,6 +214,7 @@ const dependencies = [
     Playpen5(),
     ProcessDiagram(),
     Profile(),
+    ProposedFlow(),
     Ratings(),
     ReportGrid(),
     Roadmap(),

@@ -1,15 +1,15 @@
 <script>
-    import {expandedSections, logicalFlow} from "./physical-flow-editor-store";
+    import {expandedSections, logicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
     import _ from "lodash";
     import RouteSelector from "./RouteSelector.svelte";
     import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
     import StepHeader from "./StepHeader.svelte";
-    import {determineExpandedSections, Direction, sections} from "./physical-flow-registration-utils";
+    import {determineExpandedSections, Direction, sections} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
     import {toEntityRef} from "../../common/entity-utils";
     import FlowCreator from "./FlowCreator.svelte";
-    import {onMount} from "svelte";
+    import LogicalFlowMocker from "../../data-flow/components/svelte/propose-data-flow/LogicalFlowMocker.svelte";
 
     const Modes = {
         CREATE: "CREATE",
@@ -17,6 +17,7 @@
     }
 
     export let primaryEntityRef;
+    export let dataFlowProposalSetting;
 
     let logicalFlowsCall = null;
     let editableFlowsCall = null;
@@ -55,16 +56,21 @@
         }
     }
 
+    $: dataFlowProposalsEnabled = dataFlowProposalSetting?.value && dataFlowProposalSetting.value.toLowerCase() === "true";
+
     $: {
         if (primaryEntityRef) {
             logicalFlowsCall = logicalFlowStore.findByEntityReference(primaryEntityRef);
-            editableFlowsCall = logicalFlowStore.findEditableFlowIdsForParentReference(primaryEntityRef);
+            if(!dataFlowProposalsEnabled) {
+                editableFlowsCall = logicalFlowStore.findEditableFlowIdsForParentReference(primaryEntityRef);
+            }
         }
     }
 
     $: logicalFlows = _
         .chain($logicalFlowsCall?.data)
-        .filter(f => _.includes(editableFlows, f.id))
+        // if proposals enabled show all non-read-only flows
+        .filter(f => (dataFlowProposalsEnabled && !f.isReadOnly) || _.includes(editableFlows, f.id))
         .orderBy([
             d => d.source.name.toLowerCase(),
             d => d.target.name.toLowerCase()
@@ -109,13 +115,22 @@
                                on:select={(evt) => selectFlow(evt.detail)}/>
 
             {:else if activeMode === Modes.CREATE}
-
-                <FlowCreator {primaryEntityRef}
-                             bind:source
-                             bind:target
-                             {direction}
-                             on:cancel={cancel}
-                             on:select={(evt) => selectFlow(evt.detail)}/>
+                <!--setting can be undefined if the setting is not created-->
+                {#if dataFlowProposalsEnabled}
+                    <LogicalFlowMocker {primaryEntityRef}
+                                       bind:source
+                                       bind:target
+                                       {direction}
+                                       on:cancel={cancel}
+                                       on:select={(evt) => selectFlow(evt.detail)}/>
+                {:else}
+                    <FlowCreator {primaryEntityRef}
+                                 bind:source
+                                 bind:target
+                                 {direction}
+                                 on:cancel={cancel}
+                                 on:select={(evt) => selectFlow(evt.detail)}/>
+                {/if}
             {/if}
 
         {:else}

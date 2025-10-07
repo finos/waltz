@@ -73,6 +73,8 @@ const initialState = {
     FlowRatingCell
 };
 
+const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
+
 
 function mkNodeFilterFn(nodeInfo) {
     return f => nodeInfo === "ALL" || sameRef(f[nodeInfo.position], nodeInfo.entity);
@@ -251,6 +253,15 @@ function controller($element,
             .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
 
         vm.diagramElem = _.head($element.find("waltz-source-and-target-graph"));
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.SettingsStore.findAll, [], {force: true}
+            )
+            .then(r => {
+                const dataFlowProposalSetting = r.data.filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
+                vm.dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value === 'true';
+            });
     };
 
     vm.$onChanges = (changes) => {
