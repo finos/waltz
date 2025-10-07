@@ -220,7 +220,15 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    public Long validateDuplicates(ProposedFlowCommand proposedFlowCommand, String username) {
+    /**
+     *
+     * @param proposedFlowCommand
+     * @param username
+     * @return ID based on the matched case
+     * ID can be physical flow id or proposed flow id
+     * if already exist else returns null
+     */
+    public Long checkForDuplicateFlows(ProposedFlowCommand proposedFlowCommand, String username) {
 
         switch (proposedFlowCommand.proposalType()){
             case CREATE:

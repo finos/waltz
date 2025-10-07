@@ -44,6 +44,9 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
 
 @Repository
 public class ProposedFlowDao {
@@ -222,10 +225,10 @@ public class ProposedFlowDao {
 
     private Condition getProposalTypeCondition(ProposalType proposalType) {
         Condition proposalTypeCondition;
-        if(proposalType == ProposalType.CREATE)
-            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(ProposalType.CREATE.name());
-        else if(proposalType == ProposalType.EDIT || proposalType == ProposalType.DELETE)
-            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(ProposalType.EDIT.name(), ProposalType.DELETE.name());
+        if(proposalType == CREATE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(CREATE.name());
+        else if(proposalType == EDIT || proposalType == DELETE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(EDIT.name(), DELETE.name());
         else
             throw new IllegalArgumentException("Unexpected proposal type: "+ proposalType);
         return proposalTypeCondition;
