@@ -83,6 +83,10 @@ function controller($interval,
             vm.allowDirectLogin = webAuthentication === "waltz";
         });
 
+    settingsService
+        .findOrDefault("feature.data-flow-proposals.enabled", false)
+        .then(setting => vm.dataFlowProposalsEnabled = setting === "true");
+
     userService
         .whoami(true) // force
         .then(user => vm.user = user)
