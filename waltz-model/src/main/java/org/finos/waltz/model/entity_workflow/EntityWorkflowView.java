@@ -2,6 +2,7 @@ package org.finos.waltz.model.entity_workflow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public abstract class EntityWorkflowView {
     public abstract EntityWorkflowState workflowState();
 
     public abstract List<EntityWorkflowTransition> workflowTransitionList();
+
+    public abstract List<EntityReference> entityWorkflowResultList();
 }

@@ -20,6 +20,7 @@ package org.finos.waltz.service.entity_workflow;
 
 
 import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowResultDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityReference;
@@ -28,6 +29,7 @@ import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -49,15 +51,17 @@ public class EntityWorkflowService {
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
+    private final EntityWorkflowResultDao entityWorkflowResultDao;
 
     @Autowired
     public EntityWorkflowService(ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
                                  EntityWorkflowStateDao entityWorkflowStateDao,
-                                 EntityWorkflowTransitionDao entityWorkflowTransitionDao) {
+                                 EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowResultDao entityWorkflowResultDao) {
         this.changeLogService = changeLogService;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
         this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
+        this.entityWorkflowResultDao = entityWorkflowResultDao;
     }
 
 
@@ -116,6 +120,14 @@ public class EntityWorkflowService {
                         format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
         );
         changeLogService.write(changeLogList);
+    }
+
+    public void createEntityWorkflowResult(Long entityWorkflowDefinitionId, EntityReference workflowEntity, EntityReference resultEntity, String username) {
+        entityWorkflowResultDao.create(entityWorkflowDefinitionId, workflowEntity, resultEntity, username);
+    }
+
+    public List<EntityWorkflowResult> findByWorkflowEntity(Long entityWorkflowDefinitionId, EntityReference workflowEntity) {
+        return entityWorkflowResultDao.findByWorkflowEntity(entityWorkflowDefinitionId, workflowEntity);
     }
 
     private ImmutableChangeLog mkChangeLog(EntityReference entityReference,
