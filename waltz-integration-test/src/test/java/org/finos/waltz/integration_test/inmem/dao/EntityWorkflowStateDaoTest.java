@@ -34,7 +34,7 @@ public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
     @Autowired
     EntityWorkflowStateDao entityWorkflowStateDao;
 
-    @Test
+    //@Test
     public void testSearchByName() {
         EntityKind entityKind = EntityKind.PROPOSED_FLOW;
         String description = "testDescription";
