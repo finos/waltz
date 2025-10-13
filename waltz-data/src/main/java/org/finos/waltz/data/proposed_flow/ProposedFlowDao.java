@@ -218,7 +218,7 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
                         .and(proposalTypeCondition)
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.getEndStates()))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
                         .fetchInto(ProposedFlowRecord.class);
         return records;
     }

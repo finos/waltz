@@ -19,6 +19,7 @@
 package org.finos.waltz.model.proposed_flow;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,9 +48,10 @@ public enum ProposedFlowWorkflowState {
     }
     public boolean isEndState(){ return  endState; }
 
-    public static List<ProposedFlowWorkflowState> getEndStates() {
-        return Arrays.stream(values())
-                .filter(ProposedFlowWorkflowState::isEndState)
-                .collect(Collectors.toList());
-    }
+    public static final List<ProposedFlowWorkflowState> END_STATES =
+            Collections.unmodifiableList(
+                    Arrays.stream(values())
+                            .filter(ProposedFlowWorkflowState::isEndState)
+                            .collect(Collectors.toList()));
+
 }
