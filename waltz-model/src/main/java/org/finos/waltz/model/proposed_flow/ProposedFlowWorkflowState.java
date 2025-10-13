@@ -34,6 +34,12 @@ public enum ProposedFlowWorkflowState {
     TARGET_REJECTED("Target Rejected", true),
     CANCELLED("Cancelled", true);
 
+    public static final List<ProposedFlowWorkflowState> END_STATES =
+            Collections.unmodifiableList(
+                    Arrays.stream(values())
+                            .filter(ProposedFlowWorkflowState::isEndState)
+                            .collect(Collectors.toList()));
+
     private final String prettyName;
     private final boolean endState;
 
@@ -48,10 +54,5 @@ public enum ProposedFlowWorkflowState {
     }
     public boolean isEndState(){ return  endState; }
 
-    public static final List<ProposedFlowWorkflowState> END_STATES =
-            Collections.unmodifiableList(
-                    Arrays.stream(values())
-                            .filter(ProposedFlowWorkflowState::isEndState)
-                            .collect(Collectors.toList()));
 
 }
