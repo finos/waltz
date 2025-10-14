@@ -22,7 +22,6 @@ import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
@@ -47,6 +46,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -233,25 +233,7 @@ public class PhysicalFlowService {
                         .withLastUpdatedAt(now)
                         .withCreated(UserTimestamp.mkForUser(username, now))));
 
-        ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
-                .specificationId(specId)
-                .name(command.flowAttributes().name())
-                .basisOffset(command.flowAttributes().basisOffset())
-                .frequency(command.flowAttributes().frequency())
-                .transport(command.flowAttributes().transport())
-                .criticality(command.flowAttributes().criticality())
-                .description(mkSafe(command.flowAttributes().description()))
-                .logicalFlowId(command.logicalFlowId())
-                .lastUpdatedBy(username)
-                .lastUpdatedAt(now)
-                .created(UserTimestamp.mkForUser(username, now));
-
-        command
-                .flowAttributes()
-                .externalId()
-                .ifPresent(flowBuilder::externalId);
-
-        PhysicalFlow flow = flowBuilder.build();
+        PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
 
         // ensure existing not in database
         List<PhysicalFlow> byAttributesAndSpecification = physicalFlowDao.findByAttributesAndSpecification(flow);
@@ -294,32 +276,22 @@ public class PhysicalFlowService {
                 .build();
     }
 
-    public Long isPhysicalFlowExist(ProposedFlowCommand command, String username) {
-        checkNotNull(command, "command cannot be null");
-        checkNotNull(username, "username cannot be null");
-
-        //check we have a logical data flow
-        ensureLogicalDataFlowExistsAndIsNotRemoved(command.logicalFlowId().get(), username);
-
-        PhysicalFlow flow = buildPhysicalFlow(command, username);
-
-        // ensure existing not in database
-        return physicalFlowDao.findByAttributesAndSpecification(flow).stream()
-                .findFirst()
-                .map(f -> f.id().orElse(null))
+    public Long getPhysicalFlowIfExist(PhysicalFlowCreateCommand command, String username) {
+        return command.specification().id()
+                .filter(Objects::nonNull)
+                .map(specId -> {
+                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
+                    // ensure existing not in database
+                    return physicalFlowDao.findByAttributesAndSpecification(flow).stream()
+                            .findFirst()
+                            .map(f -> f.id().orElse(null))
+                            .orElse(null);
+                })
                 .orElse(null);
     }
 
-    private PhysicalFlow buildPhysicalFlow(ProposedFlowCommand command, String username){
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId){
         LocalDateTime now = nowUtc();
-        long specId = command
-                .specification()
-                .id()
-                .orElseGet(() -> physicalSpecificationService.create(ImmutablePhysicalSpecification
-                        .copyOf(command.specification())
-                        .withLastUpdatedBy(username)
-                        .withLastUpdatedAt(now)
-                        .withCreated(UserTimestamp.mkForUser(username, now))));
 
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
@@ -329,7 +301,7 @@ public class PhysicalFlowService {
                 .transport(command.flowAttributes().transport())
                 .criticality(command.flowAttributes().criticality())
                 .description(mkSafe(command.flowAttributes().description()))
-                .logicalFlowId(command.logicalFlowId().get())
+                .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
                 .lastUpdatedAt(now)
                 .created(UserTimestamp.mkForUser(username, now));

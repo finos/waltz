@@ -39,6 +39,7 @@ import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableReason;
 import org.finos.waltz.model.proposed_flow.ProposalType;
@@ -179,6 +180,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     private PhysicalSpecification getPhysicalSpecification(EntityReference owningEntity) {
         return ImmutablePhysicalSpecification.builder()
+                .id(1L)
                 .owningEntity(owningEntity)
                 .name("mc_specification")
                 .description("mc_specification description")
@@ -271,10 +273,10 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         logicalFlowDao.addFlow(flowToAdd);
 
         // 2. Act --------------------------------------------------------------
-        Long id =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
-        assertNull(id);
+        assertNull(flowIdResponse);
     }
 
     @Test
@@ -312,16 +314,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         logicalFlowDao.addFlow(flowToAdd);
 
-        PhysicalSpecification specification = ImmutablePhysicalSpecification
-                .copyOf(command.specification())
-                .withLastUpdatedBy(USER_NAME)
-                .withLastUpdatedAt(now)
-                .withCreated(UserTimestamp.mkForUser(USER_NAME, now));
-
-        physicalSpecificationDao.create(specification);
-
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
-                .specificationId(2)
+                .specificationId(1L)
                 .name(command.flowAttributes().name())
                 .basisOffset(command.flowAttributes().basisOffset())
                 .frequency(command.flowAttributes().frequency())
@@ -343,11 +337,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         physicalFlowDao.create(flow);
 
         // 2. Act --------------------------------------------------------------
-        Long id =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
-        assertNotNull(id);
-        assertEquals(physicalId, id);
+        assertNotNull(flowIdResponse);
+        assertEquals(physicalId, flowIdResponse.id());
     }
 
 

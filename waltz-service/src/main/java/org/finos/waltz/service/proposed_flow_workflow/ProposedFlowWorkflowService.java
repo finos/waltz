@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
@@ -13,7 +14,6 @@ import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -46,13 +47,12 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_CREATED_WITH_SUCCESS = "PROPOSED_FLOW_CREATED_WITH_SUCCESS";
     private static final String PROPOSED_FLOW_CREATED_WITH_FAILURE = "PROPOSED_FLOW_CREATED_WITH_FAILURE";
     private static final String PROPOSED_FLOW_SUBMITTED = "Proposed Flow Submitted";
-    private static final String EDIT = "EDIT";
-    private static final String DELETE = "DELETE";
+    private static final String PROPOSED_FLOW_ALREADY_EXIST = "Proposed Flow Already Exist";
+    private static final String PHYSICAL_FLOW_ALREADY_EXIST = "Physical Flow Already Exist";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
     private final DataFlowService dataFlowService;
-    private final PhysicalFlowService physicalFlowService;
     private final ProposedFlowDao proposedFlowDao;
     private final ProposedFlowIdSelectorFactory proposedFlowIdSelectorFactory = new ProposedFlowIdSelectorFactory();
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
@@ -65,14 +65,13 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService,
-                                PhysicalFlowService physicalFlowService) {
+                                DataFlowService dataFlowService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(permissionService, "ProposedFlowWorkflowPermissionService cannot be null");
-        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -81,14 +80,18 @@ public class ProposedFlowWorkflowService {
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
-        this.physicalFlowService = physicalFlowService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
+        EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        FlowIdResponse flowIdResponse = checkForDuplicateFlows(proposedFlowCommand, username);
+        return flowIdResponse == null ? createProposedFlow(username, proposedFlowCommand, workflowDefinition) : getDuplicateFlowResponse(proposedFlowCommand, flowIdResponse, workflowDefinition);
+    }
+
+    private ProposedFlowCommandResponse createProposedFlow(String username, ProposedFlowCommand proposedFlowCommand, EntityWorkflowDefinition workflowDefinition) {
         String msg = PROPOSED_FLOW_CREATED_WITH_SUCCESS;
         CommandOutcome outcome = SUCCESS;
         Long proposedFlowId = null;
-        EntityWorkflowDefinition workflowDefinition = null;
         try {
             proposedFlowId = proposedFlowDao.saveProposedFlow(username, proposedFlowCommand);
             EntityReference proposedFlowRef = mkRef(PROPOSED_FLOW, proposedFlowId);
@@ -117,6 +120,26 @@ public class ProposedFlowWorkflowService {
                 .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
                 .build();
     }
+
+    private ProposedFlowCommandResponse getDuplicateFlowResponse(ProposedFlowCommand command, FlowIdResponse response,
+                                                                 EntityWorkflowDefinition workflowDefinition) {
+        ImmutableProposedFlowCommandResponse.Builder builder = ImmutableProposedFlowCommandResponse.builder();
+        if(response.type().equals(PROPOSED_FLOW)) {
+            builder.message(PROPOSED_FLOW_ALREADY_EXIST)
+                    .proposedFlowId(response.id());
+        } else  {
+            builder.message(PHYSICAL_FLOW_ALREADY_EXIST)
+                    .physicalFlowId(response.id())
+                    .proposedFlowId(0L);
+        }
+        return  builder
+                    .outcome(SUCCESS)
+                    .proposedFlowCommand(command)
+                    .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
+                    .build();
+
+    }
+
 
     public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
@@ -228,7 +251,7 @@ public class ProposedFlowWorkflowService {
      * ID can be physical flow id or proposed flow id
      * if already exist else returns null
      */
-    public Long checkForDuplicateFlows(ProposedFlowCommand proposedFlowCommand, String username) {
+    public FlowIdResponse checkForDuplicateFlows(ProposedFlowCommand proposedFlowCommand, String username) {
 
         switch (proposedFlowCommand.proposalType()){
             case CREATE:
@@ -243,27 +266,37 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    private Long validateDuplicatesForCreate(ProposedFlowCommand command, String username){
+    private FlowIdResponse validateDuplicatesForCreate(ProposedFlowCommand command, String username){
         return command.logicalFlowId()
-                .map(id ->physicalFlowService.isPhysicalFlowExist(command, username))
-                .filter(id ->id != null)
+                .map(id -> dataFlowService.getPhysicalFlowIfExist(command, username))
+                .filter(Objects::nonNull)
+                .map(flowId -> buildFlowIdResponse(flowId, EntityKind.PHYSICAL_FLOW))
                 .orElseGet(() -> proposedFlowDao.proposedFlowRecordsByProposalType(command)
-                        .stream().findFirst()
-                        .map(ProposedFlowRecord :: getId)
+                        .stream()
+                        .findFirst()
+                        .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
                         .orElse(null));
     }
 
-    private Long validateDuplicatesForEditOrDelete(ProposedFlowCommand command){
+    private FlowIdResponse buildFlowIdResponse(Long id, EntityKind flowType){
+        return ImmutableFlowIdResponse.builder()
+                .id(id)
+                .type(flowType)
+                .build();
+    }
 
-        return proposedFlowDao.proposedFlowRecordsByProposalType(command).stream()
+    private FlowIdResponse validateDuplicatesForEditOrDelete(ProposedFlowCommand command){
+
+        return proposedFlowDao.proposedFlowRecordsByProposalType(command)
+                .stream()
                 .filter(record -> {
                     ProposedFlowCommand flow = getFlowDefinition(record);
                     return flow.logicalFlowId().isPresent() && flow.physicalFlowId().isPresent()
                             && flow.logicalFlowId().get().equals(command.logicalFlowId().orElse(null))
                             && flow.physicalFlowId().get().equals(command.physicalFlowId().orElse(null));
                 })
-                .map(ProposedFlowRecord :: getId)
                 .findFirst()
+                .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
                 .orElse(null);
     }
 
