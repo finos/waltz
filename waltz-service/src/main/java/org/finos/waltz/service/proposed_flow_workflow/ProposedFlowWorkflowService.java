@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
@@ -84,7 +85,7 @@ public class ProposedFlowWorkflowService {
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
-        FlowIdResponse flowIdResponse = checkForDuplicateFlows(proposedFlowCommand, username);
+        FlowIdResponse flowIdResponse = validateProposedFlow(proposedFlowCommand, username);
         return flowIdResponse == null ? createProposedFlow(username, proposedFlowCommand, workflowDefinition) : getDuplicateFlowResponse(proposedFlowCommand, flowIdResponse, workflowDefinition);
     }
 
@@ -247,18 +248,19 @@ public class ProposedFlowWorkflowService {
      *
      * @param proposedFlowCommand
      * @param username
-     * @return ID based on the matched case
-     * ID can be physical flow id or proposed flow id
+     * @return FlowIdResponse having id and type based on the matched case
+     * type can be physical flow or proposed flow
      * if already exist else returns null
      */
-    public FlowIdResponse checkForDuplicateFlows(ProposedFlowCommand proposedFlowCommand, String username) {
+    public FlowIdResponse validateProposedFlow(ProposedFlowCommand proposedFlowCommand, String username) {
 
         switch (proposedFlowCommand.proposalType()){
             case CREATE:
-                return validateDuplicatesForCreate(proposedFlowCommand, username);
+                return validateProposedFlowForCreate(proposedFlowCommand, username);
             case EDIT:
+                return validateProposedFlowForEdit(proposedFlowCommand);
             case DELETE:
-                return validateDuplicatesForEditOrDelete(proposedFlowCommand);
+                return validateProposedFlowForDelete(proposedFlowCommand);
             default:
                 throw new UnsupportedOperationException(
                         "proposalType not supported: " + proposedFlowCommand.proposalType()
@@ -266,7 +268,7 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    private FlowIdResponse validateDuplicatesForCreate(ProposedFlowCommand command, String username){
+    private FlowIdResponse validateProposedFlowForCreate(ProposedFlowCommand command, String username){
         return command.logicalFlowId()
                 .map(id -> dataFlowService.getPhysicalFlowIfExist(command, username))
                 .filter(Objects::nonNull)
@@ -285,7 +287,25 @@ public class ProposedFlowWorkflowService {
                 .build();
     }
 
-    private FlowIdResponse validateDuplicatesForEditOrDelete(ProposedFlowCommand command){
+    private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command){
+        checkNotNull(command.physicalFlowId(),"physical flow id can not be null");
+        checkNotNull(command.specification().id().get(), "specification id can not be null");
+        checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
+
+        return proposedFlowDao.proposedFlowRecordsByProposalType(command)
+                .stream()
+                .filter(record -> {
+                    ProposedFlowCommand flow = getFlowDefinition(record);
+                    return flow.logicalFlowId().isPresent() && flow.physicalFlowId().isPresent()
+                            && flow.logicalFlowId().get().equals(command.logicalFlowId().orElse(null))
+                            && flow.physicalFlowId().get().equals(command.physicalFlowId().orElse(null));
+                })
+                .findFirst()
+                .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
+                .orElse(null);
+    }
+
+    private FlowIdResponse validateProposedFlowForDelete(ProposedFlowCommand command){
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
