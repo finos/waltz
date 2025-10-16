@@ -56,7 +56,7 @@
 
     $: isMaker = proposedFlow?.createdBy === user?.email;
 
-    $: canCancelProposedFlow = proposedFlow && workflowEnded() ? false : isMaker;
+    $: canCancelProposedFlow = proposedFlow && !workflowEnded() && isMaker;
 
     $: workflowEnded = function() {
         switch (currentState) {
