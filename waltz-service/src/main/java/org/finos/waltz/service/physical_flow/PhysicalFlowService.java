@@ -22,6 +22,7 @@ import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
