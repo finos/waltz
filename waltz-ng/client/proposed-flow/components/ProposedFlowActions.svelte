@@ -56,7 +56,19 @@
 
     $: isMaker = proposedFlow?.createdBy === user?.email;
 
-    $: canCancelProposedFlow = currentState === STATES.CANCELLED ? false : isMaker;
+    $: canCancelProposedFlow = proposedFlow && workflowEnded() ? false : isMaker;
+
+    $: workflowEnded = function() {
+        switch (currentState) {
+            case STATES.CANCELLED:
+            case STATES.FULLY_APPROVED:
+            case STATES.SOURCE_REJECTED:
+            case STATES.TARGET_REJECTED:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     function mkButtonClasses(action) {
         return `btn btn-xs btn-${action.style}`;
