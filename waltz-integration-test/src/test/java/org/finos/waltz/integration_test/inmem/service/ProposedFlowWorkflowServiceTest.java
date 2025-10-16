@@ -273,7 +273,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         logicalFlowDao.addFlow(flowToAdd);
 
         // 2. Act --------------------------------------------------------------
-        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNull(flowIdResponse);
@@ -337,7 +337,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         physicalFlowDao.create(flow);
 
         // 2. Act --------------------------------------------------------------
-        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.checkForDuplicateFlows(command, USER_NAME);
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(flowIdResponse);
