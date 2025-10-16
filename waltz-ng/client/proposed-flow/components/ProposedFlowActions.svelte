@@ -9,7 +9,8 @@
     import { lastProposedFlowId } from "../services/svelte-stores/proposed-flow-store";
     import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
     import { get } from "svelte/store";
-    
+    import {personStore} from "../../svelte-stores/person-store";
+
     export let refreshState;
     const Modes = {
         LIST: "LIST",
@@ -23,6 +24,9 @@
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
     export let proposedFlow = {};
+
+    $: userCall = personStore.getSelf();
+    $: user = $userCall?.data;
 
     $: currentState = proposedFlow?.workflowState?.state || {};
 
@@ -38,7 +42,7 @@
             return (permissions.sourceApprover && permissions.sourceApprover.length > 0) ||
                 (permissions.targetApprover && permissions.targetApprover.length > 0);
         }
-        if (currentState === STATES.SOURCE_APPROVED || currentState === STATES.SOURCE_REJECTED) { 
+        if (currentState === STATES.SOURCE_APPROVED || currentState === STATES.SOURCE_REJECTED) {
             // Only target approver can act
             return permissions.targetApprover && permissions.targetApprover.length > 0;
         }
@@ -46,10 +50,13 @@
             // Only source approver can act
             return permissions.sourceApprover && permissions.sourceApprover.length > 0;
         }
-        
+
         return false;
     }
 
+    $: isMaker = proposedFlow?.createdBy === user?.email;
+
+    $: canCancelProposedFlow = currentState === STATES.CANCELLED ? false : isMaker;
 
     function mkButtonClasses(action) {
         return `btn btn-xs btn-${action.style}`;
@@ -86,10 +93,10 @@
             validationMessage = "Reason is required when rejecting a proposed flow";
             return;
         }
-        
+
         // SHOW MESSAGE
         const updateCmd = { action: name, payload: { comment: reason } };
-        
+
         mode = Modes.LOADING;
         return Promise
             .resolve(proposeDataFlowRemoteStore.transitionProposedFlow(proposedFlow.id, updateCmd))
@@ -109,7 +116,7 @@
 
     $: isFullyApproved = currentState === STATES.FULLY_APPROVED;
     $: canAct = proposedFlow && canApproveOrReject();
-    
+
     $: actionList = [
         {
             display: "Approve",
@@ -131,6 +138,16 @@
             name: "reject",
             disabled: !canAct
         },
+        {
+            display: "Cancel",
+            verb: "cancelled",
+            icon: "xmark",
+            style: "danger",
+            description: canCancelProposedFlow ? "Cancel the flow" : "You cannot cancel the flow",
+            confirmationRequirement: "CONFIRM_REQUIRED",
+            name: "cancel",
+            disabled: !canCancelProposedFlow
+        }
     ];
 
     let permissionsCall;
@@ -178,10 +195,10 @@
         {/if}
         {#if isFullyApproved}
             <div style="padding-top: 0.5em" class="small">
-                <EntityLink 
+                <EntityLink
                     ref={{
-                    kind: 'LOGICAL_DATA_FLOW', 
-                    id: proposedFlow?.flowDef?.logicalFlowId, 
+                    kind: 'LOGICAL_DATA_FLOW',
+                    id: proposedFlow?.flowDef?.logicalFlowId,
                     name: 'Go to logical flow'}} />
             </div>
         {/if}
