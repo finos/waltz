@@ -136,6 +136,7 @@ public class ProposedFlowWorkflowService {
         );
         boolean isSourceApprover = !flowPermission.sourceApprover().isEmpty();
         boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
+        boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
 
 //        Fetch the current state
         ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
@@ -147,6 +148,7 @@ public class ProposedFlowWorkflowService {
                         proposedFlow.workflowState().entityReference(), username, proposedFlowActionCommand.comment())
                         .setSourceApprover(isSourceApprover)
                         .setTargetApprover(isTargetApprover)
+                        .setMaker(isMaker)
                         .setCurrentState(currentState);
 
         try {
