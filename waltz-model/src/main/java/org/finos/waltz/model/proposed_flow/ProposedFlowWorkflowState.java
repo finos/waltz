@@ -26,7 +26,8 @@ public enum ProposedFlowWorkflowState {
     TARGET_APPROVED("Target Approved"),
     FULLY_APPROVED("Fully Approved"),
     SOURCE_REJECTED("Source Rejected"),
-    TARGET_REJECTED("Target Rejected");
+    TARGET_REJECTED("Target Rejected"),
+    CANCELLED("Cancelled");
 
     private final String prettyName;
 

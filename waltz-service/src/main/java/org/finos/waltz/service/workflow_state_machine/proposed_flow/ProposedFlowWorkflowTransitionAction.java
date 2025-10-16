@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public enum ProposedFlowWorkflowTransitionAction {
     PROPOSE("Propose", "propose"),
     APPROVE("Approve", "approve"),
-    REJECT("Reject", "reject");
+    REJECT("Reject", "reject"),
+    CANCEL("Cancel", "cancel");
 
     private final String display;
     private final String verb;
