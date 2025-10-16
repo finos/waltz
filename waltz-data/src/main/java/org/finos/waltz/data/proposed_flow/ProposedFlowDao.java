@@ -39,7 +39,6 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
-
     private final DSLContext dsl;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
