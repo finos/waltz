@@ -8,7 +8,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -182,15 +181,7 @@ public class ProposedFlowWorkflowService {
             }
 
             // Refresh Return Object
-            EntityWorkflowView entityWorkflowView = proposedFlowDao.getEntityWorkflowView(
-                    ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
-            proposedFlow = ImmutableProposedFlowResponse
-                    .copyOf(proposedFlow)
-                    .withWorkflowState(entityWorkflowView.workflowState())
-                    .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
-                    .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
-                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
+            proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;
