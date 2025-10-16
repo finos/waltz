@@ -9,6 +9,8 @@ public class ProposedFlowWorkflowContext extends WorkflowContext {
   private ProposedFlowWorkflowState prevState;
   private boolean isSourceApprover;
   private boolean isTargetApprover;
+  private boolean isMaker;
+
 
   public ProposedFlowWorkflowContext(
       long workflowId, EntityReference entityReference, String userId, String reason) {
@@ -48,6 +50,15 @@ public class ProposedFlowWorkflowContext extends WorkflowContext {
 
   public ProposedFlowWorkflowContext setTargetApprover(boolean targetApprover) {
     isTargetApprover = targetApprover;
+    return this;
+  }
+
+  public boolean isMaker() {
+    return isMaker;
+  }
+
+  public ProposedFlowWorkflowContext setMaker(boolean maker) {
+    isMaker = maker;
     return this;
   }
 }
