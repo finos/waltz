@@ -11,10 +11,6 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
-import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowView;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -35,13 +31,18 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
@@ -213,7 +214,7 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
                         .and(proposalTypeCondition)
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
                         .fetchInto(ProposedFlowRecord.class);
         return records;
     }

@@ -2,6 +2,7 @@ package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
@@ -13,17 +14,24 @@ import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationR
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -35,13 +43,19 @@ public class DataFlowService {
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
     public final EntityWorkflowService entityWorkflowService;
+    private final PhysicalSpecificationService physicalSpecificationService;
+    private final DataTypeDecoratorService dataTypeDecoratorService;
 
     @Autowired
-    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService) {
+    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService,
+                           PhysicalSpecificationService physicalSpecificationService,
+                           DataTypeDecoratorService dataTypeDecoratorService) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
+        this.physicalSpecificationService = physicalSpecificationService;
     }
 
     /**
@@ -143,6 +157,34 @@ public class DataFlowService {
             LOG.error("Failed to create physical flow from proposedFlowId={}", proposedFlow.id(), ex);
             throw new FlowCreationException("Physical flow creation failed", ex);
         }
+    }
+
+    public boolean editPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
+        checkNotNull(proposedFlow.flowDef().logicalFlowId().get(),"logical flow id can not be null");
+        checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
+        checkNotNull(proposedFlow.flowDef().specification().id().get(), "specification id can not be null");
+        checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
+
+        Long physicalFlowId = proposedFlow.flowDef().physicalFlowId().get();
+        Long specId = proposedFlow.flowDef().specification().id().get();
+
+        //fetch data type id's from DB and request
+        Set<Long> dataTypeIdsInDB = physicalSpecificationService.getDataTypesByPhysicalFlowId(physicalFlowId);
+        Set<Long> dataTypeIdsInRequest =  new HashSet<>(proposedFlow.flowDef().dataTypeIds());
+
+        //Determine which id's to add and remove
+        Set<Long> toAdd = difference(dataTypeIdsInRequest, dataTypeIdsInDB);
+        Set<Long> toRemove = difference(dataTypeIdsInDB, dataTypeIdsInRequest);
+
+        return dataTypeDecoratorService.updateDecorators(
+                username,
+                mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId),
+                toAdd,
+                toRemove);
+    }
+
+    private Set<Long> difference(Set<Long> a, Set<Long> b){
+        return  a.stream().filter(id -> !b.contains(id)).collect(Collectors.toSet());
     }
 
     public Long getPhysicalFlowIfExist(ProposedFlowCommand command, String username) {
