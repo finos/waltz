@@ -16,19 +16,30 @@
  *
  */
 
-import {writable} from "svelte/store";
+export function store($http) {
+    const base = `api/mc`;
 
-export const ViewMode = {
-    SECTION: "SECTION",
-    FLOW: "FLOW"
+    const getById = (id) => {
+        return $http
+            .get(`${base}/propose-flow/id/${id}`)
+            .then(r => r.data);
+    };
+
+    return {
+        getById
+    };
 }
 
-export const logicalFlow = writable(null);
-export const physicalFlow = writable(null);
-export const physicalSpecification = writable(null);
-export const dataTypes = writable([]);
-export const expandedSections = writable([]);
-export const nestedEnums = writable({});
-export const skipDataTypes = writable(false);
-export const viewMode = writable(ViewMode.SECTION)
+store.$inject = [
+    "$http"
+];
 
+export const serviceName = "ProposedFlowStore";
+
+export const ProposedFlowStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "executes getById"
+    }
+};

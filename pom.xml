@@ -31,7 +31,7 @@
 
     <groupId>org.finos</groupId>
     <artifactId>waltz</artifactId>
-    <version>1.74.0-SNAPSHOT</version>
+    <version>1.75-SNAPSHOT</version>
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
@@ -99,7 +99,7 @@
         <pcollections.version>4.0.1</pcollections.version>
         <poi.version>5.2.4</poi.version>
         <slf4j.version>2.0.7</slf4j.version>
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
         <spark.version>2.9.4</spark.version>
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.30</spring.version>
@@ -332,7 +332,7 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
             </dependency>
-                        <dependency>
+            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
@@ -532,9 +532,9 @@
                 <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE</database.url>
                 <database.user>sa</database.user>
                 <database.password>sa</database.password>
-<!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
-<!--                <database.user>root</database.user>-->
-<!--                <database.password></database.password>-->
+                <!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
+                <!--                <database.user>root</database.user>-->
+                <!--                <database.password></database.password>-->
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
@@ -671,22 +671,22 @@
     <reporting>
         <plugins>
             <!-- DISABLING: causes a build failure with message: "Unable to download NVD CVE 2022" -->
-<!--            <plugin>-->
-<!--                <groupId>org.owasp</groupId>-->
-<!--                <artifactId>dependency-check-maven</artifactId>-->
-<!--                <configuration>-->
-<!--                    <cveValidForHours>48</cveValidForHours>-->
-<!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
-<!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
-<!--                </configuration>-->
-<!--                <reportSets>-->
-<!--                    <reportSet>-->
-<!--                        <reports>-->
-<!--                            <report>aggregate</report>-->
-<!--                        </reports>-->
-<!--                    </reportSet>-->
-<!--                </reportSets>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.owasp</groupId>-->
+            <!--                <artifactId>dependency-check-maven</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <cveValidForHours>48</cveValidForHours>-->
+            <!--                    &lt;!&ndash;<failBuildOnCVSS>7</failBuildOnCVSS>&ndash;&gt;-->
+            <!--                    &lt;!&ndash;mavenSettingsProxyId>artifactory</mavenSettingsProxyId&ndash;&gt;-->
+            <!--                </configuration>-->
+            <!--                <reportSets>-->
+            <!--                    <reportSet>-->
+            <!--                        <reports>-->
+            <!--                            <report>aggregate</report>-->
+            <!--                        </reports>-->
+            <!--                    </reportSet>-->
+            <!--                </reportSets>-->
+            <!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>

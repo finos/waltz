@@ -1,0 +1,131 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div class="container-fluid">
+    <!-- HEADER -->
+    <waltz-page-header
+        name="{{ $ctrl.proposedFlow.name}}"
+        small="{{ $ctrl.proposedFlow.flowDef.source.name }} {{$ctrl.proposedFlow ? '&rarr;': '' }} {{ $ctrl.proposedFlow.flowDef.target.name }}"
+        icon="{{$ctrl.proposedFlow.kind | toIconName:'entity'}}"
+        class="waltz-visibility-parent"
+    >
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>Proposed Flow</li>
+            </ol>
+        </breadcrumbs>
+    </waltz-page-header>
+    
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div ng-if="$ctrl.proposedFlow">
+            <waltz-section-actions>
+                <button class="btn btn-xs btn-primary"
+                        ng-click="$ctrl.goToDashboard()">
+                    <waltz-icon name="display"></waltz-icon>
+                    Go to Dashboard
+                </button>
+            </waltz-section-actions>
+            <div class="row">
+                <!-- OVERVIEW -->
+                <div class="col-md-7">
+                    <div ng-include="'wpfv-overview'"></div>
+                </div>
+
+                <!-- DATA USAGE -->
+                <div class="col-md-5">
+
+                    <div class="mini-section">
+                        <waltz-svelte-component
+                            component="$ctrl.ProposedFlowActions"
+                            proposed-flow="$ctrl.proposedFlow"
+                            refresh-state="$ctrl.refreshState"
+                        >
+                        </waltz-svelte-component>
+                    </div>
+                    <br />
+
+                    <!-- Data Types -->
+                    <div ng-include="'wpfv-data-types'"></div>
+                    <br />
+
+                    <!-- Transition Metadata -->
+                    <div ng-include="'wpfv-transitions-data'"></div>
+                    <br />
+                </div>
+            </div>
+        </div>
+        <br />
+        <waltz-no-data ng-if="!$ctrl.proposedFlow" >
+            <message>No information is available for the selected proposed flow</message>
+        </waltz-no-data>
+    </div>
+</div>
+
+<!-- Templates -->
+<script type="text/ng-template" id="wpfv-overview">
+    <waltz-sub-section name="Overview">
+        <content>
+            <div class="waltz-sub-section-content">
+                <waltz-svelte-component
+                    component="$ctrl.ProposedFlowDetails"
+                    proposed-flow="$ctrl.proposedFlow"
+                >
+                <waltz-svelte-component
+                    component="$ctrl.FlowWizard"
+                    proposed-flow="$ctrl.proposedFlow"
+                >
+            </div>
+        </content>
+    </waltz-sub-section>
+</script>
+
+<script type="text/ng-template" id="wpfv-data-types">
+    <div class="waltz-data-type-usage-panel">
+        <waltz-sub-section name="Data Types">
+            <content>
+                <div style="padding-top: 0.5em">
+                    <div ng-if="$ctrl.usedDataTypes.length > 0">
+                        <waltz-data-type-usage-tree used="$ctrl.usedDataTypes">
+                        </waltz-data-type-usage-tree>
+
+                        <div ng-if='$ctrl.dataTypeHelpText'
+                            class="help-block waltz-sub-section-content small"
+                            ng-bind="$ctrl.dataTypeHelpText">
+                        </div>
+                    </div>
+                    <div ng-if="$ctrl.usedDataTypes.length == 0"
+                        class="waltz-sub-section-content">
+                        No associated <strong>data types</strong> have been found
+                    </div>
+                </div>
+            </content>
+        </waltz-sub-section>
+    </div>
+</script>
+
+<script type="text/ng-template" id="wpfv-transitions-data">
+    <waltz-sub-section name="Workflow Approvals">
+        <content>
+            <waltz-svelte-component
+                component="$ctrl.FlowTransitionDetails"
+                proposed-flow="$ctrl.proposedFlow"
+            >
+        </content>
+    </waltz-sub-section>
+</script>

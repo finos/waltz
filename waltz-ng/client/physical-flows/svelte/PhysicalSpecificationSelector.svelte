@@ -4,8 +4,8 @@
     import {termSearch} from "../../common";
     import _ from "lodash";
     import {createEventDispatcher} from "svelte";
-    import {nestedEnums} from "./physical-flow-editor-store";
-    import {toDataFormatKindName} from "./physical-flow-registration-utils";
+    import {nestedEnums} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+    import {toDataFormatKindName} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-utils";
 
     export let specifications = [];
 

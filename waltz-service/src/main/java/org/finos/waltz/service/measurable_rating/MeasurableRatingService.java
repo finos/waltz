@@ -58,6 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.jooq.Condition;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,6 +68,7 @@ import java.util.Set;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 
 @Service
 public class MeasurableRatingService {
@@ -83,6 +86,7 @@ public class MeasurableRatingService {
 
     private final MeasurableCategoryService measurableCategoryService;
     private final ApplicationDao applicationDao;
+    private final RatingSchemeDAO ratingSchemeDAO;
 
     private static final MeasurableIdSelectorFactory MEASURABLE_ID_SELECTOR_FACTORY = new MeasurableIdSelectorFactory();
     private static final ApplicationIdSelectorFactory APPLICATION_ID_SELECTOR_FACTORY = new ApplicationIdSelectorFactory();
@@ -96,7 +100,9 @@ public class MeasurableRatingService {
                                    ChangeLogService changeLogService,
                                    RatingSchemeService ratingSchemeService,
                                    EntityReferenceNameResolver entityReferenceNameResolver,
-                                   MeasurableService measurableService, ApplicationService applicationService, MeasurableCategoryService measurableCategoryService, ApplicationDao applicationDao) {
+                                   MeasurableService measurableService, ApplicationService applicationService, MeasurableCategoryService measurableCategoryService,
+                                   ApplicationDao applicationDao,
+                                   RatingSchemeDAO ratingSchemeDAO) {
 
 
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
@@ -106,6 +112,7 @@ public class MeasurableRatingService {
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
         checkNotNull(measurableService, "MeasurableService cannot be null");
         checkNotNull(applicationDao, "ApplicationDao cannot be null");
+        checkNotNull(ratingSchemeDAO, "RatingSchemeDao cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
@@ -116,6 +123,7 @@ public class MeasurableRatingService {
         this.measurableService = measurableService;
         this.applicationDao = applicationDao;
         this.measurableCategoryService = measurableCategoryService;
+        this.ratingSchemeDAO = ratingSchemeDAO;
     }
 
     // -- READ
@@ -378,8 +386,19 @@ public class MeasurableRatingService {
     }
 
 
-    public void migrateRatings(Long measurableId, Long targetMeasurableId, String userId) {
-        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId);
+    public void migrateRatings(Long measurableId,
+                               Long targetMeasurableId,
+                               String userId,
+                               long measurableCategoryId) {
+
+        MeasurableCategory category = checkNotNull(
+                measurableCategoryDao.getById(measurableCategoryId),
+                "Cannot find category: %d", measurableCategoryId);
+
+        Condition itemCondition = RATING_SCHEME_ITEM.SCHEME_ID.eq(category.ratingSchemeId());
+        List<RatingSchemeItem> ratingSchemeItems = ratingSchemeDAO.fetchItems(itemCondition);
+
+        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId, category.ratingSchemeId(), ratingSchemeItems);
     }
 
 

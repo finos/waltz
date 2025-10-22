@@ -19,7 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {kindToViewState} from "../common/link-utils";
-import {logicalFlow, ViewMode, viewMode} from "./svelte/physical-flow-editor-store";
+import {logicalFlow, ViewMode, viewMode} from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 
 
 import template from "./physical-flow-registration.html";

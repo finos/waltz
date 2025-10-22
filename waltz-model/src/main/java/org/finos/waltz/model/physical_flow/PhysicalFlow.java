@@ -100,6 +100,8 @@ public abstract class PhysicalFlow implements
                 .kind(EntityKind.PHYSICAL_FLOW)
                 .id(id().get())
                 .description(description())
+                .externalId(externalId())
+                .name(Optional.ofNullable(name()))
                 .build();
     }
 
