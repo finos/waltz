@@ -20,7 +20,6 @@ import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommandResponse;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
@@ -167,9 +166,9 @@ public class DataFlowService {
      *
      * @param physicalFlowId id of the flow to delete
      * @param username       user performing the operation
-     * @return immutable response object with the ids of the deleted artefacts
+     * @return boolean value of the deletePhysicalFlow
      */
-    public ProposedFlowResponse deletePhysicalFlow(Long physicalFlowId, String username) {
+    public boolean deletePhysicalFlow(Long physicalFlowId, String username) {
 
         checkNotNull(physicalFlowId, "physicalFlowId must not be null");
         checkNotNull(username, "username must not be null");
@@ -203,11 +202,7 @@ public class DataFlowService {
 
         LOG.info("[deletePhysicalFlow] completed successfully for physicalFlowId={}", physicalFlowId);
 
-        return ImmutableProposedFlowResponse.builder()
-                .logicalFlowId(physicalFlow.logicalFlowId())
-                .physicalFlowId(physicalFlowId)
-                .specificationId(physicalFlow.specificationId())
-                .build();
+        return true;
     }
 
     private PhysicalFlowDeleteCommand buildPhysicalFlowDeleteCommand(Long physicalFlowId) {
