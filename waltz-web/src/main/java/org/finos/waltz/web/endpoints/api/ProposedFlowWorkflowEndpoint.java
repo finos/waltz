@@ -50,6 +50,8 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
 
+        getForDatum(mkPath(BASE_URL, "logicalFlowId", ":id"), this::getLogicalIdForLastPhysicalFlow);
+
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -83,5 +85,10 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         EntityReference entityRef = getEntityReference(request, "entityKind", "entityId");
         return proposedFlowWorkflowService.getUserPermissionsForEntityRef(username, entityRef);
+    }
+
+    public Long getLogicalIdForLastPhysicalFlow(Request request, Response response){
+        Long logicalFlowId = WebUtilities.getLong(request, "id");
+        return proposedFlowWorkflowService.getLastPhysicalFlowLogicalId(logicalFlowId);
     }
 }

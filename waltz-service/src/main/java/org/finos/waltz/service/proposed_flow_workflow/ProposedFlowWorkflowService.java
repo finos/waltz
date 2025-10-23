@@ -2,6 +2,7 @@ package org.finos.waltz.service.proposed_flow_workflow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityReference;
@@ -51,6 +52,7 @@ public class ProposedFlowWorkflowService {
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
+    private final PhysicalFlowDao physicalFlowDao;
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -58,12 +60,14 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService) {
+                                DataFlowService dataFlowService,
+                                PhysicalFlowDao physicalFlowDao) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(permissionService, "ProposedFlowWorkflowPermissionService cannot be null");
+        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -72,6 +76,7 @@ public class ProposedFlowWorkflowService {
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
+        this.physicalFlowDao = physicalFlowDao;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -200,5 +205,10 @@ public class ProposedFlowWorkflowService {
         } else {
             throw new UnsupportedOperationException(format("%s is not supported", entityRef.kind()));
         }
+    }
+
+    public Long getLastPhysicalFlowLogicalId(Long logicalFlowId) {
+
+        return physicalFlowDao.getLogicalFlowIdIfSinglePhysicalFlow(logicalFlowId);
     }
 }
