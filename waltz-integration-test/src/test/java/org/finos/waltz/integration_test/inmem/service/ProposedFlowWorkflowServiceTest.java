@@ -18,6 +18,7 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
@@ -26,14 +27,30 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FlowAttributes;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.ProposalType;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +61,7 @@ import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -73,6 +91,15 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @Autowired
     PhysicalFlowDao physicalFlowDao;
+
+    @Autowired
+    private AppHelper appHelper;
+
+    @Autowired
+    private LogicalFlowHelper lfHelper;
+
+    @Autowired
+    private PhysicalFlowService pfSvc;
 
     @Test
     public void testProposedNewFlow() {
@@ -212,5 +239,122 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(response);
         assertNotNull(response.proposedFlowCommand());
         assertEquals(CREATE.name(), response.proposedFlowCommand().proposalType().name());
+    }
+
+    @Test
+    public void testShouldReturnLogicalId_whenExactlyOneNonRemovedPhysicalFlowExists() {
+        // 1. Arrange ----------------------------------------------------------
+        String username = mkName("test user");
+
+        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+        EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
+
+        LogicalFlow logicalFlow = lfHelper.createLogicalFlow(a, b);
+
+        String specExtId = mkName("createWillCreateSpecIfRequired");
+
+        ImmutablePhysicalSpecification newSpec = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId)
+                .owningEntity(a)
+                .name(specExtId)
+                .description(specExtId)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec)
+                .flowAttributes(flowAttrs)
+                .build();
+
+        pfSvc.create(createCommand, username);
+
+        // 2. Act --------------------------------------------------------------
+        Long result = proposedFlowWorkflowService.getLastPhysicalFlowLogicalId(logicalFlow.id().get());
+
+        // 3. Assert -----------------------------------------------------------
+        assertEquals(result, logicalFlow.id().get());
+    }
+
+    @Test
+    public void testShouldReturnNull_whenMoreThanOnePhysicalFlowExists() {
+        // 1. Arrange ----------------------------------------------------------
+        String username = mkName("test user");
+
+        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+        EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
+
+        LogicalFlow logicalFlow = lfHelper.createLogicalFlow(a, b);
+
+        String specExtId = mkName("test");
+
+        String specExtId_1 = mkName("test1");
+
+        ImmutablePhysicalSpecification newSpec = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId)
+                .owningEntity(a)
+                .name(specExtId)
+                .description(specExtId)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutablePhysicalSpecification newSpec_1 = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId_1)
+                .owningEntity(a)
+                .name(specExtId_1)
+                .description(specExtId_1)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutableFlowAttributes flowAttrs_1 = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("LOW"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec)
+                .flowAttributes(flowAttrs)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand_1 = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec_1)
+                .flowAttributes(flowAttrs_1)
+                .build();
+
+        pfSvc.create(createCommand, username);
+        pfSvc.create(createCommand_1, username);
+
+        // 2. Act --------------------------------------------------------------
+        Long result = proposedFlowWorkflowService.getLastPhysicalFlowLogicalId(logicalFlow.id().get());
+
+        // 3. Assert -----------------------------------------------------------
+        assertNull(result);
     }
 }
