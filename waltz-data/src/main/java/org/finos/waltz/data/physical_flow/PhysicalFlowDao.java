@@ -28,11 +28,26 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.enum_value.EnumValueKind;
-import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowInfo;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlowInfo;
+import org.finos.waltz.model.physical_flow.PhysicalFlowParsed;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.PhysicalSpecDataType;
 import org.finos.waltz.schema.tables.records.PhysicalFlowRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectQuery;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +68,9 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.DATA_TYPE;
+import static org.finos.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
+import static org.finos.waltz.schema.Tables.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -585,11 +602,11 @@ public class PhysicalFlowDao {
     }
 
     /**
-     * Returns the supplied logical-flow id <b>only</b> when exactly one
-     * non-removed physical flow is linked to it; otherwise returns {@code null}.
+     * Returns the supplied logical-flow id only when exactly one
+     * non-removed physical flow is linked to it; otherwise returns null.
      *
      * @param logicalFlowId the logical flow to inspect
-     * @return the same logical-flow id when count == 1, otherwise {@code null}
+     * @return the same logical-flow id when count == 1, otherwise null
      */
     public Long getLogicalFlowIdIfSinglePhysicalFlow(long logicalFlowId) {
         int count = dsl.fetchCount(

@@ -62,7 +62,10 @@ import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
