@@ -1,6 +1,7 @@
 package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -8,6 +9,7 @@ import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
@@ -42,6 +44,7 @@ public class DataFlowService {
     private final ProposedFlowDao proposedFlowDao;
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
+    public final PhysicalFlowDao physicalFlowDao;
     public final EntityWorkflowService entityWorkflowService;
     private final PhysicalSpecificationService physicalSpecificationService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
@@ -49,13 +52,15 @@ public class DataFlowService {
     @Autowired
     public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService,
                            PhysicalSpecificationService physicalSpecificationService,
-                           DataTypeDecoratorService dataTypeDecoratorService) {
+                           DataTypeDecoratorService dataTypeDecoratorService,
+                           PhysicalFlowDao physicalFlowDao) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
         this.dataTypeDecoratorService = dataTypeDecoratorService;
         this.physicalSpecificationService = physicalSpecificationService;
+        this.physicalFlowDao = physicalFlowDao;
     }
 
     /**
@@ -162,14 +167,13 @@ public class DataFlowService {
     public boolean editPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
         checkNotNull(proposedFlow.flowDef().logicalFlowId().get(),"logical flow id can not be null");
         checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
-        checkNotNull(proposedFlow.flowDef().specification().id().get(), "specification id can not be null");
         checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
 
-        Long physicalFlowId = proposedFlow.flowDef().physicalFlowId().get();
-        Long specId = proposedFlow.flowDef().specification().id().get();
+        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
+        checkNotNull(physicalFlow,"physical flow can not be null");
 
         //fetch data type id's from DB and request
-        Set<Long> dataTypeIdsInDB = physicalSpecificationService.getDataTypesByPhysicalFlowId(physicalFlowId);
+        Set<Long> dataTypeIdsInDB = physicalSpecificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
         Set<Long> dataTypeIdsInRequest =  new HashSet<>(proposedFlow.flowDef().dataTypeIds());
 
         //Determine which id's to add and remove
@@ -178,7 +182,7 @@ public class DataFlowService {
 
         return dataTypeDecoratorService.updateDecorators(
                 username,
-                mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId),
+                mkRef(EntityKind.PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
                 toAdd,
                 toRemove);
     }

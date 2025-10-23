@@ -248,10 +248,13 @@ public class ProposedFlowWorkflowService {
         switch (proposedFlow.flowDef().proposalType()) {
             case CREATE:
                          dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlow.id(), username);
+                         break;
             case EDIT:
                          dataFlowService.editPhysicalFlow(proposedFlow, username);
+                         break;
             case DELETE:
                 //TODO
+                        break;
             default:
                 throw new UnsupportedOperationException(
                         "proposalType not supported: " + proposedFlow.flowDef().proposalType()
@@ -281,7 +284,6 @@ public class ProposedFlowWorkflowService {
     private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command){
         checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
         checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
-        checkNotNull(command.specification().id().get(), "specification id can not be null");
         checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
