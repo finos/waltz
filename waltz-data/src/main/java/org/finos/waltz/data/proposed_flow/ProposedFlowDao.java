@@ -46,11 +46,11 @@ import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
-import static org.finos.waltz.schema.Tables.PERSON;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.name;
 import static org.jooq.impl.DSL.table;
@@ -125,94 +125,6 @@ public class ProposedFlowDao {
         }
     }
 
-    private Result<Record> fetchFlowsForPerson(Long personId,
-                                              boolean includeSubordinates, Long workflowId) {
-        SelectFieldOrAsterisk[] selectFields = Stream.of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(), ENTITY_WORKFLOW_TRANSITION.fields())
-                .flatMap(Arrays::stream).map(f -> (SelectFieldOrAsterisk) f).toArray(SelectFieldOrAsterisk[]::new);
-
-        // --- Base CTE: current person
-        SelectConditionStep<Record3<Long, String, String>> currentPerson = getCurrentPerson(personId);
-
-        CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
-                name("current_person").fields("id", "employee_id", "email").as(currentPerson);
-
-        // --- Optional subordinate CTE if needed
-        CommonTableExpression<Record3<Long, String, String>> personScopeCte;
-
-        personScopeCte = getPersonScope(includeSubordinates, currentPerson);
-
-        // table reference for unified CTE
-        Table<Record> personScopeTbl = table(name("person_scope")).as("ps");
-
-        SelectJoinStep<?> invJoin = dsl.selectOne().from(INVOLVEMENT);
-        if(includeSubordinates){
-            invJoin = invJoin
-                    .join(INVOLVEMENT_KIND)
-                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID));
-        }
-
-        // --- Build the shared query
-        return dsl
-                .with(currentPersonCte)
-                .with(personScopeCte)
-                .select(selectFields)
-                .from(PROPOSED_FLOW)
-                .join(ENTITY_WORKFLOW_STATE)
-                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .join(ENTITY_WORKFLOW_TRANSITION)
-                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .whereExists(
-                            invJoin
-                               .join(personScopeTbl)
-                                .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
-                                .where(
-                                        INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                                                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                                                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                                        .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
-                                )
-                )
-                .or(PROPOSED_FLOW.CREATED_BY.in(
-                        dsl.select(field(name("email"), String.class))
-                                .from(personScopeTbl)
-                )).fetch();
-    }
-
-    private SelectConditionStep<Record3<Long, String, String>> getCurrentPerson(Long personId) {
-        return dsl
-                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
-                .from(PERSON)
-                .where(PERSON.ID.eq(personId));
-    }
-
-    private CommonTableExpression<Record3<Long, String, String>> getPersonScope(boolean includeSubordinates, SelectConditionStep<Record3<Long, String, String>> currentPerson) {
-
-        return includeSubordinates ?
-                name("person_scope").fields("id", "employee_id", "email").as(getPersonWithSubordinates(currentPerson))
-                : name("person_scope").fields("id", "employee_id", "email").as(currentPerson);
-
-    }
-
-    private SelectUnionStep<Record3<Long, String, String>> getPersonWithSubordinates(SelectConditionStep<Record3<Long, String, String>> currentPerson) {
-        return dsl
-                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
-                .from(PERSON)
-                .join(PERSON_HIERARCHY)
-                .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
-                .join(currentPerson.asTable("cp"))
-                .on(PERSON_HIERARCHY.MANAGER_ID.eq(field(name("cp", "employee_id"), String.class)))
-                .where(PERSON.IS_REMOVED.eq(false))
-                .union(
-                        dsl.select(field(name("id"), Long.class),
-                                        field(name("employee_id"), String.class),
-                                        field(name("email"), String.class))
-                                .from(currentPerson)
-                );
-        }
-
-
     public List<ProposedFlowResponse> getProposedFlowsByUser(Long personId, boolean isHierarchyRequired, Long workflowId) throws JsonProcessingException {
 
         Result<Record> flatResults = fetchFlowsForPerson(personId, isHierarchyRequired, workflowId);
@@ -259,6 +171,94 @@ public class ProposedFlowDao {
                 })
                 .collect(Collectors.toList());
     }
+
+    private Result<Record> fetchFlowsForPerson(Long personId,
+                                               boolean includeSubordinates, Long workflowId) {
+        SelectFieldOrAsterisk[] selectFields = Stream.of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(), ENTITY_WORKFLOW_TRANSITION.fields())
+                .flatMap(Arrays::stream).map(f -> (SelectFieldOrAsterisk) f).toArray(SelectFieldOrAsterisk[]::new);
+
+        // --- Base CTE: current person
+        SelectConditionStep<Record3<Long, String, String>> currentPerson = getCurrentPerson(personId);
+
+        CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
+                name("current_person").fields("id", "employee_id", "email").as(currentPerson);
+
+        // --- Optional subordinate CTE if needed
+        CommonTableExpression<Record3<Long, String, String>> personScopeCte;
+
+        personScopeCte = getPersonScope(includeSubordinates, currentPerson);
+
+        // table reference for unified CTE
+        Table<Record> personScopeTbl = table(name("person_scope")).as("ps");
+
+        SelectJoinStep<?> invJoin = dsl.selectOne().from(INVOLVEMENT);
+        if (includeSubordinates) {
+            invJoin = invJoin
+                    .join(INVOLVEMENT_KIND)
+                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID));
+        }
+
+        // --- Build the shared query
+        return dsl
+                .with(currentPersonCte)
+                .with(personScopeCte)
+                .select(selectFields)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .join(ENTITY_WORKFLOW_TRANSITION)
+                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .whereExists(
+                        invJoin
+                                .join(personScopeTbl)
+                                .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
+                                .where(
+                                        INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                                                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                                                        .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
+                                )
+                )
+                .or(PROPOSED_FLOW.CREATED_BY.in(
+                        dsl.select(field(name("email"), String.class))
+                                .from(personScopeTbl)
+                )).fetch();
+    }
+
+    private SelectConditionStep<Record3<Long, String, String>> getCurrentPerson(Long personId) {
+        return dsl
+                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
+                .from(PERSON)
+                .where(PERSON.ID.eq(personId));
+    }
+
+    private CommonTableExpression<Record3<Long, String, String>> getPersonScope(boolean includeSubordinates, SelectConditionStep<Record3<Long, String, String>> currentPerson) {
+
+        return includeSubordinates ?
+                name("person_scope").fields("id", "employee_id", "email").as(getPersonWithSubordinates(currentPerson))
+                : name("person_scope").fields("id", "employee_id", "email").as(currentPerson);
+
+    }
+
+    private SelectUnionStep<Record3<Long, String, String>> getPersonWithSubordinates(SelectConditionStep<Record3<Long, String, String>> currentPerson) {
+        return dsl
+                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
+                .from(PERSON)
+                .join(PERSON_HIERARCHY)
+                .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .join(currentPerson.asTable("cp"))
+                .on(PERSON_HIERARCHY.MANAGER_ID.eq(field(name("cp", "employee_id"), String.class)))
+                .where(PERSON.IS_REMOVED.eq(false))
+                .union(
+                        dsl.select(field(name("id"), Long.class),
+                                        field(name("employee_id"), String.class),
+                                        field(name("email"), String.class))
+                                .from(currentPerson)
+                );
+    }
+
 
     private ProposedFlowResponse createProposedFlowView(ProposedFlowCommand flowDefinition, List<EntityWorkflowTransition> updatedTransitions, ProposedFlowRecord proposedFlowRecord, EntityWorkflowState entityWorkflowState) {
         return ImmutableProposedFlowResponse.builder()
