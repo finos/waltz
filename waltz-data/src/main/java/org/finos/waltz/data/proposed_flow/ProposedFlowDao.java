@@ -195,7 +195,8 @@ public class ProposedFlowDao {
         if (includeSubordinates) {
             invJoin = invJoin
                     .join(INVOLVEMENT_KIND)
-                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID));
+                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                    .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
         }
 
         // --- Build the shared query
