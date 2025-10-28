@@ -32,6 +32,7 @@
     <groupId>org.finos</groupId>
     <artifactId>waltz</artifactId>
     <version>1.75-SNAPSHOT</version>
+    
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
