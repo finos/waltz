@@ -134,7 +134,7 @@ public class ProposedFlowWorkflowService {
                     .proposedFlowId(0L);
         }
         return  builder
-                    .outcome(SUCCESS)
+                    .outcome(FAILURE)
                     .proposedFlowCommand(command)
                     .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
                     .build();

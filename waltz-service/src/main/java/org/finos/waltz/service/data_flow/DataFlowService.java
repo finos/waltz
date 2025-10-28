@@ -91,7 +91,7 @@ public class DataFlowService {
                 .build();
     }
 
-    public PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
+    private PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(command.specification())
                 .logicalFlowId(command.logicalFlowId().get())

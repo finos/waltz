@@ -233,7 +233,7 @@ public class PhysicalFlowService {
                         .withLastUpdatedAt(now)
                         .withCreated(UserTimestamp.mkForUser(username, now))));
 
-        PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
+        PhysicalFlow flow = buildPhysicalFlow(command, username, specId, now);
 
         // ensure existing not in database
         List<PhysicalFlow> byAttributesAndSpecification = physicalFlowDao.findByAttributesAndSpecification(flow);
@@ -280,7 +280,7 @@ public class PhysicalFlowService {
         return command.specification().id()
                 .filter(Objects::nonNull)
                 .map(specId -> {
-                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
+                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId, null);
                     // ensure existing not in database
                     return physicalFlowDao.findByAttributesAndSpecification(flow).stream()
                             .findFirst()
@@ -290,8 +290,8 @@ public class PhysicalFlowService {
                 .orElse(null);
     }
 
-    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId){
-        LocalDateTime now = nowUtc();
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId, LocalDateTime now){
+        LocalDateTime effectiveNow = (now != null) ? now : LocalDateTime.now();
 
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
@@ -303,8 +303,8 @@ public class PhysicalFlowService {
                 .description(mkSafe(command.flowAttributes().description()))
                 .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
-                .lastUpdatedAt(now)
-                .created(UserTimestamp.mkForUser(username, now));
+                .lastUpdatedAt(effectiveNow)
+                .created(UserTimestamp.mkForUser(username, effectiveNow));
 
         command
                 .flowAttributes()
