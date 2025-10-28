@@ -7,7 +7,8 @@ export const STATES = {
     SOURCE_REJECTED: "SOURCE_REJECTED",
     TARGET_APPROVED: "TARGET_APPROVED",
     TARGET_REJECTED: "TARGET_REJECTED",
-    FULLY_APPROVED: "FULLY_APPROVED"
+    FULLY_APPROVED: "FULLY_APPROVED",
+    CANCELLED: "CANCELLED"
 };
 
 export const stateMeta = {
@@ -16,7 +17,8 @@ export const stateMeta = {
     SOURCE_REJECTED: { label: 'Source Rejected', color: '#d9534f', icon: 'xmark' },
     TARGET_APPROVED: { label: 'Target Approved', color: '#1976d2', icon: 'check' },
     TARGET_REJECTED: { label: 'Target Rejected', color: '#d9534f', icon: 'xmark' },
-    FULLY_APPROVED: { label: 'Fully Approved', color: '#25b740', icon: 'check' }
+    FULLY_APPROVED: { label: 'Fully Approved', color: '#25b740', icon: 'check' },
+    CANCELLED: { label: 'Cancelled', color: '#d9534f', icon: 'xmark' }
 };
 
 export const defaultPermissions = {
