@@ -291,7 +291,7 @@ public class PhysicalFlowService {
     }
 
     private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId, LocalDateTime now){
-        LocalDateTime effectiveNow = (now != null) ? now : LocalDateTime.now();
+        LocalDateTime effectiveNow = (now != null) ? now : nowUtc();
 
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
