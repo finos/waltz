@@ -2,7 +2,6 @@ package org.finos.waltz.service.proposed_flow_workflow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityReference;
@@ -19,6 +18,7 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -59,7 +59,7 @@ public class ProposedFlowWorkflowService {
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
-    private final PhysicalFlowDao physicalFlowDao;
+    private final PhysicalFlowService physicalFlowService;
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -68,13 +68,13 @@ public class ProposedFlowWorkflowService {
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
                                 DataFlowService dataFlowService,
-                                PhysicalFlowDao physicalFlowDao) {
+                                PhysicalFlowService physicalFlowService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(permissionService, "ProposedFlowWorkflowPermissionService cannot be null");
-        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -83,7 +83,7 @@ public class ProposedFlowWorkflowService {
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
-        this.physicalFlowDao = physicalFlowDao;
+        this.physicalFlowService = physicalFlowService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -214,8 +214,8 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    public Long getLastPhysicalFlowLogicalId(Long logicalFlowId) {
+    public int getPhysicalFlowsCount(Long physicalFlowId) {
 
-        return physicalFlowDao.getLogicalFlowIdIfSinglePhysicalFlow(logicalFlowId);
+        return physicalFlowService.getPhysicalFlowsCount(physicalFlowId);
     }
 }

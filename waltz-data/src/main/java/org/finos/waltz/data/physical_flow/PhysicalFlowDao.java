@@ -490,11 +490,8 @@ public class PhysicalFlowDao {
 
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
-        return dsl.fetchCount(DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
-                .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
+
+        return getPhysicalFlowsCountForLogicalFlow(logicalFlowId) > 0;
     }
 
 
@@ -602,21 +599,19 @@ public class PhysicalFlowDao {
     }
 
     /**
-     * Returns the supplied logical-flow id only when exactly one
-     * non-removed physical flow is linked to it; otherwise returns null.
+     * Retrieves the number of active (non-removed) {@code PhysicalFlow}s that are
+     * associated with the specified logical flow.
      *
-     * @param logicalFlowId the logical flow to inspect
-     * @return the same logical-flow id when count == 1, otherwise null
+     * @param logicalFlowId the primary-key identifier of the logical flow whose
+     *                      physical flows are to be counted
+     * @return the count of physical flows linked to the given logical flow and
+     *         whose {@code IS_REMOVED} flag is {@code false}
      */
-    public Long getLogicalFlowIdIfSinglePhysicalFlow(long logicalFlowId) {
-        int count = dsl.fetchCount(
-                DSL.select(PHYSICAL_FLOW.ID)
-                        .from(PHYSICAL_FLOW)
-                        .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
-                        .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
-        );
-
-        return count == 1 ? logicalFlowId : null;
+    public int getPhysicalFlowsCountForLogicalFlow(long logicalFlowId) {
+        return dsl.fetchCount(DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .and(PHYSICAL_FLOW.IS_REMOVED.eq(false)));
     }
-
 }

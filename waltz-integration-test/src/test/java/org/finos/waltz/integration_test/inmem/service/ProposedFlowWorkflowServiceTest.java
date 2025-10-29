@@ -34,6 +34,7 @@ import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
 import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -64,7 +65,6 @@ import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -245,7 +245,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     }
 
     @Test
-    public void testShouldReturnLogicalId_whenExactlyOneNonRemovedPhysicalFlowExists() {
+    public void testShouldReturnOnePhysicalFlowCount_whenExactlyOneNonRemovedPhysicalFlowExistsForItsLogicalFlow() {
         // 1. Arrange ----------------------------------------------------------
         String username = mkName("test user");
 
@@ -280,17 +280,17 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .flowAttributes(flowAttrs)
                 .build();
 
-        pfSvc.create(createCommand, username);
+        PhysicalFlowCreateCommandResponse physicalFlowCreateCommandResponse = pfSvc.create(createCommand, username);
 
         // 2. Act --------------------------------------------------------------
-        Long result = proposedFlowWorkflowService.getLastPhysicalFlowLogicalId(logicalFlow.id().get());
+        int result = proposedFlowWorkflowService.getPhysicalFlowsCount(physicalFlowCreateCommandResponse.entityReference().id());
 
         // 3. Assert -----------------------------------------------------------
-        assertEquals(result, logicalFlow.id().get());
+        assertEquals(1, result);
     }
 
     @Test
-    public void testShouldReturnNull_whenMoreThanOnePhysicalFlowExists() {
+    public void testShouldReturnMultiplePhysicalFlowCount_whenMoreThanOnePhysicalFlowExistsForItsAssociatedLogicalFlow() {
         // 1. Arrange ----------------------------------------------------------
         String username = mkName("test user");
 
@@ -351,13 +351,13 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .flowAttributes(flowAttrs_1)
                 .build();
 
-        pfSvc.create(createCommand, username);
+        PhysicalFlowCreateCommandResponse physicalFlowCreateCommandResponse = pfSvc.create(createCommand, username);
         pfSvc.create(createCommand_1, username);
 
         // 2. Act --------------------------------------------------------------
-        Long result = proposedFlowWorkflowService.getLastPhysicalFlowLogicalId(logicalFlow.id().get());
+        int result = proposedFlowWorkflowService.getPhysicalFlowsCount(physicalFlowCreateCommandResponse.entityReference().id());
 
         // 3. Assert -----------------------------------------------------------
-        assertNull(result);
+        assertEquals(2, result);
     }
 }
