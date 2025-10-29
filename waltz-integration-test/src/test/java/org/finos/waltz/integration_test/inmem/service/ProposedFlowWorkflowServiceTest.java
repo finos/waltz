@@ -26,25 +26,48 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FlowAttributes;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.FlowIdResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.ProposalType;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
@@ -157,6 +180,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     private PhysicalSpecification getPhysicalSpecification(EntityReference owningEntity) {
         return ImmutablePhysicalSpecification.builder()
+                .id(1L)
                 .owningEntity(owningEntity)
                 .name("mc_specification")
                 .description("mc_specification description")
@@ -213,4 +237,112 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(response.proposedFlowCommand());
         assertEquals(CREATE.name(), response.proposedFlowCommand().proposalType().name());
     }
+
+    @Test
+    void testWhenPhysicalFlowAndProposedFlowDoesNotExist() {
+        // 1. Arrange ----------------------------------------------------------
+        long logicalId = 1L;
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(CREATE)
+                .logicalFlowId(Optional.of(logicalId))
+                .build();
+
+        LocalDateTime now = nowUtc();
+        LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                .source(command.source())
+                .target(command.target())
+                .lastUpdatedAt(now)
+                .lastUpdatedBy(USER_NAME)
+                .created(UserTimestamp.mkForUser(USER_NAME, now))
+                .build();
+
+        logicalFlowDao.addFlow(flowToAdd);
+
+        // 2. Act --------------------------------------------------------------
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNull(flowIdResponse);
+    }
+
+    @Test
+    void testWhenLogicalFlowExistsAndPhysicalFlowExists() {
+        // 1. Arrange ----------------------------------------------------------
+        long logicalId = 1L;
+        long physicalId = 1L;
+
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(CREATE)
+                .logicalFlowId(Optional.of(logicalId))
+                .physicalFlowId(Optional.of(physicalId))
+                .build();
+
+        LocalDateTime now = nowUtc();
+        LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                .source(command.source())
+                .target(command.target())
+                .lastUpdatedAt(now)
+                .lastUpdatedBy(USER_NAME)
+                .created(UserTimestamp.mkForUser(USER_NAME, now))
+                .build();
+
+        logicalFlowDao.addFlow(flowToAdd);
+
+        ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
+                .specificationId(1L)
+                .name(command.flowAttributes().name())
+                .basisOffset(command.flowAttributes().basisOffset())
+                .frequency(command.flowAttributes().frequency())
+                .transport(command.flowAttributes().transport())
+                .criticality(command.flowAttributes().criticality())
+                .description(mkSafe(command.flowAttributes().description()))
+                .logicalFlowId(1l)
+                .lastUpdatedBy(USER_NAME)
+                .lastUpdatedAt(now)
+                .created(UserTimestamp.mkForUser(USER_NAME, now));
+
+        command
+                .flowAttributes()
+                .externalId()
+                .ifPresent(flowBuilder::externalId);
+
+        PhysicalFlow flow = flowBuilder.build();
+
+        physicalFlowDao.create(flow);
+
+        // 2. Act --------------------------------------------------------------
+        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(flowIdResponse);
+        assertEquals(physicalId, flowIdResponse.id());
+    }
+
+
 }
