@@ -605,11 +605,10 @@ public class PhysicalFlowDao {
     }
 
     /**
-     * Returns the number of *active* physical flows that share the same
+     * Returns the number of active physical flows that share the same
      * logical flow as the given physical-flow id.
      *
-     * @param physicalFlowId primary key of the physical flow whose logical
-     *                       siblings we want to count
+     * @param physicalFlowId primary key of the physical flow
      * @return count ≥ 0
      */
     public int getPhysicalFlowSCountForAssociatedLogicalFlow(long physicalFlowId) {

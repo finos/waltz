@@ -170,7 +170,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         String cleanupOrphansPath = WebUtilities.mkPath(BASE_URL, "cleanup-orphans");
 
-        String physicalFlowsCountForAssociatedLogicalFlowPath = WebUtilities.mkPath(BASE_URL, ":id", "associated-logical-flow");
+        String physicalFlowsCountForAssociatedLogicalFlowPath = WebUtilities.mkPath(BASE_URL, ":id", "sibling-physical-flows-count");
 
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
