@@ -18,7 +18,6 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -59,7 +58,6 @@ public class ProposedFlowWorkflowService {
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
-    private final PhysicalFlowService physicalFlowService;
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -67,14 +65,12 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService,
-                                PhysicalFlowService physicalFlowService) {
+                                DataFlowService dataFlowService) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
         checkNotNull(proposedFlowWorkflowDefinition, "proposedFlowWorkflowDefinition cannot be null");
         checkNotNull(permissionService, "ProposedFlowWorkflowPermissionService cannot be null");
-        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
@@ -83,7 +79,6 @@ public class ProposedFlowWorkflowService {
         proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
-        this.physicalFlowService = physicalFlowService;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -212,10 +207,5 @@ public class ProposedFlowWorkflowService {
         } else {
             throw new UnsupportedOperationException(format("%s is not supported", entityRef.kind()));
         }
-    }
-
-    public int getPhysicalFlowsCount(Long physicalFlowId) {
-
-        return physicalFlowService.getPhysicalFlowsCount(physicalFlowId);
     }
 }

@@ -218,6 +218,7 @@ public class PhysicalFlowService {
                 responseBuilder
                         .isSpecificationUnused(!physicalSpecificationService.isUsed(physicalFlow.specificationId()))
                         .isLastPhysicalFlow(!physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId()));
+
             }
 
             changeLogService.writeChangeLogEntries(
@@ -478,8 +479,7 @@ public class PhysicalFlowService {
         return physicalFlowDao.search(options);
     }
 
-    public int getPhysicalFlowsCount(long physicalFlowId) {
-        PhysicalFlow physicalFlow = physicalFlowDao.getById(physicalFlowId);
-        return physicalFlowDao.getPhysicalFlowsCountForLogicalFlow(physicalFlow.logicalFlowId());
+    public int getPhysicalFlowsCountForAssociatedLogicalFlow(long physicalFlowId) {
+        return physicalFlowDao.getPhysicalFlowSCountForAssociatedLogicalFlow(physicalFlowId);
     }
 }

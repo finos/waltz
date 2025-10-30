@@ -31,7 +31,9 @@ import static org.finos.waltz.web.WebUtilities.getEntityReference;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readBody;
 import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -56,9 +58,6 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
-
-        getForDatum(mkPath(BASE_URL, "physicalFlowId", ":id"), this::getPhysicalFlowsCount);
-
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -92,10 +91,5 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         EntityReference entityRef = getEntityReference(request, "entityKind", "entityId");
         return proposedFlowWorkflowService.getUserPermissionsForEntityRef(username, entityRef);
-    }
-
-    public int getPhysicalFlowsCount(Request request, Response response){
-        Long physicalFlowId = WebUtilities.getLong(request, "id");
-        return proposedFlowWorkflowService.getPhysicalFlowsCount(physicalFlowId);
     }
 }

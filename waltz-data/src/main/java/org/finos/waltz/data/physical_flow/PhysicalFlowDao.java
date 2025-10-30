@@ -74,6 +74,8 @@ import static org.finos.waltz.schema.Tables.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.jooq.impl.DSL.count;
+import static org.jooq.impl.DSL.select;
 
 
 @Repository
@@ -491,7 +493,11 @@ public class PhysicalFlowDao {
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
 
-        return getPhysicalFlowsCountForLogicalFlow(logicalFlowId) > 0;
+        return dsl.fetchCount(DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
     }
 
 
@@ -599,19 +605,24 @@ public class PhysicalFlowDao {
     }
 
     /**
-     * Retrieves the number of active (non-removed) {@code PhysicalFlow}s that are
-     * associated with the specified logical flow.
+     * Returns the number of *active* physical flows that share the same
+     * logical flow as the given physical-flow id.
      *
-     * @param logicalFlowId the primary-key identifier of the logical flow whose
-     *                      physical flows are to be counted
-     * @return the count of physical flows linked to the given logical flow and
-     *         whose {@code IS_REMOVED} flag is {@code false}
+     * @param physicalFlowId primary key of the physical flow whose logical
+     *                       siblings we want to count
+     * @return count ≥ 0
      */
-    public int getPhysicalFlowsCountForLogicalFlow(long logicalFlowId) {
-        return dsl.fetchCount(DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
-                .and(PHYSICAL_FLOW.IS_REMOVED.eq(false)));
+    public int getPhysicalFlowSCountForAssociatedLogicalFlow(long physicalFlowId) {
+        return dsl.fetchOne(
+                select(count())
+                        .from(PHYSICAL_FLOW)
+                        .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(
+                                select(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
+                                        .from(PHYSICAL_FLOW)
+                                        .where(PHYSICAL_FLOW.ID.eq(physicalFlowId))
+                                        .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
+                        ))
+                        .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
+        ).value1();
     }
 }
