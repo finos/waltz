@@ -325,7 +325,7 @@ public class ProposedFlowWorkflowService {
             return getJsonMapper()
                     .readValue(record.getFlowDef(), ProposedFlowCommand.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
 
     }
