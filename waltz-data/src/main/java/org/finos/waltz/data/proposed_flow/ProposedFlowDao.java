@@ -11,7 +11,6 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
-import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -40,9 +39,12 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
@@ -87,7 +89,7 @@ public class ProposedFlowDao {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
-        EntityWorkflowView entityWorkflowView = getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
+        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
