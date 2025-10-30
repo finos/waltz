@@ -19,23 +19,28 @@
 package org.finos.waltz.data.entity_workflow;
 
 
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_workflow.*;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.EntityWorkflowDefinitionRecord;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowDefinition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.EntityWorkflowDefinition.ENTITY_WORKFLOW_DEFINITION;
 
 @Repository
 public class EntityWorkflowDefinitionDao {
 
-    private static final RecordMapper<? super Record, EntityWorkflowDefinition> TO_DOMAIN_MAPPER = record -> {
+    public static final RecordMapper<? super Record, EntityWorkflowDefinition> TO_DOMAIN_MAPPER = record -> {
         EntityWorkflowDefinitionRecord r = record.into(ENTITY_WORKFLOW_DEFINITION);
 
         return ImmutableEntityWorkflowDefinition
@@ -62,10 +67,61 @@ public class EntityWorkflowDefinitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public EntityWorkflowDefinition searchByName(String name){
+    public EntityWorkflowDefinition searchByName(String name) {
         return dsl.select(ENTITY_WORKFLOW_DEFINITION.fields())
                 .from(ENTITY_WORKFLOW_DEFINITION)
                 .where(ENTITY_WORKFLOW_DEFINITION.NAME.eq(name))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
+        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
+        checkNotNull(ref, "ref cannot be null");
+
+        // Fetch all related workflow data in a single query
+        Result<Record> records = dsl
+                .select(Tables.ENTITY_WORKFLOW_DEFINITION.fields())
+                .select(ENTITY_WORKFLOW_STATE.fields())
+                .select(ENTITY_WORKFLOW_TRANSITION.fields())
+                .select(ENTITY_WORKFLOW_RESULT.fields())
+                .from(Tables.ENTITY_WORKFLOW_DEFINITION)
+                .leftJoin(ENTITY_WORKFLOW_STATE).on(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(Tables.ENTITY_WORKFLOW_DEFINITION.ID)
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
+                .leftJoin(ENTITY_WORKFLOW_TRANSITION).on(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(Tables.ENTITY_WORKFLOW_DEFINITION.ID)
+                        .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(ref.id()))
+                        .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(ref.kind().name())))
+                .leftJoin(ENTITY_WORKFLOW_RESULT).on(ENTITY_WORKFLOW_RESULT.WORKFLOW_ID.eq(Tables.ENTITY_WORKFLOW_DEFINITION.ID)
+                        .and(ENTITY_WORKFLOW_RESULT.WORKFLOW_ENTITY_ID.eq(ref.id()))
+                        .and(ENTITY_WORKFLOW_RESULT.WORKFLOW_ENTITY_KIND.eq(ref.kind().name())))
+                .where(Tables.ENTITY_WORKFLOW_DEFINITION.NAME.eq(workFlowDefName))
+                .fetch();
+
+        checkNotNull(ref, "Workflow not found: " + workFlowDefName);
+
+        // All records share the same definition and state, so we can map them from the first record
+        Record firstRecord = records.get(0);
+        EntityWorkflowDefinition definition = EntityWorkflowDefinitionDao.TO_DOMAIN_MAPPER.map(firstRecord.into(Tables.ENTITY_WORKFLOW_DEFINITION));
+        EntityWorkflowState state = firstRecord.get(ENTITY_WORKFLOW_STATE.WORKFLOW_ID) == null
+                ? null
+                : EntityWorkflowStateDao.TO_DOMAIN_MAPPER.map(firstRecord.into(ENTITY_WORKFLOW_STATE));
+
+        // Map the potentially multiple transitions and results
+        List<EntityWorkflowTransition> transitions = records.stream()
+                .filter(r -> r.get(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID) != null)
+                .map(r -> EntityWorkflowTransitionDao.TO_DOMAIN_MAPPER.map(r.into(ENTITY_WORKFLOW_TRANSITION)))
+                .collect(Collectors.toList());
+
+        List<EntityReference> results = records.stream()
+                .filter(r -> r.get(ENTITY_WORKFLOW_RESULT.WORKFLOW_ID) != null)
+                .map(r -> EntityWorkflowResultDao.TO_DOMAIN_MAPPER.map(r.into(ENTITY_WORKFLOW_RESULT)).resultEntity())
+                .collect(Collectors.toList());
+
+        return ImmutableEntityWorkflowView.builder()
+                .workflowDefinition(definition)
+                .workflowState(state)
+                .workflowTransitionList(transitions)
+                .entityWorkflowResultList(results)
+                .build();
     }
 }

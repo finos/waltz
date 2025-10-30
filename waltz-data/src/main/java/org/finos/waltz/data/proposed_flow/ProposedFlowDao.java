@@ -98,30 +98,27 @@ public class ProposedFlowDao {
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
                     .workflowTransitionList(entityWorkflowView.workflowTransitionList())
+                    .logicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(LOGICAL_DATA_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.logicalFlowId().orElse(null)))
+                    .physicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.physicalFlowId().orElse(null)))
+                    .specificationId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_SPECIFICATION))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.specification().id().orElse(null)))
                     .build();
 
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
-    }
-
-    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
-        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
-        checkNotNull(ref, "ref cannot be null");
-
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(workFlowDefName);
-        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
-                .flatMap(EntityWorkflowDefinition::id)
-                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, ref);
-        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
-
-        return ImmutableEntityWorkflowView.builder()
-                .workflowDefinition(entityWorkflowDefinition)
-                .workflowState(entityWorkflowState)
-                .workflowTransitionList(entityWorkflowTransitionList)
-                .build();
     }
 
     public List<ProposedFlowResponse> getProposedFlowsBySelector(Select<Record1<Long>> flowIdSelector, Long workflowId) throws JsonProcessingException {

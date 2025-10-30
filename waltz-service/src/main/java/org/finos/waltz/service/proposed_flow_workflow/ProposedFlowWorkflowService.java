@@ -14,6 +14,7 @@ import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -215,15 +216,7 @@ public class ProposedFlowWorkflowService {
             }
 
             // Refresh Return Object
-            EntityWorkflowView entityWorkflowView = proposedFlowDao.getEntityWorkflowView(
-                    ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW, proposedFlow.workflowState().entityReference());
-            proposedFlow = ImmutableProposedFlowResponse
-                    .copyOf(proposedFlow)
-                    .withWorkflowState(entityWorkflowView.workflowState())
-                    .withWorkflowTransitionList(entityWorkflowView.workflowTransitionList())
-                    .withLogicalFlowId(response != null ? response.logicalFlow().id().get() : null)
-                    .withPhysicalFlowId(response != null ? response.physicalFlowCreateCommandResponse().entityReference().id() : null)
-                    .withSpecificationId(response != null ? response.physicalFlowCreateCommandResponse().specificationId() : null);
+            proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         } catch (Exception e) {
             LOG.error("Error Occurred : {} ", e.getMessage());
             throw e;

@@ -2,6 +2,7 @@ package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
@@ -12,6 +13,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationR
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.slf4j.Logger;
@@ -22,6 +24,9 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.model.EntityReference.mkRef;
+
 @Service
 public class DataFlowService {
     private static final Logger LOG = LoggerFactory.getLogger(DataFlowService.class);
@@ -29,12 +34,14 @@ public class DataFlowService {
     private final ProposedFlowDao proposedFlowDao;
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
+    public final EntityWorkflowService entityWorkflowService;
 
     @Autowired
-    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService) {
+    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
+        this.entityWorkflowService = entityWorkflowService;
     }
 
     /**
@@ -48,7 +55,7 @@ public class DataFlowService {
     public LogicalPhysicalFlowCreationResponse createLogicalAndPhysicalFlowFromProposedFlowDef(long proposedFlowId, String username) throws FlowCreationException {
 
         Objects.requireNonNull(username, "username must not be null");
-        PhysicalFlowCreateCommandResponse physicalFlow;
+        PhysicalFlowCreateCommandResponse physicalFlowCreateCommandResponse;
         LogicalFlow logicalFlow;
 
         ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
@@ -62,17 +69,30 @@ public class DataFlowService {
         } else {
             //create logical flow
             logicalFlow = createLogicalFlow(proposedFlow, username);
+            saveEntityWorkflowResult(proposedFlow, logicalFlow.entityReference(), username);
         }
 
         //create physical flow
-        physicalFlow = createPhysicalFlow(proposedFlow, username, logicalFlow.id());
+        physicalFlowCreateCommandResponse = createPhysicalFlow(proposedFlow, username, logicalFlow.id());
+        if (!proposedFlow.flowDef().specification().id().isPresent()) {
+            saveEntityWorkflowResult(proposedFlow, mkRef(PHYSICAL_SPECIFICATION, physicalFlowCreateCommandResponse.specificationId()), username);
+        }
+        saveEntityWorkflowResult(proposedFlow, physicalFlowCreateCommandResponse.entityReference(), username);
 
         LOG.info("Successfully created flows for proposedFlowId = {}", proposedFlowId);
 
         return ImmutableLogicalPhysicalFlowCreationResponse.builder()
                 .logicalFlow(logicalFlow)
-                .physicalFlowCreateCommandResponse(physicalFlow)
+                .physicalFlowCreateCommandResponse(physicalFlowCreateCommandResponse)
                 .build();
+    }
+
+    private void saveEntityWorkflowResult(ProposedFlowResponse proposedFlow, EntityReference resultingEntity, String username) {
+        entityWorkflowService.createEntityWorkflowResult(
+                proposedFlow.workflowState().workflowId(),
+                proposedFlow.workflowState().entityReference(),
+                resultingEntity,
+                username);
     }
 
     public AddLogicalFlowCommand mapProposedFlowToAddLogicalFlowCommand(ProposedFlowResponse proposedFlow) {
