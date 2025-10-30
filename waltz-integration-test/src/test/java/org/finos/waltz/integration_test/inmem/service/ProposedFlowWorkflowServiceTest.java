@@ -18,7 +18,6 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
-import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
@@ -27,14 +26,10 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
 import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
-import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -48,10 +43,7 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
-import org.finos.waltz.test_common.helpers.AppHelper;
-import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -62,7 +54,6 @@ import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -94,15 +85,6 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @Autowired
     PhysicalFlowDao physicalFlowDao;
-
-    @Autowired
-    private AppHelper appHelper;
-
-    @Autowired
-    private LogicalFlowHelper lfHelper;
-
-    @Autowired
-    private PhysicalFlowService pfSvc;
 
     @Test
     public void testProposedNewFlow() {
