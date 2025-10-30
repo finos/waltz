@@ -21,23 +21,23 @@ package org.finos.waltz.service.physical_flow;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
-import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
-import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,7 +157,7 @@ public class PhysicalFlowService {
                         .build(),
                 username);
 
-        if(updateStatus > 0) {
+        if (updateStatus > 0) {
             String postamble = format(
                     "Merged physical flow %s to: %s",
                     fromRef.id(),
@@ -280,7 +280,7 @@ public class PhysicalFlowService {
         return command.specification().id()
                 .filter(Objects::nonNull)
                 .map(specId -> {
-                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId, null);
+                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
                     // ensure existing not in database
                     return physicalFlowDao.findByAttributesAndSpecification(flow).stream()
                             .findFirst()
@@ -290,9 +290,11 @@ public class PhysicalFlowService {
                 .orElse(null);
     }
 
-    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId, LocalDateTime now){
-        LocalDateTime effectiveNow = (now != null) ? now : nowUtc();
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId) {
+        return buildPhysicalFlow(command, username, specId, nowUtc());
+    }
 
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId, LocalDateTime now) {
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
                 .name(command.flowAttributes().name())
@@ -303,8 +305,8 @@ public class PhysicalFlowService {
                 .description(mkSafe(command.flowAttributes().description()))
                 .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
-                .lastUpdatedAt(effectiveNow)
-                .created(UserTimestamp.mkForUser(username, effectiveNow));
+                .lastUpdatedAt(now)
+                .created(UserTimestamp.mkForUser(username, now));
 
         command
                 .flowAttributes()
@@ -377,7 +379,7 @@ public class PhysicalFlowService {
     private int doUpdateAttribute(SetAttributeCommand command) {
         long flowId = command.entityReference().id();
         ensureFlowExistsAndIsNotReadOnly(flowId);
-        switch(command.name()) {
+        switch (command.name()) {
             case "criticality":
                 return physicalFlowDao.updateCriticality(flowId, CriticalityValue.of(command.value()));
             case "frequency":
@@ -407,7 +409,7 @@ public class PhysicalFlowService {
      *   <li>ModifyingReadOnlyRecordException</li>
      * </ul>
      *
-     * @param flowId  identifier of the flow being checked
+     * @param flowId identifier of the flow being checked
      */
     private void ensureFlowExistsAndIsNotReadOnly(long flowId) {
         PhysicalFlow flow = getById(flowId);
@@ -435,9 +437,9 @@ public class PhysicalFlowService {
                 .externalId()
                 .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
-                    if(isEmpty(targetPhysicalFlow.externalId())) {
+                    if (isEmpty(targetPhysicalFlow.externalId())) {
                         physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
-                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                    } else if (!externalIdentifiers.contains(sourceExtId)) {
                         externalIdentifierService.create(toRef, sourceExtId, username);
                         externalIdentifiers.add(sourceExtId);
                     }
@@ -452,7 +454,7 @@ public class PhysicalFlowService {
                     PhysicalSpecification targetSpec = physicalSpecificationService
                             .getById(targetPhysicalFlow.specificationId());
 
-                    if(isEmpty(targetSpec.externalId())) {
+                    if (isEmpty(targetSpec.externalId())) {
                         targetSpec.id()
                                 .ifPresent(id ->
                                         physicalSpecificationService.updateExternalId(id, sourceExtId));
