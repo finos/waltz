@@ -26,11 +26,21 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FlowAttributes;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableReason;
+import org.finos.waltz.model.proposed_flow.ProposalType;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
@@ -44,7 +54,9 @@ import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
