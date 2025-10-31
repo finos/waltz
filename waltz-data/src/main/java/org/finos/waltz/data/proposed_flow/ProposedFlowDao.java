@@ -179,18 +179,13 @@ public class ProposedFlowDao {
 
         // --- Base CTE: current person
         SelectConditionStep<Record3<Long, String, String>> currentPerson = getCurrentPerson(personId);
-
         CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
                 name("current_person").fields("id", "employee_id", "email").as(currentPerson);
-
         // --- Optional subordinate CTE if needed
         CommonTableExpression<Record3<Long, String, String>> personScopeCte;
-
         personScopeCte = getPersonScope(includeSubordinates, currentPerson);
-
         // table reference for unified CTE
         Table<Record> personScopeTbl = table(name("person_scope")).as("ps");
-
         SelectJoinStep<?> invJoin = dsl.selectOne().from(INVOLVEMENT);
         if (includeSubordinates) {
             invJoin = invJoin
@@ -198,7 +193,6 @@ public class ProposedFlowDao {
                     .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
                     .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
         }
-
         // --- Build the shared query
         return dsl
                 .with(currentPersonCte)
@@ -212,20 +206,21 @@ public class ProposedFlowDao {
                 .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
                 .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
                 .whereExists(
-                        invJoin
-                                .join(personScopeTbl)
-                                .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
-                                .where(
-                                        INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                                                .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                                                .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                                        .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
-                                )
+                    invJoin
+                        .join(personScopeTbl)
+                        .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
+                        .where(
+                            INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                            .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))))
                 )
                 .or(PROPOSED_FLOW.CREATED_BY.in(
-                        dsl.select(field(name("email"), String.class))
-                                .from(personScopeTbl)
-                )).fetch();
+                    dsl
+                      .select(field(name("email"), String.class))
+                      .from(personScopeTbl))
+                )
+                .fetch();
     }
 
     private SelectConditionStep<Record3<Long, String, String>> getCurrentPerson(Long personId) {
@@ -253,11 +248,11 @@ public class ProposedFlowDao {
                 .on(PERSON_HIERARCHY.MANAGER_ID.eq(field(name("cp", "employee_id"), String.class)))
                 .where(PERSON.IS_REMOVED.eq(false))
                 .union(
-                        dsl.select(field(name("id"), Long.class),
-                                        field(name("employee_id"), String.class),
-                                        field(name("email"), String.class))
-                                .from(currentPerson)
-                );
+                    dsl
+                        .select(field(name("id"), Long.class),
+                        field(name("employee_id"), String.class),
+                        field(name("email"), String.class))
+                        .from(currentPerson));
     }
 
 
