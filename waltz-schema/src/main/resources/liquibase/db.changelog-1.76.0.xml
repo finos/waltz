@@ -18,11 +18,11 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
-                   logicalFilePath="db.changelog-1.76.xml">
+                   logicalFilePath="db.changelog-1.76.0.xml">
 
-    <changeSet id="v1-75-0-tag"
-               author="guptmayb">
-        <tagDatabase tag="v1.75.0"/> <!-- tag the current db version, i.e. the last  -->
+    <changeSet id="v1-75-tag"
+               author="ramerav">
+        <tagDatabase tag="v1.75"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
     <!-- 7345 Create Table - ProposedFlow Table -->
@@ -75,5 +75,4 @@
             <column name="workflow_entity_kind"/>
         </createIndex>
     </changeSet>
-
 </databaseChangeLog>
