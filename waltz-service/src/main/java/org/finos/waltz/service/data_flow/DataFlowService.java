@@ -11,6 +11,7 @@ import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -110,6 +111,16 @@ public class DataFlowService {
                 .build();
     }
 
+    private PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
+        return ImmutablePhysicalFlowCreateCommand.builder()
+                .specification(command.specification())
+                .logicalFlowId(command.logicalFlowId().get())
+                .flowAttributes(command.flowAttributes())
+                .dataTypeIds(command.dataTypeIds())
+                .build();
+    }
+
+
     public LogicalFlow createLogicalFlow(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         AddLogicalFlowCommand addCmd = mapProposedFlowToAddLogicalFlowCommand(proposedFlow);
 
@@ -132,5 +143,10 @@ public class DataFlowService {
             LOG.error("Failed to create physical flow from proposedFlowId={}", proposedFlow.id(), ex);
             throw new FlowCreationException("Physical flow creation failed", ex);
         }
+    }
+
+    public Long getPhysicalFlowIfExist(ProposedFlowCommand command, String username) {
+        return physicalFlowService.getPhysicalFlowIfExist(mapProposedFlowCommandToPhysicalFlowCreateCommand(command),
+                username);
     }
 }
