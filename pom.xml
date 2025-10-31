@@ -33,6 +33,7 @@
     <artifactId>waltz</artifactId>
     <version>1.76.0-SNAPSHOT</version>
 
+
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
