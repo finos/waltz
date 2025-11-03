@@ -21,7 +21,26 @@ package org.finos.waltz.service.physical_flow;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.SetAttributeCommand;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowInfo;
+import org.finos.waltz.model.physical_flow.PhysicalFlowSpecDefinitionChangeCommand;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
@@ -30,12 +49,10 @@ import org.finos.waltz.service.permission.permission_checker.FlowPermissionCheck
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
-import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
@@ -209,6 +226,7 @@ public class PhysicalFlowService {
                 responseBuilder
                         .isSpecificationUnused(!physicalSpecificationService.isUsed(physicalFlow.specificationId()))
                         .isLastPhysicalFlow(!physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId()));
+
             }
 
             changeLogService.writeChangeLogEntries(
@@ -489,5 +507,9 @@ public class PhysicalFlowService {
     public List<PhysicalFlow> search(EntitySearchOptions options) {
         checkNotNull(options, "Search options cannot be null");
         return physicalFlowDao.search(options);
+    }
+
+    public int getPhysicalFlowsCountForAssociatedLogicalFlow(long physicalFlowId) {
+        return physicalFlowDao.getPhysicalFlowSCountForAssociatedLogicalFlow(physicalFlowId);
     }
 }

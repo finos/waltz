@@ -74,6 +74,7 @@ import static org.finos.waltz.schema.Tables.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.select;
 
 
@@ -491,6 +492,7 @@ public class PhysicalFlowDao {
 
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
+
         return dsl.fetchCount(DSL
                 .select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
@@ -602,4 +604,24 @@ public class PhysicalFlowDao {
         });
     }
 
+    /**
+     * Returns the number of active physical flows that share the same
+     * logical flow as the given physical-flow id.
+     *
+     * @param physicalFlowId primary key of the physical flow
+     * @return count ≥ 0
+     */
+    public int getPhysicalFlowSCountForAssociatedLogicalFlow(long physicalFlowId) {
+        return dsl.fetchOne(
+                select(count())
+                        .from(PHYSICAL_FLOW)
+                        .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(
+                                select(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
+                                        .from(PHYSICAL_FLOW)
+                                        .where(PHYSICAL_FLOW.ID.eq(physicalFlowId))
+                                        .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
+                        ))
+                        .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
+        ).value1();
+    }
 }
