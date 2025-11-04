@@ -15,6 +15,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.Condition;
@@ -39,12 +40,11 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
-import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
@@ -54,13 +54,20 @@ import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
 public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
+
     private final DSLContext dsl;
+    private final EntityWorkflowStateDao entityWorkflowStateDao;
+    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
     @Autowired
-    public ProposedFlowDao(DSLContext dsl, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
-        this.dsl = dsl;
+    public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
+        checkNotNull(dsl, "dsl cannot be null");
+
+        this.entityWorkflowStateDao = entityWorkflowStateDao;
+        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
+        this.dsl = dsl;
     }
 
     public Long saveProposedFlow(String username, ProposedFlowCommand proposedFlowCommand) throws JsonProcessingException {
@@ -82,11 +89,7 @@ public class ProposedFlowDao {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
-        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao
-                .getEntityWorkflowView(
-                        PROPOSE_FLOW_LIFECYCLE_WORKFLOW,
-                        entityReference);
-
+        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
@@ -214,7 +217,7 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
                         .and(proposalTypeCondition)
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
                         .fetchInto(ProposedFlowRecord.class);
         return records;
     }
