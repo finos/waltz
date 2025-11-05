@@ -305,7 +305,7 @@ public class ProposedFlowWorkflowService {
 
     private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command){
         checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
-        checkNotNull(command.physicalFlowId(),"physical flow id can not be null");
+        checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
         checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
