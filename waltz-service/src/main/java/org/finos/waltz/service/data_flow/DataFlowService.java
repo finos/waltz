@@ -1,7 +1,6 @@
 package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -44,7 +43,6 @@ public class DataFlowService {
     private final ProposedFlowDao proposedFlowDao;
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
-    public final PhysicalFlowDao physicalFlowDao;
     public final EntityWorkflowService entityWorkflowService;
     private final PhysicalSpecificationService physicalSpecificationService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
@@ -52,15 +50,13 @@ public class DataFlowService {
     @Autowired
     public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService,
                            PhysicalSpecificationService physicalSpecificationService,
-                           DataTypeDecoratorService dataTypeDecoratorService,
-                           PhysicalFlowDao physicalFlowDao) {
+                           DataTypeDecoratorService dataTypeDecoratorService) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
         this.dataTypeDecoratorService = dataTypeDecoratorService;
         this.physicalSpecificationService = physicalSpecificationService;
-        this.physicalFlowDao = physicalFlowDao;
     }
 
     /**
@@ -130,7 +126,7 @@ public class DataFlowService {
                 .build();
     }
 
-    public PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
+    private PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(command.specification())
                 .logicalFlowId(command.logicalFlowId().get())
@@ -169,7 +165,7 @@ public class DataFlowService {
         checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
         checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
+        PhysicalFlow physicalFlow = physicalFlowService.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
         checkNotNull(physicalFlow,"physical flow can not be null");
 
         //fetch data type id's from DB and request

@@ -9,12 +9,18 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.FlowIdResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -197,7 +203,6 @@ public class ProposedFlowWorkflowService {
             entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
                     proposedFlow.workflowState(), currentState.name(), newState.name());
 
-            LogicalPhysicalFlowCreationResponse response = null;
             ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
                     .nextPossibleTransition(
                             newState,
@@ -209,7 +214,7 @@ public class ProposedFlowWorkflowService {
 
             if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
                 // auto switch to fully approved
-                response = dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlowId, username);
+                proposedFlowOperations(proposedFlow, username);
 
                 entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
                         proposedFlow.workflowState(), newState.name(), nextPossibleTransition.name());
@@ -299,8 +304,8 @@ public class ProposedFlowWorkflowService {
     }
 
     private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command){
+        checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
         checkNotNull(command.physicalFlowId(),"physical flow id can not be null");
-        checkNotNull(command.specification().id().get(), "specification id can not be null");
         checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
