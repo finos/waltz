@@ -18,24 +18,41 @@
 
 package org.finos.waltz.model.proposed_flow;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum ProposedFlowWorkflowState {
 
-    PROPOSED_CREATE("Proposed Create"),
-    PENDING_APPROVALS("Pending Approval"),
-    SOURCE_APPROVED("Source Approved"),
-    TARGET_APPROVED("Target Approved"),
-    FULLY_APPROVED("Fully Approved"),
-    SOURCE_REJECTED("Source Rejected"),
-    TARGET_REJECTED("Target Rejected"),
-    CANCELLED("Cancelled");
+    PROPOSED_CREATE("Proposed Create", false),
+    PENDING_APPROVALS("Pending Approval", false),
+    SOURCE_APPROVED("Source Approved", false),
+    TARGET_APPROVED("Target Approved", false),
+    FULLY_APPROVED("Fully Approved", true),
+    SOURCE_REJECTED("Source Rejected", true),
+    TARGET_REJECTED("Target Rejected", true),
+    CANCELLED("Cancelled", true);
+
+    public static final List<ProposedFlowWorkflowState> END_STATES =
+            Collections.unmodifiableList(
+                    Arrays.stream(values())
+                            .filter(ProposedFlowWorkflowState::isEndState)
+                            .collect(Collectors.toList()));
 
     private final String prettyName;
+    private final boolean endState;
 
-    ProposedFlowWorkflowState(String prettyName) {
+    ProposedFlowWorkflowState(String prettyName, boolean endState) {
+
         this.prettyName = prettyName;
+        this.endState = endState;
     }
 
     public String prettyName() {
         return prettyName;
     }
+    public boolean isEndState(){ return  endState; }
+
+
 }

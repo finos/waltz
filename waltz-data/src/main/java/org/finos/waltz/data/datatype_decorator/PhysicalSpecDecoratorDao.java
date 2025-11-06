@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -209,6 +210,20 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     @Override
     public Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
         throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
+    }
+
+    public Set<Long> findDataTypeByPhysicalFlowId(Long physicalFlowId) {
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .join(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID))
+                .where(PHYSICAL_FLOW.ID.eq(physicalFlowId))
+                .and(PHYSICAL_FLOW.IS_REMOVED.isFalse())
+                .fetch(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                .stream()
+                .collect(Collectors.toSet());
+
     }
 
 
