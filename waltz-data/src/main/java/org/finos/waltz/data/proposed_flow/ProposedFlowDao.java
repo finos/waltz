@@ -21,14 +21,9 @@ import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Result;
-import org.jooq.Select;
-import org.jooq.CommonTableExpression;
-import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Record3;
 import org.jooq.Result;
+import org.jooq.CommonTableExpression;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectFieldOrAsterisk;
 import org.jooq.SelectJoinStep;
@@ -65,6 +60,9 @@ import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
 import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
+import static org.jooq.impl.DSL.table;
 
 @Repository
 public class ProposedFlowDao {
