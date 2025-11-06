@@ -42,6 +42,8 @@
 
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
+    let responseMessage="";
+    let existingProposedFlow="";
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
@@ -122,12 +124,19 @@
         proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
+                if(response.outcome === "FAILURE")
+                    responseMessage=response.message;
+                if(response.proposedFlowId)
+                existingProposedFlow="/proposed-flow/"+response.proposedFlowId
+                else if(response.physicalFlowId)
+                    existingProposedFlow="/physical-flow/"+response.physicalFlowId
                 if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
                     if(response.proposedFlowId) {
                         toasts.success("Data Flow Proposed");
                         resetStore(); // only on success we want to reset the state
                         setTimeout(goToWorkflow, 500, response.proposedFlowId);
-                    } else {
+                    }
+                    else {
                         toasts.error("Error proposing data flow");
                         commandLaunched = false; // reset in case of error so that user is able to re-submit
                     }
