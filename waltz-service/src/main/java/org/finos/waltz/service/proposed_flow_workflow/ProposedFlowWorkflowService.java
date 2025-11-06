@@ -3,7 +3,6 @@ package org.finos.waltz.service.proposed_flow_workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
-import org.finos.waltz.data.proposed_flow.ProposedFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
@@ -29,6 +28,7 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
 import static org.finos.waltz.model.command.CommandOutcome.SUCCESS;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -47,7 +47,6 @@ public class ProposedFlowWorkflowService {
     private final ProposedFlowWorkflowPermissionService permissionService;
     private final DataFlowService dataFlowService;
     private final ProposedFlowDao proposedFlowDao;
-    private final ProposedFlowIdSelectorFactory proposedFlowIdSelectorFactory = new ProposedFlowIdSelectorFactory();
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
@@ -110,8 +109,9 @@ public class ProposedFlowWorkflowService {
 
     public List<ProposedFlowResponse> getProposedFlows(IdSelectionOptions options) throws JsonProcessingException {
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
-        return proposedFlowDao.getProposedFlowsBySelector(
-                proposedFlowIdSelectorFactory.apply(options),
+        return proposedFlowDao.getProposedFlowsByUser(
+                options.entityReference().id(),
+                options.scope() == CHILDREN ? true : false,
                 workflowDefinition.id().get()
         );
     }
