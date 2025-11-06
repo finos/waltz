@@ -29,12 +29,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import  static org.finos.waltz.common.SetUtilities.difference;
 
 @Service
 public class DataFlowService {
@@ -161,7 +161,6 @@ public class DataFlowService {
     }
 
     public boolean editPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
-        checkNotNull(proposedFlow.flowDef().logicalFlowId().get(),"logical flow id can not be null");
         checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
         checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
 
@@ -183,9 +182,6 @@ public class DataFlowService {
                 toRemove);
     }
 
-    private Set<Long> difference(Set<Long> a, Set<Long> b){
-        return  a.stream().filter(id -> !b.contains(id)).collect(Collectors.toSet());
-    }
 
     public Long getPhysicalFlowIfExist(ProposedFlowCommand command, String username) {
         return physicalFlowService.getPhysicalFlowIfExist(mapProposedFlowCommandToPhysicalFlowCreateCommand(command),
