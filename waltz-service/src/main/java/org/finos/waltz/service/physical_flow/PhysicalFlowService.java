@@ -50,18 +50,11 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.model.command.CommandOutcome;
-import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
-import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,7 +199,7 @@ public class PhysicalFlowService {
                 .isSpecificationUnused(false)
                 .isLastPhysicalFlow(false);
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(command.flowId(), false);
+        PhysicalFlow physicalFlow = getByIdAndIsRemoved(command.flowId(), false);
 
         if (physicalFlow == null) {
             return responseBuilder
@@ -299,6 +292,10 @@ public class PhysicalFlowService {
                 .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
                 .specificationId(specId)
                 .build();
+    }
+
+    public PhysicalFlow getByIdAndIsRemoved(Long physicalFlowId, boolean isRemoved) {
+        return physicalFlowDao.getByIdAndIsRemoved(physicalFlowId, isRemoved);
     }
 
     public Long getPhysicalFlowIfExist(PhysicalFlowCreateCommand command, String username) {

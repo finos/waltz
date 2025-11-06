@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.physical_specification;
 
+import org.finos.waltz.data.datatype_decorator.PhysicalSpecDecoratorDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
@@ -62,21 +63,25 @@ public class PhysicalSpecificationService {
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSearchDao specificationSearchDao;
+    private final PhysicalSpecDecoratorDao specDecoratorDao;
     private final PhysicalSpecificationIdSelectorFactory idSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
-                                        PhysicalSpecificationSearchDao specificationSearchDao)
+                                        PhysicalSpecificationSearchDao specificationSearchDao,
+                                        PhysicalSpecDecoratorDao specDecoratorDao)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
+        checkNotNull(specDecoratorDao, "specDecoratorDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.specificationSearchDao = specificationSearchDao;
+        this.specDecoratorDao = specDecoratorDao;
     }
 
 
@@ -222,6 +227,10 @@ public class PhysicalSpecificationService {
         }
 
         return rc;
+    }
+
+    public Set<Long> getDataTypesByPhysicalFlowId(Long id){
+        return specDecoratorDao.findDataTypeByPhysicalFlowId(id);
     }
 
 
