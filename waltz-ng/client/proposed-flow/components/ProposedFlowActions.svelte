@@ -175,7 +175,7 @@
 <div style="padding-bottom: 0.5em" class="small">
     <NoData type="info">
         <Icon name="info" style="padding: 0.5em"/>
-        You are currently reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
+        You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
     </NoData>
 </div>
 {#if mode === Modes.LIST}
