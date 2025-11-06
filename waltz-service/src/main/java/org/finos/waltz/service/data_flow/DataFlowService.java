@@ -4,6 +4,7 @@ import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
@@ -35,14 +36,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.difference;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import  static org.finos.waltz.common.SetUtilities.difference;
 
 @Service
 public class DataFlowService {
@@ -52,26 +56,23 @@ public class DataFlowService {
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
     public final EntityWorkflowService entityWorkflowService;
-    private final PhysicalSpecificationService physicalSpecificationService;
+    private final PhysicalSpecificationService specificationService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
+    private final PhysicalFlowDao physicalFlowDao;
+    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
     @Autowired
-    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService,
-                           PhysicalSpecificationService physicalSpecificationService,
-                           DataTypeDecoratorService dataTypeDecoratorService) {
     public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService,
-                           EntityWorkflowService entityWorkflowService, PhysicalSpecificationService specificationService, PhysicalFlowDao physicalFlowDao,
-                           DataTypeDecoratorService dataTypeDecoratorService, LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+                           EntityWorkflowService entityWorkflowService, PhysicalSpecificationService specificationService,
+                           DataTypeDecoratorService dataTypeDecoratorService, PhysicalFlowDao physicalFlowDao, LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
         this.specificationService = specificationService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
         this.physicalFlowDao = physicalFlowDao;
-        this.dataTypeDecoratorService = dataTypeDecoratorService;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
-        this.dataTypeDecoratorService = dataTypeDecoratorService;
-        this.physicalSpecificationService = physicalSpecificationService;
     }
 
     /**
@@ -183,7 +184,7 @@ public class DataFlowService {
         checkNotNull(physicalFlow,"physical flow can not be null");
 
         //fetch data type id's from DB and request
-        Set<Long> dataTypeIdsInDB = physicalSpecificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
+        Set<Long> dataTypeIdsInDB = specificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
         Set<Long> dataTypeIdsInRequest =  new HashSet<>(proposedFlow.flowDef().dataTypeIds());
 
         //Determine which id's to add and remove

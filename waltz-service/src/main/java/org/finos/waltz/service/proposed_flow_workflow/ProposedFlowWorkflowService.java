@@ -9,15 +9,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -269,14 +261,14 @@ public class ProposedFlowWorkflowService {
     private void proposedFlowOperations(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         switch (proposedFlow.flowDef().proposalType()) {
             case CREATE:
-                         dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlow.id(), username);
-                         break;
+                dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlow.id(), username);
+                break;
             case EDIT:
-                         dataFlowService.editPhysicalFlow(proposedFlow, username);
-                         break;
+                dataFlowService.editPhysicalFlow(proposedFlow, username);
+                break;
             case DELETE:
-                //TODO
-                        break;
+                dataFlowService.deletePhysicalFlow(proposedFlow.physicalFlowId(), username);
+                break;
             default:
                 throw new UnsupportedOperationException(
                         "proposalType not supported: " + proposedFlow.flowDef().proposalType()
@@ -322,6 +314,8 @@ public class ProposedFlowWorkflowService {
     }
 
     private FlowIdResponse validateProposedFlowForDelete(ProposedFlowCommand command){
+        checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
+        checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
