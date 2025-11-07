@@ -209,7 +209,7 @@ public class DataFlowService {
      * associated logical flow together with its data-type decorators.
      *
      * @param physicalFlowId id of the flow to delete
-     * @param username       user performing the operation
+     * @param username user performing the operation
      * @return immutable response object with the ids of the deleted artefacts
      */
     public DeletePhysicalFlowResponse deletePhysicalFlow(Long physicalFlowId, String username) {
@@ -217,14 +217,15 @@ public class DataFlowService {
         checkNotNull(physicalFlowId, "physicalFlowId must not be null");
         checkNotNull(username, "username must not be null");
 
+        PhysicalFlow physicalFlow = physicalFlowDao.getById(physicalFlowId);
+        checkNotNull(physicalFlow, "No physical flow found");
+
         LOG.info("[deletePhysicalFlow] user={} physicalFlowId={}", username, physicalFlowId);
 
         PhysicalFlowDeleteCommand physicalFlowDeleteCommand = buildPhysicalFlowDeleteCommand(physicalFlowId);
 
         //soft delete physical flow
         PhysicalFlowDeleteCommandResponse physicalFlowDeleteCommandResponse = physicalFlowService.delete(physicalFlowDeleteCommand, username);
-        PhysicalFlow physicalFlow = physicalFlowDao.getById(physicalFlowId);
-        checkNotNull(physicalFlow, "No physical flow found");
 
         //check specification is unused
         if (physicalFlowDeleteCommandResponse.isSpecificationUnused()) {
@@ -272,7 +273,7 @@ public class DataFlowService {
         List<DataTypeDecorator> logicalFlowDecoratorList = logicalFlowDecoratorDao.findByEntityId(logicalFlowId);
         if (logicalFlowDecoratorList.isEmpty()) {
             LOG.debug("No decorators found for logicalFlowId={}", logicalFlowId);
-            return 0;                     // nothing to do
+            return 0;  // nothing to do
         }
         Set<Long> dataTypeIds = logicalFlowDecoratorList.stream()
                 .map(d -> d.decoratorEntity().id())
