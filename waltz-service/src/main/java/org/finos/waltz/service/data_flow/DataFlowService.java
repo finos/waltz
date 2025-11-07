@@ -1,8 +1,6 @@
 package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
-import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -58,28 +56,24 @@ public class DataFlowService {
     public final EntityWorkflowService entityWorkflowService;
     private final PhysicalSpecificationService specificationService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
-    private final PhysicalFlowDao physicalFlowDao;
-    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
     @Autowired
     public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService,
                            EntityWorkflowService entityWorkflowService, PhysicalSpecificationService specificationService,
-                           DataTypeDecoratorService dataTypeDecoratorService, PhysicalFlowDao physicalFlowDao, LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+                           DataTypeDecoratorService dataTypeDecoratorService) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
         this.specificationService = specificationService;
         this.dataTypeDecoratorService = dataTypeDecoratorService;
-        this.physicalFlowDao = physicalFlowDao;
-        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
     /**
      * Creates logical and physical flows from the ProposedFlow.
      *
      * @param proposedFlowId primary key of the ProposedFlow
-     * @param username       actor requesting the creation
+     * @param username actor requesting the creation
      * @return immutable response containing the created flows
      * @throws FlowCreationException if either creation step fails
      */
@@ -217,7 +211,7 @@ public class DataFlowService {
         checkNotNull(physicalFlowId, "physicalFlowId must not be null");
         checkNotNull(username, "username must not be null");
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getById(physicalFlowId);
+        PhysicalFlow physicalFlow = physicalFlowService.getById(physicalFlowId);
         checkNotNull(physicalFlow, "No physical flow found");
 
         LOG.info("[deletePhysicalFlow] user={} physicalFlowId={}", username, physicalFlowId);
@@ -270,7 +264,7 @@ public class DataFlowService {
 
         checkNotNull(entityReference, "entityReference must not be null");
 
-        List<DataTypeDecorator> logicalFlowDecoratorList = logicalFlowDecoratorDao.findByEntityId(logicalFlowId);
+        List<DataTypeDecorator> logicalFlowDecoratorList = dataTypeDecoratorService.findByEntityId(entityReference);
         if (logicalFlowDecoratorList.isEmpty()) {
             LOG.debug("No decorators found for logicalFlowId={}", logicalFlowId);
             return 0;  // nothing to do
