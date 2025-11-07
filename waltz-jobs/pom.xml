@@ -54,9 +54,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.codearte.jfairy</groupId>
+            <groupId>com.devskiller</groupId>
             <artifactId>jfairy</artifactId>
-            <version>0.5.9</version>
+            <version>0.6.5</version>
         </dependency>
 
         <dependency>

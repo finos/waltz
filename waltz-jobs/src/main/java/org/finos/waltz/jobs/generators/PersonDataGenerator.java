@@ -18,8 +18,8 @@
 
 package org.finos.waltz.jobs.generators;
 
-import io.codearte.jfairy.Fairy;
-import io.codearte.jfairy.producer.person.Person;
+import com.devskiller.jfairy.Fairy;
+import com.devskiller.jfairy.producer.person.Person;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.model.person.ImmutablePerson;

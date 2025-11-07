@@ -41,24 +41,16 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sparkjava</groupId>
+            <groupId>io.github.sparkjavateam</groupId>
             <artifactId>spark-core</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-webapp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -246,6 +238,42 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- AntRun to execute the Jakarta migration Ant task -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>jakarta-migration</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <!-- Define the migration task -->
+                                <taskdef name="jakarta-migration"
+                                         classname="org.apache.tomcat.jakartaee.MigrationTask"
+                                         classpathref="maven.plugin.classpath"/>
+
+                                <!-- Run the migration on the WAR output -->
+                                <jakarta-migration
+                                        src="${project.build.directory}${file.separator}${project.build.finalName}.war"
+                                        dest="${project.build.directory}${file.separator}${project.build.finalName}-jakarta.war"/>
+                            </target>
+                        </configuration>
+                        <goals>
+
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>jakartaee-migration</artifactId>
+                        <version>1.0.9</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
