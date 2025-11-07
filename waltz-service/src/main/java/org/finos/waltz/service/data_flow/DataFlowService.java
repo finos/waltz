@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.difference;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -236,7 +237,7 @@ public class DataFlowService {
             logicalFlowService.removeFlow(physicalFlow.logicalFlowId(), username);
 
             //delete logical flow decorator
-            deleteLogicalFlowDecorator(username, EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, physicalFlow.logicalFlowId()), physicalFlow.logicalFlowId());
+            deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
         }
 
         LOG.info("[deletePhysicalFlow] completed successfully for physicalFlowId={}", physicalFlowId);
@@ -260,9 +261,9 @@ public class DataFlowService {
                 .build();
     }
 
-    private int deleteLogicalFlowDecorator(String username, EntityReference entityReference, Long logicalFlowId) {
+    private int deleteLogicalFlowDecorator(String username, Long logicalFlowId) {
 
-        checkNotNull(entityReference, "entityReference must not be null");
+        EntityReference entityReference = mkRef(LOGICAL_DATA_FLOW, logicalFlowId);
 
         List<DataTypeDecorator> logicalFlowDecoratorList = dataTypeDecoratorService.findByEntityId(entityReference);
         if (logicalFlowDecoratorList.isEmpty()) {
