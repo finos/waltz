@@ -171,15 +171,15 @@ public class DataFlowService {
     }
 
     public boolean editPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
-        checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
+        checkNotNull(proposedFlow.flowDef().physicalFlowId().get(), "physical flow id can not be null");
         checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
 
         PhysicalFlow physicalFlow = physicalFlowService.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
-        checkNotNull(physicalFlow,"physical flow can not be null");
+        checkNotNull(physicalFlow, "physical flow can not be null");
 
         //fetch data type id's from DB and request
         Set<Long> dataTypeIdsInDB = specificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
-        Set<Long> dataTypeIdsInRequest =  new HashSet<>(proposedFlow.flowDef().dataTypeIds());
+        Set<Long> dataTypeIdsInRequest = new HashSet<>(proposedFlow.flowDef().dataTypeIds());
 
         //Determine which id's to add and remove
         Set<Long> toAdd = difference(dataTypeIdsInRequest, dataTypeIdsInDB);
