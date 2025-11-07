@@ -198,7 +198,15 @@
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
-
+                {#if responseMessage}
+                <div style="margin:20px 0px">
+                    <NoData type="error" >
+                        {responseMessage}
+                        <br>
+                        <a href={existingProposedFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                    </NoData>
+                </div>
+                {/if}
                 {#if incompleteRecord}
                     <span class="incomplete-warning">
                         <Icon name="exclamation-triangle"/>You must complete all sections
