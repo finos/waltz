@@ -269,14 +269,14 @@ public class ProposedFlowWorkflowService {
     private void proposedFlowOperations(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
         switch (proposedFlow.flowDef().proposalType()) {
             case CREATE:
-                         dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlow.id(), username);
-                         break;
+                dataFlowService.createLogicalAndPhysicalFlowFromProposedFlowDef(proposedFlow.id(), username);
+                break;
             case EDIT:
-                         dataFlowService.editPhysicalFlow(proposedFlow, username);
-                         break;
+                dataFlowService.editPhysicalFlow(proposedFlow, username);
+                break;
             case DELETE:
-                //TODO
-                        break;
+                dataFlowService.deletePhysicalFlow(proposedFlow.physicalFlowId(), username);
+                break;
             default:
                 throw new UnsupportedOperationException(
                         "proposalType not supported: " + proposedFlow.flowDef().proposalType()
@@ -322,6 +322,8 @@ public class ProposedFlowWorkflowService {
     }
 
     private FlowIdResponse validateProposedFlowForDelete(ProposedFlowCommand command){
+        checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
+        checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
