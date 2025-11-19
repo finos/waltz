@@ -1,17 +1,24 @@
 package org.finos.waltz.service.data_flow;
 
 import org.finos.waltz.common.exception.FlowCreationException;
-import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowDeleteCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.proposed_flow.DeletePhysicalFlowResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableDeletePhysicalFlowResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableLogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.LogicalPhysicalFlowCreationResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -27,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +42,8 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.difference;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -44,30 +54,27 @@ public class DataFlowService {
     private final ProposedFlowDao proposedFlowDao;
     public final LogicalFlowService logicalFlowService;
     public final PhysicalFlowService physicalFlowService;
-    public final PhysicalFlowDao physicalFlowDao;
     public final EntityWorkflowService entityWorkflowService;
-    private final PhysicalSpecificationService physicalSpecificationService;
+    private final PhysicalSpecificationService specificationService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
 
     @Autowired
-    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService, EntityWorkflowService entityWorkflowService,
-                           PhysicalSpecificationService physicalSpecificationService,
-                           DataTypeDecoratorService dataTypeDecoratorService,
-                           PhysicalFlowDao physicalFlowDao) {
+    public DataFlowService(ProposedFlowDao proposedFlowDao, LogicalFlowService logicalFlowService, PhysicalFlowService physicalFlowService,
+                           EntityWorkflowService entityWorkflowService, PhysicalSpecificationService specificationService,
+                           DataTypeDecoratorService dataTypeDecoratorService) {
         this.proposedFlowDao = proposedFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
+        this.specificationService = specificationService;
         this.dataTypeDecoratorService = dataTypeDecoratorService;
-        this.physicalSpecificationService = physicalSpecificationService;
-        this.physicalFlowDao = physicalFlowDao;
     }
 
     /**
      * Creates logical and physical flows from the ProposedFlow.
      *
      * @param proposedFlowId primary key of the ProposedFlow
-     * @param username       actor requesting the creation
+     * @param username actor requesting the creation
      * @return immutable response containing the created flows
      * @throws FlowCreationException if either creation step fails
      */
@@ -130,7 +137,7 @@ public class DataFlowService {
                 .build();
     }
 
-    public PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
+    private PhysicalFlowCreateCommand mapProposedFlowCommandToPhysicalFlowCreateCommand(ProposedFlowCommand command) {
         return ImmutablePhysicalFlowCreateCommand.builder()
                 .specification(command.specification())
                 .logicalFlowId(command.logicalFlowId().get())
@@ -165,16 +172,15 @@ public class DataFlowService {
     }
 
     public boolean editPhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
-        checkNotNull(proposedFlow.flowDef().logicalFlowId().get(),"logical flow id can not be null");
-        checkNotNull(proposedFlow.flowDef().physicalFlowId().get(),"physical flow id can not be null");
+        checkNotNull(proposedFlow.flowDef().physicalFlowId().get(), "physical flow id can not be null");
         checkNotEmpty(proposedFlow.flowDef().dataTypeIds(), "dataTypeIds can not be empty");
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
-        checkNotNull(physicalFlow,"physical flow can not be null");
+        PhysicalFlow physicalFlow = physicalFlowService.getByIdAndIsRemoved(proposedFlow.flowDef().physicalFlowId().get(), false);
+        checkNotNull(physicalFlow, "physical flow can not be null");
 
         //fetch data type id's from DB and request
-        Set<Long> dataTypeIdsInDB = physicalSpecificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
-        Set<Long> dataTypeIdsInRequest =  new HashSet<>(proposedFlow.flowDef().dataTypeIds());
+        Set<Long> dataTypeIdsInDB = specificationService.getDataTypesByPhysicalFlowId(physicalFlow.id().get());
+        Set<Long> dataTypeIdsInRequest = new HashSet<>(proposedFlow.flowDef().dataTypeIds());
 
         //Determine which id's to add and remove
         Set<Long> toAdd = difference(dataTypeIdsInRequest, dataTypeIdsInDB);
@@ -187,12 +193,89 @@ public class DataFlowService {
                 toRemove);
     }
 
-    private Set<Long> difference(Set<Long> a, Set<Long> b){
-        return  a.stream().filter(id -> !b.contains(id)).collect(Collectors.toSet());
-    }
 
     public Long getPhysicalFlowIfExist(ProposedFlowCommand command, String username) {
         return physicalFlowService.getPhysicalFlowIfExist(mapProposedFlowCommandToPhysicalFlowCreateCommand(command),
                 username);
+    }
+
+    /**
+     * Soft-deletes a physical flow and – when safe – its specification and the
+     * associated logical flow together with its data-type decorators.
+     *
+     * @param physicalFlowId id of the flow to delete
+     * @param username user performing the operation
+     * @return immutable response object with the ids of the deleted artefacts
+     */
+    public DeletePhysicalFlowResponse deletePhysicalFlow(Long physicalFlowId, String username) {
+
+        checkNotNull(physicalFlowId, "physicalFlowId must not be null");
+        checkNotNull(username, "username must not be null");
+
+        PhysicalFlow physicalFlow = physicalFlowService.getById(physicalFlowId);
+        checkNotNull(physicalFlow, "No physical flow found");
+
+        LOG.info("[deletePhysicalFlow] user={} physicalFlowId={}", username, physicalFlowId);
+
+        PhysicalFlowDeleteCommand physicalFlowDeleteCommand = buildPhysicalFlowDeleteCommand(physicalFlowId);
+
+        //soft delete physical flow
+        PhysicalFlowDeleteCommandResponse physicalFlowDeleteCommandResponse = physicalFlowService.delete(physicalFlowDeleteCommand, username);
+
+        //check specification is unused
+        if (physicalFlowDeleteCommandResponse.isSpecificationUnused()) {
+            PhysicalSpecificationDeleteCommand physicalSpecDeleteCmd = buildPhysicalSpecificationDeleteCommand(physicalFlow.specificationId());
+            //soft delete physical specification
+            specificationService.markRemovedIfUnused(physicalSpecDeleteCmd, username);
+        }
+
+        //check last physical flow
+        if (physicalFlowDeleteCommandResponse.isLastPhysicalFlow()) {
+            LOG.info("[deletePhysicalFlow] last physical flow removed – deleting logical flow {}", physicalFlow.logicalFlowId());
+
+            //soft delete associated logical flow
+            logicalFlowService.removeFlow(physicalFlow.logicalFlowId(), username);
+
+            //delete logical flow decorator
+            deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
+        }
+
+        LOG.info("[deletePhysicalFlow] completed successfully for physicalFlowId={}", physicalFlowId);
+
+        return ImmutableDeletePhysicalFlowResponse.builder()
+                .logicalFlowId(physicalFlow.logicalFlowId())
+                .physicalFlowId(physicalFlowId)
+                .specificationId(physicalFlow.specificationId())
+                .build();
+    }
+
+    private PhysicalFlowDeleteCommand buildPhysicalFlowDeleteCommand(Long physicalFlowId) {
+        return ImmutablePhysicalFlowDeleteCommand.builder()
+                .flowId(physicalFlowId)
+                .build();
+    }
+
+    private PhysicalSpecificationDeleteCommand buildPhysicalSpecificationDeleteCommand(long specId) {
+        return ImmutablePhysicalSpecificationDeleteCommand.builder()
+                .specificationId(specId)
+                .build();
+    }
+
+    private int deleteLogicalFlowDecorator(String username, Long logicalFlowId) {
+
+        EntityReference entityReference = mkRef(LOGICAL_DATA_FLOW, logicalFlowId);
+
+        List<DataTypeDecorator> logicalFlowDecoratorList = dataTypeDecoratorService.findByEntityId(entityReference);
+        if (logicalFlowDecoratorList.isEmpty()) {
+            LOG.debug("No decorators found for logicalFlowId={}", logicalFlowId);
+            return 0;  // nothing to do
+        }
+        Set<Long> dataTypeIds = logicalFlowDecoratorList.stream()
+                .map(d -> d.decoratorEntity().id())
+                .collect(Collectors.toSet());
+
+        int deleted = dataTypeDecoratorService.removeDataTypeDecorator(username, entityReference, dataTypeIds);
+        LOG.info("Successfully deleted {} decorators for logicalFlowId={} by user={}", deleted, logicalFlowId, username);
+        return deleted;
     }
 }
