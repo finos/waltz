@@ -23,25 +23,40 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EntityWorkflowStateDaoTest extends BaseInMemoryIntegrationTest {
 
+    public static final long WORKFLOW_DEF_ID = 1L;
     @Autowired
     EntityWorkflowStateDao entityWorkflowStateDao;
+
+    @Autowired
+    private DSLContext dsl;
+
+    @BeforeEach
+    public void removeEntityWorkflowState() {
+        dsl.deleteFrom(ENTITY_WORKFLOW_STATE)
+                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(WORKFLOW_DEF_ID))
+                .execute();
+    }
 
     @Test
     public void testSearchByName() {
         EntityKind entityKind = EntityKind.PROPOSED_FLOW;
         String description = "testDescription";
         EntityReference ref = EntityReference.mkRef(entityKind, 2L);
-        entityWorkflowStateDao.createWorkflowState(1L, ref, "testUser",
+        entityWorkflowStateDao.createWorkflowState(WORKFLOW_DEF_ID, ref, "testUser",
                 FULLY_APPROVED.name(), description);
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(1L, ref);
+        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(WORKFLOW_DEF_ID, ref);
         assertNotNull(entityWorkflowState);
     }
 
