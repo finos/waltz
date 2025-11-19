@@ -186,4 +186,8 @@ public class SetUtilities {
     public static <T> Set<T> compact(T... ts) {
         return remove(asSet(ts), (T) null);
     }
+
+    public static Set<Long> difference(Set<Long> a, Set<Long> b){
+        return  a.stream().filter(id -> !b.contains(id)).collect(Collectors.toSet());
+    }
 }

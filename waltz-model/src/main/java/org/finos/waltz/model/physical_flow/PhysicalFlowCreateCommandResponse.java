@@ -27,5 +27,5 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutablePhysicalFlowCreateCommandResponse.class)
 @JsonDeserialize(as = ImmutablePhysicalFlowCreateCommandResponse.class)
 public abstract class PhysicalFlowCreateCommandResponse extends AbstractCommandResponse<PhysicalFlowCreateCommand> {
-
+    public abstract long specificationId();
 }

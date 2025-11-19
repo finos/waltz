@@ -195,7 +195,7 @@ public class TaxonomyManagementHelper {
                 preview,
                 sharedRatingsCount,
                 Severity.WARNING,
-                "This node has measurable ratings that cannot be migrated due to an existing rating on the target");
+                "This node has measurable ratings, kindly note that the higher rating will take precedence.");
     }
 
     public void previewDecommMigrations(ImmutableTaxonomyChangePreview.Builder preview,
@@ -214,13 +214,13 @@ public class TaxonomyManagementHelper {
 
     // ACTIONS
 
-    public void migrateMeasurable(IdSelectionOptions selectionOptions, Long targetId, String userId) {
+    public void migrateMeasurable(IdSelectionOptions selectionOptions, Long targetId, String userId, long measurableCategoryId) {
 
         EntityReference sourceMeasurable = selectionOptions.entityReference();
         EntityReference targetMeasurable = mkRef(EntityKind.MEASURABLE, targetId);
 
         measurableService.moveChildren(sourceMeasurable.id(), targetId, userId);
-        measurableRatingService.migrateRatings(sourceMeasurable.id(), targetId, userId);
+        measurableRatingService.migrateRatings(sourceMeasurable.id(), targetId, userId, measurableCategoryId);
         entityRelationshipService.migrateEntityRelationships(sourceMeasurable, targetMeasurable, userId);
         measurableService.deleteByIdSelector(selectionOptions);
     }

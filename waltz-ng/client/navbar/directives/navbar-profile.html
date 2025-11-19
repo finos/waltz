@@ -200,6 +200,23 @@
             </li>
 
 
+            <li ng-if="ctrl.dataFlowProposalsEnabled">
+                <span>
+                    <a ui-sref="main.data-flow.dashboard">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="shuffle">
+                        </waltz-icon>
+                        Data Flows
+                        <span class="badge wnp-badge"
+                              ng-if="ctrl.notificationsCountsByKind['PROPOSED_FLOW'].count > 0"
+                              ng-bind="ctrl.notificationsCountsByKind['PROPOSED_FLOW'].count">
+                        </span>
+                    </a>
+                </span>
+            </li>
+
+
             <li>
                 <span ng-show="ctrl.showSysAdminMenuItem">
                     <a ui-sref="main.system.list">

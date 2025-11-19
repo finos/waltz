@@ -21,7 +21,26 @@ package org.finos.waltz.service.physical_flow;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.SetAttributeCommand;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowInfo;
+import org.finos.waltz.model.physical_flow.PhysicalFlowSpecDefinitionChangeCommand;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
@@ -30,11 +49,9 @@ import org.finos.waltz.service.permission.permission_checker.FlowPermissionCheck
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
-import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
@@ -46,6 +63,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -156,7 +174,7 @@ public class PhysicalFlowService {
                         .build(),
                 username);
 
-        if(updateStatus > 0) {
+        if (updateStatus > 0) {
             String postamble = format(
                     "Merged physical flow %s to: %s",
                     fromRef.id(),
@@ -181,7 +199,7 @@ public class PhysicalFlowService {
                 .isSpecificationUnused(false)
                 .isLastPhysicalFlow(false);
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(command.flowId(), false);
+        PhysicalFlow physicalFlow = getByIdAndIsRemoved(command.flowId(), false);
 
         if (physicalFlow == null) {
             return responseBuilder
@@ -201,6 +219,7 @@ public class PhysicalFlowService {
                 responseBuilder
                         .isSpecificationUnused(!physicalSpecificationService.isUsed(physicalFlow.specificationId()))
                         .isLastPhysicalFlow(!physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId()));
+
             }
 
             changeLogService.writeChangeLogEntries(
@@ -232,25 +251,7 @@ public class PhysicalFlowService {
                         .withLastUpdatedAt(now)
                         .withCreated(UserTimestamp.mkForUser(username, now))));
 
-        ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
-                .specificationId(specId)
-                .name(command.flowAttributes().name())
-                .basisOffset(command.flowAttributes().basisOffset())
-                .frequency(command.flowAttributes().frequency())
-                .transport(command.flowAttributes().transport())
-                .criticality(command.flowAttributes().criticality())
-                .description(mkSafe(command.flowAttributes().description()))
-                .logicalFlowId(command.logicalFlowId())
-                .lastUpdatedBy(username)
-                .lastUpdatedAt(now)
-                .created(UserTimestamp.mkForUser(username, now));
-
-        command
-                .flowAttributes()
-                .externalId()
-                .ifPresent(flowBuilder::externalId);
-
-        PhysicalFlow flow = flowBuilder.build();
+        PhysicalFlow flow = buildPhysicalFlow(command, username, specId, now);
 
         // ensure existing not in database
         List<PhysicalFlow> byAttributesAndSpecification = physicalFlowDao.findByAttributesAndSpecification(flow);
@@ -260,6 +261,7 @@ public class PhysicalFlowService {
                     .outcome(CommandOutcome.FAILURE)
                     .message("Duplicate with existing flow")
                     .entityReference(mkRef(PHYSICAL_FLOW, byAttributesAndSpecification.get(0).id().get()))
+                    .specificationId(specId)
                     .build();
         }
 
@@ -288,7 +290,52 @@ public class PhysicalFlowService {
                 .originalCommand(command)
                 .outcome(CommandOutcome.SUCCESS)
                 .entityReference(mkRef(PHYSICAL_FLOW, physicalFlowId))
+                .specificationId(specId)
                 .build();
+    }
+
+    public PhysicalFlow getByIdAndIsRemoved(Long physicalFlowId, boolean isRemoved) {
+        return physicalFlowDao.getByIdAndIsRemoved(physicalFlowId, isRemoved);
+    }
+
+    public Long getPhysicalFlowIfExist(PhysicalFlowCreateCommand command, String username) {
+        return command.specification().id()
+                .filter(Objects::nonNull)
+                .map(specId -> {
+                    PhysicalFlow flow = buildPhysicalFlow(command, username, specId);
+                    // ensure existing not in database
+                    return physicalFlowDao.findByAttributesAndSpecification(flow).stream()
+                            .findFirst()
+                            .map(f -> f.id().orElse(null))
+                            .orElse(null);
+                })
+                .orElse(null);
+    }
+
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId) {
+        return buildPhysicalFlow(command, username, specId, nowUtc());
+    }
+
+    private PhysicalFlow buildPhysicalFlow(PhysicalFlowCreateCommand command, String username, long specId, LocalDateTime now) {
+        ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
+                .specificationId(specId)
+                .name(command.flowAttributes().name())
+                .basisOffset(command.flowAttributes().basisOffset())
+                .frequency(command.flowAttributes().frequency())
+                .transport(command.flowAttributes().transport())
+                .criticality(command.flowAttributes().criticality())
+                .description(mkSafe(command.flowAttributes().description()))
+                .logicalFlowId(command.logicalFlowId())
+                .lastUpdatedBy(username)
+                .lastUpdatedAt(now)
+                .created(UserTimestamp.mkForUser(username, now));
+
+        command
+                .flowAttributes()
+                .externalId()
+                .ifPresent(flowBuilder::externalId);
+
+        return flowBuilder.build();
     }
 
 
@@ -354,7 +401,7 @@ public class PhysicalFlowService {
     private int doUpdateAttribute(SetAttributeCommand command) {
         long flowId = command.entityReference().id();
         ensureFlowExistsAndIsNotReadOnly(flowId);
-        switch(command.name()) {
+        switch (command.name()) {
             case "criticality":
                 return physicalFlowDao.updateCriticality(flowId, CriticalityValue.of(command.value()));
             case "frequency":
@@ -384,7 +431,7 @@ public class PhysicalFlowService {
      *   <li>ModifyingReadOnlyRecordException</li>
      * </ul>
      *
-     * @param flowId  identifier of the flow being checked
+     * @param flowId identifier of the flow being checked
      */
     private void ensureFlowExistsAndIsNotReadOnly(long flowId) {
         PhysicalFlow flow = getById(flowId);
@@ -412,9 +459,9 @@ public class PhysicalFlowService {
                 .externalId()
                 .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
-                    if(isEmpty(targetPhysicalFlow.externalId())) {
+                    if (isEmpty(targetPhysicalFlow.externalId())) {
                         physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
-                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                    } else if (!externalIdentifiers.contains(sourceExtId)) {
                         externalIdentifierService.create(toRef, sourceExtId, username);
                         externalIdentifiers.add(sourceExtId);
                     }
@@ -429,7 +476,7 @@ public class PhysicalFlowService {
                     PhysicalSpecification targetSpec = physicalSpecificationService
                             .getById(targetPhysicalFlow.specificationId());
 
-                    if(isEmpty(targetSpec.externalId())) {
+                    if (isEmpty(targetSpec.externalId())) {
                         targetSpec.id()
                                 .ifPresent(id ->
                                         physicalSpecificationService.updateExternalId(id, sourceExtId));
@@ -457,5 +504,9 @@ public class PhysicalFlowService {
     public List<PhysicalFlow> search(EntitySearchOptions options) {
         checkNotNull(options, "Search options cannot be null");
         return physicalFlowDao.search(options);
+    }
+
+    public int getPhysicalFlowsCountForAssociatedLogicalFlow(long physicalFlowId) {
+        return physicalFlowDao.getPhysicalFlowSCountForAssociatedLogicalFlow(physicalFlowId);
     }
 }

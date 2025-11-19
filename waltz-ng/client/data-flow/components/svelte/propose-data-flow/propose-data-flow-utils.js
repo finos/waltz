@@ -21,7 +21,8 @@ export const sections = {
     ROUTE: "ROUTE",
     SPECIFICATION: "SPECIFICATION",
     FLOW: "FLOW",
-    DATA_TYPE: "DATA_TYPE"
+    DATA_TYPE: "DATA_TYPE",
+    REASON: "REASON"
 }
 
 export function determineExpandedSections(expandedSections, section) {

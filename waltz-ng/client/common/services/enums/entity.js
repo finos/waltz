@@ -485,5 +485,12 @@ export const entity = {
         icon: "tags",
         description: null,
         position: 2700
+    },
+    PROPOSED_FLOW: {
+        key: "PROPOSED_FLOW",
+        name: "Proposed Flow",
+        icon: "arrows-turn-to-dots",
+        description: null,
+        position: 2800
     }
 };
