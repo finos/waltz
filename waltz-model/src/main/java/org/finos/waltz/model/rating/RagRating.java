@@ -25,6 +25,7 @@ public enum RagRating {
     A, // Amber
     G, // Green
     Z, // Unknown
-    X  // None
+    X, // None
+    C  //Blue
 
 }

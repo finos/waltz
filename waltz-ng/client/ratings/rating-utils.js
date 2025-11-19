@@ -72,9 +72,15 @@ export const baseRagNames = {
 
 
 export const investmentRagNames = {
+    "C": {
+        rating: "C",
+        name: "Disinvest - Certified",
+        position: 40,
+        color: "#1F7FE0"
+    },
     "R": {
         rating: "R",
-        name: "Disinvest",
+        name: "Disinvest - Non-Certified",
         position: 30,
         color: "#DA524B"
     },
@@ -93,13 +99,13 @@ export const investmentRagNames = {
     "Z": {
         rating: "Z",
         name: "Unknown",
-        position: 40,
+        position: 50,
         color: "#939393"
     },
     "X": {
         rating: "X",
         name: "Not Applicable",
-        position: 50,
+        position: 60,
         color: "#D1D1D1"
     }
 };

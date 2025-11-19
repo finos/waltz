@@ -44,15 +44,23 @@ public abstract class RatingScheme implements
         return toList();
     }
 
+    private static final RatingSchemeItem dfltC = ImmutableRatingSchemeItem.builder()
+            .ratingSchemeId(1)
+            .rating("C")
+            .name("dflt - Disinvest- Certified")
+            .description("dflt - Disinvest- Certified")
+            .color("#1F7FE0")
+            .position(5)
+            .build();
+
     private static final RatingSchemeItem dfltR = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating("R")
-            .name("dflt - Disinvest")
-            .description("dflt - Disinvest")
+            .name("dflt - Disinvest- Non-Certified")
+            .description("dflt - Disinvest- Non-Certified")
             .color("#d62728")
             .position(10)
             .build();
-
 
     private static final RatingSchemeItem dfltA = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
@@ -81,8 +89,6 @@ public abstract class RatingScheme implements
             .color("#786aa5")
             .position(35)
             .build();
-
-
 
     private static final RatingSchemeItem dfltZ = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
@@ -113,7 +119,8 @@ public abstract class RatingScheme implements
                 dfltA,
                 dfltG,
                 dfltX,
-                dfltZ);
+                dfltZ,
+                dfltC);
     }
 
 }
