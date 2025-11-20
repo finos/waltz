@@ -53,11 +53,20 @@ public abstract class RatingScheme implements
             .position(5)
             .build();
 
+    private static final RatingSchemeItem dfltN = ImmutableRatingSchemeItem.builder()
+            .ratingSchemeId(1)
+            .rating("N")
+            .name("dflt - Disinvest- Non-Certified")
+            .description("dflt - Disinvest- Non-Certified")
+            .color("#d62728")
+            .position(10)
+            .build();
+
     private static final RatingSchemeItem dfltR = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating("R")
-            .name("dflt - Disinvest- Non-Certified")
-            .description("dflt - Disinvest- Non-Certified")
+            .name("dflt - Disinvest")
+            .description("dflt - Disinvest")
             .color("#d62728")
             .position(10)
             .build();
@@ -120,6 +129,7 @@ public abstract class RatingScheme implements
                 dfltG,
                 dfltX,
                 dfltZ,
+                dfltN,
                 dfltC);
     }
 

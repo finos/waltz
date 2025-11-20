@@ -24,9 +24,16 @@ export const investmentRating = {
         description: null,
         position: 5
     },
+    N: {
+        key: 'N',
+        name: 'Disinvest - Non-Certified',
+        icon: null,
+        description: null,
+        position: 10
+    },
     R: {
         key: 'R',
-        name: 'Disinvest - Non-Certified',
+        name: 'Disinvest',
         icon: null,
         description: null,
         position: 10

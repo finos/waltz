@@ -78,9 +78,15 @@ export const investmentRagNames = {
         position: 40,
         color: "#1F7FE0"
     },
+    "N": {
+        rating: "N",
+        name: "Disinvest - Non-Certified",
+        position: 30,
+        color: "#DA524B"
+    },
     "R": {
         rating: "R",
-        name: "Disinvest - Non-Certified",
+        name: "Disinvest",
         position: 30,
         color: "#DA524B"
     },
