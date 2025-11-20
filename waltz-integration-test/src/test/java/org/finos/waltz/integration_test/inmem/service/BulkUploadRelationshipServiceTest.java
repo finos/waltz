@@ -183,9 +183,11 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
         assertEquals(2l, applyResult.skippedRows().longValue());
     }
 
-    //@Test
+    @Test
     public void testBulkUploadWithSourceCategory() {
 
+        LOG.info(">>> LOG RUNNING TEST: " + this + " @ " + LocalDateTime.now());
+        System.out.println(">>> CONSOLE RUNNING TEST: " + this + " @ " + LocalDateTime.now());
         userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
 
         long newMeasurableId = measurableHelper.createMeasurable("M_1", measurableHelper.createMeasurableCategory("testCat1"));
