@@ -31,7 +31,7 @@
             </ol>
         </breadcrumbs>
     </waltz-page-header>
-    
+
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="$ctrl.proposedFlow">
             <waltz-section-actions>
@@ -97,7 +97,7 @@
 
 <script type="text/ng-template" id="wpfv-data-types">
     <div class="waltz-data-type-usage-panel">
-        <waltz-sub-section name="Data Types">
+        <waltz-sub-section name="{{ $ctrl.proposedFlow.proposalType === 'EDIT' ? 'Data Types (edited)' : 'Data Types' }}">
             <content>
                 <div style="padding-top: 0.5em">
                     <div ng-if="$ctrl.usedDataTypes.length > 0">
