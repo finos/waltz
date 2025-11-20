@@ -43,7 +43,7 @@
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
     let responseMessage="";
-    let existingProposedFlow="";
+    let existingFlow="";
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
@@ -130,9 +130,9 @@
                         toasts.error("Error proposing data flow");
                         commandLaunched = false; // reset so user can re-submit
                         if (response.proposedFlowId) {
-                            existingProposedFlow = "proposed-flow/" + response.proposedFlowId;
+                            existingFlow = "proposed-flow/" + response.proposedFlowId;
                         } else if (response.physicalFlowId) {
-                            existingProposedFlow = "physical-flow/" + response.physicalFlowId;
+                            existingFlow = "physical-flow/" + response.physicalFlowId;
                         }
                         break;
 
@@ -212,7 +212,7 @@
                     <NoData type="error" >
                         {responseMessage}
                         <br>
-                        <a href={existingProposedFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                        <a href={existingFlow} target="_blank" rel="noreferrer">Go to Flow</a>
                     </NoData>
                 </div>
                 {/if}
