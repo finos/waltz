@@ -18,6 +18,8 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;

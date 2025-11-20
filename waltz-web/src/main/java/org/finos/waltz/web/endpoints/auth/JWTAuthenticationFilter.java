@@ -60,16 +60,22 @@ public class JWTAuthenticationFilter extends WaltzFilter {
     @Override
     public void handle(Request request, Response response) throws Exception {
         String authorizationHeader = request.headers("Authorization");
+        LOG.info("authorizationHeader : {} ", authorizationHeader);
 
         if (authorizationHeader == null) {
             AuthenticationUtilities.setUserAsAnonymous(request);
         } else {
             String token = authorizationHeader.replaceFirst("Bearer ", "");
             DecodedJWT decodedToken = JWT.decode(token);
+            LOG.info("decodedToken : {} ", decodedToken);
 
             JWTVerifier verifier = selectVerifier(decodedToken);
+            LOG.info("verifier : {} ", verifier);
 
             DecodedJWT decodedJWT = verifier.verify(token);
+            LOG.info("decodedJWT : {} ", decodedJWT);
+            LOG.info("subject : {} ", decodedJWT.getSubject());
+
             AuthenticationUtilities.setUser(request, decodedJWT.getSubject());
         }
     }
@@ -85,6 +91,8 @@ public class JWTAuthenticationFilter extends WaltzFilter {
 
     private JWTVerifier selectVerifier(DecodedJWT decodedToken) {
         String algorithm = decodedToken.getAlgorithm();
+        LOG.info("algorithm : {} ", algorithm);
+
         switch (algorithm) {
             case "HS256":
                 return verifier256;
