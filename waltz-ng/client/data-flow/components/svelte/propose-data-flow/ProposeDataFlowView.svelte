@@ -127,7 +127,6 @@
                 switch (response.outcome) {
                     case PROPOSAL_OUTCOMES.FAILURE:
                         responseMessage = response.message;
-                        toasts.error("Error proposing data flow");
                         commandLaunched = false; // reset so user can re-submit
                         if (response.proposedFlowId) {
                             existingFlow = "proposed-flow/" + response.proposedFlowId;
@@ -141,8 +140,7 @@
                             toasts.success("Data Flow Proposed");
                             resetStore();
                             setTimeout(goToWorkflow, 500, response.proposedFlowId);
-                        }
-                        else {
+                        } else {
                             toasts.error("Error proposing data flow");
                             commandLaunched = false;
                         }
