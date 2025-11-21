@@ -41,8 +41,10 @@ import org.finos.waltz.schema.tables.SoftwarePackage;
 import org.finos.waltz.schema.tables.SurveyQuestion;
 import org.finos.waltz.schema.tables.SurveyTemplate;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 
 import static org.finos.waltz.model.EntityKind.ACTOR;
+import static org.jooq.impl.DSL.cast;
 
 public class CommonTableFieldsRegistry {
 
@@ -96,7 +98,7 @@ public class CommonTableFieldsRegistry {
                         .idField(ag.ID)
                         .parentIdField(null)
                         .nameField(ag.NAME)
-                        .descriptionField(ag.DESCRIPTION)
+                        .descriptionField(cast(ag.DESCRIPTION, SQLDataType.NVARCHAR(4000)))
                         .externalIdField(ag.EXTERNAL_ID)
                         .isActiveCondition(ag.IS_REMOVED.isFalse())
                         .build();
