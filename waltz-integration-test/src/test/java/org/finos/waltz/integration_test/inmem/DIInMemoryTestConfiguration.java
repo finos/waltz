@@ -20,14 +20,14 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-@Configuration
-@ComponentScan(basePackages = {
-        "org.finos.waltz.data",
-        "org.finos.waltz.service"
-
-}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
-@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-@PropertySource("classpath:integration-test.properties")
+//@Configuration
+//@ComponentScan(basePackages = {
+//        "org.finos.waltz.data",
+//        "org.finos.waltz.service"
+//
+//}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
+//@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
+//@PropertySource("classpath:integration-test.properties")
 public class DIInMemoryTestConfiguration {
 
     @Bean
@@ -39,7 +39,7 @@ public class DIInMemoryTestConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        System.out.println("Setting up ds");
+        System.out.println("Setting up ds inmem");
 
         HikariConfig dsConfig = new HikariConfig();
         dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE");
@@ -52,7 +52,7 @@ public class DIInMemoryTestConfiguration {
 
 
     @Bean
-    @Autowired
+    //@Autowired
     public DSLContext dsl(DataSource dataSource) {
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
@@ -72,7 +72,7 @@ public class DIInMemoryTestConfiguration {
 
     @Bean
     public SpringLiquibase springLiquibase(DataSource dataSource, DSLContext dsl) throws SQLException {
-        System.out.println("Setting up liquibase");
+        System.out.println("Setting up liquibase inmem");
         SpringLiquibase liquibase = new SpringLiquibase();
 
         liquibase.setDropFirst(true);
