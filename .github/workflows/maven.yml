@@ -12,11 +12,9 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(
-                (secrets.JOOQ_USERNAME != '' && secrets.JOOQ_PASSWORD != '') &&
-                '{"db":["postgres","mssql"]}' ||
-                '{"db":["postgres"]}'
-              ) }}
+      matrix:
+        db: [ postgres, mssql ]
+
 
     services:
       postgres:
