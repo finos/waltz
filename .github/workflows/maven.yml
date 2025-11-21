@@ -8,6 +8,9 @@ on: [push, pull_request]
 jobs:
   build:
 
+    # if not mssql run always; otherwise run mssql if the jooq credentials exist
+    if: ${{ matrix.db != 'mssql' || (secrets.JOOQ_USERNAME != '' && secrets.JOOQ_PASSWORD != '') }}
+
     runs-on: ubuntu-latest
 
     strategy:
