@@ -68,6 +68,7 @@ public enum EntityKind {
     LEGAL_ENTITY_RELATIONSHIP_KIND("Legal Entity Relationship Kind"),
     LOGICAL_DATA_ELEMENT("Logical Data Element"),
     LOGICAL_DATA_FLOW("Logical Flow"),
+    LOGICAL_FLOW_DECORATOR("Logical Flow Decorator"),
     LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR("Logical Flow Datatype Decorator"),
     MEASURABLE("Measurable"),
     MEASURABLE_CATEGORY("Measurable category"),

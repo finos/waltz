@@ -275,7 +275,7 @@ public class ProposedFlowWorkflowService {
                 dataFlowService.editPhysicalFlow(proposedFlow, username);
                 break;
             case DELETE:
-                dataFlowService.deletePhysicalFlow(proposedFlow.physicalFlowId(), username);
+                dataFlowService.deletePhysicalFlow(proposedFlow, username);
                 break;
             default:
                 throw new UnsupportedOperationException(
