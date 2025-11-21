@@ -47,7 +47,8 @@ const initialState = {
         overviewEditor: false
     },
     potentialMergeTargets: [],
-    mergeTarget: null
+    mergeTarget: null,
+    settings:null
 };
 
 
@@ -119,6 +120,14 @@ function controller($q,
 
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
+
+
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                vm.settings = r.data;
+                console.log("Settings loaded via serviceBroker:", vm.settings);
+            });
 
 
         const physicalFlowPromise = serviceBroker

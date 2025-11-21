@@ -154,7 +154,7 @@
             })
             .catch(e => {
                 displayError("Error proposing data flow", e);
-                commandLaunched = false;
+                commandLaunched = false; // reset in case of error so that user is able to re-submit
             });
     }
 
