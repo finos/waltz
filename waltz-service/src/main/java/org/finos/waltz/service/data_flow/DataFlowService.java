@@ -186,11 +186,13 @@ public class DataFlowService {
         Set<Long> toAdd = difference(dataTypeIdsInRequest, dataTypeIdsInDB);
         Set<Long> toRemove = difference(dataTypeIdsInDB, dataTypeIdsInRequest);
 
-        return dataTypeDecoratorService.updateDecorators(
+        boolean updatedDT = dataTypeDecoratorService.updateDecorators(
                 username,
                 mkRef(EntityKind.PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
                 toAdd,
                 toRemove);
+        saveEntityWorkflowResult(proposedFlow, mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()), username);
+        return updatedDT;
     }
 
 
