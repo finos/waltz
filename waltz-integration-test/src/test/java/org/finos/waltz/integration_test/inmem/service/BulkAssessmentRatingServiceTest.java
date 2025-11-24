@@ -252,7 +252,7 @@ public class BulkAssessmentRatingServiceTest extends BaseInMemoryIntegrationTest
         SaveAssessmentRatingCommand cmd = ImmutableSaveAssessmentRatingCommand.builder()
                 .entityReference(cfg)
                 .assessmentDefinitionId(defId)
-                .ratingId(26)
+                .ratingId(1)
                 .lastUpdatedBy("test")
                 .build();
         try {
