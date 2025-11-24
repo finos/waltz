@@ -44,7 +44,6 @@ import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.difference;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
-import static org.finos.waltz.model.EntityKind.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -217,8 +216,6 @@ public class DataFlowService {
         PhysicalFlow physicalFlow = physicalFlowService.getById(proposedFlow.physicalFlowId());
         checkNotNull(physicalFlow, "No physical flow found");
 
-        LOG.info("[deletePhysicalFlow] user={} physicalFlowId={}", username, proposedFlow.physicalFlowId());
-
         PhysicalFlowDeleteCommand physicalFlowDeleteCommand = buildPhysicalFlowDeleteCommand(proposedFlow.physicalFlowId());
 
         //soft delete physical flow
@@ -243,11 +240,7 @@ public class DataFlowService {
 
             //delete logical flow decorator
             deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
-            saveEntityWorkflowResult(proposedFlow, mkRef(LOGICAL_FLOW_DECORATOR, physicalFlow.logicalFlowId()), username);
         }
-
-        LOG.info("[deletePhysicalFlow] completed successfully for physicalFlowId={}", proposedFlow.physicalFlowId());
-
         return ImmutableDeletePhysicalFlowResponse.builder()
                 .logicalFlowId(physicalFlow.logicalFlowId())
                 .physicalFlowId(proposedFlow.physicalFlowId())
