@@ -44,6 +44,7 @@ import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.difference;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -203,30 +204,30 @@ public class DataFlowService {
      * Soft-deletes a physical flow and – when safe – its specification and the
      * associated logical flow together with its data-type decorators.
      *
-     * @param physicalFlowId id of the flow to delete
+     * @param proposedFlow as input
      * @param username user performing the operation
      * @return immutable response object with the ids of the deleted artefacts
      */
-    public DeletePhysicalFlowResponse deletePhysicalFlow(Long physicalFlowId, String username) {
+    public DeletePhysicalFlowResponse deletePhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
 
-        checkNotNull(physicalFlowId, "physicalFlowId must not be null");
+        checkNotNull(proposedFlow.physicalFlowId(), "physicalFlowId must not be null");
         checkNotNull(username, "username must not be null");
 
-        PhysicalFlow physicalFlow = physicalFlowService.getById(physicalFlowId);
+        PhysicalFlow physicalFlow = physicalFlowService.getById(proposedFlow.physicalFlowId());
         checkNotNull(physicalFlow, "No physical flow found");
 
-        LOG.info("[deletePhysicalFlow] user={} physicalFlowId={}", username, physicalFlowId);
-
-        PhysicalFlowDeleteCommand physicalFlowDeleteCommand = buildPhysicalFlowDeleteCommand(physicalFlowId);
+        PhysicalFlowDeleteCommand physicalFlowDeleteCommand = buildPhysicalFlowDeleteCommand(proposedFlow.physicalFlowId());
 
         //soft delete physical flow
         PhysicalFlowDeleteCommandResponse physicalFlowDeleteCommandResponse = physicalFlowService.delete(physicalFlowDeleteCommand, username);
+        saveEntityWorkflowResult(proposedFlow, mkRef(PHYSICAL_FLOW, proposedFlow.physicalFlowId()), username);
 
         //check specification is unused
         if (physicalFlowDeleteCommandResponse.isSpecificationUnused()) {
             PhysicalSpecificationDeleteCommand physicalSpecDeleteCmd = buildPhysicalSpecificationDeleteCommand(physicalFlow.specificationId());
             //soft delete physical specification
             specificationService.markRemovedIfUnused(physicalSpecDeleteCmd, username);
+            saveEntityWorkflowResult(proposedFlow, mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()), username);
         }
 
         //check last physical flow
@@ -235,16 +236,14 @@ public class DataFlowService {
 
             //soft delete associated logical flow
             logicalFlowService.removeFlow(physicalFlow.logicalFlowId(), username);
+            saveEntityWorkflowResult(proposedFlow, mkRef(LOGICAL_DATA_FLOW, physicalFlow.logicalFlowId()), username);
 
             //delete logical flow decorator
             deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
         }
-
-        LOG.info("[deletePhysicalFlow] completed successfully for physicalFlowId={}", physicalFlowId);
-
         return ImmutableDeletePhysicalFlowResponse.builder()
                 .logicalFlowId(physicalFlow.logicalFlowId())
-                .physicalFlowId(physicalFlowId)
+                .physicalFlowId(proposedFlow.physicalFlowId())
                 .specificationId(physicalFlow.specificationId())
                 .build();
     }
