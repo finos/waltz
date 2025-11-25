@@ -22,12 +22,12 @@
     import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
     import { settingsStore } from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
+    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../../common/constants"
+    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
 
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
-    const DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
 
     const PROPOSAL_OUTCOMES = {
         SUCCESS: "SUCCESS",
@@ -48,10 +48,9 @@
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
-    $: dataFlowProposalsRatingSchemeSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME)[0];
-    $: dataFlowProposalsRatingSchemeExtId = dataFlowProposalsRatingSchemeSetting?.value;
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingScheme($settingsCall.data);
+
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?

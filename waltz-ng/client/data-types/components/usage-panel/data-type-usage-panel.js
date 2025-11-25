@@ -25,7 +25,8 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import EditReasonSelection from "./EditReasonSelection.svelte"
-import {editDataType} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+import {editDataType} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME,DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
 
 const bindings = {
     parentEntityRef: "<",
@@ -54,8 +55,6 @@ const initialState = {
 function controller(serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
-    const DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
-    const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
 
     const reload = (force = false) => {
         loadUsageData($q, serviceBroker, vm.parentEntityRef, force)

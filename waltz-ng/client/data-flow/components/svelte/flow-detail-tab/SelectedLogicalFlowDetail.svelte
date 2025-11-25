@@ -13,6 +13,7 @@
     import {createEventDispatcher} from "svelte";
     import toastStore from "../../../../svelte-stores/toast-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
+    import {isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -20,8 +21,6 @@
     };
 
     const dispatch = createEventDispatcher();
-
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
     function goToPhysicalFlowEdit(flow) {
         $pageInfo = {
@@ -66,10 +65,13 @@
 
     let settingsCall=settingsStore.loadAll();
 
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
+    let isSettingsLoaded = false;
 
+    $: if ($settingsCall?.data && Object.keys($settingsCall.data).length > 0) {
+        isSettingsLoaded = true;
+    }
+
+    $: dataFlowProposalsEnabled = isSettingsLoaded? isDataFlowProposalsEnabled($settingsCall.data) : undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
@@ -143,7 +145,6 @@
     <AssessmentsTable ratingsByDefId={logicalFlowRatingsByDefId}
                       {assessmentDefinitionsById}/>
 {/if}
-
 
 {#if dataFlowProposalsEnabled !== undefined && !dataFlowProposalsEnabled}
     <details>

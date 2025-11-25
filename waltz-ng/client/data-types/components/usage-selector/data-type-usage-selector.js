@@ -25,6 +25,8 @@ import {loadUsageData} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-flow-remote-store";
 import toasts from "../../../svelte-stores/toast-store";
+import pageInfo from "../../../svelte-stores/page-navigation-store";
+import {PROPOSAL_OUTCOMES} from "../../../common/constants";
 
 
 const bindings = {
@@ -51,14 +53,16 @@ const initialState = {
     onRegisterSavePropose: (f) => console.log("dtus:onRegisterSavePropose - default impl", f)
 };
 
-const PROPOSAL_OUTCOMES = {
-    SUCCESS: "SUCCESS",
-    FAILURE: "FAILURE"
-}
+
 
 function goToWorkflow(proposedFlowId) {
     // Simple navigation using window.location
-    window.location.href = `/proposed-flow/${proposedFlowId}`;
+    pageInfo.set({
+        state: "main.proposed-flow.view",
+        params: {
+            id: proposedFlowId
+        }
+    })
 }
 
 
@@ -166,16 +170,8 @@ function controller($q, serviceBroker) {
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {
                         const response = r.data;
-                        let responseMessage;
-                        let existingFlow;
                         switch (response.outcome) {
                             case PROPOSAL_OUTCOMES.FAILURE:
-                                responseMessage = response.message;
-                                if (response.proposedFlowId) {
-                                    existingFlow = "proposed-flow/" + response.proposedFlowId;
-                                } else if (response.physicalFlowId) {
-                                    existingFlow = "physical-flow/" + response.physicalFlowId;
-                                }
                                 toasts.error("Flow already exists")
                                 break;
 

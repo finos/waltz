@@ -20,6 +20,7 @@
     import toastStore from "../../../../svelte-stores/toast-store";
     import {physicalFlowStore} from "../../../../svelte-stores/physical-flow-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
+    import {isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -27,8 +28,6 @@
     };
 
     const dispatch = createEventDispatcher();
-
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
 
     function goToPhysicalFlowPage(flow) {
@@ -61,10 +60,12 @@
     let actionSectionState = ActionSectionStates.LIST;
 
     let settingsCall=settingsStore.loadAll();
+    let isSettingsLoaded = false;
 
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
+    $: if ($settingsCall?.data && Object.keys($settingsCall.data).length > 0) {
+        isSettingsLoaded = true;
+    }
+    $: dataFlowProposalsEnabled = isSettingsLoaded?isDataFlowProposalsEnabled($settingsCall.data):undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;

@@ -17,6 +17,8 @@
     import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
     import SuggestedDataTypeTreeSelector from "./SuggestedDataTypeTreeSelector.svelte";
     import {settingsStore} from "../../../svelte-stores/settings-store";
+    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
+    import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
     export let primaryEntityReference;
@@ -25,10 +27,7 @@
         VIEW: "VIEW",
         EDIT: "EDIT"
     }
-
     const root = {name: "Root"};
-
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
     let activeMode = Modes.VIEW;
     let selectionOptions;
@@ -131,9 +130,9 @@
     let settingsCall=settingsStore.loadAll();
 
     $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
-
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
+        [0];
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
 
 </script>
 
