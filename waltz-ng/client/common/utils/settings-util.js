@@ -9,5 +9,5 @@ export function isDataFlowProposalsEnabled(settings) {
 
 export function getDataFlowProposalsRatingScheme(settings) {
     const setting = settings.filter(t => t.name === DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME)[0];
-    return setting?.value === 'true';
+    return setting?.value;
 }
