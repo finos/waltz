@@ -25,6 +25,7 @@ import {toEntityRefWithKind} from "../common/entity-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
 import {copyTextToClipboard} from "../common/browser-utils";
+import {isDataFlowProposalsEnabled} from "../common/utils/settings-util";
 
 
 const modes = {
@@ -48,9 +49,9 @@ const initialState = {
     },
     potentialMergeTargets: [],
     mergeTarget: null,
-    settings:null
+    settings: null,
+    dataFlowProposalsEnabled: null
 };
-
 
 
 function mkHistoryObj(flow, spec) {
@@ -58,13 +59,15 @@ function mkHistoryObj(flow, spec) {
         name: spec.name,
         kind: "PHYSICAL_FLOW",
         state: "main.physical-flow.view",
-        stateParams: { id: flow.id }
+        stateParams: {id: flow.id}
     };
 }
 
 
 function addToHistory(historyStore, flow, spec) {
-    if (! flow || !spec) { return; }
+    if (!flow || !spec) {
+        return;
+    }
 
     const historyObj = mkHistoryObj(flow, spec);
 
@@ -77,7 +80,9 @@ function addToHistory(historyStore, flow, spec) {
 
 
 function removeFromHistory(historyStore, flow, spec) {
-    if (! flow || !spec) { return; }
+    if (!flow || !spec) {
+        return;
+    }
 
     const historyObj = mkHistoryObj(flow, spec);
 
@@ -99,8 +104,6 @@ function navigateToLastView($state, historyStore) {
 }
 
 
-
-
 function controller($q,
                     $state,
                     $stateParams,
@@ -108,8 +111,7 @@ function controller($q,
                     historyStore,
                     physicalFlowStore,
                     physicalSpecificationStore,
-                    serviceBroker)
-{
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const entityReference = {
@@ -126,7 +128,7 @@ function controller($q,
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 vm.settings = r.data;
-                console.log("Settings loaded via serviceBroker:", vm.settings);
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
             });
 
 
@@ -197,7 +199,7 @@ function controller($q,
                     deleteSpecification();
                 }
 
-                if(response.isLastPhysicalFlow && confirm(deleteLogicalFlowText)) {
+                if (response.isLastPhysicalFlow && confirm(deleteLogicalFlowText)) {
                     deleteLogicalFlow()
                 }
             } else {
@@ -220,21 +222,21 @@ function controller($q,
     // -- INTERACT: de-dupe
     const loadPotentialMergeTargets = () => {
         const selector = {
-            entityReference: { id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW" },
+            entityReference: {id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW"},
             scope: "EXACT"
         };
 
         const potentialFlowsPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalFlowStore.findBySelector,
-                [ selector ],
-                { force: true })
+                [selector],
+                {force: true})
             .then(r => r.data);
 
         const potentialSpecsPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalSpecificationStore.findBySelector,
-                [ selector ])
+                [selector])
             .then(r => r.data);
 
         $q.all([potentialFlowsPromise, potentialSpecsPromise])
@@ -275,7 +277,7 @@ function controller($q,
             serviceBroker
                 .loadViewData(
                     CORE_API.PhysicalFlowStore.merge,
-                    [ fromId , toId ])
+                    [fromId, toId])
                 .then(toasts.warning("Flow has been marked as duplicate"))
                 .then(() => $state.reload())
         } else {
@@ -292,7 +294,7 @@ function controller($q,
 
 
     vm.sharePageLink = () => {
-        const viewUrl = $state.href("main.physical-flow.external-id", { externalId: vm.physicalFlow.externalId });
+        const viewUrl = $state.href("main.physical-flow.external-id", {externalId: vm.physicalFlow.externalId});
         copyTextToClipboard(`${$window.location.origin}${viewUrl}`)
             .then(() => toasts.success("Copied link to clipboard"))
             .catch(e => displayError("Could not copy link to clipboard", e));

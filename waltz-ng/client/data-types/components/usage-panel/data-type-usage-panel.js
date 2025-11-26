@@ -26,7 +26,7 @@ import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-ut
 import {entity} from "../../../common/services/enums/entity";
 import EditReasonSelection from "./EditReasonSelection.svelte"
 import {editDataType} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
-import {DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME,DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
+import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 const bindings = {
     parentEntityRef: "<",
@@ -67,12 +67,9 @@ function controller(serviceBroker, userService, $q) {
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= vm.settings
-                    .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0].value === "true";
+                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
 
-                dataFlowProposalsRatingSchemeSetting = vm.settings
-                    .filter(t => t.name === DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME)[0];
-                vm.ratingSchemeExtId = dataFlowProposalsRatingSchemeSetting?.value;
+                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
 
             });
 
@@ -207,7 +204,6 @@ function controller(serviceBroker, userService, $q) {
         vm.savePropose = saveFn;
     };
 }
-
 
 controller.$inject = [
     "ServiceBroker",

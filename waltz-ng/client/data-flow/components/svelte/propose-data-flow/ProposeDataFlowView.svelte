@@ -22,17 +22,11 @@
     import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
     import { settingsStore } from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../../common/constants"
+    import {DATAFLOW_PROPOSAL_SETTING_NAME,PROPOSAL_OUTCOMES} from "../../../../common/constants"
     import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
-
-
-    const PROPOSAL_OUTCOMES = {
-        SUCCESS: "SUCCESS",
-        FAILURE: "FAILURE"
-    }
 
     const PROPOSAL_TYPES = {
         CREATE: "CREATE",
@@ -50,7 +44,6 @@
         [0];
     $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
     $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingScheme($settingsCall.data);
-
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?

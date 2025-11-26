@@ -28,7 +28,6 @@ import toasts from "../../../svelte-stores/toast-store";
 import pageInfo from "../../../svelte-stores/page-navigation-store";
 import {PROPOSAL_OUTCOMES} from "../../../common/constants";
 
-
 const bindings = {
     parentEntityRef: "<",
     onDirty: "<?",
