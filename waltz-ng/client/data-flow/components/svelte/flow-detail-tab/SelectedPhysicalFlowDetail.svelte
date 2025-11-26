@@ -60,11 +60,9 @@
     let actionSectionState = ActionSectionStates.LIST;
 
     let settingsCall=settingsStore.loadAll();
-    let isSettingsLoaded = false;
+    let isSettingsLoaded;
 
-    $: if ($settingsCall?.data && Object.keys($settingsCall.data).length > 0) {
-        isSettingsLoaded = true;
-    }
+    $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
     $: dataFlowProposalsEnabled = isSettingsLoaded?isDataFlowProposalsEnabled($settingsCall.data):undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
