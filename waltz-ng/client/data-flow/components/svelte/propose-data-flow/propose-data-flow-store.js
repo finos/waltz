@@ -32,5 +32,5 @@ export const nestedEnums = writable({});
 export const skipDataTypes = writable(false);
 export const viewMode = writable(ViewMode.SECTION);
 export const proposalReason = writable(null);
-export const editDataType= writable(null);
+export const editDataTypeReason= writable(null);
 

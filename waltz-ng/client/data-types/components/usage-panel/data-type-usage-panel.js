@@ -25,7 +25,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import EditReasonSelection from "./EditReasonSelection.svelte"
-import {editDataType} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {editDataTypeReason} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 const bindings = {
@@ -100,7 +100,7 @@ function controller(serviceBroker, userService, $q) {
         vm.visibility.editor = false;
     };
 
-    editDataType.subscribe(value => {
+    editDataTypeReason.subscribe(value => {
         vm.selectedReason = value;
     });
 
@@ -184,7 +184,9 @@ function controller(serviceBroker, userService, $q) {
                     .then(()=> {
                         toasts.success("Data types updated successfully");
                         reload(true);
-                        vm.onHideEdit();}
+                        vm.onHideEdit();
+                        editDataTypeReason.set(null)
+                    }
                     )
                     .catch(error => {
                         console.error("Error in savePropose:", error);

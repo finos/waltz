@@ -1,5 +1,5 @@
 <script>
-    import {editDataType} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+    import {editDataTypeReason} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
@@ -24,13 +24,13 @@
     let ratingScheme;
 
     onMount(async () => {
-        if ($editDataType) {
-            workingCopy = Object.assign({}, $editDataType);
+        if ($editDataTypeReason) {
+            workingCopy = Object.assign({}, $editDataTypeReason);
         }
     });
 
     function save() {
-        $editDataType = workingCopy;
+        $editDataTypeReason = workingCopy;
     }
 
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
