@@ -36,6 +36,10 @@
         TARGET_REJECTED: {
             name: "Target Rejected",
             color: "#c1664f"
+        },
+        CANCELLED: {
+            name: "Cancelled",
+            color: "#c16644"
         }
     }
     const historicalStatuses = Object.keys(historicalStatusPillDefs)
