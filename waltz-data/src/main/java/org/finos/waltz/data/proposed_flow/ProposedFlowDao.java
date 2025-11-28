@@ -7,13 +7,25 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.entity_workflow.*;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.*;
+import org.jooq.Record;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +41,22 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
 
 @Repository
 public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
+
     private final DSLContext dsl;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
@@ -72,7 +91,7 @@ public class ProposedFlowDao {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
-        EntityWorkflowView entityWorkflowView = getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
+        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
@@ -83,30 +102,27 @@ public class ProposedFlowDao {
                     .flowDef(flowDefinition)
                     .workflowState(entityWorkflowView.workflowState())
                     .workflowTransitionList(entityWorkflowView.workflowTransitionList())
+                    .logicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(LOGICAL_DATA_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.logicalFlowId().orElse(null)))
+                    .physicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.physicalFlowId().orElse(null)))
+                    .specificationId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_SPECIFICATION))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(flowDefinition.specification().id().orElse(null)))
                     .build();
 
         } catch (JsonProcessingException e) {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
-    }
-
-    public EntityWorkflowView getEntityWorkflowView(String workFlowDefName, EntityReference ref) {
-        checkNotNull(workFlowDefName, "workFlowDefName cannot be null");
-        checkNotNull(ref, "ref cannot be null");
-
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(workFlowDefName);
-        Long workFlowId = Optional.ofNullable(entityWorkflowDefinition)
-                .flatMap(EntityWorkflowDefinition::id)
-                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
-        EntityWorkflowState entityWorkflowState = entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workFlowId, ref);
-        List<EntityWorkflowTransition> entityWorkflowTransitionList = entityWorkflowTransitionDao.findForEntityReferenceAndWorkflowId(workFlowId, ref);
-
-        return ImmutableEntityWorkflowView.builder()
-                .workflowDefinition(entityWorkflowDefinition)
-                .workflowState(entityWorkflowState)
-                .workflowTransitionList(entityWorkflowTransitionList)
-                .build();
     }
 
     public List<ProposedFlowResponse> getProposedFlowsBySelector(Select<Record1<Long>> flowIdSelector, Long workflowId) throws JsonProcessingException {
@@ -185,6 +201,45 @@ public class ProposedFlowDao {
                 .from(PROPOSED_FLOW)
                 .where(PROPOSED_FLOW.ID.eq(id))
                 .fetchOneInto(ProposedFlowRecord.class);
+    }
+
+    public List<ProposedFlowRecord> proposedFlowRecordsByProposalType(ProposedFlowCommand proposedFlowCommand) {
+        Long workflowId = fetchWorkflowID();
+        Condition proposalTypeCondition = getProposalTypeCondition(proposedFlowCommand.proposalType());
+
+        List<ProposedFlowRecord> records =
+                dsl
+                        .selectDistinct(PROPOSED_FLOW.fields())
+                        .from(PROPOSED_FLOW)
+                        .join(ENTITY_WORKFLOW_STATE)
+                        .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                        .where(PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(proposedFlowCommand.source().id()))
+                        .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(proposedFlowCommand.source().kind().name()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
+                        .and(proposalTypeCondition)
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                        .fetchInto(ProposedFlowRecord.class);
+        return records;
+    }
+
+    private Condition getProposalTypeCondition(ProposalType proposalType) {
+        Condition proposalTypeCondition;
+        if(proposalType == CREATE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(CREATE.name());
+        else if(proposalType == EDIT || proposalType == DELETE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(EDIT.name(), DELETE.name());
+        else
+            throw new IllegalArgumentException("Unexpected proposal type: "+ proposalType);
+        return proposalTypeCondition;
+    }
+
+    private Long fetchWorkflowID() {
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        return Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
     }
 }
 

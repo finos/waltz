@@ -31,7 +31,9 @@
 
     <groupId>org.finos</groupId>
     <artifactId>waltz</artifactId>
-    <version>1.75-SNAPSHOT</version>
+    <version>1.76.0-SNAPSHOT</version>
+
+
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
@@ -74,7 +76,7 @@
         <plugin.maven-compiler.version>3.8.1</plugin.maven-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+        <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
         <annotation-api.version>1.3.2</annotation-api.version>
@@ -85,12 +87,12 @@
         <immutables.version>2.9.3</immutables.version>
         <jackson.version>2.15.2</jackson.version>
         <jackson-jsr310.version>2.15.2</jackson-jsr310.version>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
         <jgrapht.version>1.4.0</jgrapht.version>
         <jool.version>0.9.15</jool.version>
-        <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
+        <jooq.version>3.18.29</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.10.0</junit.version>
         <jwt.version>4.3.0</jwt.version>
         <mockito.version>4.11.0</mockito.version>  <!-- 5.3.1 is 9+ -->
@@ -100,7 +102,7 @@
         <poi.version>5.2.4</poi.version>
         <slf4j.version>2.0.7</slf4j.version>
         <snakeyaml.version>2.5</snakeyaml.version>
-        <spark.version>2.9.1</spark.version> <!-- 2.9.3 causes issues with tomcat -->
+        <spark.version>2.9.4</spark.version> <!-- 2.9.3 causes issues with tomcat -->
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.30</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
@@ -118,9 +120,19 @@
         <dependencies>
             <!-- web -->
             <dependency>
-                <groupId>com.sparkjava</groupId>
+                <groupId>io.github.sparkjavateam</groupId>
                 <artifactId>spark-core</artifactId>
                 <version>${spark.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.websocket</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.auth0</groupId>
@@ -243,7 +255,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jool-java-8</artifactId>
+                <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
             </dependency>
             <dependency>
@@ -444,7 +456,7 @@
                 <jdbc.artifact>sqljdbc4</jdbc.artifact>
                 <jdbc.version>4.0</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.pro-java-8</jooq.group>
+                <jooq.group>org.jooq.pro</jooq.group>
                 <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
@@ -498,7 +510,7 @@
                 <jdbc.artifact>mssql-jdbc</jdbc.artifact>
                 <jdbc.version>6.1.0.jre8</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.pro-java-8</jooq.group>
+                <jooq.group>org.jooq.pro</jooq.group>
                 <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
