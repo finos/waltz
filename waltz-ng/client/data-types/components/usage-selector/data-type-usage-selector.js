@@ -26,7 +26,12 @@ import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-flow-remote-store";
 import toasts from "../../../svelte-stores/toast-store";
 import pageInfo from "../../../svelte-stores/page-navigation-store";
-import {PROPOSAL_OUTCOMES} from "../../../common/constants";
+import {PROPOSAL_TYPES} from "../../../common/constants";
+import {
+    duplicateFlowMessage,
+    existingDuplicateFlow
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+import {handleProposalValidation} from "../../../common/utils/proposalValidation";
 
 const bindings = {
     parentEntityRef: "<",
@@ -62,6 +67,8 @@ function goToWorkflow(proposedFlowId) {
             id: proposedFlowId
         }
     })
+    existingDuplicateFlow.set(null)
+    duplicateFlowMessage.set(null)
 }
 
 
@@ -169,24 +176,7 @@ function controller($q, serviceBroker) {
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {
                         const response = r.data;
-                        switch (response.outcome) {
-                            case PROPOSAL_OUTCOMES.FAILURE:
-                                toasts.error("Flow already exists")
-                                break;
-
-                            case PROPOSAL_OUTCOMES.SUCCESS:
-                                if (response.proposedFlowId) {
-                                    toasts.success("Data Flow Proposed");
-                                    setTimeout(goToWorkflow, 500, response.proposedFlowId);
-                                } else {
-                                    toasts.error("Error proposing data flow");
-                                }
-                                break;
-
-                            default:
-                                toasts.error("Error proposing data flow");
-                                break;
-                        }
+                        const commandLaunched=handleProposalValidation(response,false,null,false,goToWorkflow,PROPOSAL_TYPES.EDIT);
                     })
                     .catch(e => {
                         console.error("Error proposing data flow", e);

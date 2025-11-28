@@ -25,8 +25,12 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import EditReasonSelection from "./EditReasonSelection.svelte"
-import {editDataTypeReason} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {
+    duplicateFlowMessage,
+    editDataTypeReason, existingDuplicateFlow
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+import {PROPOSAL_TYPES} from "../../../common/constants";
 
 const bindings = {
     parentEntityRef: "<",
@@ -48,7 +52,10 @@ const initialState = {
     ratingsScheme:null,
     ratingSchemeExtId:null,
     dataFlowProposalsEnabled:null,
-    selectedReason:null
+    selectedReason:null,
+    type:PROPOSAL_TYPES.EDIT,
+    duplicateFlowMessage:duplicateFlowMessage,
+    existingDuplicateFlow:existingDuplicateFlow
 };
 
 
@@ -183,9 +190,9 @@ function controller(serviceBroker, userService, $q) {
                 vm.savePropose(command)
                     .then(()=> {
                         toasts.success("Data types updated successfully");
+                        editDataTypeReason.set(null)
                         reload(true);
                         vm.onHideEdit();
-                        editDataTypeReason.set(null)
                     }
                     )
                     .catch(error => {
