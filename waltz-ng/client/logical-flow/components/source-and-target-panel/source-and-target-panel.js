@@ -35,6 +35,7 @@ import {loadFlowClassificationRatings} from "../../../flow-classification-rule/f
 import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 import FlowRatingCell from "../../../common/svelte/FlowRatingCell.svelte"
 import {flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
+import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
 
 const bindings = {
     entityRef: "<",
@@ -72,9 +73,6 @@ const initialState = {
     diagramElem: null,
     FlowRatingCell
 };
-
-const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
-
 
 function mkNodeFilterFn(nodeInfo) {
     return f => nodeInfo === "ALL" || sameRef(f[nodeInfo.position], nodeInfo.entity);

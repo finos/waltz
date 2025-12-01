@@ -22,17 +22,11 @@
     import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
     import { settingsStore } from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
+    import {DATAFLOW_PROPOSAL_SETTING_NAME,PROPOSAL_OUTCOMES} from "../../../../common/constants"
+    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
-
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
-    const DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
-
-    const PROPOSAL_OUTCOMES = {
-        SUCCESS: "SUCCESS",
-        FAILURE: "FAILURE"
-    }
 
     const PROPOSAL_TYPES = {
         CREATE: "CREATE",
@@ -42,14 +36,14 @@
 
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
+    let responseMessage="";
+    let existingFlow="";
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
-    $: dataFlowProposalsRatingSchemeSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_RATINGSCHEME_SETTING_NAME)[0];
-    $: dataFlowProposalsRatingSchemeExtId = dataFlowProposalsRatingSchemeSetting?.value;
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingScheme($settingsCall.data);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -122,18 +116,32 @@
         proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
-                if(response.outcome === PROPOSAL_OUTCOMES.SUCCESS) {
-                    if(response.proposedFlowId) {
-                        toasts.success("Data Flow Proposed");
-                        resetStore(); // only on success we want to reset the state
-                        setTimeout(goToWorkflow, 500, response.proposedFlowId);
-                    } else {
+                switch (response.outcome) {
+                    case PROPOSAL_OUTCOMES.FAILURE:
+                        responseMessage = response.message;
+                        commandLaunched = false; // reset so user can re-submit
+                        if (response.proposedFlowId) {
+                            existingFlow = "proposed-flow/" + response.proposedFlowId;
+                        } else if (response.physicalFlowId) {
+                            existingFlow = "physical-flow/" + response.physicalFlowId;
+                        }
+                        break;
+
+                    case PROPOSAL_OUTCOMES.SUCCESS:
+                        if (response.proposedFlowId) {
+                            toasts.success("Data Flow Proposed");
+                            resetStore();
+                            setTimeout(goToWorkflow, 500, response.proposedFlowId);
+                        } else {
+                            toasts.error("Error proposing data flow");
+                            commandLaunched = false;
+                        }
+                        break;
+
+                    default:
                         toasts.error("Error proposing data flow");
-                        commandLaunched = false; // reset in case of error so that user is able to re-submit
-                    }
-                } else {
-                    toasts.error("Error proposing data flow");
-                    commandLaunched = false; // reset in case of error so that user is able to re-submit
+                        commandLaunched = false;
+                        break;
                 }
             })
             .catch(e => {
@@ -189,7 +197,15 @@
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
-
+                {#if responseMessage}
+                <div style="margin:20px 0px">
+                    <NoData type="error" >
+                        {responseMessage}
+                        <br>
+                        <a href={existingFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                    </NoData>
+                </div>
+                {/if}
                 {#if incompleteRecord}
                     <span class="incomplete-warning">
                         <Icon name="exclamation-triangle"/>You must complete all sections
