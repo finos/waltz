@@ -148,7 +148,7 @@ public class AssessmentRatingRippler {
      *
      * @return  the number of steps taken, where a step is a source assessment def and a target assessment def
      */
-    public final Long rippleAssessments(org.finos.waltz.model.assessment_definition.AssessmentDefinition assessmentDefinition, IdSelectionOptions scope) {
+    public final void rippleAssessments(org.finos.waltz.model.assessment_definition.AssessmentDefinition assessmentDefinition, IdSelectionOptions scope) {
         // make sure that the assessment is being modified from the correct parent
         // (i.e. an application assessment is not being modified by a flow)
         checkTrue(assessmentDefinition.entityKind().equals(scope.entityReference().kind()),
@@ -158,28 +158,24 @@ public class AssessmentRatingRippler {
         Set<AssessmentRipplerJobStep> rippleConfig = findRippleConfig()
                 .stream()
                 .flatMap(config -> config.steps().stream())
-                .filter(step -> safeEq(step.fromDef(), assessmentDefinition.externalId().get()))
+                .filter(step -> safeEq(step.fromDef(), assessmentDefinition.externalId().orElse(null)))
                 .collect(toSet());
 
-        if(!rippleConfig.isEmpty()) {
-            return dsl.transactionResult(ctx -> {
-                DSLContext tx = ctx.dsl();
-                return rippleConfig
-                        .stream()
-                        .map(step -> {
-                            rippleAssessment(
-                                    tx,
-                                    "waltz",
-                                    "waltz-assessment-rippler",
-                                    step.fromDef(),
-                                    step.toDef(),
-                                    Optional.ofNullable(scope));
-                            return 1;
-                        })
-                        .count();
-            });
-        }
-        return 0L;
+        rippleConfig
+                .forEach(step -> {
+                    dsl.transactionResult(ctx -> {
+                        DSLContext tx = ctx.dsl();
+                        rippleAssessment(
+                                tx,
+                                "waltz",
+                                "waltz-assessment-rippler",
+                                step.fromDef(),
+                                step.toDef(),
+                                Optional.of(scope)
+                        );
+                        return null; // ignored
+                    });
+                });
     }
 
 
