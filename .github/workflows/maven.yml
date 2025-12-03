@@ -47,6 +47,9 @@ jobs:
           --health-timeout=10s
           --health-retries=30
 
+    env:
+      WALTZ_PROFILE: ${{ matrix.db == 'mssql' && 'waltz-mssql-latest' || 'waltz-postgres' }}
+
     steps:
     - name: Ensure MSSQL database exists
       if: ${{ matrix.db == 'mssql' }}
@@ -76,7 +79,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Generate effective POM
-      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests -Dverbose -Doutput=effective-pom-${{ matrix.db }}.xml
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-${{ matrix.db }},${{ WALTZ_PROFILE }},integration-tests -Dverbose -Doutput=effective-pom-${{ matrix.db }}.xml
 
     - name: Upload effective POM
       uses: actions/upload-artifact@v4
@@ -88,7 +91,7 @@ jobs:
       env:
         JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
         JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
-      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},waltz-${{ matrix.db }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},${{ WALTZ_PROFILE }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
 
     - name: Publish build
       uses: actions/upload-artifact@v4
