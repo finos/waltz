@@ -441,7 +441,7 @@
                 Note: this profile requires a professional license for JOOQ,
                 see: http://www.jooq.org/download/
             -->
-            <id>waltz-mssql-alt</id>
+            <id>waltz-mssql</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>sqljdbc4</jdbc.artifact>
@@ -495,7 +495,36 @@
                 Note: this profile requires a professional license for JOOQ,
                 see: http://www.jooq.org/download/
             -->
-            <id>waltz-mssql</id>
+            <id>waltz-mssql-alt</id>
+            <properties>
+                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
+                <jdbc.artifact>mssql-jdbc</jdbc.artifact>
+                <jdbc.version>6.1.0.jre8</jdbc.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jooq.group>org.jooq.pro</jooq.group>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
+            <id>waltz-mssql-latest</id>
             <properties>
                 <jdbc.group>com.microsoft.sqlserver</jdbc.group>
                 <jdbc.artifact>mssql-jdbc</jdbc.artifact>
