@@ -1,6 +1,5 @@
 package org.finos.waltz.integration_test.inmem.service;
 
-import org.junit.jupiter.api.Disabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.finos.waltz.common.SetUtilities;
@@ -185,10 +184,8 @@ public class BulkUploadRelationshipServiceTest extends BaseInMemoryIntegrationTe
     }
 
     @Test
-    @Disabled
     public void testBulkUploadWithSourceCategory() {
 
-        System.out.println(">>> CONSOLE RUNNING TEST: " + this + " @ " + LocalDateTime.now());
         userHelper.createUserWithSystemRoles("test_user", SetUtilities.asSet(SystemRole.ADMIN));
 
         long newMeasurableId = measurableHelper.createMeasurable("M_1", measurableHelper.createMeasurableCategory("testCat1"));
