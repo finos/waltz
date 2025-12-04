@@ -47,25 +47,5 @@
                 <database.catalog></database.catalog>
             </properties>
         </profile>
-
-        <profile>
-            <id>build-mssql</id>
-            <activation><activeByDefault>false</activeByDefault></activation>
-            <properties>
-                <database.url>jdbc:sqlserver://localhost:1433;databaseName=waltz;encrypt=true;trustServerCertificate=true</database.url>
-                <database.user>sa</database.user>
-                <database.password>Some4Complex#Password</database.password>
-                <database.schema>dbo</database.schema>
-                <database.catalog>waltz</database.catalog>
-            </properties>
-        </profile>
     </profiles>
-
-    <servers>
-        <server>
-            <id>jooq-pro</id>
-            <username>${env.JOOQ_USERNAME}</username>
-            <password>${env.JOOQ_PASSWORD}</password>
-        </server>
-    </servers>
 </settings>
