@@ -110,7 +110,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    @Disabled
+
     public void assessmentAddRipples() {
         userHelper.createUserWithSystemRoles("test", SetUtilities.asSet(SystemRole.ADMIN));
         OneOffRipplerTestConfig cfg = mkWorld("assessmentAddRipples");
@@ -139,7 +139,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    @Disabled
+
     public void assessmentRemoveRipples() {
         userHelper.createUserWithSystemRoles("test", SetUtilities.asSet(SystemRole.ADMIN));
         OneOffRipplerTestConfig cfg = mkWorld("assessmentAddRipples");
@@ -215,7 +215,7 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    @Disabled
+
     public void createUpdateAndRemoveSingleRating() throws InsufficientPrivelegeException {
         String adminUser = NameHelper.mkUserId("adminUser");
         String userWithPerms = NameHelper.mkUserId("userWithPerms");

@@ -538,9 +538,9 @@ public class AssessmentRatingService {
     private void validateAndAutoUpdateAssessmentRating(AssessmentDefinition definition, AssessmentRating existingRating,
                                                     UpdateRatingCommand cmd,
                                                     String username, Map<String, String> dataMap) {
-        LOG.info("Assessment definition Id: {}", definition.externalId().get());
+        LOG.info("Assessment definition Id: {}", definition.externalId().orElse(null));
 
-        if (definition.externalId().get().equals(dataMap.get("CURRENT_ASSESSMENT_DEFINITION"))
+        if (definition.externalId().orElse("undefinedExtId").equals(dataMap.get("CURRENT_ASSESSMENT_DEFINITION"))
                 && ratingSchemeDAO.getRatingSchemeItemById(existingRating.ratingId()).rating().equals(dataMap.get("EXISTING_RATING_CODE")) //old rating
                 && ratingSchemeDAO.getRatingSchemeItemById(cmd.newRatingId()).rating().equals(dataMap.get("NEW_RATING_CODE"))) {  //new rating
 
