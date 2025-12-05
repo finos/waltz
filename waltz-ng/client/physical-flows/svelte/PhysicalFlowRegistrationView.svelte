@@ -33,6 +33,8 @@
     import Toggle from "../../common/svelte/Toggle.svelte";
     import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
     import {settingsStore} from "../../svelte-stores/settings-store";
+    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../common/constants"
+    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../common/utils/settings-util";
 
     export let primaryEntityRef = {};
 
@@ -41,7 +43,6 @@
         CLONE: "CLONE"
     }
 
-    const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
 
     let activeMode = Modes.CREATE;
     let enumsCall = enumValueStore.load();
@@ -49,8 +50,9 @@
 
     $: $nestedEnums = nestEnums($enumsCall.data);
     $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value && dataFlowProposalSetting.value === 'true';
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
+        [0];
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];

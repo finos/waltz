@@ -12,6 +12,8 @@
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
     import {createEventDispatcher} from "svelte";
     import toastStore from "../../../../svelte-stores/toast-store";
+    import {settingsStore} from "../../../../svelte-stores/settings-store";
+    import {isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -60,6 +62,13 @@
     let hasRemovePermission = false;
     let assessmentDefinitionsById = {};
     let flowClassificationsByCode = {};
+
+    let settingsCall=settingsStore.loadAll();
+
+    let isSettingsLoaded;
+
+    $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
+    $: dataFlowProposalsEnabled = isSettingsLoaded? isDataFlowProposalsEnabled($settingsCall.data) : undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
@@ -134,84 +143,85 @@
                       {assessmentDefinitionsById}/>
 {/if}
 
-<details>
-    <summary>Actions</summary>
-    <menu>
-        {#if actionSectionState === ActionSectionStates.LIST }
-            {#if hasAddPermission}
-                <li>
-                    <button class="btn btn-skinny btn-success"
-                            on:click={() => goToPhysicalFlowEdit(flow)}>
-                        <Icon name="plus"/>
-                        Add physical flow
-                    </button>
-                    <span class="help-block small">
-                        This will open the flow registration page
-                    </span>
-                </li>
-            {/if}
-            {#if hasRemovePermission}
-                <li>
-                    <button class="btn btn-skinny btn-danger"
-                            on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>
-                        <Icon name="trash"/>
-                        Remove logical flow
-                    </button>
-                    <p class="help-block small">
-                        This will remove the logical flow
+{#if dataFlowProposalsEnabled !== undefined && !dataFlowProposalsEnabled}
+    <details>
+        <summary>Actions</summary>
+        <menu>
+            {#if actionSectionState === ActionSectionStates.LIST }
+                {#if hasAddPermission}
+                    <li>
+                        <button class="btn btn-skinny btn-success"
+                                on:click={() => goToPhysicalFlowEdit(flow)}>
+                            <Icon name="plus"/>
+                            Add physical flow
+                        </button>
+                        <span class="help-block small">
+                            This will open the flow registration page
+                        </span>
+                    </li>
+                {/if}
+                {#if hasRemovePermission}
+                    <li>
+                        <button class="btn btn-skinny btn-danger"
+                                on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>
+                            <Icon name="trash"/>
+                            Remove logical flow
+                        </button>
+                        <p class="help-block small">
+                            This will remove the logical flow
+                            {#if $selectedLogicalFlow.physicalCount > 0}
+                                and the {$selectedLogicalFlow.physicalCount} associated physical flows
+                            {/if}
+
+                                Note: removed flows may be restored via the link in the changelog.
+                            </p>
+                        </li>
+                    {/if}
+                    <li>
+                        <button class="btn btn-skinny"
+                                on:click={() => goToLogicalFlowPage(flow)}>
+                            <Icon name="random"/>
+                            Visit the logical flow page
+                        </button>
+                        {#if hasUpdatePermission}
+                            <span class="help-block small">
+                                To remove the flow or edit it's data types
+                            </span>
+                        {/if}
+                    </li>
+                {/if}
+                {#if actionSectionState === ActionSectionStates.REMOVAL_CONFIRMATION}
+                    <div class="removal-box">
+                        <h4>Removal Confirmation:</h4>
+                        <p>
+                            Are you sure you want to remove the flow ?
+                        </p>
+                        <p>
+                            <EntityLabel ref={flow.source}/>
+                            <Icon name="arrow-right"/>
+                            <EntityLabel ref={flow.target}/>
+                        </p>
                         {#if $selectedLogicalFlow.physicalCount > 0}
-                            and the {$selectedLogicalFlow.physicalCount} associated physical flows
+                            <p>
+                                This will also remove <strong>{$selectedLogicalFlow.physicalCount}</strong>
+                                associated physical flows.
+                            </p>
                         {/if}
 
-                        Note: removed flows may be restored via the link in the changelog.
-                    </p>
-                </li>
+                    <button class="btn btn-skinny"
+                            on:click={() => doRemove(flow)}>
+                        <Icon name="trash"/>
+                        Remove
+                    </button>
+                    <button class="btn btn-skinny"
+                            on:click={() => actionSectionState = ActionSectionStates.LIST}>
+                        Cancel
+                    </button>
+                </div>
             {/if}
-            <li>
-                <button class="btn btn-skinny"
-                        on:click={() => goToLogicalFlowPage(flow)}>
-                    <Icon name="random"/>
-                    Visit the logical flow page
-                </button>
-                {#if hasUpdatePermission}
-                    <span class="help-block small">
-                        To remove the flow or edit it's data types
-                    </span>
-                {/if}
-            </li>
-        {/if}
-        {#if actionSectionState === ActionSectionStates.REMOVAL_CONFIRMATION}
-            <div class="removal-box">
-                <h4>Removal Confirmation:</h4>
-                <p>
-                    Are you sure you want to remove the flow ?
-                </p>
-                <p>
-                    <EntityLabel ref={flow.source}/>
-                    <Icon name="arrow-right"/>
-                    <EntityLabel ref={flow.target}/>
-                </p>
-                {#if $selectedLogicalFlow.physicalCount > 0}
-                    <p>
-                        This will also remove <strong>{$selectedLogicalFlow.physicalCount}</strong>
-                        associated physical flows.
-                    </p>
-                {/if}
-
-                <button class="btn btn-skinny"
-                        on:click={() => doRemove(flow)}>
-                    <Icon name="trash"/>
-                    Remove
-                </button>
-                <button class="btn btn-skinny"
-                        on:click={() => actionSectionState = ActionSectionStates.LIST}>
-                    Cancel
-                </button>
-            </div>
-        {/if}
-    </menu>
-</details>
-
+        </menu>
+    </details>
+{/if}
 
 <style>
     menu {
