@@ -64,9 +64,10 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         String differentRoleName = mkName(stem, "differentRoleName");
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
-        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", "R");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", "A");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", "G");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Certified", 1, "blue", "C");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Non-Certified", 2, "red", "R");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 3, "amber", "A");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 4, "green", "G");
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), adminRoleName, AssessmentVisibility.PRIMARY, null);
 
         assertThrows(
@@ -173,9 +174,10 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         String adminRoleName = mkName(stem, "adminRoleName");
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
-        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", "R");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", "A");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", "G");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Certified", 1, "blue", "C");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Non-Certified", 2, "red", "R");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 3, "amber", "A");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 4, "green", "G");
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), adminRoleName, AssessmentVisibility.PRIMARY, null);
 
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
@@ -206,9 +208,10 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         String adminRoleName = mkName(stem, "adminRoleName");
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
-        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", "R");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", "A");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", "G");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Certified", 1, "blue", "C");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Non-Certified", 2, "red", "R");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 3, "amber", "A");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 4, "green", "G");
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
 
         AssessmentDefinitionRatingOperations nullPermittedRoleGivesAllPermissions = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
@@ -228,9 +231,10 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
-        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", "R");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", "A");
-        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", "G");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Certified", 1, "blue", "C");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Non-Certified", 2, "red", "R");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 3, "amber", "A");
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 4, "green", "G");
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
         assessmentHelper.updateDefinitionReadOnly(defnId);
 
@@ -251,9 +255,10 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
-        Long r1 = ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", "R");
-        Long r2 = ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", "A");
-        Long r3 = ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", "G");
+        Long r4  = ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Certified", 1, "blue", "C");
+        Long r1  = ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest- Non-Certified", 2, "red", "R");
+        Long r2 = ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 3, "amber", "A");
+        Long r3 = ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 4, "green", "G");
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
         assessmentHelper.createAssessment(defnId, appA, r1);
         assessmentHelper.updateRatingReadOnly(appA, defnId);

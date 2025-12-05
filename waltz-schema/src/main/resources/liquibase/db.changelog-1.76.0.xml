@@ -28,6 +28,11 @@
     <!-- 7345 Create Table - ProposedFlow Table -->
     <changeSet id="20251107-4525-1"
                author="guptmayb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="entity_workflow_result"/>
+            </not>
+        </preConditions>
         <createTable tableName="entity_workflow_result"
                      remarks="Store details of entities impacted by a workflow referenced by workflow_entity">
 
