@@ -109,7 +109,7 @@ public class EntityWorkflowDefinitionDao {
         // Map the potentially multiple transitions and results
         List<EntityWorkflowTransition> transitions = records.stream()
                 .filter(r -> r.get(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID) != null)
-                .map(r -> EntityWorkflowTransitionDao.TO_DOMAIN_MAPPER.map(r.into(ENTITY_WORKFLOW_TRANSITION)))
+                .map(r -> EntityWorkflowTransitionDao.TO_DOMAIN_MAPPER.map(r.into(ENTITY_WORKFLOW_TRANSITION))).distinct()
                 .collect(Collectors.toList());
 
         List<EntityReference> results = records.stream()
