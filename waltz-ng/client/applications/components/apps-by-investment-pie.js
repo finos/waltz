@@ -35,7 +35,9 @@ const DEFAULT_SIZE = 80;
 const investmentLabels = {
     "R" : "Disinvest",
     "A" : "Maintain",
-    "G" : "Invest"
+    "G" : "Invest",
+    "N": "Disinvest - Non-Certified",
+    "C": "Disinvest - Certified"
 };
 
 
