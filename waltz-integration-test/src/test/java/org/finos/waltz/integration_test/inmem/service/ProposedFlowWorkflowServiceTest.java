@@ -52,6 +52,7 @@ import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -69,7 +70,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
     private static final String USER_NAME = "testUser";
 
@@ -279,7 +280,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNull(flowIdResponse);
     }
 
-    /*@Test//TODO need to fix context issue later
+    @Test
     void testWhenLogicalFlowExistsAndPhysicalFlowExists() {
         // 1. Arrange ----------------------------------------------------------
         long logicalId = 1L;
@@ -343,6 +344,6 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(flowIdResponse);
         assertEquals(physicalId, flowIdResponse.id());
     }
-*/
+
 
 }
