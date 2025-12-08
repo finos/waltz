@@ -172,7 +172,12 @@
 
     $: permissions = $permissionsCall?.data || defaultPermissions;
 </script>
-
+<div style="padding-bottom: 0.5em" class="small">
+    <NoData type="info">
+        <Icon name="info" style="padding: 0.5em"/>
+        You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
+    </NoData>
+</div>
 {#if mode === Modes.LIST}
     <!-- ACTION LIST -->
     {#if !_.isEmpty(actionList)}

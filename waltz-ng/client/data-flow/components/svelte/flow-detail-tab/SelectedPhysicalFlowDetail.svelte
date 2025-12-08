@@ -19,6 +19,8 @@
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
     import toastStore from "../../../../svelte-stores/toast-store";
     import {physicalFlowStore} from "../../../../svelte-stores/physical-flow-store";
+    import {settingsStore} from "../../../../svelte-stores/settings-store";
+    import {isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -57,6 +59,12 @@
     let hasRemovePermission = false;
     let actionSectionState = ActionSectionStates.LIST;
 
+    let settingsCall=settingsStore.loadAll();
+    let isSettingsLoaded;
+
+    $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
+    $: dataFlowProposalsEnabled = isSettingsLoaded?isDataFlowProposalsEnabled($settingsCall.data):undefined;
+
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
     $: hasAddPermission = _.includes(permissions, "ADD");
@@ -78,6 +86,7 @@
         name: _.get(physicalFlow, "name") || _.get(specification, "name") || "??",
         kind: "PHYSICAL_FLOW"
     };
+
 </script>
 
 
@@ -171,65 +180,66 @@
                       {assessmentDefinitionsById}/>
 {/if}
 
-<details>
-    <summary>Actions</summary>
-    <menu>
-        {#if actionSectionState === ActionSectionStates.LIST }
-            {#if hasRemovePermission && ! physicalFlow.isReadOnly}
+{#if dataFlowProposalsEnabled !== undefined && !dataFlowProposalsEnabled}
+    <details>
+        <summary>Actions</summary>
+        <menu>
+            {#if actionSectionState === ActionSectionStates.LIST }
+                {#if hasRemovePermission && ! physicalFlow.isReadOnly}
+                    <li>
+                        <button class="btn btn-skinny btn-danger"
+                                on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>
+                            <Icon name="trash"/>
+                            Remove physical flow
+                        </button>
+                        <p class="help-block small">
+                            This will remove the physical flow.
+                            Note: removed flows may be restored via the link in the changelog.
+                        </p>
+                    </li>
+                {/if}
                 <li>
-                    <button class="btn btn-skinny btn-danger"
-                            on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>
-                        <Icon name="trash"/>
-                        Remove physical flow
+                    <button class="btn btn-skinny"
+                            on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                        <Icon name="qrcode"/>
+                        Visit the physical flow page
                     </button>
-                    <p class="help-block small">
-                        This will remove the physical flow.
-                        Note: removed flows may be restored via the link in the changelog.
-                    </p>
+                    {#if hasUpdatePermission}
+                        <span class="help-block small">
+                            To edit the flow attributes
+                        </span>
+                    {/if}
                 </li>
             {/if}
-            <li>
-                <button class="btn btn-skinny"
-                        on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
-                    <Icon name="qrcode"/>
-                    Visit the physical flow page
-                </button>
-                {#if hasUpdatePermission}
-                    <span class="help-block small">
-                        To edit the flow attributes
-                    </span>
-                {/if}
-            </li>
-        {/if}
-        {#if actionSectionState === ActionSectionStates.REMOVAL_CONFIRMATION }
-            <div class="removal-box">
-                <h4>Removal Confirmation:</h4>
-                <p>
-                    Are you sure you want to remove this physical flow ?
-                </p>
-                <p>
-                    Flow: <b><EntityLabel {ref}/></b>
-                </p>
-                <p>
-                    <EntityLabel ref={logicalFlow.source}/>
-                    <Icon name="arrow-right"/>
-                    <EntityLabel ref={logicalFlow.target}/>
-                </p>
+            {#if actionSectionState === ActionSectionStates.REMOVAL_CONFIRMATION }
+                <div class="removal-box">
+                    <h4>Removal Confirmation:</h4>
+                    <p>
+                        Are you sure you want to remove this physical flow ?
+                    </p>
+                    <p>
+                        Flow: <b><EntityLabel {ref}/></b>
+                    </p>
+                    <p>
+                        <EntityLabel ref={logicalFlow.source}/>
+                        <Icon name="arrow-right"/>
+                        <EntityLabel ref={logicalFlow.target}/>
+                    </p>
 
-                <button class="btn btn-skinny"
-                        on:click={() => doRemove(physicalFlow)}>
-                    <Icon name="trash"/>
-                    Remove
-                </button>
-                <button class="btn btn-skinny"
-                        on:click={() => actionSectionState = ActionSectionStates.LIST}>
-                    Cancel
-                </button>
-            </div>
-        {/if}
-    </menu>
-</details>
-
+                    <button class="btn btn-skinny"
+                            on:click={() => doRemove(physicalFlow)}>
+                        <Icon name="trash"/>
+                        Remove
+                    </button>
+                    <button class="btn btn-skinny"
+                            on:click={() => actionSectionState = ActionSectionStates.LIST}>
+                        Cancel
+                    </button>
+                </div>
+            {/if}
+        </menu>
+    </details>
+{/if}
 
 <style>
     menu {
