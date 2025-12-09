@@ -24,11 +24,8 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
-import EditReasonSelection from "./EditReasonSelection.svelte"
-import {
-    duplicateFlowMessage,
-    editDataTypeReason, existingDuplicateFlow
-} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import ReasonSelection from "./ReasonSelection.svelte"
+import {duplicateFlowMessage, editDataTypeReason, existingDuplicateFlow} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 import {PROPOSAL_TYPES} from "../../../common/constants";
 
@@ -48,12 +45,12 @@ const initialState = {
         controls: false
     },
     settings:null,
-    EditReasonSelection,
+    ReasonSelection,
     ratingsScheme:null,
     ratingSchemeExtId:null,
     dataFlowProposalsEnabled:null,
     selectedReason:null,
-    type:PROPOSAL_TYPES.EDIT,
+    proposalType:PROPOSAL_TYPES.EDIT,
     duplicateFlowMessage:duplicateFlowMessage,
     existingDuplicateFlow:existingDuplicateFlow
 };

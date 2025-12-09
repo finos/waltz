@@ -7,7 +7,6 @@ import {
 } from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 
 export function handleProposalValidation (response,commandLaunched,resetStore,resetNeeded,goToWorkflow,type){
-    console.log(response)
     switch (response.outcome) {
         case PROPOSAL_OUTCOMES.FAILURE:
             duplicateFlowMessage.set(response.message);
