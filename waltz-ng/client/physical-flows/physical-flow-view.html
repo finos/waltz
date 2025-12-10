@@ -328,11 +328,11 @@
 
             </div>
             <div class="waltz-sub-section-controls">
-                <span ng-if="ctrl.canEdit">
+                <span ng-if="!ctrl.dataFlowProposalsEnabled && ctrl.canEdit">
                     <span>|</span>
 
                     <a ng-click="ctrl.visibility.overviewEditor = true"
-                       ng-if="! ctrl.visibility.overviewEditor"
+                       ng-if="! ctrl.visibility.overviewEditor && !ctrl.dataFlowProposalsEnabled"
                        class="clickable">
                         <span ng-if="ctrl.physicalFlow.isReadOnly"
                               title="The flow is locked, only limited fields will be editable">

@@ -10,6 +10,8 @@
     import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
     import { get } from "svelte/store";
     import {personStore} from "../../svelte-stores/person-store";
+    import {PROPOSAL_TYPES} from "../../common/constants";
+    import {physicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 
     export let refreshState;
     const Modes = {
@@ -23,6 +25,7 @@
     let activeAction = null;
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
+    let physicalFlowCount = null;
     export let proposedFlow = {};
 
     $: userCall = personStore.getSelf();
@@ -67,6 +70,17 @@
                 return true;
             default:
                 return false;
+        }
+    }
+
+    function getPhysicalFlowCount(){
+        if (proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE) {
+            proposeDataFlowRemoteStore
+                .getPhysicalFlowsCountForAssociatedLogicalFlow(proposedFlow?.flowDef?.logicalFlowId)
+                .then(r => {
+                    physicalFlowCount = r.data
+                    return physicalFlowCount;
+                });
         }
     }
 
@@ -176,6 +190,9 @@
     <NoData type="info">
         <Icon name="info" style="padding: 0.5em"/>
         You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
+        {#if proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE && getPhysicalFlowCount() === 1}
+            <span>This is the last physical flow associated to the logical flow.</span>
+        {/if}
     </NoData>
 </div>
 {#if mode === Modes.LIST}

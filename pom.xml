@@ -106,7 +106,7 @@
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.30</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
-        <surefire.version>2.22.2</surefire.version>
+        <surefire.version>3.5.4</surefire.version>
         <commons-jexl3.version>3.2.1</commons-jexl3.version>  <!-- 3.3.0 causes evaluation issues -->
         <commons-io.version>2.14.0</commons-io.version> <!-- 2.9.0 contained high severity vulnerability -->
 
@@ -342,7 +342,6 @@
 
 
             <!-- test -->
-
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
@@ -355,20 +354,12 @@
                 <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
-
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
                 <version>${archunit.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.dbunit</groupId>
-                <artifactId>dbunit</artifactId>
-                <version>${dbunit.version}</version>
-                <scope>test</scope>
-            </dependency>
-
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -529,6 +520,35 @@
         </profile>
 
         <profile>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
+            <id>waltz-mssql-latest</id>
+            <properties>
+                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
+                <jdbc.artifact>mssql-jdbc</jdbc.artifact>
+                <jdbc.version>13.2.0.jre8</jdbc.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jooq.group>org.jooq.pro</jooq.group>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
             <id>dev-h2-inmem</id>
             <properties>
                 <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE</database.url>
@@ -593,7 +613,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.4</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>process-resources</phase>
@@ -648,10 +668,12 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${surefire.version}</version>
             </plugin>
@@ -692,7 +714,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>${surefire.version}</version>
                 <reportSets>
                     <reportSet>
                         <!-- defines aggregate unit test report -->
@@ -710,5 +732,18 @@
         </plugins>
     </reporting>
 
+    <!-- Specify the jOOQ repository last -->
+    <repositories>
+        <repository>
+            <id>jooq-pro</id>
+            <url>https://repo.jooq.org/repo</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jooq-pro</id>
+            <url>https://repo.jooq.org/repo</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

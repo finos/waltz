@@ -43,8 +43,25 @@
                     <waltz-data-type-usage-selector parent-entity-ref="$ctrl.parentEntityRef"
                                                     parent-flow="$ctrl.parentFlow"
                                                     on-dirty="$ctrl.onDirty"
-                                                    on-register-save="$ctrl.registerSaveFn">
+                                                    on-register-save="$ctrl.registerSaveFn"
+                                                    on-register-save-propose="$ctrl.registerSaveProposeFn"
+                                                    >
                     </waltz-data-type-usage-selector>
+                </div>
+                <div ng-if="$ctrl.visibility.editor && $ctrl.dataFlowProposalsEnabled && $ctrl.ratingSchemeExtId"
+                     class="waltz-highlight-if"
+                style="padding: 22px">
+<!--                    Rating Picker-->
+                    <waltz-svelte-component
+                        component="$ctrl.ReasonSelection"
+                        rating-scheme-ext-id="$ctrl.ratingSchemeExtId"
+                        type="$ctrl.proposalType"
+                        propose-delete-flow=null
+                        response-message="$ctrl.responseMessage"
+                        existing-flow="$ctrl.existingFlow"
+                    >
+                    </waltz-svelte-component>
+
                 </div>
             </div>
 
@@ -60,10 +77,17 @@
 
                 <span ng-if="$ctrl.visibility.editor && $ctrl.visibility.controls">
                     <!-- WHILST EDITING -->
-                    <a ng-click="$ctrl.onSave()"
+                    <a ng-if="!$ctrl.dataFlowProposalsEnabled"
+                        ng-click="$ctrl.onSave()"
                        class="clickable"
                        ng-disabled="! $ctrl.isDirty">
                         Save
+                    </a>
+                    <a ng-if="$ctrl.dataFlowProposalsEnabled"
+                       ng-click="$ctrl.onSavePropose()"
+                       class="clickable"
+                       ng-disabled="!$ctrl.isDirty">
+                        Propose Edit
                     </a>
                     |
                     <a ng-click="$ctrl.onHideEdit()"

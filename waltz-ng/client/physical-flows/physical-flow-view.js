@@ -37,7 +37,8 @@ import {handleProposalValidation} from "../common/utils/proposalValidation";
 
 
 const modes = {
-    OVERVIEW: "OVERVIEW", DUPLICATE: "DUPLICATE"
+    OVERVIEW: "OVERVIEW",
+    DUPLICATE: "DUPLICATE"
 };
 
 
@@ -45,14 +46,19 @@ const initialState = {
     mode: modes.OVERVIEW,
     physicalFlow: null,
     selected: {
-        entity: null, incoming: [], outgoing: []
+        entity: null,
+        incoming: [],
+        outgoing: []
     },
     specification: null,
     visibility: {
-        diagramEditor: false, overviewEditor: false
+        diagramEditor: false,
+        overviewEditor: false
     },
     potentialMergeTargets: [],
     mergeTarget: null,
+    settings: null,
+    dataFlowProposalsEnabled: null,
     dataFlowProposalsRatingSchemeSetting: null,
     showReason: false,
     ratingSchemeExtId: null,
@@ -63,9 +69,13 @@ const initialState = {
 };
 
 
+
 function mkHistoryObj(flow, spec) {
     return {
-        name: spec.name, kind: "PHYSICAL_FLOW", state: "main.physical-flow.view", stateParams: {id: flow.id}
+        name: spec.name,
+        kind: "PHYSICAL_FLOW",
+        state: "main.physical-flow.view",
+        stateParams: {id: flow.id}
     };
 }
 
@@ -86,7 +96,11 @@ function addToHistory(historyStore, flow, spec) {
 
     const historyObj = mkHistoryObj(flow, spec);
 
-    historyStore.put(historyObj.name, historyObj.kind, historyObj.state, historyObj.stateParams);
+    historyStore.put(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
 }
 
 
@@ -97,8 +111,13 @@ function removeFromHistory(historyStore, flow, spec) {
 
     const historyObj = mkHistoryObj(flow, spec);
 
-    historyStore.remove(historyObj.name, historyObj.kind, historyObj.state, historyObj.stateParams);
+    historyStore.remove(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
 }
+
 
 function navigateToLastView($state, historyStore) {
     const lastHistoryItem = historyStore.getAll()[0];
@@ -109,7 +128,15 @@ function navigateToLastView($state, historyStore) {
     }
 }
 
-function controller($q, $state, $stateParams, $window, historyStore, physicalFlowStore, physicalSpecificationStore, serviceBroker) {
+
+function controller($q,
+                    $state,
+                    $stateParams,
+                    $window,
+                    historyStore,
+                    physicalFlowStore,
+                    physicalSpecificationStore,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const entityReference = {
@@ -117,44 +144,51 @@ function controller($q, $state, $stateParams, $window, historyStore, physicalFlo
         kind: "PHYSICAL_FLOW"
     };
 
+
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
-
-        const physicalFlowPromise = serviceBroker
-            .loadViewData(
-                CORE_API.PhysicalFlowStore.getById, [vm.parentEntityRef.id])
-            .then(r => {
-                vm.physicalFlow = r.data
-            });
-        physicalFlowPromise
-            .then(() => serviceBroker
-                .loadViewData(
-                    CORE_API.LogicalFlowStore.getById, [vm.physicalFlow.logicalFlowId]))
-            .then(r => {
-                vm.logicalFlow = r.data;
-            });
-
-        physicalFlowPromise
-            .then(() => serviceBroker
-                .loadViewData(CORE_API.LogicalFlowStore.findPermissionsForFlow, [vm.physicalFlow.logicalFlowId]))
-            .then(r => vm.canEdit = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
-
-        physicalFlowPromise
-            .then(physicalFlow => serviceBroker
-                .loadViewData(CORE_API.PhysicalSpecificationStore.getById, [vm.physicalFlow.specificationId]))
-            .then(r => {
-                vm.specification = r.data;
-                vm.specificationReference = toEntityRefWithKind(r.data, "PHYSICAL_SPECIFICATION");
-                addToHistory(historyStore, vm.physicalFlow, vm.specification);
-            });
 
 
         const settingsPromise = serviceBroker
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
-                let settings = r.data;
-                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(settings);
+                vm.settings = r.data;
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
                 vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(settings);
+            });
+
+
+        const physicalFlowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.getById,
+                [vm.parentEntityRef.id])
+            .then(r => vm.physicalFlow = r.data);
+
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.getById,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.logicalFlow = r.data);
+
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.findPermissionsForFlow,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.canEdit = _.some(
+                r.data,
+                d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
+
+        physicalFlowPromise
+            .then(physicalFlow => serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalSpecificationStore.getById,
+                    [physicalFlow.specificationId]))
+            .then(r => {
+                vm.specification = r.data;
+                vm.specificationReference = toEntityRefWithKind(r.data, "PHYSICAL_SPECIFICATION");
+                addToHistory(historyStore, vm.physicalFlow, vm.specification);
             });
     };
 
@@ -293,15 +327,21 @@ function controller($q, $state, $stateParams, $window, historyStore, physicalFlo
     // -- INTERACT: de-dupe
     const loadPotentialMergeTargets = () => {
         const selector = {
-            entityReference: {id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW"}, scope: "EXACT"
+            entityReference: {id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW"},
+            scope: "EXACT"
         };
 
         const potentialFlowsPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [selector], {force: true})
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.findBySelector,
+                [selector],
+                {force: true})
             .then(r => r.data);
 
         const potentialSpecsPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [selector])
+            .loadViewData(
+                CORE_API.PhysicalSpecificationStore.findBySelector,
+                [selector])
             .then(r => r.data);
 
         $q.all([potentialFlowsPromise, potentialSpecsPromise])
@@ -311,7 +351,8 @@ function controller($q, $state, $stateParams, $window, historyStore, physicalFlo
                     .chain(flows)
                     .reject(f => f.id === vm.parentEntityRef.id)
                     .map(f => ({
-                        physicalFlow: f, physicalSpec: specsById[f.specificationId]
+                        physicalFlow: f,
+                        physicalSpec: specsById[f.specificationId]
                     }))
                     .reject(d => d.physicalSpec === null)
                     .orderBy(d => d.physicalSpec.name)
@@ -339,7 +380,9 @@ function controller($q, $state, $stateParams, $window, historyStore, physicalFlo
     vm.onMergePhysicalFlow = (fromId, toId) => {
         if (confirm("Are you sure you want to de-duplicate these flows ?")) {
             serviceBroker
-                .loadViewData(CORE_API.PhysicalFlowStore.merge, [fromId, toId])
+                .loadViewData(
+                    CORE_API.PhysicalFlowStore.merge,
+                    [fromId, toId])
                 .then(toasts.warning("Flow has been marked as duplicate"))
                 .then(() => $state.reload())
         } else {
@@ -364,9 +407,20 @@ function controller($q, $state, $stateParams, $window, historyStore, physicalFlo
 }
 
 
-controller.$inject = ["$q", "$state", "$stateParams", "$window", "HistoryStore", "PhysicalFlowStore", "PhysicalSpecificationStore", "ServiceBroker"];
+controller.$inject = [
+    "$q",
+    "$state",
+    "$stateParams",
+    "$window",
+    "HistoryStore",
+    "PhysicalFlowStore",
+    "PhysicalSpecificationStore",
+    "ServiceBroker"
+];
 
 
 export default {
-    template, controller, controllerAs: "ctrl"
+    template,
+    controller,
+    controllerAs: "ctrl"
 };
