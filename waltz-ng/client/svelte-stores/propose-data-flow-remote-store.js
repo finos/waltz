@@ -43,7 +43,7 @@ export function mkStore()  {
     const transitionProposedFlow = (proposedFlowId, command) => remote
         .execute("POST", `${BASE_URL}/${proposedFlowId}/${command.action}`, command.payload);
 
-    const getPhysicalFlowsCountForAssociatedLogicalFlow = (logicalFlowId, force = false) => remote
+    const getPhysicalFlowsCountForAssociatedLogicalFlow = (logicalFlowId,force = false) => remote
         .fetchViewData(
             "GET",
             `api/physical-flow/${logicalFlowId}/sibling-physical-flows-count`,

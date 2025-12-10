@@ -154,7 +154,7 @@ function controller($q,
             .then(r => {
                 vm.settings = r.data;
                 vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
-                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(settings);
+                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings);
             });
 
 

@@ -12,6 +12,7 @@
     import {personStore} from "../../svelte-stores/person-store";
     import {PROPOSAL_TYPES} from "../../common/constants";
     import {physicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+    import {onMount} from "svelte";
 
     export let refreshState;
     const Modes = {
@@ -25,7 +26,8 @@
     let activeAction = null;
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
-    let physicalFlowCount = null;
+    let physicalFlowCount;
+
     export let proposedFlow = {};
 
     $: userCall = personStore.getSelf();
@@ -73,16 +75,13 @@
         }
     }
 
-    function getPhysicalFlowCount(){
-        if (proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE) {
-            proposeDataFlowRemoteStore
-                .getPhysicalFlowsCountForAssociatedLogicalFlow(proposedFlow?.flowDef?.logicalFlowId)
-                .then(r => {
-                    physicalFlowCount = r.data
-                    return physicalFlowCount;
-                });
-        }
-    }
+    $: physicalFlowId = proposedFlow?.flowDef?.physicalFlowId;
+
+    $: physcialFlowCountStore = physicalFlowId
+        ? proposeDataFlowRemoteStore.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowId, false)
+        : null;
+
+    $: physicalFlowCount = $physcialFlowCountStore.data
 
     function mkButtonClasses(action) {
         return `btn btn-xs btn-${action.style}`;
@@ -176,6 +175,7 @@
         }
     ];
 
+
     let permissionsCall;
     $: {
         if (proposedFlow?.id && proposedFlow.id !== get(lastProposedFlowId)) {
@@ -190,7 +190,7 @@
     <NoData type="info">
         <Icon name="info" style="padding: 0.5em"/>
         You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
-        {#if proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE && getPhysicalFlowCount() === 1}
+        {#if proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE && physicalFlowCount===1}
             <span>This is the last physical flow associated to the logical flow.</span>
         {/if}
     </NoData>
