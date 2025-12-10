@@ -53,8 +53,12 @@
                 style="padding: 22px">
 <!--                    Rating Picker-->
                     <waltz-svelte-component
-                        component="$ctrl.EditReasonSelection"
+                        component="$ctrl.ReasonSelection"
                         rating-scheme-ext-id="$ctrl.ratingSchemeExtId"
+                        type="$ctrl.proposalType"
+                        propose-delete-flow=null
+                        response-message="$ctrl.responseMessage"
+                        existing-flow="$ctrl.existingFlow"
                     >
                     </waltz-svelte-component>
 
