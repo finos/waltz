@@ -27,7 +27,7 @@ import {displayError} from "../common/error-utils";
 import {copyTextToClipboard} from "../common/browser-utils";
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../common/utils/settings-util";
 import {proposeDataFlowRemoteStore} from "../svelte-stores/propose-data-flow-remote-store";
-import EditReasonSelection from "../data-types/components/usage-panel/EditReasonSelection.svelte";
+import ReasonSelection from "../data-types/components/usage-panel/ReasonSelection.svelte";
 import {
     deleteFlowReason, duplicateFlowMessage, existingDuplicateFlow
 } from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
@@ -65,7 +65,7 @@ const initialState = {
     selectedReason: null,
     dataType: [],
     type: PROPOSAL_TYPES.DELETE,
-    EditReasonSelection
+    ReasonSelection
 };
 
 
@@ -193,8 +193,6 @@ function controller($q,
     };
 
     const launchCommand = () => {
-        console.log("in launch command");
-        console.log("spec ref", vm.specificationReference);
 
         return serviceBroker
             .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics, [vm.specificationReference])
@@ -308,7 +306,6 @@ function controller($q,
 
     vm.proposeDeleteFlow = () => {
         launchCommand().then(command => {
-            console.log("in propose delete flow", command);
             if (command) {
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {

@@ -189,7 +189,7 @@
         <Icon name="info" style="padding: 0.5em"/>
         You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
         {#if proposedFlow?.flowDef?.proposalType === PROPOSAL_TYPES.DELETE && physicalFlowCount===1}
-            <span>This is the last physical flow associated to the logical flow.</span>
+            <span>This is the last physical flow associated with the logical flow.</span>
         {/if}
     </NoData>
 </div>
