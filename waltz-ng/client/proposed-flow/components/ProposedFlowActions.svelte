@@ -11,8 +11,6 @@
     import { get } from "svelte/store";
     import {personStore} from "../../svelte-stores/person-store";
     import {PROPOSAL_TYPES} from "../../common/constants";
-    import {physicalFlow} from "../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
-    import {onMount} from "svelte";
 
     export let refreshState;
     const Modes = {
