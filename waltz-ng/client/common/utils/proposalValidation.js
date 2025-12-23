@@ -20,10 +20,12 @@ export function handleProposalValidation (response,commandLaunched,resetStore,re
         case PROPOSAL_OUTCOMES.SUCCESS:
             if (response.proposedFlowId) {
                 toasts.success("Data Flow Proposed");
-                if(type===PROPOSAL_TYPES.DELETE)
-                    deleteFlowReason.set(null)
-                if(type===PROPOSAL_TYPES.EDIT)
+                if(type===PROPOSAL_TYPES.DELETE) {
+                    deleteFlowReason.set(null);
+                }
+                if(type===PROPOSAL_TYPES.EDIT) {
                     editDataTypeReason.set(null)
+                }
                 if(resetNeeded){
                     resetStore();
                 }

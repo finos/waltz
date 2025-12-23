@@ -28,6 +28,7 @@ import ReasonSelection from "./ReasonSelection.svelte"
 import {duplicateFlowMessage, editDataTypeReason, existingDuplicateFlow} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 import {PROPOSAL_TYPES} from "../../../common/constants";
+import {buildFlowCommand, buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
 
 const bindings = {
     parentEntityRef: "<",
@@ -44,15 +45,15 @@ const initialState = {
         editor: false,
         controls: false
     },
-    settings:null,
+    settings: null,
     ReasonSelection,
-    ratingsScheme:null,
-    ratingSchemeExtId:null,
-    dataFlowProposalsEnabled:null,
-    selectedReason:null,
-    proposalType:PROPOSAL_TYPES.EDIT,
-    duplicateFlowMessage:duplicateFlowMessage,
-    existingDuplicateFlow:existingDuplicateFlow
+    ratingsScheme: null,
+    ratingSchemeExtId: null,
+    dataFlowProposalsEnabled: null,
+    selectedReason: null,
+    proposalType: PROPOSAL_TYPES.EDIT,
+    duplicateFlowMessage: duplicateFlowMessage,
+    existingDuplicateFlow: existingDuplicateFlow
 };
 
 
@@ -66,7 +67,6 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
-        let dataFlowProposalsRatingSchemeSetting="";
         const settingsPromise = serviceBroker
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
@@ -140,47 +140,19 @@ function controller(serviceBroker, userService, $q) {
             const specificationData = specResponse.data;
             const logicalFlowData = logicalFlowResponse.data;
 
-            const specification = {
-                owningEntity: {id:vm.parentFlow.id,kind:vm.parentFlow.kind},
-                name: specificationData.name,
-                description: specificationData.description,
-                format: specificationData.format,
-                lastUpdatedBy: "waltz",
-                externalId: !_.isEmpty(specificationData.externalId) ? specificationData.externalId : null,
-                id: specificationData.id || null
-            };
+            const command = buildProposalFlowCommand({
+                physicalFlow: vm.parentFlow,
+                specification: specificationData,
+                logicalFlow: logicalFlowData,
+                dataType: [],
+                selectedReason: vm.selectedReason,
+                proposalType: PROPOSAL_TYPES.EDIT
+            });
 
-            const logicalFlow = {
-                logicalFlowId: logicalFlowData.id || null,
-                source: logicalFlowData.source || null,
-                target: logicalFlowData.target || null
-            };
-
-            const flowAttributes = {
-                name: vm.parentFlow.name,
-                transport: vm.parentFlow.transport,
-                frequency: vm.parentFlow.frequency,
-                basisOffset: vm.parentFlow.basisOffset,
-                criticality: vm.parentFlow.criticality,
-                description: vm.parentFlow.description,
-                externalId: !_.isEmpty(vm.parentFlow.externalId) ? vm.parentFlow.externalId : null
-            };
-
-            const command = {
-                specification,
-                flowAttributes,
-                logicalFlowId: logicalFlow.logicalFlowId,
-                source: logicalFlow.source,
-                target: logicalFlow.target,
-                physicalFlowId: vm.parentFlow.id,
-                dataTypeIds: [],
-                proposalType: "EDIT",
-                reason:{
-                    ratingId:vm.selectedReason.rating[0].id,
-                    description:vm.selectedReason.rating[0].description
-                }
-            };
-
+            if (!command) {
+                console.error("Could not build command for proposal");
+                return;
+            }
             if (!vm.isDirty) return;
 
             if (vm.savePropose) {

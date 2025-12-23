@@ -34,6 +34,7 @@ import {
 import pageInfo from "../svelte-stores/page-navigation-store";
 import {PROPOSAL_OUTCOMES, PROPOSAL_TYPES} from "../common/constants";
 import {handleProposalValidation} from "../common/utils/proposalValidation";
+import {buildFlowCommand, buildProposalFlowCommand} from "../common/utils/propose-flow-command-util";
 
 
 const modes = {
@@ -201,47 +202,14 @@ function controller($q,
                 vm.dataType = ids;
 
                 if (vm.physicalFlow && vm.specification && vm.logicalFlow) {
-                    const specification = {
-                        owningEntity: { id: vm.physicalFlow.id, kind: vm.physicalFlow.kind },
-                        name: vm.specification.name,
-                        description: vm.specification.description,
-                        format: vm.specification.format,
-                        lastUpdatedBy: "waltz",
-                        externalId: !_.isEmpty(vm.specification.externalId) ? vm.specification.externalId : null,
-                        id: vm.specification.id || null
-                    };
-
-                    const logicalFlow = {
-                        logicalFlowId: vm.logicalFlow.id || null,
-                        source: vm.logicalFlow.source || null,
-                        target: vm.logicalFlow.target || null
-                    };
-
-                    const flowAttributes = {
-                        name: vm.physicalFlow.name,
-                        transport: vm.physicalFlow.transport,
-                        frequency: vm.physicalFlow.frequency,
-                        basisOffset: vm.physicalFlow.basisOffset,
-                        criticality: vm.physicalFlow.criticality,
-                        description: vm.physicalFlow.description,
-                        externalId: !_.isEmpty(vm.physicalFlow.externalId) ? vm.physicalFlow.externalId : null
-                    };
-
-                    const command = {
-                        specification,
-                        flowAttributes,
-                        logicalFlowId: logicalFlow.logicalFlowId,
-                        source: logicalFlow.source,
-                        target: logicalFlow.target,
-                        physicalFlowId: vm.physicalFlow.id,
-                        dataTypeIds: vm.dataType,
-                        proposalType: "DELETE",
-                        reason: {
-                            ratingId: vm.selectedReason.rating[0].id,
-                            description: vm.selectedReason.rating[0].name
-                        }
-                    };
-                    return command;
+                    return buildProposalFlowCommand({
+                        physicalFlow: vm.physicalFlow,
+                        specification: vm.specification,
+                        logicalFlow: vm.logicalFlow,
+                        dataType: vm.dataType,
+                        selectedReason: vm.selectedReason,
+                        proposalType: PROPOSAL_TYPES.DELETE
+                    });
                 }
             })
             .catch(error => {
