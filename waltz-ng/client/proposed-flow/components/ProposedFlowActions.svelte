@@ -6,7 +6,7 @@
     import NoData from "../../common/svelte/NoData.svelte";
     import { defaultPermissions, STATES } from "../utils";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import { lastProposedFlowId } from "../services/svelte-stores/proposed-flow-store";
+    import { lastProposedFlowId} from "../services/svelte-stores/proposed-flow-store";
     import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
     import { get } from "svelte/store";
     import {personStore} from "../../svelte-stores/person-store";
@@ -215,7 +215,7 @@
                 <EntityLink
                     ref={{
                     kind: 'LOGICAL_DATA_FLOW',
-                    id: proposedFlow?.flowDef?.logicalFlowId,
+                    id: proposedFlow.workflowState.state === STATES.FULLY_APPROVED ? proposedFlow.logicalFlowId : proposedFlow?.flowDef?.logicalFlowId,
                     name: 'Go to logical flow'}} />
             </div>
         {/if}
