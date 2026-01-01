@@ -126,6 +126,15 @@
             });
     }
 
+    function getLogicalFlowId(currentState, proposedFlow){
+    switch(currentState) {
+        case STATES.FULLY_APPROVED:
+            return proposedFlow?.logicalFlowId;
+        default:
+            return proposedFlow?.flowDef?.logicalFlowId;
+    }
+    }
+
     $: isFullyApproved = currentState === STATES.FULLY_APPROVED;
     $: canAct = proposedFlow && canApproveOrReject();
 
@@ -215,7 +224,7 @@
                 <EntityLink
                     ref={{
                     kind: 'LOGICAL_DATA_FLOW',
-                    id: proposedFlow.workflowState.state === STATES.FULLY_APPROVED ? proposedFlow.logicalFlowId : proposedFlow?.flowDef?.logicalFlowId,
+                    id: getLogicalFlowId(proposedFlow.workflowState.state,proposedFlow),
                     name: 'Go to logical flow'}} />
             </div>
         {/if}
