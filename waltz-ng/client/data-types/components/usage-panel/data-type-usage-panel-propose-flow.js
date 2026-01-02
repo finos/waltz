@@ -17,7 +17,7 @@
  */
 import {initialiseData} from "../../../common/index";
 
-import template from "./data-type-usage-panel.html";
+import template from "./data-type-usage-panel-propose-flow.html";
 import {loadUsageData} from "../../data-type-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
