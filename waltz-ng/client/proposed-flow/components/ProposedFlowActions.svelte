@@ -210,7 +210,7 @@
                 </NoData>
             </div>
         {/if}
-        {#if isFullyApproved}
+        {#if proposedFlow?.logicalFlowId}
             <div style="padding-top: 0.5em" class="small">
                 <EntityLink
                     ref={{

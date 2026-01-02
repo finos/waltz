@@ -1,7 +1,7 @@
 <script>
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
-    import {safe, STATES} from "../utils";
+    import { safe,STATES } from "../utils";
 
     export let proposedFlow = {};
 
@@ -55,7 +55,6 @@
         { key: "Last Updated At", value: safe(flowDef?.specification?.lastUpdatedAt) },
         { key: "Last Updated By", value: safe(flowDef?.specification?.lastUpdatedBy) },
     ]
-
 </script>
 
 <style>
