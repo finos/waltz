@@ -3,28 +3,30 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
-    import toasts from "../../../../svelte-stores/toast-store";
-    import { proposeDataFlowRemoteStore } from "../../../../svelte-stores/propose-data-flow-remote-store";
+    import {proposeDataFlowRemoteStore} from "../../../../svelte-stores/propose-data-flow-remote-store";
     import {
         dataTypes,
+        duplicateProposeFlowMessage,
+        existingProposeFlowId,
         logicalFlow,
         physicalFlow,
         physicalSpecification,
-        skipDataTypes,
-        proposalReason, duplicateFlowMessage, existingDuplicateFlow
+        proposalReason,
+        skipDataTypes
     } from "./propose-data-flow-store";
-    import { loadSvelteEntity, toEntityRef } from "../../../../common/entity-utils";
+    import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import LogicalFlowSelectionStep from "../../../../physical-flows/svelte/LogicalFlowSelectionStep.svelte";
-    import PhysicalFlowCharacteristicsStep from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalFlowCharacteristicsStep
+        from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
     import PhysicalSpecificationStep from "../../../../physical-flows/svelte/PhysicalSpecificationStep.svelte";
     import DataTypeSelectionStep from "../../../../physical-flows/svelte/DataTypeSelectionStep.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
-    import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
-    import { settingsStore } from "../../../../svelte-stores/settings-store";
+    import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
+    import {settingsStore} from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME, PROPOSAL_OUTCOMES, PROPOSAL_TYPES} from "../../../../common/constants"
+    import {DATAFLOW_PROPOSAL_SETTING_NAME, PROPOSAL_TYPES} from "../../../../common/constants"
     import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
     import {displayError} from "../../../../common/error-utils";
     import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
@@ -84,7 +86,7 @@
         proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
-                commandLaunched=handleProposalValidation(response,false,resetStore,true,goToWorkflow,PROPOSAL_TYPES.CREATE);
+                commandLaunched = handleProposalValidation(response, false, resetStore, true, goToWorkflow, PROPOSAL_TYPES.CREATE);
             })
             .catch(e => {
                 displayError("Error proposing data flow", e);
@@ -96,68 +98,72 @@
 </script>
 
 {#if dataFlowProposalsEnabled && primaryEntityRef}
-<PageHeader name="Propose Data Flow"
-            icon="code-pull-request"
-            small={_.get(sourceEntity, ["name"], "-")}>
-    <div slot="breadcrumbs">
-        <ol class="waltz-breadcrumbs">
-            <li><ViewLink state="main">Home</ViewLink></li>
-            <li><EntityLink ref={sourceEntity}/></li>
-            <li>Propose Data Flow</li>
-        </ol>
-    </div>
-    <div slot="summary">
-        {#if !sourceEntity.name}
-            <NoData>
-                No data found for {primaryEntityRef.kind} {primaryEntityRef.id}
-            </NoData>
-        {:else}
-            <div class="selection-step">
-                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
-            </div>
+    <PageHeader name="Propose Data Flow"
+                icon="code-pull-request"
+                small={_.get(sourceEntity, ["name"], "-")}>
+        <div slot="breadcrumbs">
+            <ol class="waltz-breadcrumbs">
+                <li>
+                    <ViewLink state="main">Home</ViewLink>
+                </li>
+                <li>
+                    <EntityLink ref={sourceEntity}/>
+                </li>
+                <li>Propose Data Flow</li>
+            </ol>
+        </div>
+        <div slot="summary">
+            {#if !sourceEntity.name}
+                <NoData>
+                    No data found for {primaryEntityRef.kind} {primaryEntityRef.id}
+                </NoData>
+            {:else}
+                <div class="selection-step">
+                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
+                </div>
 
-            <div class="selection-step">
-                <PhysicalSpecificationStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <PhysicalSpecificationStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <PhysicalFlowCharacteristicsStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <PhysicalFlowCharacteristicsStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <ReasonSelectionStep ratingSchemeExtId={dataFlowProposalsRatingSchemeExtId}/>
-            </div>
-            <br>
+                <div class="selection-step">
+                    <ReasonSelectionStep ratingSchemeExtId={dataFlowProposalsRatingSchemeExtId}/>
+                </div>
+                <br>
 
-            <span>
+                <span>
                 <button class="btn btn-success"
                         disabled={incompleteRecord || commandLaunched}
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
-                {#if $duplicateFlowMessage}
+                    {#if $duplicateProposeFlowMessage}
                 <div style="margin:20px 0px">
-                    <NoData type="error" >
-                        {$duplicateFlowMessage}
+                    <NoData type="error">
+                        {$duplicateProposeFlowMessage}
                         <br>
-                        <a href={$existingDuplicateFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                        <a href={$existingProposeFlowId} target="_blank" rel="noreferrer">Go to Flow</a>
                     </NoData>
                 </div>
                 {/if}
-                {#if incompleteRecord}
+                    {#if incompleteRecord}
                     <span class="incomplete-warning">
                         <Icon name="exclamation-triangle"/>You must complete all sections
                     </span>
                 {/if}
             </span>
 
-        {/if}
-    </div>
-</PageHeader>
+            {/if}
+        </div>
+    </PageHeader>
 {/if}
 
 <style type="text/scss">

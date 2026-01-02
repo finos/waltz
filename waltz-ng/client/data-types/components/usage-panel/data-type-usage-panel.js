@@ -22,13 +22,17 @@ import {loadUsageData} from "../../data-type-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
+import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import ReasonSelection from "./ReasonSelection.svelte"
-import {duplicateFlowMessage, editDataTypeReason, existingDuplicateFlow} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {
+    duplicateProposeFlowMessage,
+    editDataTypeReason,
+    existingProposeFlowId
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 import {PROPOSAL_TYPES} from "../../../common/constants";
-import {buildFlowCommand, buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
+import {buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
 
 const bindings = {
     parentEntityRef: "<",
@@ -52,8 +56,8 @@ const initialState = {
     dataFlowProposalsEnabled: null,
     selectedReason: null,
     proposalType: PROPOSAL_TYPES.EDIT,
-    duplicateFlowMessage: duplicateFlowMessage,
-    existingDuplicateFlow: existingDuplicateFlow
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 };
 
 
@@ -71,7 +75,7 @@ function controller(serviceBroker, userService, $q) {
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
 
                 vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
 
@@ -92,7 +96,7 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onChanges = () => {
-        if (! vm.parentEntityRef) return;
+        if (!vm.parentEntityRef) return;
         reload(true);
     };
 
@@ -109,9 +113,9 @@ function controller(serviceBroker, userService, $q) {
     });
 
     vm.onSave = () => {
-        if(!vm.isDirty)
+        if (!vm.isDirty)
             return;
-        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+        if (vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")) {
             return;
         }
         if (vm.save) {
@@ -126,7 +130,7 @@ function controller(serviceBroker, userService, $q) {
         }
     };
 
-    vm.onSavePropose = ()=>{
+    vm.onSavePropose = () => {
         Promise.all([
             serviceBroker.loadViewData(
                 CORE_API.PhysicalSpecificationStore.getById,
@@ -157,12 +161,12 @@ function controller(serviceBroker, userService, $q) {
 
             if (vm.savePropose) {
                 vm.savePropose(command)
-                    .then(()=> {
-                        toasts.success("Data types updated successfully");
-                        editDataTypeReason.set(null)
-                        reload(true);
-                        vm.onHideEdit();
-                    }
+                    .then(() => {
+                            toasts.success("Data types updated successfully");
+                            editDataTypeReason.set(null)
+                            reload(true);
+                            vm.onHideEdit();
+                        }
                     )
                     .catch(error => {
                         console.error("Error in savePropose:", error);

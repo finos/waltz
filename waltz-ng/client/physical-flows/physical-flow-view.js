@@ -29,12 +29,14 @@ import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../c
 import {proposeDataFlowRemoteStore} from "../svelte-stores/propose-data-flow-remote-store";
 import ReasonSelection from "../data-types/components/usage-panel/ReasonSelection.svelte";
 import {
-    deleteFlowReason, duplicateFlowMessage, existingDuplicateFlow
+    deleteFlowReason,
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 } from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 import pageInfo from "../svelte-stores/page-navigation-store";
-import {PROPOSAL_OUTCOMES, PROPOSAL_TYPES} from "../common/constants";
+import {PROPOSAL_TYPES} from "../common/constants";
 import {handleProposalValidation} from "../common/utils/proposalValidation";
-import {buildFlowCommand, buildProposalFlowCommand} from "../common/utils/propose-flow-command-util";
+import {buildProposalFlowCommand} from "../common/utils/propose-flow-command-util";
 
 
 const modes = {
@@ -70,7 +72,6 @@ const initialState = {
 };
 
 
-
 function mkHistoryObj(flow, spec) {
     return {
         name: spec.name,
@@ -86,8 +87,8 @@ function goToWorkflow(proposedFlowId) {
             id: proposedFlowId
         }
     })
-    existingDuplicateFlow.set(null)
-    duplicateFlowMessage.set(null)
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
 }
 
 function addToHistory(historyStore, flow, spec) {
@@ -278,7 +279,7 @@ function controller($q,
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {
                         const response = r.data;
-                        const commandLaunched=handleProposalValidation(response,false,null,false,goToWorkflow,PROPOSAL_TYPES.DELETE);
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.DELETE);
                     })
                     .catch(e => console.error("Error proposing data flow", e));
             }
