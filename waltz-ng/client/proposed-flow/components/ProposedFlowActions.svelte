@@ -10,6 +10,7 @@
     import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
     import { get } from "svelte/store";
     import {personStore} from "../../svelte-stores/person-store";
+    import {PROPOSAL_TYPES} from "../../common/constants";
 
     export let refreshState;
     const Modes = {
@@ -23,6 +24,8 @@
     let activeAction = null;
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
+    let physicalFlowCount;
+
     export let proposedFlow = {};
 
     $: userCall = personStore.getSelf();
@@ -69,6 +72,16 @@
                 return false;
         }
     }
+
+    $: physicalFlowId = proposedFlow?.flowDef?.physicalFlowId;
+    $: logicalFlowId = proposedFlow?.flowDef?.logicalFlowId;
+    $: proposalType= proposedFlow?.flowDef?.proposalType;
+
+    $: physcialFlowCountStore = physicalFlowId
+        ? proposeDataFlowRemoteStore.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowId, false)
+        : null;
+
+    $: physicalFlowCount = $physcialFlowCountStore?.data
 
     function mkButtonClasses(action) {
         return `btn btn-xs btn-${action.style}`;
@@ -162,6 +175,7 @@
         }
     ];
 
+
     let permissionsCall;
     $: {
         if (proposedFlow?.id && proposedFlow.id !== get(lastProposedFlowId)) {
@@ -174,9 +188,17 @@
 </script>
 <div style="padding-bottom: 0.5em" class="small">
     <NoData type="info">
-        <Icon name="info" style="padding: 0.5em"/>
-        You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
+        <Icon name="info" style="padding: 1em"/>
+        You are reviewing a {proposalType.toLowerCase()} request.
     </NoData>
+    {#if proposalType === PROPOSAL_TYPES.DELETE && physicalFlowCount===1}
+        <NoData type="error">
+            <Icon name="warning" style="padding: 1em"/>
+            This is the last physical flow associated with the logical flow.
+            <br>This will lead to the deletion of the physical as well as the
+            <a href={`/logical-flow/${logicalFlowId}`} target="_blank" rel="noreferrer">logical flow</a>.
+        </NoData>
+    {/if}
 </div>
 {#if mode === Modes.LIST}
     <!-- ACTION LIST -->

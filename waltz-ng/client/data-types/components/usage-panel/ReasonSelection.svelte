@@ -1,5 +1,10 @@
 <script>
-    import {deleteFlowReason,duplicateFlowMessage,existingDuplicateFlow,editDataTypeReason} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+    import {
+        deleteFlowReason,
+        duplicateProposeFlowMessage,
+        editDataTypeReason,
+        existingProposeFlowId
+    } from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
@@ -26,20 +31,18 @@
     let ratingScheme;
 
     onMount(async () => {
-        if (type===PROPOSAL_TYPES.DELETE && $deleteFlowReason) {
+        if (type === PROPOSAL_TYPES.DELETE && $deleteFlowReason) {
             workingCopy = Object.assign({}, $deleteFlowReason);
-        }
-        else if (type===PROPOSAL_TYPES.EDIT && $editDataTypeReason) {
+        } else if (type === PROPOSAL_TYPES.EDIT && $editDataTypeReason) {
             workingCopy = Object.assign({}, $editDataTypeReason);
         }
     });
 
     function save() {
-        if(type===PROPOSAL_TYPES.DELETE){
+        if (type === PROPOSAL_TYPES.DELETE) {
             $deleteFlowReason = workingCopy;
             proposeDeleteFlow()
-        }
-        else if(type===PROPOSAL_TYPES.EDIT){
+        } else if (type === PROPOSAL_TYPES.EDIT) {
             $editDataTypeReason = workingCopy;
         }
     }
@@ -51,8 +54,9 @@
         workingCopy.rating = evt.detail;
         const emittedEvent = {ratingSchemeItems: workingCopy.rating};
         dispatch("select", emittedEvent);
-        if(type===PROPOSAL_TYPES.EDIT)
-        save();
+        if (type === PROPOSAL_TYPES.EDIT) {
+            save();
+        }
     }
 
 </script>
@@ -84,28 +88,28 @@
                 <NoData>Reasons have not been defined.</NoData>
             {/if}
         {/if}
-        {#if type===PROPOSAL_TYPES.EDIT}
-            <div class="small" >
+        {#if type === PROPOSAL_TYPES.EDIT}
+            <div class="small">
                 <NoData type="info">
                     This will affect all associated physical flows.
                 </NoData>
             </div>
         {/if}
 
-        {#if type===PROPOSAL_TYPES.DELETE}
-        <div style="display: flex; justify-content: flex-end;margin: 0;">
-            <button class="btn btn-sm btn-primary">
-                Submit
-            </button>
-        </div>
+        {#if type === PROPOSAL_TYPES.DELETE}
+            <div style="display: flex; justify-content: flex-end;margin: 0;">
+                <button class="btn btn-sm btn-primary">
+                    Submit
+                </button>
+            </div>
         {/if}
 
-        {#if $duplicateFlowMessage}
+        {#if $duplicateProposeFlowMessage}
             <div style="margin:20px 0px">
                 <NoData type="error">
-                    {$duplicateFlowMessage}
+                    {$duplicateProposeFlowMessage}
                     <br>
-                    <a href={$existingDuplicateFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                    <a href={$existingProposeFlowId} target="_blank" rel="noreferrer">Go to Flow</a>
                 </NoData>
             </div>
         {/if}

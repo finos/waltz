@@ -25,7 +25,18 @@ import {toEntityRefWithKind} from "../common/entity-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
 import {copyTextToClipboard} from "../common/browser-utils";
-import {isDataFlowProposalsEnabled} from "../common/utils/settings-util";
+import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../common/utils/settings-util";
+import {proposeDataFlowRemoteStore} from "../svelte-stores/propose-data-flow-remote-store";
+import ReasonSelection from "../data-types/components/usage-panel/ReasonSelection.svelte";
+import {
+    deleteFlowReason,
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
+} from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+import pageInfo from "../svelte-stores/page-navigation-store";
+import {PROPOSAL_TYPES} from "../common/constants";
+import {handleProposalValidation} from "../common/utils/proposalValidation";
+import {buildProposalFlowCommand} from "../common/utils/propose-flow-command-util";
 
 
 const modes = {
@@ -50,7 +61,14 @@ const initialState = {
     potentialMergeTargets: [],
     mergeTarget: null,
     settings: null,
-    dataFlowProposalsEnabled: null
+    dataFlowProposalsEnabled: null,
+    dataFlowProposalsRatingSchemeSetting: null,
+    showReason: false,
+    ratingSchemeExtId: null,
+    selectedReason: null,
+    dataType: [],
+    type: PROPOSAL_TYPES.DELETE,
+    ReasonSelection
 };
 
 
@@ -63,6 +81,15 @@ function mkHistoryObj(flow, spec) {
     };
 }
 
+function goToWorkflow(proposedFlowId) {
+    pageInfo.set({
+        state: "main.proposed-flow.view", params: {
+            id: proposedFlowId
+        }
+    })
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
+}
 
 function addToHistory(historyStore, flow, spec) {
     if (!flow || !spec) {
@@ -129,6 +156,7 @@ function controller($q,
             .then(r => {
                 vm.settings = r.data;
                 vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
+                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings);
             });
 
 
@@ -166,6 +194,29 @@ function controller($q,
             });
     };
 
+    const launchCommand = () => {
+
+        return serviceBroker
+            .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics, [vm.specificationReference])
+            .then(dataTypeResponse => {
+                const ids = dataTypeResponse.data.map(item => item.dataTypeId);
+                vm.dataType = ids;
+
+                if (vm.physicalFlow && vm.specification && vm.logicalFlow) {
+                    return buildProposalFlowCommand({
+                        physicalFlow: vm.physicalFlow,
+                        specification: vm.specification,
+                        logicalFlow: vm.logicalFlow,
+                        dataType: vm.dataType,
+                        selectedReason: vm.selectedReason,
+                        proposalType: PROPOSAL_TYPES.DELETE
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error in launchCommand:", error);
+            });
+    };
 
     // -- INTERACT ---
 
@@ -218,6 +269,26 @@ function controller($q,
         }
     };
 
+    vm.setShowReason = () => {
+        vm.showReason = !vm.showReason;
+    }
+
+    vm.proposeDeleteFlow = () => {
+        launchCommand().then(command => {
+            if (command) {
+                proposeDataFlowRemoteStore.proposeDataFlow(command)
+                    .then(r => {
+                        const response = r.data;
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.DELETE);
+                    })
+                    .catch(e => console.error("Error proposing data flow", e));
+            }
+        });
+    };
+
+    deleteFlowReason.subscribe(value => {
+        vm.selectedReason = value;
+    });
 
     // -- INTERACT: de-dupe
     const loadPotentialMergeTargets = () => {
