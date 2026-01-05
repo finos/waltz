@@ -67,7 +67,7 @@
 
             <!-- ACTIONS -->
             <div class="waltz-sub-section-controls">
-                <span ng-if="!$ctrl.visibility.editor && $ctrl.visibility.controls">
+                <span ng-if="$ctrl.dataFlowProposalsEnabled || (!$ctrl.visibility.editor && $ctrl.visibility.controls)">
                     <!-- WHILST VIEWING -->
                     <a ng-click="$ctrl.onShowEdit()"
                        class="clickable">
