@@ -24,12 +24,11 @@ import template from "./data-type-usage-selector.html";
 import {loadUsageData} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-flow-remote-store";
-import toasts from "../../../svelte-stores/toast-store";
 import pageInfo from "../../../svelte-stores/page-navigation-store";
 import {PROPOSAL_TYPES} from "../../../common/constants";
 import {
-    duplicateFlowMessage,
-    existingDuplicateFlow
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 } from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 import {handleProposalValidation} from "../../../common/utils/proposalValidation";
 
@@ -58,7 +57,6 @@ const initialState = {
 };
 
 
-
 function goToWorkflow(proposedFlowId) {
     // Simple navigation using window.location
     pageInfo.set({
@@ -67,8 +65,8 @@ function goToWorkflow(proposedFlowId) {
             id: proposedFlowId
         }
     })
-    existingDuplicateFlow.set(null)
-    duplicateFlowMessage.set(null)
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
 }
 
 
@@ -104,7 +102,6 @@ function enrichDataTypes(dataTypes = [], usageCharacteristics = []) {
     const usageById = _.keyBy(usageCharacteristics, d => d.dataTypeId);
     return _.map(dataTypes, dt => enrichDataTypeWithUsage(dt, usageById));
 }
-
 
 
 function controller($q, serviceBroker) {
@@ -150,7 +147,7 @@ function controller($q, serviceBroker) {
         return serviceBroker
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
-                [ vm.parentEntityRef, decoratorUpdateCommand ]);
+                [vm.parentEntityRef, decoratorUpdateCommand]);
     };
 
     const doSavePropose = (command) => {
@@ -158,7 +155,7 @@ function controller($q, serviceBroker) {
             vm.parentEntityRef,
             vm.checkedItemIds,
             vm.originalSelectedItemIds);
-        command.dataTypeIds=vm.originalSelectedItemIds
+        command.dataTypeIds = vm.originalSelectedItemIds
         // Start with the original dataTypeIds from command
         let updatedDataTypeIds = new Set(command.dataTypeIds || []);
 
@@ -176,7 +173,7 @@ function controller($q, serviceBroker) {
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {
                         const response = r.data;
-                        const commandLaunched=handleProposalValidation(response,false,null,false,goToWorkflow,PROPOSAL_TYPES.EDIT);
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.EDIT);
                     })
                     .catch(e => {
                         console.error("Error proposing data flow", e);
@@ -261,11 +258,11 @@ function controller($q, serviceBroker) {
     };
 
     vm.isReadonlyPredicate = (node) => {
-        if(_.isNull(node.usage)){
+        if (_.isNull(node.usage)) {
             return false;
         } else {
             return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
-                ? node.usage.readOnly || ! node.usage.isRemovable
+                ? node.usage.readOnly || !node.usage.isRemovable
                 : node.usage.readOnly;
         }
     };

@@ -22,12 +22,17 @@ import {loadUsageData} from "../../data-type-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
+import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import ReasonSelection from "./ReasonSelection.svelte"
-import {duplicateFlowMessage, editDataTypeReason, existingDuplicateFlow} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {
+    duplicateProposeFlowMessage,
+    editDataTypeReason,
+    existingProposeFlowId
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 import {PROPOSAL_TYPES} from "../../../common/constants";
+import {buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
 
 const bindings = {
     parentEntityRef: "<",
@@ -44,15 +49,15 @@ const initialState = {
         editor: false,
         controls: false
     },
-    settings:null,
+    settings: null,
     ReasonSelection,
-    ratingsScheme:null,
-    ratingSchemeExtId:null,
-    dataFlowProposalsEnabled:null,
-    selectedReason:null,
-    proposalType:PROPOSAL_TYPES.EDIT,
-    duplicateFlowMessage:duplicateFlowMessage,
-    existingDuplicateFlow:existingDuplicateFlow
+    ratingsScheme: null,
+    ratingSchemeExtId: null,
+    dataFlowProposalsEnabled: null,
+    selectedReason: null,
+    proposalType: PROPOSAL_TYPES.EDIT,
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 };
 
 
@@ -66,12 +71,11 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
-        let dataFlowProposalsRatingSchemeSetting="";
         const settingsPromise = serviceBroker
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
 
                 vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
 
@@ -92,7 +96,7 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onChanges = () => {
-        if (! vm.parentEntityRef) return;
+        if (!vm.parentEntityRef) return;
         reload(true);
     };
 
@@ -109,9 +113,9 @@ function controller(serviceBroker, userService, $q) {
     });
 
     vm.onSave = () => {
-        if(!vm.isDirty)
+        if (!vm.isDirty)
             return;
-        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+        if (vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")) {
             return;
         }
         if (vm.save) {
@@ -126,7 +130,7 @@ function controller(serviceBroker, userService, $q) {
         }
     };
 
-    vm.onSavePropose = ()=>{
+    vm.onSavePropose = () => {
         Promise.all([
             serviceBroker.loadViewData(
                 CORE_API.PhysicalSpecificationStore.getById,
@@ -140,57 +144,29 @@ function controller(serviceBroker, userService, $q) {
             const specificationData = specResponse.data;
             const logicalFlowData = logicalFlowResponse.data;
 
-            const specification = {
-                owningEntity: {id:vm.parentFlow.id,kind:vm.parentFlow.kind},
-                name: specificationData.name,
-                description: specificationData.description,
-                format: specificationData.format,
-                lastUpdatedBy: "waltz",
-                externalId: !_.isEmpty(specificationData.externalId) ? specificationData.externalId : null,
-                id: specificationData.id || null
-            };
+            const command = buildProposalFlowCommand({
+                physicalFlow: vm.parentFlow,
+                specification: specificationData,
+                logicalFlow: logicalFlowData,
+                dataType: [],
+                selectedReason: vm.selectedReason,
+                proposalType: PROPOSAL_TYPES.EDIT
+            });
 
-            const logicalFlow = {
-                logicalFlowId: logicalFlowData.id || null,
-                source: logicalFlowData.source || null,
-                target: logicalFlowData.target || null
-            };
-
-            const flowAttributes = {
-                name: vm.parentFlow.name,
-                transport: vm.parentFlow.transport,
-                frequency: vm.parentFlow.frequency,
-                basisOffset: vm.parentFlow.basisOffset,
-                criticality: vm.parentFlow.criticality,
-                description: vm.parentFlow.description,
-                externalId: !_.isEmpty(vm.parentFlow.externalId) ? vm.parentFlow.externalId : null
-            };
-
-            const command = {
-                specification,
-                flowAttributes,
-                logicalFlowId: logicalFlow.logicalFlowId,
-                source: logicalFlow.source,
-                target: logicalFlow.target,
-                physicalFlowId: vm.parentFlow.id,
-                dataTypeIds: [],
-                proposalType: "EDIT",
-                reason:{
-                    ratingId:vm.selectedReason.rating[0].id,
-                    description:vm.selectedReason.rating[0].description
-                }
-            };
-
+            if (!command) {
+                console.error("Could not build command for proposal");
+                return;
+            }
             if (!vm.isDirty) return;
 
             if (vm.savePropose) {
                 vm.savePropose(command)
-                    .then(()=> {
-                        toasts.success("Data types updated successfully");
-                        editDataTypeReason.set(null)
-                        reload(true);
-                        vm.onHideEdit();
-                    }
+                    .then(() => {
+                            toasts.success("Data types updated successfully");
+                            editDataTypeReason.set(null)
+                            reload(true);
+                            vm.onHideEdit();
+                        }
                     )
                     .catch(error => {
                         console.error("Error in savePropose:", error);

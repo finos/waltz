@@ -53,10 +53,19 @@
         <div ng-if="ctrl.logicalFlow">
             <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
                 <div ng-if="ctrl.canEdit">
-                    <button class="btn btn-xs btn-danger"
+                    <button
+                            ng-if="!ctrl.dataFlowProposalsEnabled"
+                            class="btn btn-xs btn-danger"
                             ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
                         Delete
+                    </button>
+                    <button
+                            ng-if="ctrl.dataFlowProposalsEnabled"
+                            class="btn btn-xs btn-danger"
+                            ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
+                            ng-click="(ctrl.mentions | isEmpty) && ctrl.setShowReason()">
+                       Propose Delete
                     </button>
                     <button class="btn btn-xs btn-warning"
                             ng-disabled="! (ctrl.mentions | isEmpty)"
@@ -92,6 +101,24 @@
 
                 <!-- DATA USAGE & ASSESSMENTS -->
                 <div class="col-md-5">
+                    <waltz-sub-section name="Reason selection" ng-if="ctrl.showReason">
+                        <content>
+                            <div style="padding: 1em">
+                                <waltz-svelte-component
+                                    component="ctrl.ReasonSelection"
+                                    rating-scheme-ext-id="ctrl.ratingSchemeExtId"
+                                    type="ctrl.type"
+                                    propose-delete-flow="ctrl.proposeDeleteFlow",
+                                    response-message="ctrl.responseMessage",
+                                    existing-flow="ctrl.existingFlow"
+                                >
+                                </waltz-svelte-component>
+                            </div>
+                        </content>
+                    </waltz-sub-section>
+
+                    <br ng-if="ctrl.showReason">
+
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
                                                  parent-flow="ctrl.physicalFlow"
                                                  help-text="Data types referenced by the specification">
@@ -331,3 +358,4 @@
         </content>
     </waltz-sub-section>
 </script>
+
