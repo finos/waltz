@@ -51,7 +51,7 @@
             <column name="external_id"
                     type="VARCHAR(64)"
                     remarks="External Id of the ARC">
-                <constraints primaryKey="true"
+                <constraints unique="true"
                              nullable="false"/>
             </column>
             <column name="title"
