@@ -24,4 +24,80 @@
                author="ramerav">
         <tagDatabase tag="v1.77.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <changeSet id="20260106-4813-1" author="jainshrk">
+        <addColumn tableName="survey_question_response">
+            <column name="json_response"
+                    type="${maxvarchar.type}"
+                    remarks="Stores the response to a question as a json string. Used for complex questions such as ARC questions."/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260106-4813-2" author="jainshrk">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="architecture_required_change"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="architecture_required_change">
+            <column name="id"
+                    type="BIGINT"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+            <column name="external_id"
+                    type="VARCHAR(64)"
+                    remarks="External Id of the ARC">
+                <constraints primaryKey="true"
+                             nullable="false"/>
+            </column>
+            <column name="title"
+                    type="VARCHAR(255)"
+                    remarks="Title of the ARC"/>
+            <column name="description"
+                    type="VARCHAR(4000)"
+                    remarks="Description of the ARC"/>
+            <column name="status"
+                    type="VARCHAR(64)"/>
+            <column name="milestone_rag"
+                    type="VARCHAR(64)"/>
+            <column name="milestone_forecast_date"
+                    type="DATETIME"/>
+            <column name="parent_id"
+                    type="bigint"/>
+            <column name="linked_entity_id"
+                    type="bigint"/>
+            <column name="linked_entity_kind"
+                    type="VARCHAR(64)"/>
+            <column name="resolution"
+                    type="VARCHAR(255)"/>
+            <column name="created_at"
+                    type="DATETIME"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated_at"
+                    type="DATETIME"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="provenance"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
