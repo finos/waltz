@@ -48,31 +48,6 @@
                 </div>
             </div>
 
-            <!-- ACTIONS -->
-            <div class="waltz-sub-section-controls">
-                <span ng-if="$ctrl.dataFlowProposalsEnabled || (!$ctrl.visibility.editor && $ctrl.visibility.controls)">
-                    <!-- WHILST VIEWING -->
-                    <a ng-click="$ctrl.onShowEdit()"
-                       class="clickable">
-                        Edit
-                    </a>
-                </span>
-
-                <span ng-if="$ctrl.visibility.editor && $ctrl.visibility.controls">
-                    <!-- WHILST EDITING -->
-                    <a ng-click="$ctrl.onSave()"
-                       class="clickable"
-                       ng-disabled="! $ctrl.isDirty">
-                        Save
-                    </a>
-                    |
-                    <a ng-click="$ctrl.onHideEdit()"
-                       class="clickable">
-                        Cancel
-                    </a>
-                </span>
-            </div>
-
         </content>
 
     </waltz-sub-section>

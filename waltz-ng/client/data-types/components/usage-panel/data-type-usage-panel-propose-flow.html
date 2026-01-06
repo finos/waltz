@@ -16,7 +16,7 @@
   ~
   -->
 
-<div class="waltz-data-type-usage-panel-propose-flow">
+<div class="waltz-data-type-usage-panel">
     <waltz-sub-section name="Data Types">
         <content>
 
@@ -57,8 +57,6 @@
                         rating-scheme-ext-id="$ctrl.ratingSchemeExtId"
                         type="$ctrl.proposalType"
                         propose-delete-flow=null
-                        response-message="$ctrl.responseMessage"
-                        existing-flow="$ctrl.existingFlow"
                     >
                     </waltz-svelte-component>
 
@@ -67,7 +65,7 @@
 
             <!-- ACTIONS -->
             <div class="waltz-sub-section-controls">
-                <span ng-if="!$ctrl.visibility.editor && $ctrl.visibility.controls">
+                <span ng-if="!$ctrl.visibility.editor && ($ctrl.dataFlowProposalsEnabled || $ctrl.visibility.controls)">
                     <!-- WHILST VIEWING -->
                     <a ng-click="$ctrl.onShowEdit()"
                        class="clickable">
@@ -75,7 +73,7 @@
                     </a>
                 </span>
 
-                <span ng-if="$ctrl.visibility.editor && $ctrl.visibility.controls">
+                <span ng-if="$ctrl.visibility.editor && ($ctrl.dataFlowProposalsEnabled || $ctrl.visibility.controls)">
                     <!-- WHILST EDITING -->
                     <a ng-if="!$ctrl.dataFlowProposalsEnabled"
                         ng-click="$ctrl.onSave()"

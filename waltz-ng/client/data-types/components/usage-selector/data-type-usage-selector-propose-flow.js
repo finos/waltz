@@ -27,8 +27,8 @@ import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-fl
 import pageInfo from "../../../svelte-stores/page-navigation-store";
 import {PROPOSAL_TYPES} from "../../../common/constants";
 import {
-    duplicateFlowMessage,
-    existingDuplicateFlow
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 } from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 import {handleProposalValidation} from "../../../common/utils/proposalValidation";
 
@@ -57,7 +57,6 @@ const initialState = {
 };
 
 
-
 function goToWorkflow(proposedFlowId) {
     // Simple navigation using window.location
     pageInfo.set({
@@ -66,8 +65,8 @@ function goToWorkflow(proposedFlowId) {
             id: proposedFlowId
         }
     })
-    existingDuplicateFlow.set(null)
-    duplicateFlowMessage.set(null)
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
 }
 
 
@@ -175,7 +174,7 @@ function controller($q, serviceBroker) {
                 proposeDataFlowRemoteStore.proposeDataFlow(command)
                     .then(r => {
                         const response = r.data;
-                        const commandLaunched=handleProposalValidation(response,false,null,false,goToWorkflow,PROPOSAL_TYPES.EDIT);
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.EDIT);
                     })
                     .catch(e => {
                         console.error("Error proposing data flow", e);
@@ -320,4 +319,3 @@ export default {
     },
     id: "waltzDataTypeUsageSelectorProposeFlow"
 };
-

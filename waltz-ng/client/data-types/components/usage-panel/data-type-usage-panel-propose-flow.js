@@ -25,7 +25,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import ReasonSelection from "./ReasonSelection.svelte"
-import {duplicateFlowMessage, editDataTypeReason, existingDuplicateFlow} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {duplicateProposeFlowMessage, editDataTypeReason, existingProposeFlowId} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 import {PROPOSAL_TYPES} from "../../../common/constants";
 
@@ -51,8 +51,8 @@ const initialState = {
     dataFlowProposalsEnabled:null,
     selectedReason:null,
     proposalType:PROPOSAL_TYPES.EDIT,
-    duplicateFlowMessage:duplicateFlowMessage,
-    existingDuplicateFlow:existingDuplicateFlow
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
 };
 
 
