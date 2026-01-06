@@ -109,8 +109,6 @@
                                     rating-scheme-ext-id="ctrl.ratingSchemeExtId"
                                     type="ctrl.type"
                                     propose-delete-flow="ctrl.proposeDeleteFlow",
-                                    response-message="ctrl.responseMessage",
-                                    existing-flow="ctrl.existingFlow"
                                 >
                                 </waltz-svelte-component>
                             </div>
@@ -119,10 +117,10 @@
 
                     <br ng-if="ctrl.showReason">
 
-                    <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                    <waltz-data-type-usage-panel-propose-flow parent-entity-ref="ctrl.specificationReference"
                                                  parent-flow="ctrl.physicalFlow"
                                                  help-text="Data types referenced by the specification">
-                    </waltz-data-type-usage-panel>
+                    </waltz-data-type-usage-panel-propose-flow>
 
                     <br>
 
@@ -358,4 +356,3 @@
         </content>
     </waltz-sub-section>
 </script>
-
