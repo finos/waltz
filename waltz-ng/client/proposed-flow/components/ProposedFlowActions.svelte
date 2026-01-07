@@ -196,7 +196,8 @@
             <Icon name="warning" style="padding: 1em"/>
             This is the last physical flow associated with the logical flow.
             <br>This will lead to the deletion of the physical as well as the
-            <a href={`/logical-flow/${logicalFlowId}`} target="_blank" rel="noreferrer">logical flow</a>.
+            <EntityLink ref={{ kind: "LOGICAL_DATA_FLOW", id: logicalFlowId, name: "logical flow" }}
+                        showIcon={false}/>.
         </NoData>
     {/if}
 </div>
