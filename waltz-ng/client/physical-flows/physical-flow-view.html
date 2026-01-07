@@ -64,7 +64,7 @@
                             ng-if="ctrl.dataFlowProposalsEnabled"
                             class="btn btn-xs btn-danger"
                             ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
-                            ng-click="(ctrl.mentions | isEmpty) && ctrl.setShowReason()">
+                            ng-click="(ctrl.mentions | isEmpty) && ctrl.showReason(true)">
                        Propose Delete
                     </button>
                     <button class="btn btn-xs btn-warning"
@@ -101,14 +101,15 @@
 
                 <!-- DATA USAGE & ASSESSMENTS -->
                 <div class="col-md-5">
-                    <waltz-sub-section name="Reason selection" ng-if="ctrl.showReason">
+                    <waltz-sub-section name="Reason selection" ng-if="ctrl.isReasonSelectionOpen">
                         <content>
                             <div style="padding: 1em">
                                 <waltz-svelte-component
                                     component="ctrl.ReasonSelection"
                                     rating-scheme-ext-id="ctrl.ratingSchemeExtId"
                                     type="ctrl.type"
-                                    propose-delete-flow="ctrl.proposeDeleteFlow",
+                                    propose-delete-flow="ctrl.proposeDeleteFlow"
+                                    cancel-propose-delete-flow="ctrl.showReason"
                                 >
                                 </waltz-svelte-component>
                             </div>

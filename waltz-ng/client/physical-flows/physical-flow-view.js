@@ -63,7 +63,7 @@ const initialState = {
     settings: null,
     dataFlowProposalsEnabled: null,
     dataFlowProposalsRatingSchemeSetting: null,
-    showReason: false,
+    isReasonSelectionOpen: false,
     ratingSchemeExtId: null,
     selectedReason: null,
     dataType: [],
@@ -133,6 +133,7 @@ function navigateToLastView($state, historyStore) {
 
 function controller($q,
                     $state,
+                    $scope,
                     $stateParams,
                     $window,
                     historyStore,
@@ -269,9 +270,11 @@ function controller($q,
         }
     };
 
-    vm.setShowReason = () => {
-        vm.showReason = !vm.showReason;
-    }
+    vm.showReason = (value) => {
+        $scope.$applyAsync(() => {
+            vm.isReasonSelectionOpen = value;
+        });
+    };
 
     vm.proposeDeleteFlow = () => {
         launchCommand().then(command => {
@@ -376,6 +379,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
+    "$scope",
     "$stateParams",
     "$window",
     "HistoryStore",

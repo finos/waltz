@@ -16,7 +16,7 @@
     export let ratingSchemeExtId;
     export let type;
     export let proposeDeleteFlow;
-
+    export let cancelProposeDeleteFlow;
 
     const Modes = {
         SELECT: "SELECT",
@@ -45,6 +45,11 @@
         } else if (type === PROPOSAL_TYPES.EDIT) {
             $editDataTypeReason = workingCopy;
         }
+    }
+
+
+    function cancel() {
+        cancelProposeDeleteFlow(false);
     }
 
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
@@ -97,9 +102,13 @@
         {/if}
 
         {#if type === PROPOSAL_TYPES.DELETE}
-            <div style="display: flex; justify-content: flex-end;margin: 0;">
-                <button class="btn btn-sm btn-primary">
+            <div style="display: flex; justify-content: flex-end;margin: 0;gap: 0.5rem">
+                <button class="btn btn-sm btn-primary"
+                        disabled={!workingCopy.rating || workingCopy.rating.length === 0}>
                     Submit
+                </button>
+                <button type="button" class="btn btn-sm" on:click={cancel}>
+                    Cancel
                 </button>
             </div>
         {/if}
