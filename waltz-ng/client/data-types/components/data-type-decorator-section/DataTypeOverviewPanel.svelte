@@ -16,6 +16,9 @@
     } from "./data-type-decorator-section-store"
     import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
     import SuggestedDataTypeTreeSelector from "./SuggestedDataTypeTreeSelector.svelte";
+    import {settingsStore} from "../../../svelte-stores/settings-store";
+    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
+    import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
     export let primaryEntityReference;
@@ -24,7 +27,6 @@
         VIEW: "VIEW",
         EDIT: "EDIT"
     }
-
     const root = {name: "Root"};
 
     let activeMode = Modes.VIEW;
@@ -125,6 +127,13 @@
     $: permissions = $permissionsCall?.data || [];
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
 
+    let settingsCall=settingsStore.loadAll();
+
+    $: dataFlowProposalSetting = $settingsCall.data
+        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
+        [0];
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+
 </script>
 
 
@@ -139,14 +148,16 @@
                                   on:select={onSelect}
                                   {ratingCharacteristics}
                                   {usageCharacteristics}/>
-            <div style="padding-top: 1em">
-                <button class="btn btn-skinny"
-                        title={!hasEditPermission ? "You do not have permission to edit logical flows and associated data types" : ""}
-                        disabled={!hasEditPermission}
-                        on:click={edit}>
-                    <Icon name="pencil"/>Edit
-                </button>
-            </div>
+            {#if dataFlowProposalsEnabled!==undefined && !dataFlowProposalsEnabled}
+                <div style="padding-top: 1em">
+                    <button class="btn btn-skinny"
+                            title={!hasEditPermission ? "You do not have permission to edit logical flows and associated data types" : ""}
+                            disabled={!hasEditPermission}
+                            on:click={edit}>
+                        <Icon name="pencil"/>Edit
+                    </button>
+                </div>
+            {/if}
         </div>
     {:else if activeMode === Modes.EDIT}
         <div class="col-sm-12">

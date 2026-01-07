@@ -32,6 +32,7 @@ import FlowDetailPanel from "../svelte/flow-detail-tab/FlowDetailPanel.svelte"
 import FlowClassificationRulesPanel
     from "../../../flow-classification-rule/components/summary-list/FlowClassificationRulesPanel.svelte";
 import {flowDirection} from "../../../common/services/enums/flow-direction";
+import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
 
 const bindings = {
     parentEntityRef: "<",
@@ -81,9 +82,6 @@ const initialState = {
     dataFlowProposalsEnabled: false,
     bulkLoaderVisible: false
 };
-
-const DATAFLOW_PROPOSAL_SETTING_NAME = "feature.data-flow-proposals.enabled";
-
 
 function controller(serviceBroker) {
 

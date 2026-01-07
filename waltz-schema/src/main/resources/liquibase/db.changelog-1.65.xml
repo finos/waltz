@@ -55,5 +55,81 @@
         <setTableRemarks  remarks="Tracks user browser info, primarily used to help determine when target newer browser features and drop support for older browsers"
                           tableName="user_agent_info"/>
     </changeSet>
-
+    <changeSet id="20241009-7162-6"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_triggers</comment>
+        <setTableRemarks  remarks="is where general information of a trigger is saved"
+                          tableName="qrtz_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-7"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_simprop_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_simprop_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-8"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_simple_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_simple_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-9"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_scheduler_state</comment>
+        <setTableRemarks  remarks="is for capturing the node state so that if in any case one node gets down or failed to execute one of the job then the other instance running in clustering mode can pick the misfired job"
+                          tableName="qrtz_scheduler_state"/>
+    </changeSet>
+    <changeSet id="20241009-7162-10"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_paused_trigger_grps</comment>
+        <setTableRemarks  remarks="is to save the information about triggers which are not active"
+                          tableName="qrtz_paused_trigger_grps"/>
+    </changeSet>
+    <changeSet id="20241009-7162-11"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_locks</comment>
+        <setTableRemarks  remarks="stores the value of the instance name executing the job, to avoid the sceanario of multiple nodes executing the same job"
+                          tableName="qrtz_locks"/>
+    </changeSet>
+    <changeSet id="20241009-7162-12"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_job_details</comment>
+        <setTableRemarks  remarks="the task to be executed."
+                          tableName="qrtz_job_details"/>
+    </changeSet>
+    <changeSet id="20241009-7162-13"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_fired_triggers</comment>
+        <setTableRemarks  remarks="is a log of all the triggers that were fired."
+                          tableName="qrtz_fired_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-14"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_cron_triggers</comment>
+        <setTableRemarks  remarks="have a foreign key relation to qrtz_triggers which save those specific details. Ex. Cron has cron expression which is unique to it."
+                          tableName="qrtz_cron_triggers"/>
+    </changeSet>
+    <changeSet id="20241009-7162-15"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_calendars</comment>
+        <setTableRemarks  remarks="for excluding blocks of time from the the trigger’s firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business’s holidays"
+                          tableName="qrtz_calendars"/>
+    </changeSet>
+    <changeSet id="20241009-7162-16"
+               author="jejuabh"
+               dbms="mssql">
+        <comment>7162: Add description to table qrtz_blob_triggers</comment>
+        <setTableRemarks  remarks="for excluding blocks of time from the the trigger’s firing schedule. For instance, you could create a trigger that fires a job every weekday at 9:30 am, but then add a Calendar that excludes all of the business’s holidays"
+                          tableName="qrtz_blob_triggers"/>
+    </changeSet>
 </databaseChangeLog>
