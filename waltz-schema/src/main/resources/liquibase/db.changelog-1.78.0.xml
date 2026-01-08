@@ -66,8 +66,8 @@
                     type="VARCHAR(64)"/>
             <column name="milestone_forecast_date"
                     type="DATETIME"/>
-            <column name="parent_id"
-                    type="bigint"/>
+            <column name="parent_external_id"
+                    type="VARCHAR(64)"/>
             <column name="linked_entity_id"
                     type="bigint"/>
             <column name="linked_entity_kind"
@@ -95,9 +95,16 @@
             </column>
 
             <column name="provenance"
-                    type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
+                    type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
+
+    <changeSet id="20260106-4813-3" author="jainshrk">
+        <createIndex indexName="arc_parent_external_id_idx"
+                     tableName="architecture_required_change"
+                     unique="false">
+            <column name="parent_external_id"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
