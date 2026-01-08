@@ -52,7 +52,7 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="ctrl.logicalFlow">
             <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
-                <div ng-if="ctrl.canEdit">
+                <div ng-if="ctrl.dataFlowProposalsEnabled || ctrl.canEdit">
                     <button
                             ng-if="!ctrl.dataFlowProposalsEnabled"
                             class="btn btn-xs btn-danger"
@@ -107,8 +107,10 @@
                                 <waltz-svelte-component
                                     component="ctrl.ReasonSelection"
                                     rating-scheme-ext-id="ctrl.ratingSchemeExtId"
-                                    type="ctrl.type"
-                                    propose-delete-flow="ctrl.proposeDeleteFlow"
+                                    proposal-type="ctrl.type"
+                                    propose-delete-flow="ctrl.proposeDeleteFlow",
+                                    physical-flow-id="ctrl.physicalFlow.id"
+                                    logical-flow-id="ctrl.physicalFlow.logicalFlowId"
                                     cancel-propose-delete-flow="ctrl.showReason"
                                 >
                                 </waltz-svelte-component>
