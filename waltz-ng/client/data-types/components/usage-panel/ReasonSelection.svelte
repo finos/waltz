@@ -104,7 +104,7 @@
         {#if type === PROPOSAL_TYPES.DELETE}
             <div style="display: flex; justify-content: flex-end;margin: 0;gap: 0.5rem">
                 <button class="btn btn-sm btn-primary"
-                        disabled={!workingCopy.rating || workingCopy.rating.length === 0}>
+                        disabled={!workingCopy?.rating?.length}>
                     Submit
                 </button>
                 <button type="button" class="btn btn-sm" on:click={cancel}>
