@@ -1,124 +1,98 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
-import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
-import org.finos.waltz.model.physical_specification.DataFormatKindValue;
-import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.ProposalType;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
+import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowPermissionService;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.finos.waltz.model.EntityKind.APPLICATION;
-import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
-import static org.finos.waltz.model.EntityReference.mkRef;
-
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     ProposedFlowWorkflowPermissionService proposedFlowWorkflowPermissionService;
 
+    @Autowired
+    private PersonHelper personHelper;
+
+    @Autowired
+    private InvolvementHelper involvementHelper;
+
+    @Autowired
+    private PermissionGroupHelper permissionHelper;
+
+    @Autowired
+    private AppHelper appHelper;
+
+    private final String stem = "pgst";
+
     @Test
     void testShouldBuildPermissionWithCorrectOperationSets() {
 
         // 1. Arrange ----------------------------------------------------------
-        String username = "testUser";
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.a);
 
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        String userName = mkName(stem, "user1");
+        Long personA = personHelper.createPerson(userName);
 
-        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
-                .logicalFlowId(12345)
-                .physicalFlowId(12345)
-                .reason(reason)
-                .specification(physicalSpecification)
-                .flowAttributes(flowAttributes)
-                .dataTypeIds(dataTypeIdSet)
-                .proposalType(ProposalType.valueOf("CREATE"))
-                .build();
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_a");
+        involvementHelper.createInvolvement(personA, involvementKind, appA);
+        involvementHelper.createInvolvement(personA, involvementKind, appB);
 
-        EntityReference sourceEntityReference = command.source();
-        EntityReference targetEntityReference = command.target();
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, stem);
+        PermissionGroupRecord pg = permissionHelper.setupPermissionGroupForProposedFlow(appA, ig, stem);
+        PermissionGroupRecord pg_1 = permissionHelper.setupPermissionGroupForProposedFlow(appB, ig, stem);
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg.getId(),
+                EntityKind.PROPOSED_FLOW,
+                EntityKind.APPLICATION,
+                Operation.APPROVE,
+                null);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg.getId(),
+                EntityKind.PROPOSED_FLOW,
+                EntityKind.APPLICATION,
+                Operation.REJECT,
+                null);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg_1.getId(),
+                EntityKind.PROPOSED_FLOW,
+                EntityKind.APPLICATION,
+                Operation.APPROVE,
+                null);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg_1.getId(),
+                EntityKind.PROPOSED_FLOW,
+                EntityKind.APPLICATION,
+                Operation.REJECT,
+                null);
 
         // 2. Act --------------------------------------------------------------
-        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(username, sourceEntityReference, targetEntityReference);
+        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(userName, appA, appB);
 
         // 3. Assert -----------------------------------------------------------
-                /*assertThat(proposeFlowPermission.sourceApprover())
-                .containsExactlyInAnyOrderElementsOf(
-                        proposedFlowWorkflowPermissionService.fetchPermittedOperationsForUser(username, sourceEntityReference));*/
-
         assertNotNull(proposeFlowPermission);
-    }
-
-    private Reason getReason() {
-        return ImmutableReason.builder()
-                .description("test")
-                .ratingId(1)
-                .build();
-    }
-
-    private EntityReference getOwningEntity() {
-        return ImmutableEntityReference.builder()
-                .id(18703)
-                .kind(APPLICATION)
-                .name("AMG")
-                .externalId("60487-1")
-                .description("Testing")
-                .entityLifecycleStatus(ACTIVE)
-                .build();
-    }
-
-    private PhysicalSpecification getPhysicalSpecification(EntityReference owningEntity) {
-        return ImmutablePhysicalSpecification.builder()
-                .id(1L)
-                .owningEntity(owningEntity)
-                .name("mc_specification")
-                .description("mc_specification description")
-                .format(DataFormatKindValue.of("DATABASE"))
-                .lastUpdatedBy("waltz")
-                .externalId("mc-extId001")
-                .build();
-    }
-
-    private FlowAttributes getFlowAttributes() {
-        return ImmutableFlowAttributes.builder()
-                .name("mc_deliverCharacterstics")
-                .transport(TransportKindValue.of("UNKNOWN"))
-                .frequency(FrequencyKindValue.of("QUARTERLY"))
-                .basisOffset(0)
-                .criticality(CriticalityValue.of("low"))
-                .description("testing")
-                .externalId("567s")
-                .build();
-    }
-
-    private Set<Long> getDataTypeIdSet() {
-        Set<Long> dataTypeIdSet = new HashSet<>();
-        dataTypeIdSet.add(41200L);
-
-        return dataTypeIdSet;
+        assertTrue(proposeFlowPermission.sourceApprover().size() > 1);
+        assertTrue(proposeFlowPermission.targetApprover().size() > 1);
     }
 }
