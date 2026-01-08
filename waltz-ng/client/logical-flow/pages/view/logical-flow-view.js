@@ -26,6 +26,7 @@ import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
 import AlignedDataTypesList from "../../components/aligned-data-types-list/AlignedDataTypesList.svelte";
 import {copyTextToClipboard} from "../../../common/browser-utils";
+import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
 const initialState = {
@@ -38,8 +39,7 @@ const initialState = {
     updateCommand: {
         readOnly: false,
     },
-    AlignedDataTypesList,
-    dataFlowProposalsRatingSchemeSetting:null
+    AlignedDataTypesList
 };
 
 function controller($q,
@@ -53,7 +53,6 @@ function controller($q,
 
     vm.$onInit = () => {
         const flowId = $stateParams.id;
-        const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
 
         vm.entityReference = {
             id: flowId,
@@ -98,8 +97,7 @@ function controller($q,
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 let settings = r.data;
-                vm.dataFlowProposalsEnabled= settings
-                    .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0].value === "true";
+                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(settings)
             });
 
     };
