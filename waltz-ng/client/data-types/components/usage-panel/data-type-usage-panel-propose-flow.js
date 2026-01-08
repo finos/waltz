@@ -51,6 +51,7 @@ const initialState = {
     ratingSchemeExtId:null,
     dataFlowProposalsEnabled:null,
     selectedReason:null,
+    isReasonSelected:false,
     proposalType:PROPOSAL_TYPES.EDIT,
     duplicateProposeFlowMessage,
     existingProposeFlowId
@@ -107,6 +108,7 @@ function controller(serviceBroker, userService, $q) {
 
     editDataTypeReason.subscribe(value => {
         vm.selectedReason = value;
+        vm.isReasonSelected = !_.isEmpty(vm.selectedReason?.rating);
     });
 
     vm.onSave = () => {
