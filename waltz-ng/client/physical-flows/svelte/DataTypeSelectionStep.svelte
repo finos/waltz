@@ -47,6 +47,8 @@
 
     $: expanded = _.includes($expandedSections, sections.DATA_TYPE);
 
+    $: done = dataTypeList.length>0
+
     function skip() {
         $skipDataTypes = true;
     }
@@ -108,6 +110,7 @@
 
             <br>
             <button class="btn btn-skinny"
+                    disabled={!done}
                     on:click={() => updateDataTypes()}>
                 Done
             </button>
