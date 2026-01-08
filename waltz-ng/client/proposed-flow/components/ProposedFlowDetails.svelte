@@ -22,7 +22,7 @@
         { key: "Target External ID", value: safe(flowDef?.target?.externalId) },
         {
             key: "Name",
-            entityRef: proposedFlow.workflowState.state === STATES.FULLY_APPROVED? {
+            entityRef: proposedFlow?.physicalFlowId? {
                 id:proposedFlow?.physicalFlowId,
                 name:safe(flowDef?.flowAttributes?.name) || safe(flowDef?.specification?.name),
                 kind:"PHYSICAL_FLOW"
