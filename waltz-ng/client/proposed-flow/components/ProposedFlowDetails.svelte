@@ -2,7 +2,9 @@
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
     import { safe,STATES } from "../utils";
+    import toBasisOffsetFilter from "../../common/filters/to-basis-offset-filter";
 
+    const toBasisOffsetFilterFn = toBasisOffsetFilter();
     export let proposedFlow = {};
 
     $: flowDef = proposedFlow?.flowDef || {};
@@ -29,7 +31,7 @@
             }:null,
             value: safe(flowDef?.flowAttributes?.name) || safe(flowDef?.specification?.name)
         },
-        { key: "Basis Offset", value: safe(flowDef?.flowAttributes?.basisOffset) },
+        { key: "Basis Offset", value: toBasisOffsetFilterFn(safe(flowDef?.flowAttributes?.basisOffset)) },
         { key: "Criticality", value: safe(flowDef?.flowAttributes?.criticality) },
         { key: "Transport", value: safe(flowDef?.flowAttributes?.transport) },
         { key: "Frequency", value: safe(flowDef?.flowAttributes?.frequency) },
