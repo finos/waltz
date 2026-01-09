@@ -54,7 +54,7 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
         String userName = mkName(stem, "user1");
         Long personA = personHelper.createPerson(userName);
 
-        long involvementKind = involvementHelper.mkInvolvementKind("rel_a");
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_ab");
         involvementHelper.createInvolvement(personA, involvementKind, appA);
         involvementHelper.createInvolvement(personA, involvementKind, appB);
 
