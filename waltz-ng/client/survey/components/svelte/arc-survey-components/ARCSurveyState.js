@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016 - 2026 Waltz open source project
  * See README.md for more information
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,7 @@
  *
  */
 
-export const FILTER_CHANGED_EVENT = "waltz::filters::changed";
-export const DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
-export const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
-export const PROPOSAL_OUTCOMES = {
-    SUCCESS: "SUCCESS",
-    FAILURE: "FAILURE"
-}
+import {writable} from "svelte/store";
 
-export const ARC_DROPDOWN_LABEL= "feature.arc.dropdown-label";
-export const ARC_EXTERNAL_URL= "feature.arc.external-url";
+export const arcSurveyState = writable([]);
+export const invalidRows = writable([]);

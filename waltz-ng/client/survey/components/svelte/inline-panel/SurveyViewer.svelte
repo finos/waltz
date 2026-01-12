@@ -14,8 +14,10 @@
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import CopySurveyResponsesPanel from "./CopySurveyResponsesPanel.svelte";
-    import Icon from "../../../../widgets/icon";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import ARCTable from "../arc-survey-components/ARCTable.svelte";
+    import { surveyCustomFieldTypes } from "../../survey-custom-fields";
+    import ARCSurveyComponent from "../arc-survey-components/ARCSurveyComponent.svelte";
 
     export let primaryEntityRef;
 
@@ -70,37 +72,38 @@
 
                 {#each section?.questions as question}
                     <div class="row section-question">
-                        <div class="col-md-6 help-block">
-                            <div>
-                                {question?.questionText}
-                                {#if question?.isMandatory}
-                                    <span class="mandatory"
-                                          title="This question is mandatory">*</span>
+                        {#if !surveyCustomFieldTypes[question.fieldType]}
+                            <div class="col-md-6 help-block">
+                                <div>
+                                    {question?.questionText}
+                                    {#if question?.isMandatory}
+                                        <span class="mandatory"
+                                              title="This question is mandatory">*</span>
+                                    {/if}
+                                </div>
+                                {#if question?.externalId}
+                                    <div class="text-muted small"
+                                         style="word-break: break-all">
+                                        ({question?.externalId})
+                                    </div>
+                                {/if}
+                                {#if question?.helpText}
+                                    <div class="text-muted small"
+                                         style="padding-top: 1em">
+                                        <Markdown text={question?.helpText}/>
+                                    </div>
                                 {/if}
                             </div>
-                            {#if question?.externalId}
-                                <div class="text-muted small"
-                                     style="word-break: break-all">
-                                    ({question?.externalId})
-                                </div>
-                            {/if}
-                            {#if question?.helpText}
-                                <div class="text-muted small"
-                                     style="padding-top: 1em">
-                                    <Markdown text={question?.helpText}/>
-                                </div>
-                            {/if}
-                        </div>
-                        <div class:col-md-6={_.isEmpty(question?.subQuestions)}
-                             class:col-md-2={!_.isEmpty(question?.subQuestions)}
-                             class="force-wrap">
-                            {#if question?.label}
-                                <div class="help-block sub-question-label">{question.label}</div>
-                            {/if}
-                            <SurveyQuestionResponse {question}
-                                                    response={_.get($responsesByQuestionId, question.id, null)}/>
-                        </div>
-                        {#if question.subQuestions}
+                            <div class:col-md-6={_.isEmpty(question?.subQuestions)}
+                                 class:col-md-2={!_.isEmpty(question?.subQuestions)}
+                                 class="force-wrap">
+                                {#if question?.label}
+                                    <div class="help-block sub-question-label">{question.label}</div>
+                                {/if}
+                                <SurveyQuestionResponse {question}
+                                                        response={_.get($responsesByQuestionId, question.id, null)}/>
+                            </div>
+                            {#if question.subQuestions}
                             {#each question?.subQuestions as subQuestion}
                                 <div class="col-md-2">
                                     {#if question?.label}
@@ -110,6 +113,11 @@
                                                             response={_.get($responsesByQuestionId, subQuestion.id, null)}/>
                                 </div>
                             {/each}
+                            {/if}
+                        {:else if question.fieldType === surveyCustomFieldTypes.ARC}
+                            <ARCSurveyComponent question={question}
+                                                instanceId={$surveyDetails?.surveyInstance?.id}
+                                                currentResponse={$responsesByQuestionId[question?.id]?.jsonResponse}/>
                         {/if}
                     </div>
                 {/each}

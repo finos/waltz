@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016 - 2026 Waltz open source project
  * See README.md for more information
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,14 @@
  *
  */
 
-export const FILTER_CHANGED_EVENT = "waltz::filters::changed";
-export const DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
-export const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
-export const PROPOSAL_OUTCOMES = {
-    SUCCESS: "SUCCESS",
-    FAILURE: "FAILURE"
-}
+/*
+  This is a map of all the custom field types that we have or may have in waltz
 
-export const ARC_DROPDOWN_LABEL= "feature.arc.dropdown-label";
-export const ARC_EXTERNAL_URL= "feature.arc.external-url";
+  Can be used to configure custom fields that may be required; apart from the available
+  fields that waltz currently provides.
+
+  These fieldTypes are custom in the sense that they have their own 'custom rendering.'
+ */
+export const surveyCustomFieldTypes = {
+    ARC: "ARC", // BETA field type
+};
