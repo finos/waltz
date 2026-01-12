@@ -14,7 +14,7 @@
     <thead>
     <tr>
         <th>
-            Transport Kind
+            Kind
         </th>
         <th>
             Description
