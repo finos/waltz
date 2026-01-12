@@ -31,5 +31,6 @@ public enum SurveyQuestionFieldType {
     NUMBER,
     PERSON,
     TEXT,
-    TEXTAREA
+    TEXTAREA,
+    ARC
 }
