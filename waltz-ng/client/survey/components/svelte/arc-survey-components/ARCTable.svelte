@@ -19,7 +19,6 @@
 <script>
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import ArcTooltip from "./ARCTooltip.svelte";
-    import ARCSubQuestions from "./ARCSubQuestions.svelte";
     import {arcSurveyState, invalidRows} from "./ARCSurveyState";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import ARCTree from "./ARCTree.svelte";
@@ -46,14 +45,6 @@
         VIEW: "VIEW",
         EDIT: "EDIT"
     }
-
-    const requiredQuestionFields = (question) => (
-        {
-            id: question.id,
-            externalId: question.externalId,
-            fieldType: question.fieldType
-        }
-    );
 
     const getArcRow = (arcId) => {
         return $arcSurveyState.find(t => t.entityRef.id === arcId);
@@ -148,7 +139,6 @@
         "Milestones",
         dropdownDefinition?.label ?? DEFAULT_DROPDOWN_DEFINITION.label,
         "Applicable ARCs",
-        ...(question?.subQuestions || []).map(q => q?.label),
     ];
 
     $: parsedCurrentResponse = (() => {
@@ -165,38 +155,11 @@
         .map(arc => (
             {
                 entityRef: arc,
-
-                questions: question?.subQuestions && [...question?.subQuestions?.map((t) => (
-                    {
-                        ...requiredQuestionFields(t),
-                        response: undefined
-                    }
-                ))],
-
                 response: [],
-
                 // by default the dropdown should be toggled to not show the tree
                 dropdownResponse: null
             }
         ));
-
-
-    // current row arc Id, question Id for which we are updating the response, the actual response
-    const updateResponse = (arcId, questionId, response) => {
-        console.log(response);
-
-        $arcSurveyState = $arcSurveyState.map(t => {
-            if(t.entityRef.id === arcId) {
-                t.questions = t?.questions?.map(q => {
-                    if(q.id === questionId) {
-                        q.response = response;
-                    }
-                    return q;
-                })
-            }
-            return t;
-        });
-    }
 
     const updateDropdownResponse = (arcId, response) => {
         $arcSurveyState = $arcSurveyState
@@ -360,20 +323,6 @@
                                      {url}/>
                         {/if}
                     </td>
-
-
-                    <!-- Sub Questions -->
-                    {#if question?.subQuestions}
-                    {#each question.subQuestions as subQuestion}
-                        <td>
-                        <!-- RENDERER FOR SUBQUESTION -->
-                            <ARCSubQuestions question={subQuestion}
-                                             selectResponse={(r) => updateResponse(arc?.id, subQuestion?.id, r)}
-                                             mode={mode}
-                                             response={getArcRow(arc.id)?.questions?.find(q => q?.id === subQuestion?.id)?.response ?? "-"}/>
-                        </td>
-                    {/each}
-                    {/if}
                 </tr>
             {/each}
         {/if}
