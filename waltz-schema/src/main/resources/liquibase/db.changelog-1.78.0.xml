@@ -93,9 +93,13 @@
                     type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-
             <column name="provenance"
                     type="VARCHAR(255)"/>
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
