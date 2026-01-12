@@ -50,10 +50,7 @@
             </column>
             <column name="external_id"
                     type="VARCHAR(64)"
-                    remarks="External Id of the ARC">
-                <constraints unique="true"
-                             nullable="false"/>
-            </column>
+                    remarks="External Id of the ARC"/>
             <column name="title"
                     type="VARCHAR(255)"
                     remarks="Title of the ARC"/>
@@ -66,7 +63,7 @@
                     type="VARCHAR(64)"/>
             <column name="milestone_forecast_date"
                     type="DATETIME"/>
-            <column name="parent_external_id"
+            <column name="external_parent_id"
                     type="VARCHAR(64)"/>
             <column name="linked_entity_id"
                     type="bigint"/>
@@ -104,10 +101,17 @@
     </changeSet>
 
     <changeSet id="20260106-4813-3" author="jainshrk">
-        <createIndex indexName="arc_parent_external_id_idx"
+        <createIndex indexName="arc_external_parent_id_idx"
                      tableName="architecture_required_change"
                      unique="false">
-            <column name="parent_external_id"/>
+            <column name="external_parent_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20260106-4813-4" author="jainshrk">
+        <createIndex indexName="arc_external_id_idx"
+                     tableName="architecture_required_change"
+                     unique="false">
+            <column name="external_id"/>
         </createIndex>
     </changeSet>
 
