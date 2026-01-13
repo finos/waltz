@@ -4,8 +4,8 @@
     import { safe,STATES } from "../utils";
     import toBasisOffsetFilter from "../../common/filters/to-basis-offset-filter";
 
-    const toBasisOffsetFilterFn = toBasisOffsetFilter();
     export let proposedFlow = {};
+    const toBasisOffsetFilterFn = toBasisOffsetFilter();
 
     $: flowDef = proposedFlow?.flowDef || {};
 
