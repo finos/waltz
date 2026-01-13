@@ -28,6 +28,8 @@ import org.finos.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
@@ -47,6 +49,8 @@ import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 
 public class FinosLicenceComplianceImporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FinosLicenceComplianceImporter.class);
 
     public static final String PROVENANCE = "finos";
     private static final String ENTITY_NOTE_CONDITIONS_NAME = "Conditions";
@@ -104,8 +108,7 @@ public class FinosLicenceComplianceImporter {
 
         List<LicenceCompliance> compliances = parseData(path);
 
-        System.out.printf("Parsed %s licence compliance files \n", compliances.size());
-
+        LOG.debug("Parsed {} licence compliance files \n",  compliances.size());
         Map<String, Licence> licencesByExternalId = licenceDao.findAll()
                 .stream()
                 .filter(l -> l.externalId().isPresent())
@@ -146,8 +149,7 @@ public class FinosLicenceComplianceImporter {
 
         int[] noteStoreExecute = dsl.batchStore(notes).execute();
 
-        System.out.println("Entity Note records stored: " + noteStoreExecute.length);
-
+        LOG.debug("Entity Note records stored: " + noteStoreExecute.length);
     }
 
 
@@ -311,7 +313,7 @@ public class FinosLicenceComplianceImporter {
                     .map(Optional::get)
                     .collect(toList());
 
-            System.out.printf("Parsed %s FINOS licence files \n", compliances.size());
+            LOG.debug("Parsed {} FINOS licence files", compliances.size());
             return compliances;
         }
     }
@@ -319,7 +321,7 @@ public class FinosLicenceComplianceImporter {
 
     private Optional<LicenceCompliance> parseCompliance(Path path) {
         try {
-            System.out.println("Parsing: " + path);
+            LOG.debug("Parsing: " + path);
             LicenceCompliance compliance = getYamlMapper().readValue(path.toFile(), LicenceCompliance.class);
             return Optional.of(compliance);
         } catch (IOException e) {
@@ -333,7 +335,7 @@ public class FinosLicenceComplianceImporter {
                 .where(ENTITY_NAMED_NOTE.PROVENANCE.eq(PROVENANCE))
                 .execute();
 
-        System.out.printf("Deleted %s compliance notes \n", deleteCount);
+        LOG.debug("Deleted {} compliance notes", deleteCount);
     }
 
 }

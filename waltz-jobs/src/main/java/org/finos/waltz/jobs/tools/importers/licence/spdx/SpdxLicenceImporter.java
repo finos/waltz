@@ -27,6 +27,8 @@ import org.finos.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.schema.tables.records.LicenceRecord;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
@@ -48,6 +50,7 @@ import static org.finos.waltz.schema.tables.Bookmark.BOOKMARK;
 import static org.finos.waltz.schema.tables.Licence.LICENCE;
 
 public class SpdxLicenceImporter {
+    private static final Logger LOG = LoggerFactory.getLogger(SpdxLicenceImporter.class);
 
     public static final String PROVENANCE = "spdx";
     private static final String SPDX_LICENCE_TEMPLATE_URL = "https://spdx.org/licenses/%s.html";
@@ -110,7 +113,7 @@ public class SpdxLicenceImporter {
 
         int[] execute = dsl.batchStore(records).execute();
 
-        System.out.println("Licence records stored to database: " + execute.length);
+        LOG.debug("Licence records stored to database: " + execute.length);
 
 
         // now create bookmarks from seeAlso section
@@ -164,7 +167,7 @@ public class SpdxLicenceImporter {
 
         int[] bookmarkStoreExecute = dsl.batchStore(bookmarks).execute();
 
-        System.out.println("Bookmark records stored: " + bookmarkStoreExecute.length);
+        LOG.debug("Bookmark records stored: " + bookmarkStoreExecute.length);
     }
 
 
@@ -173,7 +176,7 @@ public class SpdxLicenceImporter {
                 .where(BOOKMARK.PROVENANCE.eq(PROVENANCE))
                 .execute();
 
-        System.out.printf("Deleted %s licence bookmarks \n", bookmarkDeleteCount);
+        LOG.debug("Deleted {}} licence bookmarks", bookmarkDeleteCount);
     }
 
 
@@ -189,7 +192,7 @@ public class SpdxLicenceImporter {
                     .map(l -> l.get())
                     .collect(toList());
 
-            System.out.printf("Parsed %s SPDX licence files \n", spdxLicences.size());
+            LOG.debug("Parsed {}} SPDX licence files", spdxLicences.size());
             return spdxLicences;
         }
     }
@@ -198,11 +201,11 @@ public class SpdxLicenceImporter {
     private Optional<SpdxLicence> parseSpdxLicence(Path path) {
 
         try {
-            System.out.println("Parsing: " + path);
+            LOG.debug("Parsing: " + path);
             SpdxLicence spdxLicence = mapper.readValue(path.toFile(), SpdxLicence.class);
             return Optional.of(spdxLicence);
         } catch (IOException e) {
-            System.out.println(e);
+            LOG.error("Error whilst parsing spdx licence file", e);
             return Optional.empty();
         }
     }
