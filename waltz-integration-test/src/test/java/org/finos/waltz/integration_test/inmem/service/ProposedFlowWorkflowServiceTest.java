@@ -50,6 +50,8 @@ import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -59,8 +61,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
@@ -68,7 +70,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
     private static final String USER_NAME = "testUser";
@@ -96,6 +97,14 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @Autowired
     PhysicalFlowDao physicalFlowDao;
+
+    @Autowired
+    private DSLContext dsl;
+
+    @BeforeEach
+    public void removePhysicalFlowData() {
+        dsl.deleteFrom(PHYSICAL_FLOW).execute();
+    }
 
     @Test
     public void testProposedNewFlow() {
@@ -126,7 +135,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(response);
     }
 
-    //    @Test
+      //  @Test
     public void testGetProposedFlowDefinition() {
 
         // 1. Arrange ----------------------------------------------------------
