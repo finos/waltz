@@ -48,7 +48,7 @@ public class PermissionGroupHelper {
         return pg;
     }
 
-    public PermissionGroupRecord setupPermissionGroupForProposedFlow(EntityReference appRef, InvolvementGroupRecord ig, String pgNameStem) {
+    public PermissionGroupRecord setupPermissionGroupForProposedFlow(EntityReference appRef, InvolvementGroupRecord ig, String pgNameStem, Operation operation) {
         PermissionGroupRecord pg = createGroup(pgNameStem);
 
         setupPermissionGroupEntry(appRef, pg.getId());
@@ -57,7 +57,7 @@ public class PermissionGroupHelper {
                 pg.getId(),
                 EntityKind.PROPOSED_FLOW,
                 EntityKind.APPLICATION,
-                Operation.APPROVE,
+                operation,
                 null);
 
         return pg;
