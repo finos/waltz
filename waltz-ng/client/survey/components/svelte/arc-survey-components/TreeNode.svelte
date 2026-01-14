@@ -53,7 +53,7 @@
 </script>
 
 <div class="tree-node">
-    <Tooltip content={tooltipContent} props={{node, url}}>
+    <Tooltip content={tooltipContent} props={{node, url}} placement="right">
         <div class="node-label" slot="target">
             {#if node.children && node.children.length > 0}
                 <button class="toggle-btn" on:click={toggle}>

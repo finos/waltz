@@ -91,7 +91,7 @@ public class ArchitectureRequiredChangeServiceTest extends BaseInMemoryIntegrati
     @Test
     public void getArcForLinkedEntityTest() {
         ChangeInitiative ci1 = ciService.findByExternalId("ci1").stream().findFirst().get();
-        List<ArchitectureRequiredChange> arcs = arcService.findForLinkedEntity(ci1.entityReference());
+        List<ArchitectureRequiredChange> arcs = arcService.findForLinkedEntityHierarchy(ci1.entityReference());
         assertTrue(arcs.size() == 3); //arc1, arc2, and arc3 must be linked via hierarchy
 
         // for arc linked to ou

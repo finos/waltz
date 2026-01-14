@@ -28,10 +28,16 @@
     import {onDestroy} from "svelte";
     import toastStore from "../../../../svelte-stores/toast-store";
     import {ARC_DROPDOWN_LABEL, ARC_EXTERNAL_URL} from "../../../../common/constants";
+    import {architectureRequiredChangeStore} from "../../../../svelte-stores/architecture-required-changes";
+    import {mkRef} from "../../../../common/entity-utils";
+    import DateTime from "../../../../common/svelte/DateTime.svelte";
+
     export let instanceId;
     export let question;
     export let currentResponse = "";
     export let mode;
+    export let linkedEntityKind = null;
+    export let linkedEntityId = null;
 
     let savingResponse = false;
 
@@ -62,116 +68,29 @@
         }
     }
 
-    $: settingsCall = settingsStore.loadAll();
+    const mkResponseObject = (arc, response = [], dropdownResponse = null) => ({
+        entityRef: arc,
+        response: response,
+        dropdownResponse: dropdownResponse
+    })
 
-    $: settings = $settingsCall?.data;
-
-    $: dropdownSettingValue = settings?.find(t => t.name === ARC_DROPDOWN_LABEL)?.value;
-
-    $: parsedDropdownSettingValue = dropdownSettingValue && parseJSON(dropdownSettingValue);
-
-    $: dropdownDefinition = parsedDropdownSettingValue || DEFAULT_DROPDOWN_DEFINITION;
-
-    $: dropdownItems = dropdownDefinition?.options.map(t => ({name: t}));
-
-    $: urlSetting = settings?.find(t => t.name === ARC_EXTERNAL_URL)?.value;
-
-    $: url = urlSetting ?? null;
-
-    $: mode = (mode === MODES.VIEW || mode === MODES.EDIT) ? mode : MODES.VIEW;
-
-    const arcExamples = [
-        {
-            id: 1,
-            externalId: "ARC-4913",
-            title: "ARC-4913",
-            description: "This is an architecturally required change.",
-            status: "Green",
-            milestoneRag: "A",
-            milestoneForecastDate: "11/02/2026 14:22:34",
-            parentExternalId: "ARC-4407",
-            linkedEntityId: 12,
-            linkedEntityKind: "CHANGE_INITIATIVE"
-        },
-        {
-            id: 2,
-            externalId: "ARC-4407",
-            title: "ARC-4407",
-            description: "This is an architecturally required change.",
-            status: "Green",
-            milestoneRag: "A",
-            milestoneForecastDate: "11/02/2026 14:22:34",
-            parentExternalId: null,
-            linkedEntityId: 12,
-            linkedEntityKind: "CHANGE_INITIATIVE"
-        },
-        {
-            id: 3,
-            externalId: "ARC-4408",
-            title: "ARC-4408",
-            description: "This is an architecturally required change.",
-            status: "Green",
-            milestoneRag: "A",
-            milestoneForecastDate: "11/02/2026 14:22:34",
-            parentExternalId: "ARC-4407",
-            linkedEntityId: 12,
-            linkedEntityKind: "CHANGE_INITIATIVE"
-        },
-        {
-            id: 4,
-            externalId: "ARC-4402",
-            title: "ARC-4402",
-            description: "This is an architecturally required change.",
-            status: "Green",
-            milestoneRag: "A",
-            milestoneForecastDate: "11/02/2026 14:22:34",
-            parentExternalId: "ARC-4408",
-            linkedEntityId: 12,
-            linkedEntityKind: "CHANGE_INITIATIVE"
+    const updateDropdownResponse = (arcId, dropdownResponse) => {
+        if(getArcRow(arcId)) {
+            $arcSurveyState = $arcSurveyState
+                .map(t => {
+                    if (t.entityRef.id === arcId) {
+                        t = {
+                            ...t,
+                            dropdownResponse: dropdownResponse
+                        }
+                    }
+                    return t;
+                })
+        } else {
+            const arc = arcs.find(t => t.id === arcId);
+            const responseObject = mkResponseObject(arc, [], dropdownResponse);
+            $arcSurveyState = [...$arcSurveyState, responseObject];
         }
-    ]
-
-    const arcs = [...arcExamples];
-
-
-    $: tableHeadings = [
-        "ARC",
-        "Milestones",
-        dropdownDefinition?.label ?? DEFAULT_DROPDOWN_DEFINITION.label,
-        "Applicable ARCs",
-    ];
-
-    $: parsedCurrentResponse = (() => {
-        try {
-            if(!currentResponse) return null;
-            const {responseType, ...rest} = JSON.parse(currentResponse);
-            return rest.responses;
-        } catch (e) {
-            return null;
-        }
-    })();
-
-    $: $arcSurveyState = parsedCurrentResponse ?? arcs
-        .map(arc => (
-            {
-                entityRef: arc,
-                response: [],
-                // by default the dropdown should be toggled to not show the tree
-                dropdownResponse: null
-            }
-        ));
-
-    const updateDropdownResponse = (arcId, response) => {
-        $arcSurveyState = $arcSurveyState
-            .map(t => {
-            if(t.entityRef.id === arcId) {
-                t = {
-                    ...t,
-                    dropdownResponse: response
-                }
-            }
-            return t;
-        })
     }
 
     const selectTreeItem = (arcId, item) => {
@@ -210,6 +129,8 @@
                     $invalidRows = [...$invalidRows.filter(x => x?.id !== t?.entityRef?.id),
                         {id: t?.entityRef?.id, message: `You have selected ${t?.dropdownResponse}, but did not select an ARC`}];
                     displayError(`You have selected ${t?.dropdownResponse}, but did not select an ARC`);
+                } else {
+                    $invalidRows = $invalidRows?.filter(x => x?.id !== t?.entityRef?.id);
                 }
             }
 
@@ -227,6 +148,10 @@
                 displayError(`You have not selected an option from the dropdown for ${t?.entityRef?.title}`);
             }
 
+            else {
+                $invalidRows = $invalidRows?.filter(x => x?.id !== t?.entityRef?.id);
+            }
+
             return t;
         });
 
@@ -234,6 +159,55 @@
             throw new Error("Error saving response");
         }
     }
+
+    $: settingsCall = settingsStore.loadAll();
+
+    $: settings = $settingsCall?.data;
+
+    $: dropdownSettingValue = settings?.find(t => t.name === ARC_DROPDOWN_LABEL)?.value;
+
+    $: parsedDropdownSettingValue = dropdownSettingValue && parseJSON(dropdownSettingValue);
+
+    $: dropdownDefinition = parsedDropdownSettingValue || DEFAULT_DROPDOWN_DEFINITION;
+
+    $: dropdownItems = dropdownDefinition?.options.map(t => ({name: t}));
+
+    $: urlSetting = settings?.find(t => t.name === ARC_EXTERNAL_URL)?.value;
+
+    $: url = urlSetting ?? null;
+
+    $: mode = (mode === MODES.VIEW || mode === MODES.EDIT) ? mode : MODES.VIEW;
+
+    $: linkedArcsCall = linkedEntityKind && linkedEntityId && architectureRequiredChangeStore
+        .findForLinkedEntity(mkRef(linkedEntityKind, linkedEntityId));
+
+    $: arcHierarchyCall = linkedEntityKind && linkedEntityId && architectureRequiredChangeStore
+        .findForLinkedEntityHierarchy(mkRef(linkedEntityKind, linkedEntityId));
+
+    $: arcs = $linkedArcsCall?.data;
+
+    $: arcHierarchy = $arcHierarchyCall?.data;
+
+
+    $: tableHeadings = [
+        "ARC",
+        "Milestones",
+        dropdownDefinition?.label ?? DEFAULT_DROPDOWN_DEFINITION.label,
+        "Applicable ARCs",
+    ];
+
+    $: parsedCurrentResponse = (() => {
+        try {
+            if(!currentResponse) return null;
+            const {responseType, ...rest} = JSON.parse(currentResponse);
+            return rest.responses;
+        } catch (e) {
+            return null;
+        }
+    })();
+
+    $: $arcSurveyState = parsedCurrentResponse ?? arcs
+        .map(arc => mkResponseObject(arc));
 
     $: saveJsonResponseCall = () => {
         try {
@@ -255,7 +229,7 @@
                 })
                 .catch((e) => {
                     savingResponse = false;
-                    console.error({erroe: e});
+                    console.error({error: e});
                 });
 
         } catch (e) {
@@ -287,7 +261,7 @@
                     <!-- Actual ARC -->
                     <td>
                         <Tooltip content={ArcTooltip}
-                                 props={{node: arc, url}}>
+                                 props={{node: arc, url}} placement="right">
                             <span slot="target" class="clickable secondary-link">{arc?.title}</span>
                         </Tooltip>
                     </td>
@@ -297,14 +271,14 @@
                         <h5>Rag Rating: {arc.milestoneRag}</h5>
                         <hr/>
                         <h5>Forecast Date</h5>
-                        <h5>{arc.milestoneForecastDate}</h5>
+                        <h5><DateTime relative={false}>{arc.milestoneForecastDate}</DateTime></h5>
                     </td>
 
                     <!-- Dropdown -->
                     <td>
                         {#if mode === MODES.EDIT}
                             <DropdownPicker items={dropdownItems}
-                                            onSelect={(r) => updateDropdownResponse(arc.id, r.name)}
+                                            onSelect={(r) => updateDropdownResponse(arc.id, r?.name ?? null)}
                                             selectedItem={getArcRow(arc.id)?.dropdownResponse ? {name: getArcRow(arc.id)?.dropdownResponse} : null}/>
                         {/if}
                         {#if mode === MODES.VIEW}
@@ -314,8 +288,8 @@
 
                     <!-- Tree -->
                     <td>
-                        {#if $arcSurveyState.find(t => t.entityRef.id === arc.id)?.dropdownResponse === dropdownDefinition.inclusionOption}
-                            <ARCTree items={arcs}
+                        {#if arcHierarchy && getArcRow(arc.id)?.dropdownResponse === dropdownDefinition.inclusionOption}
+                            <ARCTree items={arcHierarchy}
                                      onSelectItem={(r) => selectTreeItem(arc.id, r)}
                                      onDeselectItem={(r) => deselectTreeItem(arc.id, r)}
                                      selectedItems={getSelectedItems(arc.id)}

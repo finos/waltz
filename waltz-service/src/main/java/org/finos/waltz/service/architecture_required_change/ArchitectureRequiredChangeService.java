@@ -46,16 +46,20 @@ public class ArchitectureRequiredChangeService {
         return architectureRequiredChangeDao.getById(id);
     }
 
-    // get by externalId
     public ArchitectureRequiredChange getByExternalId(String externalId) {
         return architectureRequiredChangeDao.getByExternalId(externalId);
     }
+
     public List<ArchitectureRequiredChange> findForLinkedEntity(EntityReference ref) {
+            return architectureRequiredChangeDao.findForLinkedEntity(ref);
+    }
+
+    public List<ArchitectureRequiredChange> findForLinkedEntityHierarchy(EntityReference ref) {
         switch (ref.kind()) {
             case CHANGE_INITIATIVE:
                 return findForChangeInitiativeHierarchy(ref.id());
             default:
-                return architectureRequiredChangeDao.findForLinkedEntity(ref);
+                throw new UnsupportedOperationException(String.format("Cannot find for %s kind", ref.kind()));
         }
     }
 

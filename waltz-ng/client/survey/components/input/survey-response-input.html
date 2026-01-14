@@ -151,22 +151,14 @@
                            entity-kinds="['PERSON']">
     </waltz-entity-selector>
 
-    <!-- Placeholder for ARC -->
-    <!--<waltz-entity-selector ng-switch-when="PERSON"
-                           item-id="$ctrl.question.id"
-                           required="$ctrl.question.isMandatory"
-                           current-selection="$ctrl.response.entityResponse"
-                           on-select="$ctrl.saveEntityResponse"
-                           entity-lifecycle-statuses='["ACTIVE"]'
-                           entity-kinds="['PERSON']">
-    </waltz-entity-selector>-->
-
     <div ng-switch-when="ARC">
         <waltz-svelte-component component="$ctrl.ARCSurveyComponent"
                                 question="$ctrl.question"
                                 instance-id="$ctrl.instanceId"
                                 current-response="$ctrl.response.jsonResponse"
-                                mode="'EDIT'">
+                                mode="'EDIT'"
+                                linked-entity-kind="$ctrl.subject.kind"
+                                linked-entity-id="$ctrl.subject.id">
         </waltz-svelte-component>
     </div>
 

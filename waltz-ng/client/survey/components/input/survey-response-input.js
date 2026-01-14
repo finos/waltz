@@ -15,7 +15,8 @@ const bindings = {
     saveDateResponse: "<",
     saveEntityResponse: "<",
     saveEntityListResponse: "<",
-    saveListResponse: "<"
+    saveListResponse: "<",
+    subject: "<",
 };
 
 const initialState = {

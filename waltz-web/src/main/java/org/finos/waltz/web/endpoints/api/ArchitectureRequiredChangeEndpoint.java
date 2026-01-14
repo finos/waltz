@@ -1,5 +1,6 @@
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.architecture_required_change.ArchitectureRequiredChange;
 import org.finos.waltz.service.architecture_required_change.ArchitectureRequiredChangeService;
 import org.finos.waltz.web.DatumRoute;
@@ -30,6 +31,7 @@ public class ArchitectureRequiredChangeEndpoint implements Endpoint {
     public void register() {
         String findForLinkedEntityPath = mkPath(BASE_URL, "linked-entity", ":kind", ":id");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findForLinkedEntityHierarchyPath = mkPath(BASE_URL, "linked-entity-hierarchy", ":kind", ":id");
 
         ListRoute<ArchitectureRequiredChange> findForLinkedEntityRoute = (request, response)
                 -> architectureRequiredChangeService.findForLinkedEntity(getEntityReference(request));
@@ -37,8 +39,12 @@ public class ArchitectureRequiredChangeEndpoint implements Endpoint {
         DatumRoute<ArchitectureRequiredChange> getByIdRoute = (request, response)
                 -> architectureRequiredChangeService.getById(getId(request));
 
+        ListRoute<ArchitectureRequiredChange> findForLinkedEntityHierarchyRoute = (request, response)
+                -> architectureRequiredChangeService.findForLinkedEntityHierarchy(getEntityReference(request));
+
         getForList(findForLinkedEntityPath, findForLinkedEntityRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findForLinkedEntityHierarchyPath, findForLinkedEntityHierarchyRoute);
     }
 
 }

@@ -1,5 +1,4 @@
 <script>
-
     import {
         formDetails,
         groupedQuestions,
@@ -15,7 +14,6 @@
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import CopySurveyResponsesPanel from "./CopySurveyResponsesPanel.svelte";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
-    import ARCTable from "../arc-survey-components/ARCTable.svelte";
     import { surveyCustomFieldTypes } from "../../survey-custom-fields";
     import ARCSurveyComponent from "../arc-survey-components/ARCSurveyComponent.svelte";
 
@@ -117,7 +115,9 @@
                         {:else if question.fieldType === surveyCustomFieldTypes.ARC}
                             <ARCSurveyComponent question={question}
                                                 instanceId={$surveyDetails?.surveyInstance?.id}
-                                                currentResponse={$responsesByQuestionId[question?.id]?.jsonResponse}/>
+                                                currentResponse={$responsesByQuestionId[question?.id]?.jsonResponse}
+                                                linkedEntityKind={$surveyDetails?.surveyInstance?.surveyEntity?.kind}
+                                                linkedEntityId={$surveyDetails?.surveyInstance?.surveyEntity?.id}/>
                         {/if}
                     </div>
                 {/each}

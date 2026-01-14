@@ -17,13 +17,15 @@
   -->
 
 <script>
-import Markdown from "../../../../common/svelte/Markdown.svelte";
-import ARCTable from "./ARCTable.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import ARCTable from "./ARCTable.svelte";
 
-export let question = undefined;
-export let instanceId = undefined;
-export let currentResponse = undefined;
-export let mode = "VIEW";
+    export let question = undefined;
+    export let instanceId = undefined;
+    export let currentResponse = undefined;
+    export let mode = "VIEW";
+    export let linkedEntityKind = null;
+    export let linkedEntityId = null;
 </script>
 
 <div class="col-md-12 help-block">
@@ -51,5 +53,7 @@ export let mode = "VIEW";
     <ARCTable {question}
               {instanceId}
               {currentResponse}
-              {mode}/>
+              {mode}
+              {linkedEntityKind}
+              {linkedEntityId}/>
 </div>
