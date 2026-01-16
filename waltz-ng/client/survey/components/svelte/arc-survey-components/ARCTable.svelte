@@ -288,7 +288,7 @@
 
                     <!-- Tree -->
                     <td>
-                        {#if arcHierarchy && getArcRow(arc.id)?.dropdownResponse === dropdownDefinition.inclusionOption}
+                        {#if arcHierarchy && $arcSurveyState.find(t => t.entityRef.id === arc.id)?.dropdownResponse === dropdownDefinition?.inclusionOption}
                             <ARCTree items={arcHierarchy}
                                      onSelectItem={(r) => selectTreeItem(arc.id, r)}
                                      onDeselectItem={(r) => deselectTreeItem(arc.id, r)}

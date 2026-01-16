@@ -36,8 +36,8 @@
 
         const roots = [];
         itemMap.forEach(item => {
-            if (item.parentExternalId && itemMap.has(item.parentExternalId)) {
-                const parent = itemMap.get(item.parentExternalId);
+            if (item.externalParentId && itemMap.has(item.externalParentId)) {
+                const parent = itemMap.get(item.externalParentId);
                 if (parent) {
                     parent.children.push(item);
                 }
