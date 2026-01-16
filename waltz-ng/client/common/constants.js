@@ -23,3 +23,8 @@ export const PROPOSAL_OUTCOMES = {
     SUCCESS: "SUCCESS",
     FAILURE: "FAILURE"
 }
+export const PROPOSAL_TYPES = {
+    CREATE: "CREATE",
+    EDIT: "EDIT",
+    DELETE: "DELETE"
+}

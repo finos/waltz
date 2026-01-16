@@ -48,6 +48,21 @@ public class PermissionGroupHelper {
         return pg;
     }
 
+    public PermissionGroupRecord setupPermissionGroupForProposedFlow(EntityReference appRef, InvolvementGroupRecord ig, String pgNameStem, Operation operation) {
+        PermissionGroupRecord pg = createGroup(pgNameStem);
+
+        setupPermissionGroupEntry(appRef, pg.getId());
+        setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg.getId(),
+                EntityKind.PROPOSED_FLOW,
+                EntityKind.APPLICATION,
+                operation,
+                null);
+
+        return pg;
+    }
+
     public PermissionGroupRecord createGroup(String pgNameStem) {
         String pgName = mkName(pgNameStem, "_pg");
         PermissionGroupRecord pg = dsl.newRecord(PERMISSION_GROUP);
