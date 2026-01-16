@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ import java.util.Optional;
 public abstract class ArchitectureRequiredChange {
     public abstract long id();
     public abstract String externalId();
+
+    @Nullable
     public abstract String title();
     public abstract String description();
     public abstract String status();

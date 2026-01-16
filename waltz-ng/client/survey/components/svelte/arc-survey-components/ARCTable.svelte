@@ -62,15 +62,12 @@
 
     $: mode = (mode === MODES.VIEW || mode === MODES.EDIT) ? mode : MODES.VIEW;
 
-    $: linkedArcsCall = linkedEntityKind && linkedEntityId && architectureRequiredChangeStore
-        .findForLinkedEntity(mkRef(linkedEntityKind, linkedEntityId));
-
     $: arcHierarchyCall = linkedEntityKind && linkedEntityId && architectureRequiredChangeStore
         .findForLinkedEntityHierarchy(mkRef(linkedEntityKind, linkedEntityId));
 
-    $: arcs = $linkedArcsCall?.data;
+    $: arcs = $arcHierarchyCall?.data.filter(t => !t.externalParentId);
 
-    $: arcHierarchy = $arcHierarchyCall?.data;
+    $: arcHierarchy = $arcHierarchyCall?.data.filter(t => t.externalParentId);
 
 
     $: tableHeadings = [

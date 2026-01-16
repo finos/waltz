@@ -76,7 +76,7 @@
                     <!-- Tree -->
                     <td>
                         {#if arcHierarchy && getArcRow(arc.id)?.dropdownResponse === dropdownDefinition?.inclusionOption}
-                            <ARCTree items={arcHierarchy}
+                            <ARCTree items={arcHierarchy.filter(t => t.externalParentId === arc.externalId)}
                                      selectedItems={getArcRow(arc.id)?.response ?? []}
                                      mode={"VIEW"}
                                      {url}/>

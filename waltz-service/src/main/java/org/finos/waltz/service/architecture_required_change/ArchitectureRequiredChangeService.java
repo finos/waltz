@@ -29,6 +29,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.finos.waltz.model.EntityKind.CHANGE_INITIATIVE;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+
 @Service
 public class ArchitectureRequiredChangeService {
 
@@ -65,13 +69,19 @@ public class ArchitectureRequiredChangeService {
 
     private List<ArchitectureRequiredChange> findForChangeInitiativeHierarchy(Long id) {
         if(id != null) {
-            IdSelectionOptions options = IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.CHANGE_INITIATIVE, id));
+            IdSelectionOptions options = mkOpts(mkRef(CHANGE_INITIATIVE, id));
             List<EntityReference> changeInitiatives = changeInitiativeService
                     .findHierarchyForSelector(options)
                     .stream()
-                    .map(t -> EntityReference.mkRef(EntityKind.CHANGE_INITIATIVE, t.id().get()))
+                    .map(t -> mkRef(CHANGE_INITIATIVE, t.id().orElse(-1L)))
                     .toList();
-            return architectureRequiredChangeDao.findForLinkedEntities(changeInitiatives);
+            List<ArchitectureRequiredChange> linkedArcs = architectureRequiredChangeDao.findForLinkedEntities(changeInitiatives);
+            List<ArchitectureRequiredChange> childArcs = architectureRequiredChangeDao.findByExternalParentId(linkedArcs
+                    .stream()
+                    .map(ArchitectureRequiredChange::externalId)
+                    .toList());
+            linkedArcs.addAll(childArcs);
+            return linkedArcs;
         } else {
             return List.of();
         }

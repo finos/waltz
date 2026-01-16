@@ -138,4 +138,15 @@ public class ArchitectureRequiredChangeDao {
         return ARCHITECTURE_REQUIRED_CHANGE.LINKED_ENTITY_ID.in(ids)
             .and(ARCHITECTURE_REQUIRED_CHANGE.LINKED_ENTITY_KIND.eq(kind.name()));
     }
+
+    // find for list of externalParentId method
+    public List<ArchitectureRequiredChange> findByExternalParentId(List<String> externalParentIds) {
+        return dsl
+            .select(ARCHITECTURE_REQUIRED_CHANGE.fields())
+            .from(ARCHITECTURE_REQUIRED_CHANGE)
+            .where(ARCHITECTURE_REQUIRED_CHANGE.EXTERNAL_PARENT_ID.in(externalParentIds))
+            .and(mkLifecycleCondition(EntityLifecycleStatus.ACTIVE))
+            .fetch(TO_DOMAIN_MAPPER);
+    }
+
 }
