@@ -62,7 +62,7 @@
                     ng-click="ctrl.restoreFlow()">
                 Restore
             </button>
-            <button ng-if="ctrl.canRemove"
+            <button ng-if="!ctrl.dataFlowProposalsEnabled && ctrl.canRemove "
                     class="btn btn-xs btn-danger"
                     uib-popover="Remove this flow, any physical flows that are attached to the flow will also be removed"
                     popover-append-to-body="true"

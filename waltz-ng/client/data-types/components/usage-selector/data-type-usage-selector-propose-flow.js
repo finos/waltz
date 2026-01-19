@@ -23,11 +23,20 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./data-type-usage-selector.html";
 import {loadUsageData} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
+import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-flow-remote-store";
+import pageInfo from "../../../svelte-stores/page-navigation-store";
+import {PROPOSAL_TYPES} from "../../../common/constants";
+import {
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+import {handleProposalValidation} from "../../../common/utils/proposalValidation";
 
 const bindings = {
     parentEntityRef: "<",
     onDirty: "<?",
     onRegisterSave: "<?",
+    onRegisterSavePropose: "<?",
     onSelect: "<?"
 };
 
@@ -44,7 +53,21 @@ const initialState = {
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onSelect: (d) => console.log("dtus:onSelect - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f),
+    onRegisterSavePropose: (f) => console.log("dtus:onRegisterSavePropose - default impl", f)
 };
+
+
+function goToWorkflow(proposedFlowId) {
+    // Simple navigation using window.location
+    pageInfo.set({
+        state: "main.proposed-flow.view",
+        params: {
+            id: proposedFlowId
+        }
+    })
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
+}
 
 
 function mkSelectedTypeIds(usage = []) {
@@ -125,7 +148,38 @@ function controller($q, serviceBroker) {
         return serviceBroker
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
-                [vm.parentEntityRef, decoratorUpdateCommand]);
+                [ vm.parentEntityRef, decoratorUpdateCommand ]);
+    };
+
+    const doSavePropose = (command) => {
+        const decoratorUpdateCommand = mkDataTypeUpdateCommand(
+            vm.parentEntityRef,
+            vm.checkedItemIds,
+            vm.originalSelectedItemIds);
+        command.dataTypeIds=vm.originalSelectedItemIds
+        // Start with the original dataTypeIds from command
+        let updatedDataTypeIds = new Set(command.dataTypeIds || []);
+
+        // Add new IDs
+        (decoratorUpdateCommand.addedDataTypeIds || []).forEach(id => updatedDataTypeIds.add(id));
+
+        // Remove unwanted IDs
+        (decoratorUpdateCommand.removedDataTypeIds || []).forEach(id => updatedDataTypeIds.delete(id));
+
+        // Convert back to array and update the command
+        command.dataTypeIds = Array.from(updatedDataTypeIds);
+
+        return serviceBroker
+            .execute(
+                proposeDataFlowRemoteStore.proposeDataFlow(command)
+                    .then(r => {
+                        const response = r.data;
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.EDIT);
+                    })
+                    .catch(e => {
+                        console.error("Error proposing data flow", e);
+                    })
+            )
     };
 
     const anySelected = () => {
@@ -193,6 +247,10 @@ function controller($q, serviceBroker) {
             .then(() => reload(true));
     };
 
+    vm.savePropose = (command) => {
+        return doSavePropose(command)
+            .then(() => reload(true));
+    }
 
     vm.disablePredicate = (node) => {
         const isAbstract = !node.dataType.concrete;
@@ -201,11 +259,11 @@ function controller($q, serviceBroker) {
     };
 
     vm.isReadonlyPredicate = (node) => {
-        if (_.isNull(node.usage)) {
+        if(_.isNull(node.usage)){
             return false;
         } else {
             return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
-                ? node.usage.readOnly || !node.usage.isRemovable
+                ? node.usage.readOnly || ! node.usage.isRemovable
                 : node.usage.readOnly;
         }
     };
@@ -227,6 +285,7 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => {
         vm.onDirty(false);
         vm.onRegisterSave(vm.save);  // pass the save function out so it can be called (i.e. a save btn)
+        vm.onRegisterSavePropose(vm.savePropose)
         determineMessage();
 
         reload(true);
@@ -258,6 +317,5 @@ export default {
         bindings,
         controller
     },
-    id: "waltzDataTypeUsageSelector"
+    id: "waltzDataTypeUsageSelectorProposeFlow"
 };
-
