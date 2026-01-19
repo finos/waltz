@@ -6,10 +6,11 @@
     import NoData from "../../common/svelte/NoData.svelte";
     import { defaultPermissions, STATES } from "../utils";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import { lastProposedFlowId } from "../services/svelte-stores/proposed-flow-store";
+    import { lastProposedFlowId} from "../services/svelte-stores/proposed-flow-store";
     import { proposeDataFlowRemoteStore } from "../../svelte-stores/propose-data-flow-remote-store";
     import { get } from "svelte/store";
     import {personStore} from "../../svelte-stores/person-store";
+    import {PROPOSAL_TYPES} from "../../common/constants";
 
     export let refreshState;
     const Modes = {
@@ -23,6 +24,8 @@
     let activeAction = null;
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
+    let physicalFlowCount;
+
     export let proposedFlow = {};
 
     $: userCall = personStore.getSelf();
@@ -69,6 +72,16 @@
                 return false;
         }
     }
+
+    $: physicalFlowId = proposedFlow?.flowDef?.physicalFlowId;
+    $: logicalFlowId = proposedFlow?.flowDef?.logicalFlowId;
+    $: proposalType= proposedFlow?.flowDef?.proposalType;
+
+    $: physcialFlowCountStore = physicalFlowId
+        ? proposeDataFlowRemoteStore.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowId, false)
+        : null;
+
+    $: physicalFlowCount = $physcialFlowCountStore?.data
 
     function mkButtonClasses(action) {
         return `btn btn-xs btn-${action.style}`;
@@ -162,6 +175,7 @@
         }
     ];
 
+
     let permissionsCall;
     $: {
         if (proposedFlow?.id && proposedFlow.id !== get(lastProposedFlowId)) {
@@ -174,9 +188,18 @@
 </script>
 <div style="padding-bottom: 0.5em" class="small">
     <NoData type="info">
-        <Icon name="info" style="padding: 0.5em"/>
-        You are reviewing a {proposedFlow?.flowDef?.proposalType.toLowerCase()} request.
+        <Icon name="info" style="padding: 1em"/>
+        You are reviewing a {proposalType.toLowerCase()} request.
     </NoData>
+    {#if proposalType === PROPOSAL_TYPES.DELETE && physicalFlowCount===1}
+        <NoData type="error">
+            <Icon name="warning" style="padding: 1em"/>
+            This is the last physical flow associated with the logical flow.
+            <br>This will lead to the deletion of the physical as well as the
+            <EntityLink ref={{ kind: "LOGICAL_DATA_FLOW", id: logicalFlowId, name: "logical flow" }}
+                        showIcon={false}/>.
+        </NoData>
+    {/if}
 </div>
 {#if mode === Modes.LIST}
     <!-- ACTION LIST -->
@@ -210,12 +233,12 @@
                 </NoData>
             </div>
         {/if}
-        {#if isFullyApproved}
+        {#if proposedFlow?.logicalFlowId}
             <div style="padding-top: 0.5em" class="small">
                 <EntityLink
                     ref={{
                     kind: 'LOGICAL_DATA_FLOW',
-                    id: proposedFlow?.flowDef?.logicalFlowId,
+                    id: proposedFlow?.logicalFlowId,
                     name: 'Go to logical flow'}} />
             </div>
         {/if}
