@@ -3,15 +3,18 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
-    import toasts from "../../../../svelte-stores/toast-store";
-    import { proposeDataFlowRemoteStore } from "../../../../svelte-stores/propose-data-flow-remote-store";
-    import { dataTypes,
+    import {proposeDataFlowRemoteStore} from "../../../../svelte-stores/propose-data-flow-remote-store";
+    import {
+        dataTypes,
+        duplicateProposeFlowMessage,
+        existingProposeFlowId,
         logicalFlow,
         physicalFlow,
         physicalSpecification,
-        skipDataTypes,
-        proposalReason } from "./propose-data-flow-store";
-    import { loadSvelteEntity, toEntityRef } from "../../../../common/entity-utils";
+        proposalReason,
+        skipDataTypes
+    } from "./propose-data-flow-store";
+    import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import LogicalFlowSelectionStep from "../../../../physical-flows/svelte/LogicalFlowSelectionStep.svelte";
     import PhysicalFlowCharacteristicsStep from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
@@ -19,25 +22,21 @@
     import DataTypeSelectionStep from "../../../../physical-flows/svelte/DataTypeSelectionStep.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ReasonSelectionStep from "./ReasonSelectionStep.svelte";
-    import { logicalFlowStore } from "../../../../svelte-stores/logical-flow-store";
-    import { settingsStore } from "../../../../svelte-stores/settings-store";
+    import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
+    import {settingsStore} from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME,PROPOSAL_OUTCOMES} from "../../../../common/constants"
+    import {DATAFLOW_PROPOSAL_SETTING_NAME, PROPOSAL_TYPES} from "../../../../common/constants"
     import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
+    import {displayError} from "../../../../common/error-utils";
+    import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
+    import {handleProposalValidation} from "../../../../common/utils/proposalValidation";
+    import {onDestroy} from "svelte";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
 
-    const PROPOSAL_TYPES = {
-        CREATE: "CREATE",
-        EDIT: "EDIT",
-        DELETE: "DELETE"
-    }
-
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
-    let responseMessage="";
-    let existingFlow="";
 
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
@@ -75,74 +74,19 @@
         // as soon as the user launches the command, the button gets disabled
         commandLaunched = true;
 
-        const specification = {
-            owningEntity: toEntityRef(primaryEntityRef),
-            name: $physicalSpecification.name,
-            description: $physicalSpecification.description,
-            format: $physicalSpecification.format,
-            lastUpdatedBy: "waltz",
-            externalId: !_.isEmpty($physicalSpecification.externalId) ? $physicalSpecification.externalId : null,
-            id: $physicalSpecification.id ? $physicalSpecification.id : null
-        }
-
-        const flowAttributes = {
-            name: $physicalFlow.name,
-            transport: $physicalFlow.transport,
-            frequency: $physicalFlow.frequency,
-            basisOffset: $physicalFlow.basisOffset,
-            criticality: $physicalFlow.criticality,
-            description: $physicalFlow.description,
-            externalId: !_.isEmpty($physicalFlow.externalId) ? $physicalFlow.externalId : null
-        }
-
-        const mkReason = (rating) => ({
-            ratingId: rating.id,
-            description: rating.description
-        });
-
-
-        const command = {
-            specification,
-            flowAttributes,
-            logicalFlowId: $logicalFlow.id ?? null,
-            physicalFlowId: null,
-            dataTypeIds: $dataTypes,
-            reason: $proposalReason.rating[0] ? mkReason($proposalReason.rating[0]) : null,
-            source: $logicalFlow.source ?? null,
-            target: $logicalFlow.target ?? null,
+        const command = buildProposalFlowCommand({
+            physicalFlow: $physicalFlow,
+            specification: $physicalSpecification,
+            parentEntityRef: toEntityRef(primaryEntityRef),
+            logicalFlow: $logicalFlow,
+            dataType: $dataTypes,
+            selectedReason: $proposalReason,
             proposalType: PROPOSAL_TYPES.CREATE
-        }
-
+        });
         proposeDataFlowRemoteStore.proposeDataFlow(command)
             .then(r => {
                 const response = r.data;
-                switch (response.outcome) {
-                    case PROPOSAL_OUTCOMES.FAILURE:
-                        responseMessage = response.message;
-                        commandLaunched = false; // reset so user can re-submit
-                        if (response.proposedFlowId) {
-                            existingFlow = "proposed-flow/" + response.proposedFlowId;
-                        } else if (response.physicalFlowId) {
-                            existingFlow = "physical-flow/" + response.physicalFlowId;
-                        }
-                        break;
-
-                    case PROPOSAL_OUTCOMES.SUCCESS:
-                        if (response.proposedFlowId) {
-                            toasts.success("Data Flow Proposed");
-                            resetStore();
-                            setTimeout(goToWorkflow, 500, response.proposedFlowId);
-                        } else {
-                            toasts.error("Error proposing data flow");
-                            commandLaunched = false;
-                        }
-                        break;
-
-                    default:
-                        toasts.error("Error proposing data flow");
-                        commandLaunched = false;
-                        break;
-                }
+                commandLaunched = handleProposalValidation(response, false, resetStore, true, goToWorkflow, PROPOSAL_TYPES.CREATE);
             })
             .catch(e => {
                 displayError("Error proposing data flow", e);
@@ -150,72 +94,73 @@
             });
     }
 
-    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && !_.isEmpty($dataTypes) && !$skipDataTypes);
+    $: onDestroy(()=>resetStore())
 </script>
 
 {#if dataFlowProposalsEnabled && primaryEntityRef}
-<PageHeader name="Propose Data Flow"
-            icon="code-pull-request"
-            small={_.get(sourceEntity, ["name"], "-")}>
-    <div slot="breadcrumbs">
-        <ol class="waltz-breadcrumbs">
-            <li><ViewLink state="main">Home</ViewLink></li>
-            <li><EntityLink ref={sourceEntity}/></li>
-            <li>Propose Data Flow</li>
-        </ol>
-    </div>
-    <div slot="summary">
-        {#if !sourceEntity.name}
-            <NoData>
-                No data found for {primaryEntityRef.kind} {primaryEntityRef.id}
-            </NoData>
-        {:else}
-            <div class="selection-step">
-                <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
-            </div>
+    <PageHeader name="Propose Data Flow"
+                icon="code-pull-request"
+                small={_.get(sourceEntity, ["name"], "-")}>
+        <div slot="breadcrumbs">
+            <ol class="waltz-breadcrumbs">
+                <li><ViewLink state="main">Home</ViewLink></li>
+                <li><EntityLink ref={sourceEntity}/></li>
+                <li>Propose Data Flow</li>
+            </ol>
+        </div>
+        <div slot="summary">
+            {#if !sourceEntity.name}
+                <NoData>
+                    No data found for {primaryEntityRef.kind} {primaryEntityRef.id}
+                </NoData>
+            {:else}
+                <div class="selection-step">
+                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
+                </div>
 
-            <div class="selection-step">
-                <PhysicalSpecificationStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <PhysicalSpecificationStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <PhysicalFlowCharacteristicsStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <PhysicalFlowCharacteristicsStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
-            </div>
+                <div class="selection-step">
+                    <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
+                </div>
 
-            <div class="selection-step">
-                <ReasonSelectionStep ratingSchemeExtId={dataFlowProposalsRatingSchemeExtId}/>
-            </div>
-            <br>
+                <div class="selection-step">
+                    <ReasonSelectionStep ratingSchemeExtId={dataFlowProposalsRatingSchemeExtId}/>
+                </div>
+                <br>
 
-            <span>
+                <span>
                 <button class="btn btn-success"
                         disabled={incompleteRecord || commandLaunched}
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
-                {#if responseMessage}
+                    {#if $duplicateProposeFlowMessage}
                 <div style="margin:20px 0px">
-                    <NoData type="error" >
-                        {responseMessage}
+                    <NoData type="error">
+                        {$duplicateProposeFlowMessage}
                         <br>
-                        <a href={existingFlow} target="_blank" rel="noreferrer">Go to Flow</a>
+                        <a href={$existingProposeFlowId} target="_blank" rel="noreferrer">Go to Flow</a>
                     </NoData>
                 </div>
                 {/if}
-                {#if incompleteRecord}
+                    {#if incompleteRecord}
                     <span class="incomplete-warning">
                         <Icon name="exclamation-triangle"/>You must complete all sections
                     </span>
                 {/if}
             </span>
 
-        {/if}
-    </div>
-</PageHeader>
+            {/if}
+        </div>
+    </PageHeader>
 {/if}
 
 <style type="text/scss">

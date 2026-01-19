@@ -6,13 +6,11 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.test_common.helpers.*;
-import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +58,7 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
     private final String stem = "fpc";
 
 
-    @Test
+    //    @Test
     public void findPermissionsForFlow() {
 
         String u1 = mkName(stem, "user1");

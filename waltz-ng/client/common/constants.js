@@ -23,6 +23,11 @@ export const PROPOSAL_OUTCOMES = {
     SUCCESS: "SUCCESS",
     FAILURE: "FAILURE"
 }
+export const PROPOSAL_TYPES = {
+    CREATE: "CREATE",
+    EDIT: "EDIT",
+    DELETE: "DELETE"
+}
 
 export const ARC_DROPDOWN_DEFINITION= "feature.survey.arc.dropdown-definition";
 export const ARC_EXTERNAL_URL= "arc.external.base.url";
