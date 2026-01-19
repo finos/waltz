@@ -19,7 +19,7 @@
 <script>
     import {arcSurveyState} from "./ARCSurveyState";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
-    import {ARC_DROPDOWN_LABEL, ARC_EXTERNAL_URL} from "../../../../common/constants";
+    import {ARC_DROPDOWN_DEFINITION, ARC_EXTERNAL_URL} from "../../../../common/constants";
     import {architectureRequiredChangeStore} from "../../../../svelte-stores/architecture-required-changes";
     import {mkRef} from "../../../../common/entity-utils";
     import ARCTableEdit from "./ARCTableEdit.svelte";
@@ -48,7 +48,7 @@
 
     $: settings = $settingsCall?.data;
 
-    $: dropdownSettingValue = settings?.find(t => t.name === ARC_DROPDOWN_LABEL)?.value;
+    $: dropdownSettingValue = settings?.find(t => t.name === ARC_DROPDOWN_DEFINITION)?.value;
 
     $: parsedDropdownSettingValue = dropdownSettingValue && parseJSON(dropdownSettingValue);
 
@@ -62,11 +62,14 @@
 
     $: mode = (mode === MODES.VIEW || mode === MODES.EDIT) ? mode : MODES.VIEW;
 
-    $: arcHierarchyCall = linkedEntityKind && linkedEntityId && architectureRequiredChangeStore
+    $: arcHierarchyCall = linkedEntityKind && linkedEntityId
+        && architectureRequiredChangeStore
         .findForLinkedEntityHierarchy(mkRef(linkedEntityKind, linkedEntityId));
 
+    // a parent becomes the main arc for each row
     $: arcs = $arcHierarchyCall?.data.filter(t => !t.externalParentId);
 
+    // all children become a part of the selection tree
     $: arcHierarchy = $arcHierarchyCall?.data.filter(t => t.externalParentId);
 
 

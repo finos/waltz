@@ -24,5 +24,5 @@ export const PROPOSAL_OUTCOMES = {
     FAILURE: "FAILURE"
 }
 
-export const ARC_DROPDOWN_LABEL= "feature.arc.dropdown-label";
-export const ARC_EXTERNAL_URL= "feature.arc.external-url";
+export const ARC_DROPDOWN_DEFINITION= "feature.survey.arc.dropdown-definition";
+export const ARC_EXTERNAL_URL= "arc.external.base.url";

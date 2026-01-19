@@ -6,7 +6,7 @@
 </script>
 
 <div style="padding: 0.5em">
-    <strong>{node?.title}</strong>
+    <strong>{node?.title ?? node?.externalId}</strong>
     <hr>
     <dl>
         <dt>External Id</dt>

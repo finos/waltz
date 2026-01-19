@@ -65,7 +65,7 @@
             {#if mode === MODES.EDIT}
                 <input type="checkbox" checked={isSelected(node)} on:change={handleCheck} class="clickable"/>
             {/if}
-            <span class:name-bold={mode === MODES.VIEW && isSelected(node)} class="name">{node.title}</span>
+            <span class:name-bold={mode === MODES.VIEW && isSelected(node)} class="name">{node?.title ?? node?.externalId}</span>
         </div>
     </Tooltip>
 
