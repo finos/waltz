@@ -52,6 +52,19 @@
     $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
 
+    $: $logicalFlow, resetDuplicateState();
+    $: $physicalFlow, resetDuplicateState();
+    $: $physicalSpecification, resetDuplicateState();
+    $: $dataTypes, resetDuplicateState();
+
+    function resetDuplicateState() {
+        if ($duplicateProposeFlowMessage) {
+            $duplicateProposeFlowMessage = null;
+            $existingProposeFlowId = null;
+        }
+    }
+
+
     function goToWorkflow(proposedFlowId) {
         $pageInfo = {
             state: "main.proposed-flow.view",
@@ -138,7 +151,7 @@
 
                 <span>
                 <button class="btn btn-success"
-                        disabled={incompleteRecord || commandLaunched}
+                        disabled={incompleteRecord || commandLaunched || $duplicateProposeFlowMessage}
                         on:click={() => launchCommand()}>
                     Propose
                 </button>
