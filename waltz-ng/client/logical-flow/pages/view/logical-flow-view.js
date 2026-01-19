@@ -38,7 +38,8 @@ const initialState = {
     updateCommand: {
         readOnly: false,
     },
-    AlignedDataTypesList
+    AlignedDataTypesList,
+    dataFlowProposalsRatingSchemeSetting:null
 };
 
 function controller($q,
@@ -52,6 +53,8 @@ function controller($q,
 
     vm.$onInit = () => {
         const flowId = $stateParams.id;
+        const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
+
         vm.entityReference = {
             id: flowId,
             kind: "LOGICAL_DATA_FLOW"
@@ -90,6 +93,14 @@ function controller($q,
             vm.canRemove = vm.canEdit && !vm.isRemoved;
             vm.canRestore = vm.canEdit && vm.isRemoved;
         });
+
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                let settings = r.data;
+                vm.dataFlowProposalsEnabled= settings
+                    .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0].value === "true";
+            });
 
     };
 
