@@ -88,7 +88,7 @@
         <java.version>17</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
-        <jgrapht.version>1.4.0</jgrapht.version>
+        <jgrapht.version>1.5.2</jgrapht.version>
         <jool.version>0.9.15</jool.version>
         <jooq.version>3.18.29</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.10.0</junit.version>
