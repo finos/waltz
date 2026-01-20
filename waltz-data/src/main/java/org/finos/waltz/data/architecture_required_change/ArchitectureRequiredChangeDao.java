@@ -139,7 +139,6 @@ public class ArchitectureRequiredChangeDao {
             .and(ARCHITECTURE_REQUIRED_CHANGE.LINKED_ENTITY_KIND.eq(kind.name()));
     }
 
-    // find for list of externalParentId method
     public List<ArchitectureRequiredChange> findByExternalParentId(List<String> externalParentIds) {
         return dsl
             .select(ARCHITECTURE_REQUIRED_CHANGE.fields())
