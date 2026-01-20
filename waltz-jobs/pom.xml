@@ -60,12 +60,6 @@
         </dependency>
 
         <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>33.2.0-jre</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.finos</groupId>
             <artifactId>waltz-service</artifactId>
             <version>${project.version}</version>
