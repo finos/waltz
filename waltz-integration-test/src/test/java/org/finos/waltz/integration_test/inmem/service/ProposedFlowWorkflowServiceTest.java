@@ -18,54 +18,65 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
+import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
+import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.involvement.ImmutableInvolvement;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCommand;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.person.ImmutablePerson;
+import org.finos.waltz.model.person.PersonKind;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
 import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
-import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.Operation.REJECT;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -73,37 +84,80 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
     private static final String USER_NAME = "testUser";
+    private Long testInvolvementKindId;
+    private final String stem = "pgst";
 
     @Autowired
-    ProposedFlowWorkflowService proposedFlowWorkflowService;
+    private ProposedFlowWorkflowService proposedFlowWorkflowService;
 
     @Autowired
-    ProposedFlowDao proposedFlowDao;
+    private ProposedFlowDao proposedFlowDao;
 
     @Autowired
-    LogicalFlowDao logicalFlowDao;
+    private LogicalFlowDao logicalFlowDao;
 
     @Autowired
-    PhysicalSpecificationDao physicalSpecificationDao;
+    private PhysicalSpecificationDao physicalSpecificationDao;
 
     @Autowired
-    EntityWorkflowStateDao entityWorkflowStateDao;
+    private EntityWorkflowStateDao entityWorkflowStateDao;
 
     @Autowired
-    EntityWorkflowService entityWorkflowService;
+    private EntityWorkflowService entityWorkflowService;
 
     @Autowired
-    ChangeLogService changeLogService;
+    private ChangeLogService changeLogService;
 
     @Autowired
-    PhysicalFlowDao physicalFlowDao;
+    private PhysicalFlowDao physicalFlowDao;
+
+    @Autowired
+    private InvolvementDao involvementDao;
+
+    @Autowired
+    private PersonDao personDao;
+
+    @Autowired
+    private InvolvementKindDao involvementKindDao;
 
     @Autowired
     private DSLContext dsl;
 
+    @Autowired
+    private AppHelper appHelper;
+
+    @Autowired
+    private PersonHelper personHelper;
+
+    @Autowired
+    private InvolvementHelper involvementHelper;
+
+    @Autowired
+    private PermissionGroupHelper permissionHelper;
+
+
+
     @BeforeEach
-    public void removePhysicalFlowData() {
+    public void setup() {
+        dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
+        dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(INVOLVEMENT_KIND).execute();
+        //dsl.execute("ALTER TABLE INVOLVEMENT_KIND ALTER COLUMN ID RESTART WITH 1");
+
+/*        testInvolvementKindId = involvementKindDao.create(ImmutableInvolvementKindCreateCommand.builder()
+                .name("Test Approver")
+                .description("Test Approver")
+                .subjectKind(EntityKind.APPLICATION)
+                .build(), USER_NAME);*/
+
+/*        personDao.bulkSave(Collections.singletonList(ImmutablePerson.builder()
+                .employeeId(USER_NAME)
+                .displayName(USER_NAME)
+                .email(USER_NAME + "@test.com")
+                .personKind(PersonKind.EMPLOYEE)
+                .isRemoved(false)
+                .build()));*/
     }
 
     @Test
@@ -329,7 +383,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .basisOffset(command.flowAttributes().basisOffset())
                 .frequency(command.flowAttributes().frequency())
                 .transport(command.flowAttributes().transport())
-                .criticality(command.flowAttributes().criticality())
+                .criticality(CriticalityValue.of("low"))
                 .description(mkSafe(command.flowAttributes().description()))
                 .logicalFlowId(1l)
                 .lastUpdatedBy(USER_NAME)
@@ -353,5 +407,155 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertEquals(physicalId, flowIdResponse.id());
     }
 */
+    @Test
+    void twoStepApproval_shouldTransitionToFullyApproved_andCallOperation() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        // Create a proposed flow command for a new flow (CREATE proposal type)
+        ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.CREATE)
+                .build();
+
+        // Propose the new flow
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        // Grant the user source and target approver permissions
+        involvementDao.save(ImmutableInvolvement.builder().entityReference(createCommand.source()).employeeId(USER_NAME).kindId(testInvolvementKindId).build());
+        involvementDao.save(ImmutableInvolvement.builder().entityReference(createCommand.target()).employeeId(USER_NAME).kindId(testInvolvementKindId).build());
+
+        // Ensure the state is PENDING_APPROVALS
+        ProposedFlowResponse proposedFlow = proposedFlowWorkflowService.getProposedFlowResponseById(proposedFlowId);
+        assertEquals(ProposedFlowWorkflowState.PENDING_APPROVALS.name(), proposedFlow.workflowState().state(), "State should be PENDING_APPROVALS");
+
+        // Action command for source approval
+        ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by source approver")
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        // Simulate a source approver approving the flow
+        ProposedFlowResponse sourceApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                USER_NAME,
+                sourceApproveCommand);
+
+        // Assert that the flow is now in SOURCE_APPROVED state
+        assertEquals(ProposedFlowWorkflowState.SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+
+        // Action command for target approval
+        ProposedFlowActionCommand targetApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by target approver")
+                .build();
+
+        // Simulate a target approver approving the flow
+        ProposedFlowResponse fullyApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                USER_NAME,
+                targetApproveCommand);
+
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(fullyApprovedFlow, "Approved proposed flow should not be null");
+        assertEquals(ProposedFlowWorkflowState.FULLY_APPROVED.name(), fullyApprovedFlow.workflowState().state(), "Flow should be fully approved after source approval");
+
+        // Verify that a physical flow was created in the database
+        // The @BeforeEach method clears physical flows, so we expect exactly one new flow.
+        int physicalFlowCount = dsl.selectCount().from(PHYSICAL_FLOW).fetchOne(0, int.class);
+        assertEquals(1, physicalFlowCount, "A physical flow should have been created upon full approval of a CREATE proposal");
+    }
+
+    @Test
+    void twoStepApproval_shouldTransitionToFullyApproved_andCallOperation_1() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        // Create a proposed flow command for a new flow (CREATE proposal type)
+        ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
+                .source(appHelper.createNewApp(mkName(stem, "appA"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(stem, "appB"), ouIds.a))
+                // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.CREATE)
+                .build();
+
+        String userName = mkName(stem, "user1");
+
+        // Propose the new flow
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        // Grant the user source and target approver permissions
+        Long personA = personHelper.createPerson(userName);
+
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_abc");
+        involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
+        involvementHelper.createInvolvement(personA, involvementKind, createCommand.target());
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, stem);
+
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, stem, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, stem, REJECT);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, stem, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, stem, REJECT);
+
+        // Action command for source approval
+        ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by source approver")
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        // Assert that the flow is now in SOURCE_APPROVED state
+        // Simulate a source approver approving the flow
+        ProposedFlowResponse sourceApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                userName,
+                sourceApproveCommand);
+
+        // Assert that the flow is now in SOURCE_APPROVED state
+        assertEquals(ProposedFlowWorkflowState.SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+
+        // Action command for target approval
+        ProposedFlowActionCommand targetApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by target approver")
+                .build();
+
+        // Simulate a target approver approving the flow
+        ProposedFlowResponse fullyApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                userName,
+                targetApproveCommand);
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(fullyApprovedFlow, "Approved proposed flow should not be null");
+        assertEquals(ProposedFlowWorkflowState.FULLY_APPROVED.name(), fullyApprovedFlow.workflowState().state(), "Flow should be fully approved after source approval");
+
+    }
 
 }
