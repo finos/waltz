@@ -83,7 +83,6 @@ import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
@@ -91,10 +90,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
     private static final String USER_NAME = "testUser";
@@ -159,7 +155,6 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
         dsl.deleteFrom(PERSON).execute();
-        dsl.deleteFrom(INVOLVEMENT_KIND).execute();
     }
 
     @Test
@@ -513,6 +508,45 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .externalId("mc-extId001")
                 .created(UserTimestamp.mkForUser(userName, now()))
                 .build();
+    }
+
+    @Test
+    void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() {
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = getReason();
+        EntityReference owningEntity = getOwningEntity();
+        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = getFlowAttributes();
+        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+
+        ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
+                .source(appHelper.createNewApp(mkName(stem, "appA"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(stem, "appB"), ouIds.a))
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.CREATE)
+                .build();
+
+        String userName = mkName(stem, "user1");
+        personHelper.createPerson(userName);
+
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        ProposedFlowActionCommand rejectCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Rejected due to invalid permissions")
+                .build();
+
+        // 2. Act and Assert ----------------------------------------------------
+        assertThrows(TransitionPredicateFailedException.class, () ->
+                proposedFlowWorkflowService.proposedFlowAction(
+                        proposedFlowId,
+                        org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.REJECT,
+                        userName,
+                        rejectCommand));
     }
 
 }
