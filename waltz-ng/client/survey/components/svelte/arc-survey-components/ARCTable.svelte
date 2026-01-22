@@ -77,7 +77,7 @@
         "ARC",
         "Milestones",
         dropdownDefinition?.label ?? DEFAULT_DROPDOWN_DEFINITION.label,
-        "Applicable ARCs",
+        question?.label ?? "Applicable ARCs",
     ];
 
     $: parsedCurrentResponse = (() => {
