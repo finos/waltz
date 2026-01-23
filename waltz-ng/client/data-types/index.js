@@ -22,7 +22,9 @@ import DataTypeStore from "./services/data-type-store";
 import DataTypeDecoratorStore from "./services/data-type-decorator-store";
 import DataTypeUsageCountTree from './components/usage-count-tree/data-type-usage-count-tree';
 import DataTypeUsagePanel from './components/usage-panel/data-type-usage-panel';
+import DataTypeUsagePanelProposeFlow from './components/usage-panel/data-type-usage-panel-propose-flow';
 import DataTypeUsageSelector from './components/usage-selector/data-type-usage-selector';
+import DataTypeUsageSelectorProposeFlow from './components/usage-selector/data-type-usage-selector-propose-flow';
 import DataTypeUsageTree from './components/usage-tree/data-type-usage-tree';
 import DataTypeOverview from './components/overview/data-type-overview';
 import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
@@ -38,7 +40,7 @@ export default () => {
 
     module.config(Routes);
 
-    registerStores(module, [ DataTypeStore, DataTypeDecoratorStore ]);
+    registerStores(module, [DataTypeStore, DataTypeDecoratorStore]);
     registerComponents(module, [
         DataTypeOriginators,
         DataTypeFlowSection,
@@ -46,6 +48,8 @@ export default () => {
         DataTypeUsageCountTree,
         DataTypeUsagePanel,
         DataTypeUsageSelector,
+        DataTypeUsagePanelProposeFlow,
+        DataTypeUsageSelectorProposeFlow,
         DataTypeUsageTree,
         RelatedDataTypesSection,
         DataTypesDecoratorSection,

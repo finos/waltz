@@ -52,11 +52,20 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="ctrl.logicalFlow">
             <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
-                <div ng-if="ctrl.canEdit">
-                    <button class="btn btn-xs btn-danger"
+                <div ng-if="ctrl.dataFlowProposalsEnabled || ctrl.canEdit">
+                    <button
+                            ng-if="!ctrl.dataFlowProposalsEnabled"
+                            class="btn btn-xs btn-danger"
                             ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
                         Delete
+                    </button>
+                    <button
+                            ng-if="ctrl.dataFlowProposalsEnabled"
+                            class="btn btn-xs btn-danger"
+                            ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
+                            ng-click="(ctrl.mentions | isEmpty) && ctrl.showReason(true)">
+                       Propose Delete
                     </button>
                     <button class="btn btn-xs btn-warning"
                             ng-disabled="! (ctrl.mentions | isEmpty)"
@@ -92,10 +101,29 @@
 
                 <!-- DATA USAGE & ASSESSMENTS -->
                 <div class="col-md-5">
-                    <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                    <waltz-sub-section name="Reason selection" ng-if="ctrl.isReasonSelectionOpen">
+                        <content>
+                            <div style="padding: 1em">
+                                <waltz-svelte-component
+                                    component="ctrl.ReasonSelection"
+                                    rating-scheme-ext-id="ctrl.ratingSchemeExtId"
+                                    proposal-type="ctrl.type"
+                                    propose-delete-flow="ctrl.proposeDeleteFlow",
+                                    physical-flow-id="ctrl.physicalFlow.id"
+                                    logical-flow-id="ctrl.physicalFlow.logicalFlowId"
+                                    cancel-propose-delete-flow="ctrl.showReason"
+                                >
+                                </waltz-svelte-component>
+                            </div>
+                        </content>
+                    </waltz-sub-section>
+
+                    <br ng-if="ctrl.showReason">
+
+                    <waltz-data-type-usage-panel-propose-flow parent-entity-ref="ctrl.specificationReference"
                                                  parent-flow="ctrl.physicalFlow"
                                                  help-text="Data types referenced by the specification">
-                    </waltz-data-type-usage-panel>
+                    </waltz-data-type-usage-panel-propose-flow>
 
                     <br>
 
