@@ -33,6 +33,8 @@ public class SurveyInstanceUtilities {
             case MEASURABLE_MULTI_SELECT:
             case LEGAL_ENTITY:
                 return resp.entityListResponse();
+            case ARC:
+                return resp.jsonResponse();
             default:
                 return Optional.empty();
         }

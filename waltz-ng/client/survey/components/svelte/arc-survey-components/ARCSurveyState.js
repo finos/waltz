@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016 - 2026 Waltz open source project
  * See README.md for more information
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,7 @@
  *
  */
 
-package org.finos.waltz.model.survey;
+import {writable} from "svelte/store";
 
-public enum SurveyQuestionFieldType {
-
-    APPLICATION,
-    BOOLEAN,
-    DATE,
-    DROPDOWN,
-    DROPDOWN_MULTI_SELECT,
-    STRING_LIST,
-    LEGAL_ENTITY,
-    MEASURABLE_MULTI_SELECT,
-    NUMBER,
-    PERSON,
-    TEXT,
-    TEXTAREA,
-    ARC
-}
+export const arcSurveyState = writable([]);
+export const invalidRows = writable([]);

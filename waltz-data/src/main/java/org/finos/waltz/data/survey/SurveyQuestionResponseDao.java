@@ -117,6 +117,7 @@ public class SurveyQuestionResponseDao {
                         .booleanResponse(ofNullable(record.getBooleanResponse()))
                         .dateResponse(ofNullable(record.getDateResponse()).map(Date::toLocalDate))
                         .entityResponse(entityReference)
+                        .jsonResponse(ofNullable(record.getJsonResponse()))
                         .build())
                 .build();
     };
@@ -415,6 +416,9 @@ public class SurveyQuestionResponseDao {
                                         .filter(l -> ! l.isEmpty())
                                         .map(l -> join(l, "; "))
                                         .orElse(null));
+        record.setJsonResponse(questionResponse.jsonResponse()
+                .map(s -> ifEmpty(s, null))
+                .orElse(null));
 
         return record;
     }
