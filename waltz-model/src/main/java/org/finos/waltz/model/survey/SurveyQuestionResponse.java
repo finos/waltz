@@ -42,4 +42,5 @@ public abstract class SurveyQuestionResponse {
     public abstract Optional<EntityReference> entityResponse();
     public abstract Optional<List<String>> listResponse();
     public abstract Optional<List<EntityReference>> entityListResponse();
+    public abstract Optional<String> jsonResponse();
 }
