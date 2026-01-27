@@ -10,12 +10,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        db: [ postgres, mssql ]
-
-
     services:
       postgres:
         image: postgres:15
@@ -26,39 +20,12 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
           --health-retries 5
 
-      mssql:
-        image: hmxlabs/mssql-fts:2022-latest
-        ports:
-          - 1433:1433
-        env:
-          ACCEPT_EULA: Y
-          SA_PASSWORD: Some4Complex#Password
-          MSSQL_PID: "Express"
-        # basic health check (tools are present on this image)
-        options: >-
-          --name mssql
-          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Some4Complex#Password -C -Q 'SELECT 1'"
-          --health-interval=10s
-          --health-timeout=10s
-          --health-retries=30
-
-    env:
-      WALTZ_PROFILE: ${{ matrix.db == 'mssql' && 'waltz-mssql-latest' || 'waltz-postgres' }}
-
     steps:
-    - name: Ensure MSSQL database exists
-      if: ${{ matrix.db == 'mssql' }}
-      run: |
-        set -e
-        # try tools18, fall back to tools17 path
-        docker exec mssql bash -lc "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -C -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\" \
-        || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Some4Complex#Password' -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\""
-
     - uses: actions/checkout@v4
 
     - name: Set up JDK 17
@@ -78,44 +45,32 @@ jobs:
       if: ${{ github.ref_type == 'tag' }}
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
-    - name: Generate effective POM
-      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-${{ matrix.db }},${{ env.WALTZ_PROFILE }},integration-tests -Dverbose -Doutput=effective-pom-${{ matrix.db }}.xml
-
-    - name: Upload effective POM
-      uses: actions/upload-artifact@v4
-      with:
-        name: effective-pom-${{ matrix.db }}
-        path: effective-pom-${{ matrix.db }}.xml
-
-    - name: Build with Maven (DB = ${{ matrix.db }})
-      env:
-        JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
-        JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
-      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-${{ matrix.db }},${{ env.WALTZ_PROFILE }},integration-tests clean package site -Dtarget.db=${{ matrix.db }} -Ddb.provider=docker;
+    - name: Build with Maven
+      run: mvn -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site;
 
     - name: Publish build
       uses: actions/upload-artifact@v4
       with:
-        name: waltz-web-${{ matrix.db }}.war
+        name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web.war
 
     - name: Publish mocha results
       uses: actions/upload-artifact@v4
       with:
-        name: mocha-test-results-${{ matrix.db }}.txt
+        name: mocha-test-results.txt
         path: waltz-ng/mocha-test-results.txt
 
     - name: Publish liquibase changelogs
       uses: actions/upload-artifact@v4
       with:
-        name: liquibase-changelogs-${{ matrix.db }}
+        name: liquibase-changelogs
         path: waltz-schema/src/main/resources/liquibase/
 
     - name: Publish Java Test results
       uses: actions/upload-artifact@v4
       with:
-        name: surefire-results-${{ matrix.db }}
-        path: target/site/
+        name: surefire-results.html
+        path: target/site/surefire-report.html
   
     - name: Login to GitHub Registry
       if: ${{ github.ref_type == 'tag' }}
@@ -133,8 +88,8 @@ jobs:
         flavor: latest=true
         tags: |
           type=ref,event=tag,enable=${{ github.ref_type == 'tag' }}
-          type=raw,value=${{ matrix.db }}-${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
-          type=raw,value=${{ matrix.db }}
+          type=raw,value=postgres-${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
+          type=raw,value=postgres
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
@@ -150,5 +105,5 @@ jobs:
       with:
         files: |
           waltz-schema/target/liquibase-scripts.zip
-          waltz-web/target/waltz-web-${{ matrix.db }}.war
-          waltz-web/target/waltz-web-jar-with-dependencies-${{ matrix.db }}.jar
+          waltz-web/target/waltz-web.war
+          waltz-web/target/waltz-web-jar-with-dependencies.jar
