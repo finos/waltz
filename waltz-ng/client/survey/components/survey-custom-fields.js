@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016 - 2026 Waltz open source project
  * See README.md for more information
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,14 @@
  *
  */
 
-package org.finos.waltz.model.survey;
+/*
+  This is a map of all the custom field types that we have or may have in waltz
 
-public enum SurveyQuestionFieldType {
+  Can be used to configure custom fields that may be required; apart from the available
+  fields that waltz currently provides.
 
-    APPLICATION,
-    BOOLEAN,
-    DATE,
-    DROPDOWN,
-    DROPDOWN_MULTI_SELECT,
-    STRING_LIST,
-    LEGAL_ENTITY,
-    MEASURABLE_MULTI_SELECT,
-    NUMBER,
-    PERSON,
-    TEXT,
-    TEXTAREA,
-    ARC
-}
+  These fieldTypes are custom in the sense that they have their own 'custom rendering.'
+ */
+export const surveyCustomFieldTypes = {
+    ARC: "ARC", // BETA field type
+};
