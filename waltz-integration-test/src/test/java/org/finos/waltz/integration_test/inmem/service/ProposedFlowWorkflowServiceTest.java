@@ -29,24 +29,17 @@ import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
-import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
-import org.finos.waltz.model.physical_specification.DataFormatKindValue;
-import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -58,44 +51,52 @@ import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
+import org.finos.waltz.test_common.helpers.ProposedFlowWorkflowHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.time.LocalDateTime.now;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
-    private static final String USER_NAME = "testUser";
 
-    private final String stem = "pgst";
+    private final String USER_NAME = "testUser";
 
     @Autowired
     private ProposedFlowWorkflowService proposedFlowWorkflowService;
@@ -148,12 +149,29 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     @Autowired
     DataFlowService dataFlowService;
 
+    @Autowired
+    ProposedFlowWorkflowHelper proposedFlowWorkflowHelper;
 
+    @Autowired
+    private LogicalFlowHelper lfHelper;
+
+    @Autowired
+    private PhysicalSpecHelper psHelper;
+
+    @Autowired
+    private PhysicalSpecificationService psSvc;
+
+    @Autowired
+    private PhysicalFlowService pfSvc;
 
     @BeforeEach
-    public void setup() {
-        dsl.deleteFrom(INVOLVEMENT).execute();
+    public void cleanUp(){
+        dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
+        dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
+        dsl.deleteFrom(ENTITY_WORKFLOW_STATE).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
     }
 
@@ -161,11 +179,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     public void testProposedNewFlow() {
 
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
                 .source(mkRef(APPLICATION, 101))
@@ -190,11 +208,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     public void testGetProposedFlowDefinition() {
 
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
                 .source(mkRef(APPLICATION, 101))
@@ -220,68 +238,19 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertTrue(proposedFlowResponse.workflowTransitionList().size() > 0);
     }
 
-    private Reason getReason() {
-        return ImmutableReason.builder()
-                .description("test")
-                .ratingId(1)
-                .build();
-    }
-
-    private EntityReference getOwningEntity() {
-        return ImmutableEntityReference.builder()
-                .id(18703)
-                .kind(APPLICATION)
-                .name("AMG")
-                .externalId("60487-1")
-                .description("Testing")
-                .entityLifecycleStatus(ACTIVE)
-                .build();
-    }
-
-    private PhysicalSpecification getPhysicalSpecification(EntityReference owningEntity) {
-        return ImmutablePhysicalSpecification.builder()
-                .id(1L)
-                .owningEntity(owningEntity)
-                .name("mc_specification")
-                .description("mc_specification description")
-                .format(DataFormatKindValue.of("DATABASE"))
-                .lastUpdatedBy("waltz")
-                .externalId("mc-extId001")
-                .build();
-    }
-
-    private FlowAttributes getFlowAttributes() {
-        return ImmutableFlowAttributes.builder()
-                .name("mc_deliverCharacterstics")
-                .transport(TransportKindValue.of("UNKNOWN"))
-                .frequency(FrequencyKindValue.of("QUARTERLY"))
-                .basisOffset(0)
-                .criticality(CriticalityValue.of("low"))
-                .description("testing")
-                .externalId("567s")
-                .build();
-    }
-
-    private Set<Long> getDataTypeIdSet() {
-        Set<Long> dataTypeIdSet = new HashSet<>();
-        dataTypeIdSet.add(41200L);
-
-        return dataTypeIdSet;
-    }
-
     @Test
     void testPresenceOfCreateProposalTypeWhenCreatingNewProposedFlow() {
 
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(mkRef(APPLICATION, 1011))
+                .target(mkRef(APPLICATION, 2022))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -304,15 +273,15 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         long logicalId = 1L;
 
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(mkRef(APPLICATION, 10111))
+                .target(mkRef(APPLICATION, 20222))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -408,16 +377,16 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     void twoStepApproval_shouldTransitionToFullyApproved_andCallOperation() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
 
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         // Create a proposed flow command for a new flow (CREATE proposal type)
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
-                .source(appHelper.createNewApp(mkName(stem, "appA"), ouIds.a))
-                .target(appHelper.createNewApp(mkName(stem, "appB"), ouIds.a))
+                .source(appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a))
                 // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
                 .reason(reason)
                 .specification(physicalSpecification)
@@ -426,7 +395,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .proposalType(ProposalType.CREATE)
                 .build();
 
-        String userName = mkName(stem, "user1");
+        String userName = mkName(USER_NAME, "user1");
 
         // Propose the new flow
         ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
@@ -440,12 +409,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
         involvementHelper.createInvolvement(personA, involvementKind, createCommand.target());
 
-        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, stem);
-
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, stem, Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, stem, REJECT);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, stem, Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, stem, REJECT);
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, REJECT);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, USER_NAME, REJECT);
 
         // Action command for source approval
         ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
@@ -473,13 +441,30 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
         entityWorkflowStateDao.createWorkflowState(entityWorkflowDefinition.id().get(), mkRef(PROPOSED_FLOW, proposedFlowId), USER_NAME, FULLY_APPROVED.name(), "test");
 
-        //Create new logical flow
-        ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
-        LogicalFlow logicalFlow = dataFlowService.createLogicalFlow(proposedFlow, userName);
+        //Create new logical flow, physical specification and physical flow
+        EntityReference a = createCommand.source();
+        EntityReference b = createCommand.target();
 
-        //Create new physical flow and physical specification
-        physicalSpecificationDao.create(createPhysicalSpecification(owningEntity, userName));
-        dataFlowService.createPhysicalFlow(proposedFlow, userName, logicalFlow.id());
+        LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
+        Long specId = psHelper.createPhysicalSpec(a, mkName("create"));
+        PhysicalSpecification spec = psSvc.getById(specId);
+
+        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand physicalFlwCreateCommand = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(ab.entityReference().id())
+                .specification(spec)
+                .flowAttributes(flowAttrs)
+                .build();
+
+        PhysicalFlowCreateCommandResponse createResp = pfSvc.create(physicalFlwCreateCommand, mkName("create"));
+        assertEquals(CommandOutcome.SUCCESS, createResp.outcome(), "Can successfully create physical flows");
+
 
         // 3. Act --------------------------------------------------------------
         // Simulate a target approver approving the flow
@@ -498,30 +483,18 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     }
 
-    private PhysicalSpecification createPhysicalSpecification(EntityReference owningEntity, String userName) {
-        return ImmutablePhysicalSpecification.builder()
-                .owningEntity(owningEntity)
-                .name("mc_specification")
-                .description("mc_specification description")
-                .format(DataFormatKindValue.of("DATABASE"))
-                .lastUpdatedBy("waltz")
-                .externalId("mc-extId001")
-                .created(UserTimestamp.mkForUser(userName, now()))
-                .build();
-    }
-
     @Test
     void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() {
         // 1. Arrange ----------------------------------------------------------
-        Reason reason = getReason();
-        EntityReference owningEntity = getOwningEntity();
-        PhysicalSpecification physicalSpecification = getPhysicalSpecification(owningEntity);
-        FlowAttributes flowAttributes = getFlowAttributes();
-        Set<Long> dataTypeIdSet = getDataTypeIdSet();
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
-                .source(appHelper.createNewApp(mkName(stem, "appA"), ouIds.a))
-                .target(appHelper.createNewApp(mkName(stem, "appB"), ouIds.a))
+                .source(appHelper.createNewApp(mkName(USER_NAME, "appA_1"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(USER_NAME, "appB_1"), ouIds.a))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -529,7 +502,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .proposalType(ProposalType.CREATE)
                 .build();
 
-        String userName = mkName(stem, "user1");
+        String userName = mkName(USER_NAME, "user1");
         personHelper.createPerson(userName);
 
         ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
