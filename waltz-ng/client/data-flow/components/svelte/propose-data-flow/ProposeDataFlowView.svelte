@@ -17,8 +17,7 @@
     import {loadSvelteEntity, toEntityRef} from "../../../../common/entity-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import LogicalFlowSelectionStep from "../../../../physical-flows/svelte/LogicalFlowSelectionStep.svelte";
-    import PhysicalFlowCharacteristicsStep
-        from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalFlowCharacteristicsStep from "../../../../physical-flows/svelte/PhysicalFlowCharacteristicsStep.svelte";
     import PhysicalSpecificationStep from "../../../../physical-flows/svelte/PhysicalSpecificationStep.svelte";
     import DataTypeSelectionStep from "../../../../physical-flows/svelte/DataTypeSelectionStep.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
@@ -31,6 +30,7 @@
     import {displayError} from "../../../../common/error-utils";
     import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
     import {handleProposalValidation} from "../../../../common/utils/proposalValidation";
+    import {onDestroy} from "svelte";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
@@ -94,7 +94,8 @@
             });
     }
 
-    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && (!_.isEmpty($dataTypes) || $skipDataTypes));
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && !_.isEmpty($dataTypes) && !$skipDataTypes);
+    $: onDestroy(()=>resetStore())
 </script>
 
 {#if dataFlowProposalsEnabled && primaryEntityRef}
@@ -103,12 +104,8 @@
                 small={_.get(sourceEntity, ["name"], "-")}>
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
-                <li>
-                    <ViewLink state="main">Home</ViewLink>
-                </li>
-                <li>
-                    <EntityLink ref={sourceEntity}/>
-                </li>
+                <li><ViewLink state="main">Home</ViewLink></li>
+                <li><EntityLink ref={sourceEntity}/></li>
                 <li>Propose Data Flow</li>
             </ol>
         </div>

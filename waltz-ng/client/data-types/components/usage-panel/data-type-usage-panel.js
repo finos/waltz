@@ -24,15 +24,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
-import ReasonSelection from "./ReasonSelection.svelte"
-import {
-    duplicateProposeFlowMessage,
-    editDataTypeReason,
-    existingProposeFlowId
-} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
-import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
-import {PROPOSAL_TYPES} from "../../../common/constants";
-import {buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
+
 
 const bindings = {
     parentEntityRef: "<",
@@ -49,21 +41,11 @@ const initialState = {
         editor: false,
         controls: false
     },
-    settings: null,
-    ReasonSelection,
-    ratingsScheme: null,
-    ratingSchemeExtId: null,
-    dataFlowProposalsEnabled: null,
-    selectedReason: null,
-    proposalType: PROPOSAL_TYPES.EDIT,
-    duplicateProposeFlowMessage,
-    existingProposeFlowId
 };
 
 
 function controller(serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
-
 
     const reload = (force = false) => {
         loadUsageData($q, serviceBroker, vm.parentEntityRef, force)
@@ -71,17 +53,6 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
-
-                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
-
-            });
-
-
         const decoratedRef = vm.parentEntityRef
             ? vm.parentEntityRef
             : mkRef(entity.PHYSICAL_SPECIFICATION.key, vm.parentFlow.specificationId);
@@ -108,10 +79,6 @@ function controller(serviceBroker, userService, $q) {
         vm.visibility.editor = false;
     };
 
-    editDataTypeReason.subscribe(value => {
-        vm.selectedReason = value;
-    });
-
     vm.onSave = () => {
         if (!vm.isDirty)
             return;
@@ -130,60 +97,12 @@ function controller(serviceBroker, userService, $q) {
         }
     };
 
-    vm.onSavePropose = () => {
-        Promise.all([
-            serviceBroker.loadViewData(
-                CORE_API.PhysicalSpecificationStore.getById,
-                [vm.parentFlow.specificationId]
-            ),
-            serviceBroker.loadViewData(
-                CORE_API.LogicalFlowStore.getById,
-                [vm.parentFlow.logicalFlowId]
-            )
-        ]).then(([specResponse, logicalFlowResponse]) => {
-            const specificationData = specResponse.data;
-            const logicalFlowData = logicalFlowResponse.data;
-
-            const command = buildProposalFlowCommand({
-                physicalFlow: vm.parentFlow,
-                specification: specificationData,
-                logicalFlow: logicalFlowData,
-                dataType: [],
-                selectedReason: vm.selectedReason,
-                proposalType: PROPOSAL_TYPES.EDIT
-            });
-
-            if (!command) {
-                console.error("Could not build command for proposal");
-                return;
-            }
-            if (!vm.isDirty) return;
-
-            if (vm.savePropose) {
-                vm.savePropose(command)
-                    .then(() => {
-                            toasts.success("Data types updated successfully");
-                            editDataTypeReason.set(null)
-                            reload(true);
-                            vm.onHideEdit();
-                        }
-                    )
-                    .catch(error => {
-                        console.error("Error in savePropose:", error);
-                    });
-
-            }
-        });
-    }
     vm.onDirty = (dirtyFlag) => {
         vm.isDirty = dirtyFlag;
     };
 
     vm.registerSaveFn = (saveFn) => {
         vm.save = saveFn;
-    };
-    vm.registerSaveProposeFn = (saveFn) => {
-        vm.savePropose = saveFn;
     };
 }
 
