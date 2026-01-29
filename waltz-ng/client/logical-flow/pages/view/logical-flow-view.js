@@ -97,7 +97,7 @@ function controller($q,
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
                 let settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(settings)
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(settings)
             });
 
     };
