@@ -86,7 +86,7 @@
                     <a ng-if="$ctrl.dataFlowProposalsEnabled"
                        ng-click="!($ctrl.isProposeDisabled || !$ctrl.isDirty || !$ctrl.isReasonSelected) && $ctrl.onSavePropose()"
                        class="clickable"
-                       ng-disabled="!($ctrl.isDirty && $ctrl.isReasonSelected && !$ctrl.isProposeDisabled)">
+                       ng-disabled="$ctrl.isProposeDisabled || !($ctrl.isDirty && $ctrl.isReasonSelected)">
                         Propose Edit
                     </a>
                     |
