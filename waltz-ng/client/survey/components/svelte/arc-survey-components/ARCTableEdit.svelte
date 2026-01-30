@@ -114,8 +114,8 @@
                 // if there is not a selected item
                 if(!t?.response?.length) {
                     $invalidRows = [...$invalidRows.filter(x => x?.id !== t?.entityRef?.id),
-                        {id: t?.entityRef?.id, message: `You have selected ${t?.dropdownResponse}, but did not select an item`}];
-                    displayError(`You have selected ${t?.dropdownResponse}, but did not select an item`);
+                        {id: t?.entityRef?.id, message: dropdownDefinition?.customErrorMessage}];
+                    displayError(dropdownDefinition?.customErrorMessage);
                 } else {
                     $invalidRows = $invalidRows?.filter(x => x?.id !== t?.entityRef?.id);
                 }

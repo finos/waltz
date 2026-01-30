@@ -122,7 +122,7 @@
         </insert>
         <insert tableName="settings">
             <column name="name" value="feature.survey.arc.dropdown-definition"/>
-            <column name="value" value='{"label": "Do you want to select ARCs from the tree?", "options": ["Y", "N"], "inclusionOption": "Y", "fallbackMessage": "No ARCs available to select"}'/>
+            <column name="value" value='{"label": "Do you want to select ARCs from the tree?", "options": ["Y", "N"], "inclusionOption": "Y", "fallbackMessage": "No ARCs available to select", "customErrorMessage": "You have not selected any ARCs from the dropdown."}'/>
             <column name="description" value="JSON definition for the dropdown used in ARC survey questions. Includes label, options, and the option that triggers ARC selection."/>
             <column name="restricted" valueBoolean="false"/>
         </insert>
