@@ -114,8 +114,8 @@
                 // if there is not a selected item
                 if(!t?.response?.length) {
                     $invalidRows = [...$invalidRows.filter(x => x?.id !== t?.entityRef?.id),
-                        {id: t?.entityRef?.id, message: `You have selected ${t?.dropdownResponse}, but did not select an ARC`}];
-                    displayError(`You have selected ${t?.dropdownResponse}, but did not select an ARC`);
+                        {id: t?.entityRef?.id, message: dropdownDefinition?.customErrorMessage}];
+                    displayError(dropdownDefinition?.customErrorMessage);
                 } else {
                     $invalidRows = $invalidRows?.filter(x => x?.id !== t?.entityRef?.id);
                 }
@@ -129,7 +129,7 @@
             }
 
             // dropdown is mandatory
-            else if(t.dropdownResponse === null){
+            else if(t?.dropdownResponse === null){
                 $invalidRows = [...$invalidRows.filter(x => x?.id !== t?.entityRef?.id),
                     {id: t?.entityRef?.id, message: `You have not selected an option from the dropdown for ${t?.entityRef?.title}`}];
                 displayError(`You have not selected an option from the dropdown for ${t?.entityRef?.title}`);
@@ -211,12 +211,10 @@
 
                     <!-- Milestone RAG -->
                     <td>
-                        <h5>Rag Rating: {arc.milestoneRag}</h5>
+                        <h5>Rag Rating: {arc?.milestoneRag}</h5>
                         <hr/>
                         <h5>Forecast Date</h5>
-                        <DateTime relative={false} formatStr="YYYY-MM-DD">
-                            <small class="text-muted">{arc.milestoneForecastDate}</small>
-                        </DateTime>
+                        <DateTime dateTime={arc?.milestoneForecastDate} relative={false} formatStr="YYYY-MM-DD"/>
                     </td>
 
                     <!-- Dropdown -->
@@ -229,12 +227,16 @@
                     <!-- Tree -->
                     <td>
                         {#if arcHierarchy && $arcSurveyState.find(t => t.entityRef.id === arc.id)?.dropdownResponse === dropdownDefinition?.inclusionOption}
-                            <ARCTree items={arcHierarchy.filter(t => t.externalParentId === arc.externalId)}
-                                     onSelectItem={(r) => selectTreeItem(arc.id, r)}
-                                     onDeselectItem={(r) => deselectTreeItem(arc.id, r)}
-                                     selectedItems={getSelectedItems(arc.id)}
-                                     mode={"EDIT"}
-                                     {url}/>
+                            {#if arcHierarchy.filter(t => t.externalParentId === arc.externalId)?.length}
+                                <ARCTree items={arcHierarchy.filter(t => t.externalParentId === arc.externalId)}
+                                         onSelectItem={(r) => selectTreeItem(arc.id, r)}
+                                         onDeselectItem={(r) => deselectTreeItem(arc.id, r)}
+                                         selectedItems={getSelectedItems(arc.id)}
+                                         mode={"EDIT"}
+                                         {url}/>
+                            {:else }
+                                <NoData type="error">{dropdownDefinition?.fallbackMessage}</NoData>
+                            {/if}
                         {/if}
                     </td>
                 </tr>
