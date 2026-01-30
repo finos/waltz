@@ -52,10 +52,7 @@
     $: logicalFlowCall = targetLogicalFlowId ? logicalFlowStore.getById(targetLogicalFlowId) : null;
     $: $logicalFlow = logicalFlowCall ? $logicalFlowCall.data : null;
 
-    $: $logicalFlow, resetDuplicateState();
-    $: $physicalFlow, resetDuplicateState();
-    $: $physicalSpecification, resetDuplicateState();
-    $: $dataTypes, resetDuplicateState();
+    $: $logicalFlow || $physicalFlow || $physicalSpecification ||$dataTypes, resetDuplicateState();
 
     function resetDuplicateState() {
         if ($duplicateProposeFlowMessage) {
