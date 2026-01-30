@@ -80,7 +80,7 @@
         <annotation-api.version>1.3.2</annotation-api.version>
         <archunit.version>1.0.1</archunit.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <h2.version>2.1.214</h2.version>
+        <h2.version>2.2.220</h2.version>
         <hikari.version>3.4.5</hikari.version>
         <immutables.version>2.9.3</immutables.version>
         <jackson.version>2.15.2</jackson.version>
@@ -88,7 +88,7 @@
         <java.version>17</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
-        <jgrapht.version>1.4.0</jgrapht.version>
+        <jgrapht.version>1.5.2</jgrapht.version>
         <jool.version>0.9.15</jool.version>
         <jooq.version>3.18.29</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.10.0</junit.version>
@@ -102,7 +102,7 @@
         <snakeyaml.version>2.5</snakeyaml.version>
         <spark.version>2.9.4</spark.version> <!-- 2.9.3 causes issues with tomcat -->
         <spark-freemarker.version>2.7.1</spark-freemarker.version>
-        <spring.version>5.3.30</spring.version>
+        <spring.version>5.3.36</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
         <commons-jexl3.version>3.2.1</commons-jexl3.version>  <!-- 3.3.0 causes evaluation issues -->

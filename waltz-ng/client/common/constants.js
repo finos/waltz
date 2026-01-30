@@ -28,3 +28,6 @@ export const PROPOSAL_TYPES = {
     EDIT: "EDIT",
     DELETE: "DELETE"
 }
+
+export const ARC_DROPDOWN_DEFINITION= "feature.survey.arc.dropdown-definition";
+export const ARC_EXTERNAL_URL= "arc.external.base.url";

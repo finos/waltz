@@ -27,9 +27,14 @@ export function mkSurveyQuestionStore() {
     const findQuestionsForTemplate = (id, force = false) => remote
         .fetchViewList("GET", `api/survey-question/questions/template/${id}`, [], {force});
 
+    const findDropdownEntriesForTemplate = (id, force = false) => {
+        return remote.fetchViewList("GET", `api/survey-question/dropdown-entries/template/${id}`, [], {force});
+    };
+
     return {
         findQuestionsForInstance,
-        findQuestionsForTemplate
+        findQuestionsForTemplate,
+        findDropdownEntriesForTemplate
     };
 }
 

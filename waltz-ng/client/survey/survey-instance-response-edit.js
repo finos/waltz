@@ -26,6 +26,7 @@ import template from "./survey-instance-response-edit.html";
 import * as actions from "./survey-actions";
 import toasts from "../svelte-stores/toast-store";
 import SurveyViewerContextPanel from "./components/svelte/inline-panel/SurveyViewerContextPanel.svelte";
+import {surveyCustomFieldTypes} from "./components/survey-custom-fields";
 
 const initialState = {
     changeLogSection: dynamicSections.changeLogSection,
@@ -35,7 +36,8 @@ const initialState = {
     user: {},
     dropdownEntriesByQuestionId: {},
     SurveyViewerContextPanel,
-    mode: "EDIT"
+    mode: "EDIT",
+    surveyCustomFieldTypes
 };
 
 const submissionConfirmationPrompt = `The survey cannot be edited once submitted.
