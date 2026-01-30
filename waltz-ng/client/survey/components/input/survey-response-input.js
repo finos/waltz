@@ -2,7 +2,6 @@ import template from "./survey-response-input.html"
 import {initialiseData} from "../../../common";
 import ARCSurveyComponent from "../svelte/arc-survey-components/ARCSurveyComponent.svelte";
 
-
 const bindings = {
     question: "<",
     response: "<",
@@ -17,6 +16,7 @@ const bindings = {
     saveEntityListResponse: "<",
     saveListResponse: "<",
     subject: "<",
+    surveyCustomFieldTypes: "<"
 };
 
 const initialState = {
