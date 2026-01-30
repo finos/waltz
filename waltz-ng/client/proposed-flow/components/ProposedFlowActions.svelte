@@ -18,7 +18,6 @@
         CONFIRMATION: "CONFIRMATION",
         LOADING: "LOADING",
     };
-    const lockMs = 1200;
 
     let mode = Modes.LIST;
     let reason = "";
@@ -26,7 +25,6 @@
     let validationMessage = "";
     let notification = "You do not have permission to approve or reject this proposed flow.";
     let physicalFlowCount;
-    let clickLocked = false;
 
     export let proposedFlow = {};
 
@@ -100,16 +98,6 @@
             action.confirmationRequirement === "CONFIRM_REQUIRED" ||
             action.confirmationRequirement === "CONFIRM_AND_COMMENT_REQUIRED"
         );
-    }
-
-    function withClickLock(fn) {
-        if (clickLocked) return;
-        clickLocked = true;
-        try {
-            fn && fn();
-        } finally {
-            setTimeout(() => (clickLocked = false), lockMs);
-        }
     }
 
     function initiateAction(action) {
@@ -228,7 +216,7 @@
                             class={mkButtonClasses(action)}
                             title={action.description}
                             disabled={action.disabled}
-                            on:click={() => withClickLock(() => initiateAction(action))}
+                            on:click={() => initiateAction(action)}
                         >
                             <Icon name={action.icon} />
                             {action.display}

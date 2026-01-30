@@ -54,6 +54,9 @@
 
     function cancel() {
         cancelProposeDeleteFlow(false);
+        $deleteFlowReason = null;
+        $duplicateProposeFlowMessage = null;
+        $existingProposeFlowId = null;
     }
 
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
