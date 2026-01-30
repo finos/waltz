@@ -153,10 +153,10 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     private PermissionGroupHelper permissionHelper;
 
     @Autowired
-    DataFlowService dataFlowService;
+    private DataFlowService dataFlowService;
 
     @Autowired
-    ProposedFlowWorkflowHelper proposedFlowWorkflowHelper;
+    private ProposedFlowWorkflowHelper proposedFlowWorkflowHelper;
 
     @Autowired
     private LogicalFlowHelper lfHelper;
