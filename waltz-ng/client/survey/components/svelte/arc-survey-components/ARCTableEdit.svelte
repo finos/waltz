@@ -227,12 +227,16 @@
                     <!-- Tree -->
                     <td>
                         {#if arcHierarchy && $arcSurveyState.find(t => t.entityRef.id === arc.id)?.dropdownResponse === dropdownDefinition?.inclusionOption}
-                            <ARCTree items={arcHierarchy.filter(t => t.externalParentId === arc.externalId)}
-                                     onSelectItem={(r) => selectTreeItem(arc.id, r)}
-                                     onDeselectItem={(r) => deselectTreeItem(arc.id, r)}
-                                     selectedItems={getSelectedItems(arc.id)}
-                                     mode={"EDIT"}
-                                     {url}/>
+                            {#if arcHierarchy.filter(t => t.externalParentId === arc.externalId)?.length}
+                                <ARCTree items={arcHierarchy.filter(t => t.externalParentId === arc.externalId)}
+                                         onSelectItem={(r) => selectTreeItem(arc.id, r)}
+                                         onDeselectItem={(r) => deselectTreeItem(arc.id, r)}
+                                         selectedItems={getSelectedItems(arc.id)}
+                                         mode={"EDIT"}
+                                         {url}/>
+                            {:else }
+                                <NoData type="error">{dropdownDefinition?.fallbackMessage}</NoData>
+                            {/if}
                         {/if}
                     </td>
                 </tr>
