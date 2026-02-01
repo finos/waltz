@@ -1,6 +1,6 @@
 <div ng-switch="$ctrl.question.fieldType">
 
-    <label ng-if="$ctrl.question.label"
+    <label ng-if="!$ctrl.surveyCustomFieldTypes[$ctrl.question.fieldType] && $ctrl.question.label"
            ng-attr-for="{{$ctrl.question.id}}"
            ng-bind="$ctrl.question.label">
     </label>

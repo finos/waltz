@@ -60,12 +60,10 @@
 
                     <!-- Milestone RAG -->
                     <td>
-                        <h5>Rag Rating: {arc.milestoneRag}</h5>
+                        <h5>Rag Rating: {arc?.milestoneRag}</h5>
                         <hr/>
                         <h5>Forecast Date</h5>
-                        <DateTime relative={false} formatStr="YYYY-MM-DD">
-                            <small class="text-muted">{arc.milestoneForecastDate}</small>
-                        </DateTime>
+                        <DateTime relative={false} formatStr="YYYY-MM-DD" dateTime={arc?.milestoneForecastDate}/>
                     </td>
 
                     <!-- Dropdown -->

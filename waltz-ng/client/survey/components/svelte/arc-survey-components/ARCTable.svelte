@@ -36,7 +36,9 @@
     const DEFAULT_DROPDOWN_DEFINITION = {
         label: "Do you want to select ARCs from the tree?",
         options: ["Y", "N"],
-        inclusionOption: null
+        inclusionOption: "Y",
+        fallbackMessage: "No ARCs available to select",
+        customErrorMessage: "You have not selected any ARCs from the dropdown."
     };
 
     const MODES = {
