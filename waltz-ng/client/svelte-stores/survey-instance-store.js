@@ -101,6 +101,11 @@ export function mkSurveyInstanceStore() {
             null,
             {force});
 
+    const saveResponse = (id, questionResponse) => remote
+        .execute("PUT",
+            `api/survey-instance/${id}/response`,
+            questionResponse);
+
 
     return {
         addOwner,
@@ -124,7 +129,8 @@ export function mkSurveyInstanceStore() {
         reassignRecipients,
         getReassignRecipientsCounts,
         reassignOwners,
-        getReassignOwnersCounts
+        getReassignOwnersCounts,
+        saveResponse
     };
 }
 

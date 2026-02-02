@@ -82,37 +82,80 @@
 
                             <div ng-repeat="question in groupedQuestion.questions track by question.id"
                                  class="waltz-survey-question-edit-row row">
-                                <div ng-attr-for="{{ question.id }}"
-                                     class="col-md-3">
-                                    <div>
-                                        <span ng-bind="question.questionText">
-                                        </span>
-                                        <span ng-if="question.isMandatory"
-                                              class="text-danger">
-                                            *
-                                        </span>
+
+                                <div class="col-md-12" ng-if="!ctrl.surveyCustomFieldTypes[question.fieldType]">
+                                    <!-- Label -->
+                                    <div ng-attr-for="{{ question.id }}"
+                                         class="col-md-3">
+                                        <div>
+                                            <span ng-bind="question.questionText">
+                                            </span>
+                                            <span ng-if="question.isMandatory"
+                                                  class="text-danger">
+                                                *
+                                            </span>
+                                        </div>
+                                        <div ng-if="question.externalId"
+                                             style="word-break: break-all"
+                                             class="text-muted small">
+                                            (<span ng-bind="question.externalId"></span>)
+                                        </div>
+                                        <div style="padding-top: 1em">
+                                            <!-- help text -->
+                                            <waltz-markdown text="question.helpText"
+                                                            style="display: block;"
+                                                            class='small text-muted'>
+                                            </waltz-markdown>
+                                        </div>
                                     </div>
-                                    <div ng-if="question.externalId"
-                                         style="word-break: break-all"
-                                         class="text-muted small">
-                                        (<span ng-bind="question.externalId"></span>)
-                                    </div>
-                                    <div style="padding-top: 1em">
-                                        <!-- help text -->
-                                        <waltz-markdown text="question.helpText"
-                                                        style="display: block;"
-                                                        class='small text-muted'>
-                                        </waltz-markdown>
+
+                                    <!-- MAIN QUESTION INPUT -->
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div ng-class="{
+                                            'col-md-12': !question.subQuestions,
+                                            'col-md-4': question.subQuestions
+                                         }">
+                                                <waltz-survey-response-input response="ctrl.surveyResponses[question.id]"
+                                                                             question="question"
+                                                                             options="ctrl.dropdownEntriesByQuestionId[question.id]"
+                                                                             instance-id="ctrl.surveyDetails.instance.id"
+                                                                             save-comment="ctrl.saveComment"
+                                                                             save-string-response="ctrl.saveStringResponse"
+                                                                             save-number-response="ctrl.saveNumberResponse"
+                                                                             save-boolean-response="ctrl.saveBooleanResponse"
+                                                                             save-entity-response="ctrl.saveEntityResponse"
+                                                                             save-entity-list-response="ctrl.saveEntityListResponse"
+                                                                             save-list-response="ctrl.saveListResponse"
+                                                                             save-date-response="ctrl.saveDateResponse">
+                                                </waltz-survey-response-input>
+                                            </div>
+
+                                            <!-- (optional) SUB QUESTION INPUTS -->
+                                            <div class="col-md-4"
+                                                 ng-repeat="sq in question.subQuestions">
+                                                <waltz-survey-response-input response="ctrl.surveyResponses[sq.id]"
+                                                                             question="sq"
+                                                                             options="ctrl.dropdownEntriesByQuestionId[sq.id]"
+                                                                             instance-id="ctrl.surveyDetails.instance.id"
+                                                                             save-comment="ctrl.saveComment"
+                                                                             save-string-response="ctrl.saveStringResponse"
+                                                                             save-number-response="ctrl.saveNumberResponse"
+                                                                             save-boolean-response="ctrl.saveBooleanResponse"
+                                                                             save-entity-response="ctrl.saveEntityResponse"
+                                                                             save-entity-list-response="ctrl.saveEntityListResponse"
+                                                                             save-list-response="ctrl.saveListResponse"
+                                                                             save-date-response="ctrl.saveDateResponse"
+                                                                             survey-custom-field-types="ctrl.surveyCustomFieldTypes">
+                                                </waltz-survey-response-input>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- MAIN QUESTION INPUT -->
-                                <div class="col-md-9">
+                                <div class="col-md-12" ng-if="question.fieldType === ctrl.surveyCustomFieldTypes.ARC">
                                     <div class="row">
-                                        <div ng-class="{
-                                        'col-md-12': !question.subQuestions,
-                                        'col-md-4': question.subQuestions
-                                     }">
+                                        <div class="col-md-12">
                                             <waltz-survey-response-input response="ctrl.surveyResponses[question.id]"
                                                                          question="question"
                                                                          options="ctrl.dropdownEntriesByQuestionId[question.id]"
@@ -124,25 +167,9 @@
                                                                          save-entity-response="ctrl.saveEntityResponse"
                                                                          save-entity-list-response="ctrl.saveEntityListResponse"
                                                                          save-list-response="ctrl.saveListResponse"
-                                                                         save-date-response="ctrl.saveDateResponse">
-                                            </waltz-survey-response-input>
-                                        </div>
-
-                                        <!-- (optional) SUB QUESTION INPUTS -->
-                                        <div class="col-md-4"
-                                             ng-repeat="sq in question.subQuestions">
-                                            <waltz-survey-response-input response="ctrl.surveyResponses[sq.id]"
-                                                                         question="sq"
-                                                                         options="ctrl.dropdownEntriesByQuestionId[sq.id]"
-                                                                         instance-id="ctrl.surveyDetails.instance.id"
-                                                                         save-comment="ctrl.saveComment"
-                                                                         save-string-response="ctrl.saveStringResponse"
-                                                                         save-number-response="ctrl.saveNumberResponse"
-                                                                         save-boolean-response="ctrl.saveBooleanResponse"
-                                                                         save-entity-response="ctrl.saveEntityResponse"
-                                                                         save-entity-list-response="ctrl.saveEntityListResponse"
-                                                                         save-list-response="ctrl.saveListResponse"
-                                                                         save-date-response="ctrl.saveDateResponse">
+                                                                         save-date-response="ctrl.saveDateResponse"
+                                                                         subject="ctrl.surveyDetails.subject"
+                                                                         survey-custom-field-types="ctrl.surveyCustomFieldTypes">
                                             </waltz-survey-response-input>
                                         </div>
                                     </div>
