@@ -20,7 +20,10 @@ public abstract class ArchitectureRequiredChange {
 
     @Nullable
     public abstract String title();
+
+    @Nullable
     public abstract String description();
+
     public abstract String status();
     public abstract Optional<String> milestoneRag();
     public abstract Optional<LocalDateTime> milestoneForecastDate();
