@@ -65,7 +65,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class={_.size(rowData) > 6 ? "waltz-scroll-region-300" : ""}>
+        <div class={_.size(rowData) > 6 ? "waltz-scroll-region-300" : ""} style="padding: 0">
             <table class="table table-condensed table-hover small fixed-table">
                 <colgroup>
                     {#each columnDefs as col}
@@ -118,5 +118,12 @@
 
     .searching {
         color: deepskyblue;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
     }
 </style>

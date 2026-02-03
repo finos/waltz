@@ -145,6 +145,7 @@ $: filteredGridData = gridData
         .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.workflowState.state))
         .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.flowDef.proposalType))
         .filter(d => ($filters.proposer.length === 0) || $filters.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
+        .sort((a, b) => new Date(b.workflowState.lastUpdatedAt) - new Date(a.workflowState.lastUpdatedAt))
         .sort((a, b) => $filters.state.indexOf(a.workflowState.state) - $filters.state.indexOf(b.workflowState.state))
         .sort((a, b) => $filters.change.indexOf(a.flowDef.proposalType) - $filters.change.indexOf(b.flowDef.proposalType))
         .sort((a, b) => $filters.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
