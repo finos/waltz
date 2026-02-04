@@ -54,6 +54,9 @@
 
     function cancel() {
         cancelProposeDeleteFlow(false);
+        $deleteFlowReason = null;
+        $duplicateProposeFlowMessage = null;
+        $existingProposeFlowId = null;
     }
 
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
@@ -124,7 +127,7 @@
             {/if}
             <div style="display: flex; justify-content: flex-end;margin: 0;gap: 0.5rem">
                 <button class="btn btn-sm btn-primary"
-                        disabled={!workingCopy?.rating?.length}>
+                        disabled={!workingCopy?.rating?.length || $existingProposeFlowId}>
                     Submit
                 </button>
                 <button type="button" class="btn btn-sm" on:click={cancel}>
