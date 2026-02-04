@@ -52,7 +52,7 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <waltz-section-actions>
-            <button ng-if="ctrl.canRestore"
+            <button ng-if="!ctrl.dataFlowProposalsEnabled && ctrl.canRestore"
                     class="btn btn-xs btn-primary"
                     uib-popover="Restore this flow, any physical flows that were active when this logical flow was removed will also be restored"
                     popover-append-to-body="true"

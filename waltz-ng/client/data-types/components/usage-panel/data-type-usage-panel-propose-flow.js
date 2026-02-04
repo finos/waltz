@@ -54,7 +54,8 @@ const initialState = {
     isReasonSelected:false,
     proposalType:PROPOSAL_TYPES.EDIT,
     duplicateProposeFlowMessage,
-    existingProposeFlowId
+    existingProposeFlowId,
+    isProposeDisabled:false
 };
 
 
@@ -78,6 +79,10 @@ function controller(serviceBroker, userService, $q) {
                 vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
 
             });
+
+        existingProposeFlowId.subscribe((value)=>{
+            vm.isProposeDisabled = !_.isNil(value);
+        })
 
 
         const decoratedRef = vm.parentEntityRef
@@ -104,6 +109,9 @@ function controller(serviceBroker, userService, $q) {
 
     vm.onHideEdit = () => {
         vm.visibility.editor = false;
+        editDataTypeReason.set(null);
+        duplicateProposeFlowMessage.set(null);
+        existingProposeFlowId.set(null);
     };
 
     editDataTypeReason.subscribe(value => {
