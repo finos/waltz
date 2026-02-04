@@ -19,6 +19,7 @@
 package org.finos.waltz.service;
 
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.jooq.DSLContext;
 import org.jooq.ExecuteContext;
 import org.jooq.conf.Settings;
@@ -28,6 +29,7 @@ import org.jooq.tools.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.util.concurrent.TimeUnit;
 
 
@@ -38,6 +40,8 @@ public class SlowQueryListener extends DefaultExecuteListener {
 
     private StopWatch stopWatch;
     private long slowQueryThresholdInNanos;
+    private DataSource dataSource;
+    private boolean logConnectionPoolStatus;
 
     public class SQLPerformanceWarning
             extends Exception {
@@ -48,9 +52,11 @@ public class SlowQueryListener extends DefaultExecuteListener {
     }
 
 
-    public SlowQueryListener(int slowQueryThresholdSeconds) {
+    public SlowQueryListener(int slowQueryThresholdSeconds, DataSource dataSource, boolean logConnectionPoolStatus) {
         LOG.info("Initialising with {} second threshold", slowQueryThresholdSeconds);
         this.slowQueryThresholdInNanos = TimeUnit.SECONDS.toNanos(slowQueryThresholdSeconds);
+        this.dataSource = dataSource;
+        this.logConnectionPoolStatus = logConnectionPoolStatus;
     }
 
 
@@ -71,6 +77,35 @@ public class SlowQueryListener extends DefaultExecuteListener {
                     new Settings().withRenderFormatted(true));
 
             LOG.info(String.format("Slow SQL executed in %d seconds", TimeUnit.NANOSECONDS.toSeconds(split)), new SQLPerformanceWarning(context.renderInlined(ctx.query())));
+            LOG.info(dataSource.toString());
+
+            logConnectionPoolStatus();
+        }
+    }
+
+    private void logConnectionPoolStatus() {
+        if (logConnectionPoolStatus) {
+            if (dataSource instanceof HikariDataSource) {
+                HikariDataSource hikariDataSource = (HikariDataSource) dataSource;
+
+                int activeConnections = hikariDataSource.getHikariPoolMXBean().getActiveConnections();
+                int idleConnections = hikariDataSource.getHikariPoolMXBean().getIdleConnections();
+                int totalConnections = hikariDataSource.getHikariPoolMXBean().getTotalConnections();
+                int threadsAwaitingConnection = hikariDataSource.getHikariPoolMXBean().getThreadsAwaitingConnection();
+                String poolName = hikariDataSource.getPoolName();
+
+                LOG.info(
+                        "Hikari Pool Status [{}]: Active=[{}], Idle=[{}], Total=[{}], Awaiting=[{}]",
+                        poolName,
+                        activeConnections,
+                        idleConnections,
+                        totalConnections,
+                        threadsAwaitingConnection);
+            } else if (dataSource != null) {
+                LOG.info("DataSource is of type: {}", dataSource.getClass().getName());
+            } else {
+                LOG.warn("DataSource is null, cannot log pool status.");
+            }
         }
     }
 }
