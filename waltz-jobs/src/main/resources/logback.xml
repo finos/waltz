@@ -29,6 +29,8 @@
     <logger name="org.finos" level="DEBUG" />
     <!--<logger name="org.jooq" level="DEBUG" />-->
 
+    <logger name="WALTZ.PERFORMANCE" level="INFO" />
+
     <root level="WARN">
         <appender-ref ref="STDOUT" />
     </root>

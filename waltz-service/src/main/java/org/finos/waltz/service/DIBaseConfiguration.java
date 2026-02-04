@@ -74,6 +74,9 @@ public class DIBaseConfiguration {
     @Value("${database.performance.query.slow.threshold:10}")
     private int databasePerformanceQuerySlowThreshold;
 
+    @Value("${log.connection.pool.status:false}")
+    private boolean logConnectionPoolStatus;
+
     @Bean
     public DataSource dataSource() {
 
@@ -120,7 +123,7 @@ public class DIBaseConfiguration {
                 .set(dslSettings)
                 .set(
                     //new SlowDatabaseConnectionSimulator(2000),
-                    new SlowQueryListener(databasePerformanceQuerySlowThreshold),
+                    new SlowQueryListener(databasePerformanceQuerySlowThreshold, dataSource, logConnectionPoolStatus),
                     new SpringExceptionTranslationExecuteListener(new SQLStateSQLExceptionTranslator()));
 
         return DSL.using(configuration);
