@@ -28,6 +28,7 @@ public enum EntityKind {
     ALLOCATION_SCHEME("Allocation scheme"),
     APPLICATION("Application"),
     APP_GROUP("Application group"),
+    ARCHITECTURE_REQUIRED_CHANGE("Architecture Required Change"),
     ASSESSMENT_DEFINITION("Assessment definition"),
     ASSESSMENT_RATING("Assessment rating"),
     ASSET_COST("Asset cost"),

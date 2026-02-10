@@ -40,7 +40,7 @@ const initialState = {
     visibility: {
         editor: false,
         controls: false
-    }
+    },
 };
 
 
@@ -53,7 +53,6 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
-
         const decoratedRef = vm.parentEntityRef
             ? vm.parentEntityRef
             : mkRef(entity.PHYSICAL_SPECIFICATION.key, vm.parentFlow.specificationId);
@@ -68,7 +67,7 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onChanges = () => {
-        if (! vm.parentEntityRef) return;
+        if (!vm.parentEntityRef) return;
         reload(true);
     };
 
@@ -81,9 +80,9 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.onSave = () => {
-        if(!vm.isDirty)
+        if (!vm.isDirty)
             return;
-        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+        if (vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")) {
             return;
         }
         if (vm.save) {
@@ -106,7 +105,6 @@ function controller(serviceBroker, userService, $q) {
         vm.save = saveFn;
     };
 }
-
 
 controller.$inject = [
     "ServiceBroker",

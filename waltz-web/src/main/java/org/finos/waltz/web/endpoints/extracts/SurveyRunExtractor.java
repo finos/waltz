@@ -71,6 +71,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                 DSL.coalesce(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.cast(String.class), ""),
                 DSL.coalesce(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class), ""),
                 DSL.coalesce(ENTITY_RESPONSE_NAME_FIELD, ""),
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.JSON_RESPONSE.cast(String.class), ""),
                 DSL.coalesce(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, "")).as("Answer");
 
         SURVEY_RESPONSE_FIELDS = ListUtilities.asList(

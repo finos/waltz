@@ -24,7 +24,6 @@ import template from "./data-type-usage-selector.html";
 import {loadUsageData} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
-
 const bindings = {
     parentEntityRef: "<",
     onDirty: "<?",
@@ -44,7 +43,7 @@ const initialState = {
     showAllDataTypes: false,
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onSelect: (d) => console.log("dtus:onSelect - default impl", d),
-    onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
+    onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f),
 };
 
 
@@ -126,7 +125,7 @@ function controller($q, serviceBroker) {
         return serviceBroker
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
-                [ vm.parentEntityRef, decoratorUpdateCommand ]);
+                [vm.parentEntityRef, decoratorUpdateCommand]);
     };
 
     const anySelected = () => {
@@ -194,6 +193,7 @@ function controller($q, serviceBroker) {
             .then(() => reload(true));
     };
 
+
     vm.disablePredicate = (node) => {
         const isAbstract = !node.dataType.concrete;
         const notUsed = node.usage === null;
@@ -201,11 +201,11 @@ function controller($q, serviceBroker) {
     };
 
     vm.isReadonlyPredicate = (node) => {
-        if(_.isNull(node.usage)){
+        if (_.isNull(node.usage)) {
             return false;
         } else {
             return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
-                ? node.usage.readOnly || ! node.usage.isRemovable
+                ? node.usage.readOnly || !node.usage.isRemovable
                 : node.usage.readOnly;
         }
     };

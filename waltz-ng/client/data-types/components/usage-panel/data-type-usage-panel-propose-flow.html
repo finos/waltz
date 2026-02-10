@@ -1,0 +1,102 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div class="waltz-data-type-usage-panel">
+    <waltz-sub-section name="Data Types">
+        <content>
+
+            <div style="padding-top: 0.5em">
+                <div ng-if="!$ctrl.visibility.editor">
+                    <div ng-if="$ctrl.used.length > 0">
+                        <waltz-data-type-usage-tree used="$ctrl.used">
+                        </waltz-data-type-usage-tree>
+
+
+                        <div ng-if='$ctrl.helpText'
+                             class="help-block waltz-sub-section-content small"
+                             ng-bind="$ctrl.helpText">
+                        </div>
+                    </div>
+                    <div ng-if="$ctrl.used.length == 0"
+                         class="waltz-sub-section-content">
+                         No associated <strong>data types</strong> have been found
+                    </div>
+                </div>
+
+                <div ng-if="$ctrl.visibility.editor"
+                     class="waltz-highlight-if">
+                    <waltz-data-type-usage-selector-propose-flow parent-entity-ref="$ctrl.parentEntityRef"
+                                                                 parent-flow="$ctrl.parentFlow"
+                                                                 on-dirty="$ctrl.onDirty"
+                                                                 on-register-save="$ctrl.registerSaveFn"
+                                                                 on-register-save-propose="$ctrl.registerSaveProposeFn"
+                    >
+                    </waltz-data-type-usage-selector-propose-flow>
+                </div>
+                <div ng-if="$ctrl.visibility.editor && $ctrl.dataFlowProposalsEnabled && $ctrl.ratingSchemeExtId"
+                     class="waltz-highlight-if"
+                style="padding: 22px">
+<!--                    Rating Picker-->
+                    <waltz-svelte-component
+                        component="$ctrl.ReasonSelection"
+                        rating-scheme-ext-id="$ctrl.ratingSchemeExtId"
+                        proposal-type="$ctrl.proposalType"
+                        propose-delete-flow=null
+                        physical-flow-id=null
+                        logical-flow-id=null
+                    >
+                    </waltz-svelte-component>
+
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="waltz-sub-section-controls">
+                <span ng-if="!$ctrl.visibility.editor && ($ctrl.dataFlowProposalsEnabled || $ctrl.visibility.controls)">
+                    <!-- WHILST VIEWING -->
+                    <a ng-click="$ctrl.onShowEdit()"
+                       class="clickable">
+                        Edit
+                    </a>
+                </span>
+
+                <span ng-if="$ctrl.visibility.editor && ($ctrl.dataFlowProposalsEnabled || $ctrl.visibility.controls)">
+                    <!-- WHILST EDITING -->
+                    <a ng-if="!$ctrl.dataFlowProposalsEnabled"
+                        ng-click="$ctrl.onSave()"
+                       class="clickable"
+                       ng-disabled="!$ctrl.isDirty">
+                        Save
+                    </a>
+                    <a ng-if="$ctrl.dataFlowProposalsEnabled"
+                       ng-click="!$ctrl.isProposeDisabled && $ctrl.isDirty && $ctrl.isReasonSelected && $ctrl.onSavePropose()"                       class="clickable"
+                       ng-disabled="$ctrl.isProposeDisabled || !($ctrl.isDirty && $ctrl.isReasonSelected)">
+                        Propose Edit
+                    </a>
+                    |
+                    <a ng-click="$ctrl.onHideEdit()"
+                       class="clickable">
+                        Cancel
+                    </a>
+                </span>
+            </div>
+
+        </content>
+
+    </waltz-sub-section>
+</div>

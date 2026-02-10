@@ -26,6 +26,7 @@ import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
 import AlignedDataTypesList from "../../components/aligned-data-types-list/AlignedDataTypesList.svelte";
 import {copyTextToClipboard} from "../../../common/browser-utils";
+import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
 const initialState = {
@@ -52,6 +53,7 @@ function controller($q,
 
     vm.$onInit = () => {
         const flowId = $stateParams.id;
+
         vm.entityReference = {
             id: flowId,
             kind: "LOGICAL_DATA_FLOW"
@@ -90,6 +92,13 @@ function controller($q,
             vm.canRemove = vm.canEdit && !vm.isRemoved;
             vm.canRestore = vm.canEdit && vm.isRemoved;
         });
+
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                let settings = r.data;
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(settings)
+            });
 
     };
 

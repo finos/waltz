@@ -1,6 +1,6 @@
 <div ng-switch="$ctrl.question.fieldType">
 
-    <label ng-if="$ctrl.question.label"
+    <label ng-if="!$ctrl.surveyCustomFieldTypes[$ctrl.question.fieldType] && $ctrl.question.label"
            ng-attr-for="{{$ctrl.question.id}}"
            ng-bind="$ctrl.question.label">
     </label>
@@ -150,6 +150,17 @@
                            entity-lifecycle-statuses='["ACTIVE"]'
                            entity-kinds="['PERSON']">
     </waltz-entity-selector>
+
+    <div ng-switch-when="ARC">
+        <waltz-svelte-component component="$ctrl.ARCSurveyComponent"
+                                question="$ctrl.question"
+                                instance-id="$ctrl.instanceId"
+                                current-response="$ctrl.response.jsonResponse"
+                                mode="'EDIT'"
+                                linked-entity-kind="$ctrl.subject.kind"
+                                linked-entity-id="$ctrl.subject.id">
+        </waltz-svelte-component>
+    </div>
 
     <!-- legal entity multi picker -->
     <waltz-bulk-legal-entity-selector ng-switch-when="LEGAL_ENTITY"
