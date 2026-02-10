@@ -187,12 +187,16 @@ function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
             width: "15%",
             cellTemplate: `
                 <div class="ui-grid-cell-contents">
-                    <a ui-sref="main.software-version.view({id: row.entity.version.id})"
-                       ng-bind="row.entity.version.name">
-                    </a>
+                    <waltz-entity-link entity-ref="row.entity.version"
+                                       tooltip-placement="right"
+                                       icon-placement="none"
+                                       is-secondary-link="false"
+                                       additional-display-data="row.entity.vulnerabilityData">
+                    </waltz-entity-link>
                     <waltz-icon ng-if="row.entity.vulnerabilityCounts.High" name="exclamation-circle" style="color: #d62728"></waltz-icon>
                     <waltz-icon ng-if="!row.entity.vulnerabilityCounts.High && row.entity.vulnerabilityCounts.Medium" name="warning" style="color: #ff7f0e"></waltz-icon>
-                </div>`
+                </div>
+                `
         },
         { field: "version.releaseDate", displayName: "Release Date", width: "5%"},
         { field: "package.description", displayName: "Description", width: "25%"},
@@ -364,12 +368,29 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
                     .map(u => {
                         const versionId = u.softwareVersionId;
                         const countList = _.get(vulnerabilityCountsByVersionId, `[${versionId}].tallies`, []);
-                        const vulnerabilityCounts = _.keyBy(countList, 'id');
+                        
+                        // Create simplified vulnerability object for both icons and tooltip
+                        const vulnerabilityData = _.chain(countList)
+                            .keyBy('id')
+                            .mapValues(item => item.count)
+                            .value();
+                        
+                        // Create tooltip data from same source (only non-zero severities)
+                        const tooltipVulnerabilities = _.chain(countList)
+                            .filter(item => item.count > 0)
+                            .map(item => `${item.count} ${item.id}`)
+                            .value();
+                        
+                        const formattedTooltipData = tooltipVulnerabilities.length > 0 
+                            ? [{ name: "Vulnerabilities", value: tooltipVulnerabilities.join(", ") }]
+                            : [];
+                        
                         return Object.assign(
                             { },
                             { package: packagesById[u.softwarePackageId] },
                             { version: versionsById[versionId] },
-                            { vulnerabilityCounts }
+                            { vulnerabilityCounts: vulnerabilityData },      // Simplified: {High: 2, Medium: 1}
+                            { vulnerabilityData: formattedTooltipData }       // Formatted for tooltip
                         );
                     })
                     .value();
