@@ -4,13 +4,14 @@
 
 The following table list the people and/or organisations involved with Waltz
 
-| Name | Type |
-| --- | --- |
-| [David Watkins](https://github.com/davidwatkins73) | individual |
-| [Deutsche Bank](https://github.com/db-waltz) | organisational |
-| [Kamran Saleem](https://github.com/kamransaleem) | individual |
-| [Rohit Vats](https://github.com/rovats) | individual |
+| Name                                                         | Type |
+|--------------------------------------------------------------| --- |
+| [David Watkins](https://github.com/davidwatkins73)           | individual |
+| [Deutsche Bank](https://github.com/db-waltz)                 | organisational |
+| [Kamran Saleem](https://github.com/kamransaleem)             | individual |
+| [Rohit Vats](https://github.com/rovats)                      | individual |
 | [Jessica Woodland-Scott](https://github.com/JWoodland-Scott) | individual |
+| [HMx Labs](https://github.com/hmxlabs/waltz)                      | organisational |
 
 
 ### Libraries

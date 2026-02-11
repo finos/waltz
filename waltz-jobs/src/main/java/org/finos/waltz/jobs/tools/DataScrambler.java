@@ -1,7 +1,7 @@
 package org.finos.waltz.jobs.tools;
 
-import io.codearte.jfairy.Fairy;
-import io.codearte.jfairy.producer.person.Person;
+import com.devskiller.jfairy.Fairy;
+import com.devskiller.jfairy.producer.person.Person;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.schema.tables.records.ApplicationRecord;
 import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;

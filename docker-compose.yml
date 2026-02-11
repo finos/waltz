@@ -1,5 +1,3 @@
-version: "3.9"
-    
 services:
   waltz:
     image: ghcr.io/finos/waltz:latest
