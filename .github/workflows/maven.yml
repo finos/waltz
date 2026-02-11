@@ -25,14 +25,14 @@ jobs:
           --health-timeout 5s 
           --health-retries 5
 
-    steps:     
+    steps:
     - uses: actions/checkout@v4
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'temurin'
 
     - name: Cache Maven packages    
       uses: actions/cache@v4

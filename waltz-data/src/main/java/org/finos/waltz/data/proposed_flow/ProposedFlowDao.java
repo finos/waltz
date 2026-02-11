@@ -7,45 +7,83 @@ import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.*;
+import org.jooq.Record;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.Result;
+import org.jooq.CommonTableExpression;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectFieldOrAsterisk;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectUnionStep;
+import org.jooq.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
+import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
+import static org.jooq.impl.DSL.table;
 
 @Repository
 public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
+
     private final DSLContext dsl;
+    private final EntityWorkflowStateDao entityWorkflowStateDao;
+    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
     @Autowired
-    public ProposedFlowDao(DSLContext dsl, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
-        this.dsl = dsl;
+    public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
+        checkNotNull(dsl, "dsl cannot be null");
+
+        this.entityWorkflowStateDao = entityWorkflowStateDao;
+        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
+        this.dsl = dsl;
     }
 
     public Long saveProposedFlow(String username, ProposedFlowCommand proposedFlowCommand) throws JsonProcessingException {
@@ -67,11 +105,7 @@ public class ProposedFlowDao {
         checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
 
         EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
-        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao
-                .getEntityWorkflowView(
-                        PROPOSE_FLOW_LIFECYCLE_WORKFLOW,
-                        entityReference);
-
+        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
         try {
             ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
@@ -105,21 +139,9 @@ public class ProposedFlowDao {
         }
     }
 
-    public List<ProposedFlowResponse> getProposedFlowsBySelector(Select<Record1<Long>> flowIdSelector, Long workflowId) throws JsonProcessingException {
-        Result<Record> flatResults = dsl
-                .select(PROPOSED_FLOW.fields())
-                .select(ENTITY_WORKFLOW_STATE.fields())
-                .select(ENTITY_WORKFLOW_TRANSITION.fields())
-                .from(PROPOSED_FLOW)
-                .join(ENTITY_WORKFLOW_STATE)
-                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .join(ENTITY_WORKFLOW_TRANSITION)
-                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .where(PROPOSED_FLOW.ID.in(flowIdSelector))
-                .fetch();
+    public List<ProposedFlowResponse> getProposedFlowsByUser(Long personId, boolean isHierarchyRequired, Long workflowId) throws JsonProcessingException {
 
+        Result<Record> flatResults = fetchFlowsForPerson(personId, isHierarchyRequired, workflowId);
         // 1. Group the flat records by the proposed flow ID.
         //    The result is a Map where the key is the flow ID and the value is a list of all records for that flow.
         Map<Long, List<Record>> recordsByFlowId = flatResults.stream()
@@ -164,6 +186,90 @@ public class ProposedFlowDao {
                 .collect(Collectors.toList());
     }
 
+    private Result<Record> fetchFlowsForPerson(Long personId,
+                                               boolean includeSubordinates, Long workflowId) {
+        SelectFieldOrAsterisk[] selectFields = Stream.of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(), ENTITY_WORKFLOW_TRANSITION.fields())
+                .flatMap(Arrays::stream).map(f -> (SelectFieldOrAsterisk) f).toArray(SelectFieldOrAsterisk[]::new);
+
+        // --- Base CTE: current person
+        SelectConditionStep<Record3<Long, String, String>> currentPerson = getCurrentPerson(personId);
+        CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
+                name("current_person").fields("id", "employee_id", "email").as(currentPerson);
+        // --- Optional subordinate CTE if needed
+        CommonTableExpression<Record3<Long, String, String>> personScopeCte;
+        personScopeCte = getPersonScope(includeSubordinates, currentPerson);
+        // table reference for unified CTE
+        Table<Record> personScopeTbl = table(name("person_scope")).as("ps");
+        SelectJoinStep<?> invJoin = dsl.selectOne().from(INVOLVEMENT);
+        if (includeSubordinates) {
+            invJoin = invJoin
+                    .join(INVOLVEMENT_KIND)
+                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                    .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
+        }
+        // --- Build the shared query
+        return dsl
+                .with(currentPersonCte)
+                .with(personScopeCte)
+                .select(selectFields)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .join(ENTITY_WORKFLOW_TRANSITION)
+                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .whereExists(
+                    invJoin
+                        .join(personScopeTbl)
+                        .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
+                        .where(
+                            INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                            .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))))
+                )
+                .or(PROPOSED_FLOW.CREATED_BY.in(
+                    dsl
+                      .select(field(name("email"), String.class))
+                      .from(personScopeTbl))
+                )
+                .fetch();
+    }
+
+    private SelectConditionStep<Record3<Long, String, String>> getCurrentPerson(Long personId) {
+        return dsl
+                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
+                .from(PERSON)
+                .where(PERSON.ID.eq(personId));
+    }
+
+    private CommonTableExpression<Record3<Long, String, String>> getPersonScope(boolean includeSubordinates, SelectConditionStep<Record3<Long, String, String>> currentPerson) {
+
+        return includeSubordinates ?
+                name("person_scope").fields("id", "employee_id", "email").as(getPersonWithSubordinates(currentPerson))
+                : name("person_scope").fields("id", "employee_id", "email").as(currentPerson);
+
+    }
+
+    private SelectUnionStep<Record3<Long, String, String>> getPersonWithSubordinates(SelectConditionStep<Record3<Long, String, String>> currentPerson) {
+        return dsl
+                .select(PERSON.ID, PERSON.EMPLOYEE_ID, PERSON.EMAIL)
+                .from(PERSON)
+                .join(PERSON_HIERARCHY)
+                .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .join(currentPerson.asTable("cp"))
+                .on(PERSON_HIERARCHY.MANAGER_ID.eq(field(name("cp", "employee_id"), String.class)))
+                .where(PERSON.IS_REMOVED.eq(false))
+                .union(
+                    dsl
+                        .select(field(name("id"), Long.class),
+                        field(name("employee_id"), String.class),
+                        field(name("email"), String.class))
+                        .from(currentPerson));
+    }
+
+
     private ProposedFlowResponse createProposedFlowView(ProposedFlowCommand flowDefinition, List<EntityWorkflowTransition> updatedTransitions, ProposedFlowRecord proposedFlowRecord, EntityWorkflowState entityWorkflowState) {
         return ImmutableProposedFlowResponse.builder()
                 .id(proposedFlowRecord.getId())
@@ -181,6 +287,45 @@ public class ProposedFlowDao {
                 .from(PROPOSED_FLOW)
                 .where(PROPOSED_FLOW.ID.eq(id))
                 .fetchOneInto(ProposedFlowRecord.class);
+    }
+
+    public List<ProposedFlowRecord> proposedFlowRecordsByProposalType(ProposedFlowCommand proposedFlowCommand) {
+        Long workflowId = fetchWorkflowID();
+        Condition proposalTypeCondition = getProposalTypeCondition(proposedFlowCommand.proposalType());
+
+        List<ProposedFlowRecord> records =
+                dsl
+                        .selectDistinct(PROPOSED_FLOW.fields())
+                        .from(PROPOSED_FLOW)
+                        .join(ENTITY_WORKFLOW_STATE)
+                        .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                        .where(PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(proposedFlowCommand.source().id()))
+                        .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(proposedFlowCommand.source().kind().name()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
+                        .and(proposalTypeCondition)
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                        .fetchInto(ProposedFlowRecord.class);
+        return records;
+    }
+
+    private Condition getProposalTypeCondition(ProposalType proposalType) {
+        Condition proposalTypeCondition;
+        if(proposalType == CREATE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(CREATE.name());
+        else if(proposalType == EDIT || proposalType == DELETE)
+            proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(EDIT.name(), DELETE.name());
+        else
+            throw new IllegalArgumentException("Unexpected proposal type: "+ proposalType);
+        return proposalTypeCondition;
+    }
+
+    private Long fetchWorkflowID() {
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowDefinitionDao.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+        return Optional.ofNullable(entityWorkflowDefinition)
+                .flatMap(EntityWorkflowDefinition::id)
+                .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
     }
 }
 

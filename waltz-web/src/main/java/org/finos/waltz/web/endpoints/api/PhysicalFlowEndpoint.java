@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.SetAttributeCommand;
 import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.user.SystemRole;
@@ -46,7 +45,6 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -172,6 +170,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         String cleanupOrphansPath = WebUtilities.mkPath(BASE_URL, "cleanup-orphans");
 
+        String physicalFlowsCountForAssociatedLogicalFlowPath = WebUtilities.mkPath(BASE_URL, ":id", "sibling-physical-flows-count");
+
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService.findByEntityReference(WebUtilities.getEntityReference(request));
@@ -227,6 +227,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         EndpointUtilities.deleteForDatum(deletePath, this::deleteFlow);
         EndpointUtilities.getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+        EndpointUtilities.getForDatum(physicalFlowsCountForAssociatedLogicalFlowPath, this::getPhysicalFlowsCountForAssociatedLogicalFlow);
     }
 
 
@@ -322,6 +323,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested physical flow cleanup", username);
         return physicalFlowService.cleanupOrphans();
+    }
+
+    private int getPhysicalFlowsCountForAssociatedLogicalFlow(Request request, Response response){
+        long physicalFlowId = WebUtilities.getLong(request, "id");
+        return physicalFlowService.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowId);
     }
 
 }

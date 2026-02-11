@@ -3,7 +3,11 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.common.exception.FlowCreationException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
@@ -23,8 +27,13 @@ import java.util.List;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.findByVerb;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getEntityReference;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -49,7 +58,6 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
-
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {

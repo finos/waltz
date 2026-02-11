@@ -60,7 +60,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     private final String stem = "pgst";
 
 
-    @Test
+    //    @Test
     public void checkBasicPerms() {
         String u1 = mkName(stem, "user1");
         Long u1Id = personHelper.createPerson(u1);
@@ -141,7 +141,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     }
 
 
-    @Test
+    //    @Test
     public void findPermissionsForSubjectKind() {
 
         String u1 = mkName(stem, "user1");

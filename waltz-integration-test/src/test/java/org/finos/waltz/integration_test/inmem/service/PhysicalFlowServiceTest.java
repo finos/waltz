@@ -20,10 +20,26 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableSetAttributeCommand;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowDeleteCommand;
+import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowSpecDefinitionChangeCommand;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowDeleteCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlowInfo;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
@@ -34,7 +50,11 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.ExternalIdHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
+import org.finos.waltz.test_common.helpers.PhysicalFlowHelper;
+import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,7 +70,11 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -1234,6 +1258,123 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 "EntityReference.description() should be 'test PhysicalFlow' when PhysicalFlow.description() is set to 'test PhysicalFlow'");
 
         assertFalse(ref.externalId().isPresent(), "externalId should not be present");
+    }
+
+    @Test
+    public void testShouldReturnOnePhysicalFlowCount_whenExactlyOneNonRemovedPhysicalFlowExistsForItsLogicalFlow() {
+        // 1. Arrange ----------------------------------------------------------
+        String username = mkName("test user");
+
+        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+        EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
+
+        LogicalFlow logicalFlow = lfHelper.createLogicalFlow(a, b);
+
+        String specExtId = mkName("createWillCreateSpecIfRequired");
+
+        ImmutablePhysicalSpecification newSpec = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId)
+                .owningEntity(a)
+                .name(specExtId)
+                .description(specExtId)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec)
+                .flowAttributes(flowAttrs)
+                .build();
+
+        PhysicalFlowCreateCommandResponse physicalFlowCreateCommandResponse = pfSvc.create(createCommand, username);
+
+        // 2. Act --------------------------------------------------------------
+        int result = pfSvc.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowCreateCommandResponse.entityReference().id());
+
+        // 3. Assert -----------------------------------------------------------
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void testShouldReturnMultiplePhysicalFlowCount_whenMoreThanOnePhysicalFlowExistsForItsAssociatedLogicalFlow() {
+        // 1. Arrange ----------------------------------------------------------
+        String username = mkName("test user");
+
+        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+        EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
+
+        LogicalFlow logicalFlow = lfHelper.createLogicalFlow(a, b);
+
+        String specExtId = mkName("test");
+
+        String specExtId_1 = mkName("test1");
+
+        ImmutablePhysicalSpecification newSpec = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId)
+                .owningEntity(a)
+                .name(specExtId)
+                .description(specExtId)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutablePhysicalSpecification newSpec_1 = ImmutablePhysicalSpecification.builder()
+                .externalId(specExtId_1)
+                .owningEntity(a)
+                .name(specExtId_1)
+                .description(specExtId_1)
+                .format(DataFormatKindValue.UNKNOWN)
+                .lastUpdatedBy(username)
+                .isRemoved(false)
+                .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
+                .build();
+
+        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutableFlowAttributes flowAttrs_1 = ImmutableFlowAttributes.builder()
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("LOW"))
+                .transport(TransportKindValue.UNKNOWN)
+                .basisOffset(0)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec)
+                .flowAttributes(flowAttrs)
+                .build();
+
+        ImmutablePhysicalFlowCreateCommand createCommand_1 = ImmutablePhysicalFlowCreateCommand.builder()
+                .logicalFlowId(logicalFlow.entityReference().id())
+                .specification(newSpec_1)
+                .flowAttributes(flowAttrs_1)
+                .build();
+
+        PhysicalFlowCreateCommandResponse physicalFlowCreateCommandResponse = pfSvc.create(createCommand, username);
+        pfSvc.create(createCommand_1, username);
+
+        // 2. Act --------------------------------------------------------------
+        int result = pfSvc.getPhysicalFlowsCountForAssociatedLogicalFlow(physicalFlowCreateCommandResponse.entityReference().id());
+
+        // 3. Assert -----------------------------------------------------------
+        assertEquals(2, result);
     }
 
 }

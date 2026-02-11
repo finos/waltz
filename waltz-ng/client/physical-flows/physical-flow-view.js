@@ -25,6 +25,18 @@ import {toEntityRefWithKind} from "../common/entity-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
 import {copyTextToClipboard} from "../common/browser-utils";
+import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../common/utils/settings-util";
+import {proposeDataFlowRemoteStore} from "../svelte-stores/propose-data-flow-remote-store";
+import ReasonSelection from "../data-types/components/usage-panel/ReasonSelection.svelte";
+import {
+    deleteFlowReason,
+    duplicateProposeFlowMessage,
+    existingProposeFlowId
+} from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
+import pageInfo from "../svelte-stores/page-navigation-store";
+import {PROPOSAL_TYPES} from "../common/constants";
+import {handleProposalValidation} from "../common/utils/proposalValidation";
+import {buildProposalFlowCommand} from "../common/utils/propose-flow-command-util";
 
 
 const modes = {
@@ -47,9 +59,17 @@ const initialState = {
         overviewEditor: false
     },
     potentialMergeTargets: [],
-    mergeTarget: null
+    mergeTarget: null,
+    settings: null,
+    dataFlowProposalsEnabled: null,
+    dataFlowProposalsRatingSchemeSetting: null,
+    isReasonSelectionOpen: false,
+    ratingSchemeExtId: null,
+    selectedReason: null,
+    dataType: [],
+    type: PROPOSAL_TYPES.DELETE,
+    ReasonSelection
 };
-
 
 
 function mkHistoryObj(flow, spec) {
@@ -57,13 +77,24 @@ function mkHistoryObj(flow, spec) {
         name: spec.name,
         kind: "PHYSICAL_FLOW",
         state: "main.physical-flow.view",
-        stateParams: { id: flow.id }
+        stateParams: {id: flow.id}
     };
 }
 
+function goToWorkflow(proposedFlowId) {
+    pageInfo.set({
+        state: "main.proposed-flow.view", params: {
+            id: proposedFlowId
+        }
+    })
+    existingProposeFlowId.set(null)
+    duplicateProposeFlowMessage.set(null)
+}
 
 function addToHistory(historyStore, flow, spec) {
-    if (! flow || !spec) { return; }
+    if (!flow || !spec) {
+        return;
+    }
 
     const historyObj = mkHistoryObj(flow, spec);
 
@@ -76,7 +107,9 @@ function addToHistory(historyStore, flow, spec) {
 
 
 function removeFromHistory(historyStore, flow, spec) {
-    if (! flow || !spec) { return; }
+    if (!flow || !spec) {
+        return;
+    }
 
     const historyObj = mkHistoryObj(flow, spec);
 
@@ -98,17 +131,15 @@ function navigateToLastView($state, historyStore) {
 }
 
 
-
-
 function controller($q,
                     $state,
+                    $scope,
                     $stateParams,
                     $window,
                     historyStore,
                     physicalFlowStore,
                     physicalSpecificationStore,
-                    serviceBroker)
-{
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const entityReference = {
@@ -119,6 +150,15 @@ function controller($q,
 
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
+
+
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                vm.settings = r.data;
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
+                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings);
+            });
 
 
         const physicalFlowPromise = serviceBroker
@@ -155,6 +195,29 @@ function controller($q,
             });
     };
 
+    const launchCommand = () => {
+
+        return serviceBroker
+            .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics, [vm.specificationReference])
+            .then(dataTypeResponse => {
+                const ids = dataTypeResponse.data.map(item => item.dataTypeId);
+                vm.dataType = ids;
+
+                if (vm.physicalFlow && vm.specification && vm.logicalFlow) {
+                    return buildProposalFlowCommand({
+                        physicalFlow: vm.physicalFlow,
+                        specification: vm.specification,
+                        logicalFlow: vm.logicalFlow,
+                        dataType: vm.dataType,
+                        selectedReason: vm.selectedReason,
+                        proposalType: PROPOSAL_TYPES.DELETE
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error in launchCommand:", error);
+            });
+    };
 
     // -- INTERACT ---
 
@@ -188,7 +251,7 @@ function controller($q,
                     deleteSpecification();
                 }
 
-                if(response.isLastPhysicalFlow && confirm(deleteLogicalFlowText)) {
+                if (response.isLastPhysicalFlow && confirm(deleteLogicalFlowText)) {
                     deleteLogicalFlow()
                 }
             } else {
@@ -207,25 +270,47 @@ function controller($q,
         }
     };
 
+    vm.showReason = (value) => {
+        $scope.$applyAsync(() => {
+            vm.isReasonSelectionOpen = value;
+        });
+    };
+
+    vm.proposeDeleteFlow = () => {
+        launchCommand().then(command => {
+            if (command) {
+                proposeDataFlowRemoteStore.proposeDataFlow(command)
+                    .then(r => {
+                        const response = r.data;
+                        const commandLaunched = handleProposalValidation(response, false, null, false, goToWorkflow, PROPOSAL_TYPES.DELETE);
+                    })
+                    .catch(e => console.error("Error proposing data flow", e));
+            }
+        });
+    };
+
+    deleteFlowReason.subscribe(value => {
+        vm.selectedReason = value;
+    });
 
     // -- INTERACT: de-dupe
     const loadPotentialMergeTargets = () => {
         const selector = {
-            entityReference: { id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW" },
+            entityReference: {id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW"},
             scope: "EXACT"
         };
 
         const potentialFlowsPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalFlowStore.findBySelector,
-                [ selector ],
-                { force: true })
+                [selector],
+                {force: true})
             .then(r => r.data);
 
         const potentialSpecsPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalSpecificationStore.findBySelector,
-                [ selector ])
+                [selector])
             .then(r => r.data);
 
         $q.all([potentialFlowsPromise, potentialSpecsPromise])
@@ -266,7 +351,7 @@ function controller($q,
             serviceBroker
                 .loadViewData(
                     CORE_API.PhysicalFlowStore.merge,
-                    [ fromId , toId ])
+                    [fromId, toId])
                 .then(toasts.warning("Flow has been marked as duplicate"))
                 .then(() => $state.reload())
         } else {
@@ -283,7 +368,7 @@ function controller($q,
 
 
     vm.sharePageLink = () => {
-        const viewUrl = $state.href("main.physical-flow.external-id", { externalId: vm.physicalFlow.externalId });
+        const viewUrl = $state.href("main.physical-flow.external-id", {externalId: vm.physicalFlow.externalId});
         copyTextToClipboard(`${$window.location.origin}${viewUrl}`)
             .then(() => toasts.success("Copied link to clipboard"))
             .catch(e => displayError("Could not copy link to clipboard", e));
@@ -294,6 +379,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
+    "$scope",
     "$stateParams",
     "$window",
     "HistoryStore",

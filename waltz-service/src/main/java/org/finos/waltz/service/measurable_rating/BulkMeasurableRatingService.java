@@ -129,6 +129,9 @@ public class BulkMeasurableRatingService {
         List<AllocationScheme> allAllocationSchemes = allocationSchemeDao.findAll();
         Map<String, AllocationScheme> allAllocationSchemesByExtId = indexBy(allAllocationSchemes, t -> t.externalId().get());
 
+        boolean categorySupportsAllocations = allAllocationSchemes.stream()
+                .anyMatch(s -> s.measurableCategoryId() == categoryRef.id());
+
         Map<String, Application> allApplicationsByAssetCode = indexBy(allApplications, a -> a.assetCode()
                 .map(ExternalIdValue::value)
                 .map(StringUtilities::lower)
@@ -191,7 +194,7 @@ public class BulkMeasurableRatingService {
                     if (t.v4 != null && !t.v4.userSelectable()) {
                         validationErrors.add(ValidationError.RATING_NOT_USER_SELECTABLE);
                     }
-                    if (t.v5 == null) {
+                    if (categorySupportsAllocations && t.v5 == null) {
                         validationErrors.add(ValidationError.ALLOCATION_SCHEME_NOT_FOUND);
                     }
 
@@ -446,7 +449,13 @@ public class BulkMeasurableRatingService {
                     return tuple(insertCount, updateCount, removalCount);
                 });
 
-        int allocationsInsertCount = updateAllocation(dsl, categoryRef, preview, userId);
+        int allocationsInsertCount = 0;
+        List<AllocationScheme> allAllocationSchemes = allocationSchemeDao.findAll();
+        boolean categorySupportsAllocations = allAllocationSchemes.stream()
+                .anyMatch(s -> s.measurableCategoryId() == categoryRef.id());
+        if (categorySupportsAllocations) {
+            allocationsInsertCount = updateAllocation(dsl, categoryRef, preview, userId);
+        }
         return ImmutableBulkMeasurableRatingApplyResult
                 .builder()
                 .recordsAdded(transactionResult.v1)

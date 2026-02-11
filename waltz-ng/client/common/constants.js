@@ -17,3 +17,17 @@
  */
 
 export const FILTER_CHANGED_EVENT = "waltz::filters::changed";
+export const DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME = "feature.data-flow-proposals.rating-scheme";
+export const DATAFLOW_PROPOSAL_SETTING_NAME="feature.data-flow-proposals.enabled";
+export const PROPOSAL_OUTCOMES = {
+    SUCCESS: "SUCCESS",
+    FAILURE: "FAILURE"
+}
+export const PROPOSAL_TYPES = {
+    CREATE: "CREATE",
+    EDIT: "EDIT",
+    DELETE: "DELETE"
+}
+
+export const ARC_DROPDOWN_DEFINITION= "feature.survey.arc.dropdown-definition";
+export const ARC_EXTERNAL_URL= "arc.external.base.url";

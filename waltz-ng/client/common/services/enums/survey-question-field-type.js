@@ -100,5 +100,12 @@ export const surveyQuestionFieldType = {
         icon: null,
         description: null,
         position: 70
+    },
+    ARC: {
+        key: "ARC",
+        name: "Architecture Required Change (Beta)",
+        icon: null,
+        description: null,
+        position: 80
     }
 };
