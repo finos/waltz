@@ -11,6 +11,7 @@ The following table list the people and/or organisations involved with Waltz
 | [Kamran Saleem](https://github.com/kamransaleem) | individual |
 | [Rohit Vats](https://github.com/rovats) | individual |
 | [Jessica Woodland-Scott](https://github.com/JWoodland-Scott) | individual |
+| [HMx Labs](https://github.com/hmxlabs/waltz)                      | organisational |
 
 
 ### Libraries
