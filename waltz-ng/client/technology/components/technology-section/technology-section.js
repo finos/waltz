@@ -28,6 +28,7 @@ import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 import template from "./technology-section.html";
 import {tryOrDefault} from "../../../common/function-utils";
 import CustomEnvironmentPanel from "../../svelte/custom-environment-panel/CustomEnvironmentPanel.svelte"
+import {nest} from "d3-collection";
 
 
 const bindings = {
@@ -179,8 +180,24 @@ function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
         withWidth(mkEntityLinkGridCell("Name", "package", "none", "right"), "20%"),
-        { field: "version.externalId", displayName: "External Id", width: "35%" },
-        withWidth(mkEntityLinkGridCell("Version", "version", "none", "right"), "10%"),
+        { field: "version.externalId", displayName: "External Id", width: "30%" },
+        {
+            field: "version.name",
+            displayName: "Version",
+            width: "15%",
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <waltz-entity-link entity-ref="row.entity.version"
+                                       tooltip-placement="right"
+                                       icon-placement="none"
+                                       is-secondary-link="false"
+                                       additional-display-data="row.entity.vulnerabilityData">
+                    </waltz-entity-link>
+                    <waltz-icon ng-if="row.entity.vulnerabilityCounts.High" name="exclamation-circle" style="color: #d62728"></waltz-icon>
+                    <waltz-icon ng-if="!row.entity.vulnerabilityCounts.High && row.entity.vulnerabilityCounts.Medium" name="warning" style="color: #ff7f0e"></waltz-icon>
+                </div>
+                `
+        },
         { field: "version.releaseDate", displayName: "Release Date", width: "5%"},
         { field: "package.description", displayName: "Description", width: "25%"},
         { field: "package.isNotable", displayName: "Notable", width: "5%"}
@@ -309,16 +326,29 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
 
 
         // software catalog
-        serviceBroker
+        const softwareCatalogPromise = serviceBroker
             .loadViewData(
                 CORE_API.SoftwareCatalogStore.findByAppIds,
                 [[vm.parentEntityRef.id]]
             )
-            .then(r => r.data)
-            .then(softwareCatalog => {
+            .then(r => r.data);
+
+        const vulnerabilityPromise = serviceBroker
+            .loadViewData(
+                CORE_API.VulnerabilityStore.countSeveritiesBySelector,
+                [mkSelectionOptions(vm.parentEntityRef)]
+            )
+            .then(r => r.data);
+
+        $q.all([softwareCatalogPromise, vulnerabilityPromise])
+            .then(([softwareCatalog, vulnerabilityCounts]) => {
                 vm.softwareCatalog = softwareCatalog;
                 const versionsById = _.keyBy(vm.softwareCatalog.versions, v => v.id);
                 const packagesById = _.keyBy(vm.softwareCatalog.packages, v => v.id);
+
+                // Create vulnerability counts map by version id
+                const nestedTallies = _.map(vulnerabilityCounts, v => Object.assign({}, v, {tallyMap: nest().key(t => t.id).object(v.tallies) }));
+                const vulnerabilityCountsByVersionId = _.keyBy(nestedTallies, v => v.entityReference.id);
 
                 const packageCounts = countByVersionsByPackageId(vm.softwareCatalog.usages);
                 vm.repeatedPackages =_.chain(packageCounts)
@@ -335,11 +365,34 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
                     .chain(vm.softwareCatalog.usages)
                     .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId"])))
                     .uniqWith(_.isEqual)
-                    .map(u => Object.assign(
-                        { },
-                        { package: packagesById[u.softwarePackageId] },
-                        { version: versionsById[u.softwareVersionId] }
-                    ))
+                    .map(u => {
+                        const versionId = u.softwareVersionId;
+                        const countList = _.get(vulnerabilityCountsByVersionId, `[${versionId}].tallies`, []);
+                        
+                        // Create simplified vulnerability object for both icons and tooltip
+                        const vulnerabilityData = _.chain(countList)
+                            .keyBy('id')
+                            .mapValues(item => item.count)
+                            .value();
+                        
+                        // Create tooltip data from same source (only non-zero severities)
+                        const tooltipVulnerabilities = _.chain(countList)
+                            .filter(item => item.count > 0)
+                            .map(item => `${item.count} ${item.id}`)
+                            .value();
+                        
+                        const formattedTooltipData = tooltipVulnerabilities.length > 0 
+                            ? [{ name: "Vulnerabilities", value: tooltipVulnerabilities.join(", ") }]
+                            : [];
+                        
+                        return Object.assign(
+                            { },
+                            { package: packagesById[u.softwarePackageId] },
+                            { version: versionsById[versionId] },
+                            { vulnerabilityCounts: vulnerabilityData },      // Simplified: {High: 2, Medium: 1}
+                            { vulnerabilityData: formattedTooltipData }       // Formatted for tooltip
+                        );
+                    })
                     .value();
                 vm.softwareCatalogGridOptions.data = gridData;
             })

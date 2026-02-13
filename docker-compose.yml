@@ -2,7 +2,7 @@ version: "3.9"
     
 services:
   waltz:
-    image: ghcr.io/finos/waltz:latest
+    image: ghcr.io/finos/waltz:1.76
     ports:
       - "8080:8080"
     depends_on:
