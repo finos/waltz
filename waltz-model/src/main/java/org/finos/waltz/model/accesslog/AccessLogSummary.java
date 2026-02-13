@@ -39,4 +39,19 @@ public abstract class AccessLogSummary {
 
     @Nullable
     public abstract LocalDateTime createdAt();
+
+    @Nullable
+    public abstract String period();
+
+    @Nullable
+    public abstract Integer hour();
+
+    @Nullable
+    public abstract Integer dayOfWeek();
+
+    @Nullable
+    public abstract Long sessionDuration();
+
+    @Nullable
+    public abstract Long distinctUserCount();
 }
