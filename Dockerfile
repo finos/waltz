@@ -4,7 +4,13 @@ ENV PATH="/usr/local/bin/liquibase:${PATH}"
 
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY ./waltz-schema/src/main/resources/liquibase/*.xml /opt/waltz/liquibase/
-COPY ./waltz-web/target/waltz-web.war /usr/local/tomcat/webapps/ROOT.war
+
+# tomcat 9
+#COPY ./waltz-web/target/waltz-web.war /usr/local/tomcat/webapps/ROOT.war
+
+# tomcat 10
+COPY ./waltz-web/target/waltz-web-jakarta.war /usr/local/tomcat/webapps/ROOT.war
+
 COPY docker/waltz.properties /home/waltz/.waltz/waltz-template
 COPY waltz-web/src/main/resources/logback.example.xml /home/waltz/.waltz/waltz-logback.xml
 
@@ -19,6 +25,10 @@ RUN useradd -ms /bin/bash waltz && \
   ln -s  /opt/liquibase/liquibase /usr/local/bin/liquibase && \
   rm -rf /var/lib/apt/lists/* lpm-0.1.2-linux.zip liquibase-4.5.0.zip && \
   lpm update && lpm add -g postgresql
+
+RUN apt-get update && apt-get install -y dos2unix
+RUN dos2unix /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
 
