@@ -4,12 +4,11 @@ import ViewLinkLabelled from "../../../../common/svelte/ViewLinkLabelled.svelte"
 import GridWithCellRenderer from "../../../../common/svelte/GridWithCellRenderer.svelte";
 import Pill from "../../../../common/svelte/Pill.svelte";
 import ProposedFlowFilters from "./ProposedFlowFilters.svelte";
-import { filters, tempFilters } from "./filter-store";
+import { filters } from "./filter-store";
 import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
 import TextClipper from "../../../../common/svelte/TextClipper.svelte";
 import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
-import {onMount} from "svelte";
 
 export let userName;
 export let flows = [];
@@ -18,13 +17,6 @@ export let statusPillDefs = {};
 export let changeTypePillDefs = {};
 export let proposerTypePillDefs = {};
 export let currentTabText;
-
-// works for only two sections if we add another than a new method may be required
-onMount(() => {
-   const ephemeralFilters = $tempFilters;
-   $tempFilters = $filters;
-   $filters = ephemeralFilters;
-});
 
 const approvalType = {
     SOURCE_APPROVED: "SOURCE_APPROVED",
@@ -111,6 +103,8 @@ const columnDefs = [
     { field: "targetApprovedAt", name: "Target Approved At"}
 ];
 
+$: activeFilter = $filters[currentTabText];
+
 $: gridData = flows && flows.length
     ? flows.map(flow => {
         let transformedSourceApproved = {at: "", by: ""};
@@ -142,14 +136,14 @@ $: gridData = flows && flows.length
 
 $: filteredGridData = gridData
     ? gridData
-        .filter(d => ($filters.state.length === 0) || $filters.state.includes(d.workflowState.state))
-        .filter(d => ($filters.change.length === 0) || $filters.change.includes(d.flowDef.proposalType))
-        .filter(d => ($filters.proposer.length === 0) || $filters.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
+        .filter(d => (activeFilter.state.length === 0) || activeFilter.state.includes(d.workflowState.state))
+        .filter(d => (activeFilter.change.length === 0) || activeFilter.change.includes(d.flowDef.proposalType))
+        .filter(d => (activeFilter.proposer.length === 0) || activeFilter.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
         .sort((a, b) => new Date(b.workflowState.lastUpdatedAt) - new Date(a.workflowState.lastUpdatedAt))
-        .sort((a, b) => $filters.state.indexOf(a.workflowState.state) - $filters.state.indexOf(b.workflowState.state))
-        .sort((a, b) => $filters.change.indexOf(a.flowDef.proposalType) - $filters.change.indexOf(b.flowDef.proposalType))
-        .sort((a, b) => $filters.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
-            - $filters.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
+        .sort((a, b) => activeFilter.state.indexOf(a.workflowState.state) - activeFilter.state.indexOf(b.workflowState.state))
+        .sort((a, b) => activeFilter.change.indexOf(a.flowDef.proposalType) - activeFilter.change.indexOf(b.flowDef.proposalType))
+        .sort((a, b) => activeFilter.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
+            - activeFilter.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
     : [];
 
 $: stateCounts = _.countBy(gridData, "workflowState.state");
@@ -158,7 +152,7 @@ $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "U
 
 $: filteredDataSize = filteredGridData.length;
 
-$: isDataFiltered = (!(filteredDataSize === gridData.length) || ($filters.change.length || $filters.proposer.length || $filters.state.length));
+$: isDataFiltered = (!(filteredDataSize === gridData.length) || (activeFilter.change.length || activeFilter.proposer.length || activeFilter.state.length));
 
 </script>
 
@@ -175,7 +169,8 @@ $: isDataFiltered = (!(filteredDataSize === gridData.length) || ($filters.change
                                  changePillDefs={changeTypePillDefs}
                                  changeTypeCounts={changeTypeCounts}
                                  proposerPillDefs={proposerTypePillDefs}
-                                 proposerPillCounts={proposerCounts}/>
+                                 proposerPillCounts={proposerCounts}
+                                 filterStateKey={currentTabText}/>
             <small class="text-muted">{isDataFiltered ? `Filtered: (${filteredDataSize})` : ``}</small>
             <GridWithCellRenderer columnDefs={columnDefs}
                                   rowData={filteredGridData}

@@ -12,32 +12,34 @@
     export let proposerPillDefs = {};
     export let proposerPillCounts = {};
 
+    export let filterStateKey;
+
     let showFilters = false;
 
     const updateStateFilters = (filterKey) => {
-        const selectedStates = $filters.state.includes(filterKey);
+        const selectedStates = $filters[filterStateKey].state.includes(filterKey);
         if (selectedStates) {
-            $filters.state = $filters.state.filter(f => f !== filterKey);
+            $filters[filterStateKey].state = $filters[filterStateKey].state.filter(f => f !== filterKey);
         } else {
-            $filters.state = [...$filters.state, filterKey];
+            $filters[filterStateKey].state = [...$filters[filterStateKey].state, filterKey];
         }
     };
 
     const updateChangeFilters = (filterKey) => {
-        const selectedChanges = $filters.change.includes(filterKey);
+        const selectedChanges = $filters[filterStateKey].change.includes(filterKey);
         if (selectedChanges) {
-            $filters.change = $filters.change.filter(f => f !== filterKey);
+            $filters[filterStateKey].change = $filters[filterStateKey].change.filter(f => f !== filterKey);
         } else {
-            $filters.change = [...$filters.change, filterKey];
+            $filters[filterStateKey].change = [...$filters[filterStateKey].change, filterKey];
         }
     };
 
     const updateProposerFilters = (filterKey) => {
-        const selectedUsers = $filters.proposer.includes(filterKey);
+        const selectedUsers = $filters[filterStateKey].proposer.includes(filterKey);
         if (selectedUsers) {
-            $filters.proposer = $filters.proposer.filter(f => f !== filterKey);
+            $filters[filterStateKey].proposer = $filters[filterStateKey].proposer.filter(f => f !== filterKey);
         } else {
-            $filters.proposer = [...$filters.proposer, filterKey];
+            $filters[filterStateKey].proposer = [...$filters[filterStateKey].proposer, filterKey];
         }
     }
 
@@ -67,12 +69,12 @@
     }
 
     const resetFilters = () => {
-        $filters.proposer = [];
-        $filters.change = [];
-        $filters.state = [];
+        $filters[filterStateKey].proposer = [];
+        $filters[filterStateKey].change = [];
+        $filters[filterStateKey].state = [];
     }
 
-    $: clearFiltersDisabled = !($filters.state.length || $filters.proposer.length || $filters.change.length);
+    $: clearFiltersDisabled = !($filters[filterStateKey]?.state.length || $filters[filterStateKey]?.proposer.length || $filters[filterStateKey]?.change.length);
 </script>
 
 <div class="filter-dropdown">
@@ -100,7 +102,7 @@
                             on:keydown={(e) => handleProposerFiltersKeyDown(e, key)}>
                             <Pill pillDefs={proposerPillDefs}
                                   pillKey={key}
-                                  cleanPill={!$filters.proposer.includes(key)}
+                                  cleanPill={!$filters[filterStateKey].proposer.includes(key)}
                                   smallText={proposerPillCounts[key]}
                                   clickable={true}
                             />
@@ -120,7 +122,7 @@
                         on:keydown={(e) => handleStateFiltersKeyDown(e, key)}>
                         <Pill pillDefs={pillDefs}
                             pillKey={key}
-                            cleanPill={!$filters.state.includes(key)}
+                            cleanPill={!$filters[filterStateKey].state.includes(key)}
                             smallText={stateCounts[key]}
                         />
                     </div>
@@ -139,7 +141,7 @@
                         on:keydown={(e) => handleChangeFiltersKeyDown(e, key)}>
                         <Pill pillDefs={changePillDefs}
                             pillKey={key}
-                            cleanPill={!$filters.change.includes(key)}
+                            cleanPill={!$filters[filterStateKey].change.includes(key)}
                             smallText={changeTypeCounts[key]}
                         />
                     </div>
