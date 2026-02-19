@@ -49,6 +49,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
     private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
     private static final String DIRECTS_FOR_PERSON_IDS_PATH = mkPath(BASE_URL, "person-ids", "directs");
+    private static final String GET_BY_USER_EMAILS_PATH = mkPath(BASE_URL, "user-emails");
 
     private final PersonService personService;
     private final PersonHierarchyService personHierarchyService;
@@ -80,6 +81,11 @@ public class PersonEndpoint implements Endpoint {
         postForList(DIRECTS_FOR_PERSON_IDS_PATH, (request, response) -> {
             List<Long> personIds = readIdsFromBody(request);
             return personService.findDirectsForPersonIds(personIds);
+        });
+
+        postForList(GET_BY_USER_EMAILS_PATH, (request, response) -> {
+            List<String> emails = readStringsFromBody(request);
+            return personService.getByUserEmails(emails);
         });
 
         getForDatum(MANAGERS_PATH, (request, response) -> {

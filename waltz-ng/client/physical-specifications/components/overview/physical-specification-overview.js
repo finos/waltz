@@ -19,6 +19,7 @@ import template from './physical-specification-overview.html';
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {initialiseData} from "../../../common";
+import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
 const bindings = {
@@ -34,7 +35,9 @@ const initialState = {
     specification: null,
     visibility: {
         overviewEditor: false
-    }
+    },
+    settings:null,
+    dataFlowProposalsEnabled:null
 };
 
 function controller(serviceBroker) {
@@ -42,6 +45,13 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                vm.settings = r.data;
+                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
+            });
+
         serviceBroker.loadViewData(CORE_API.PhysicalSpecificationStore.findPermissionsForSpec, [vm.specification.id])
             .then(r => vm.canEdit = _.some(
                 r.data,

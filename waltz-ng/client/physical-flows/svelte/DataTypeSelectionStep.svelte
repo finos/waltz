@@ -9,6 +9,8 @@
     import {onMount} from "svelte";
     import NoData from "../../common/svelte/NoData.svelte";
 
+    export let dataFlowProposalsEnabled;
+
     let dataTypeList = [];
 
     onMount(() => {
@@ -114,10 +116,12 @@
                     on:click={() => updateDataTypes()}>
                 Done
             </button>
-            <button class="btn btn-skinny"
-                    on:click={() => skip()}>
-                Skip
-            </button>
+            {#if !dataFlowProposalsEnabled}
+                <button class="btn btn-skinny"
+                        on:click={() => skip()}>
+                    Skip
+                </button>
+            {/if}
 
         {/if}
     </div>

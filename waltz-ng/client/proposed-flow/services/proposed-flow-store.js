@@ -17,16 +17,27 @@
  */
 
 export function store($http) {
-    const base = `api/mc`;
+    const base = "api";
+    const mcBase = `${base}/mc`;
+    const personBase = `${base}/person`;
+
 
     const getById = (id) => {
         return $http
-            .get(`${base}/propose-flow/id/${id}`)
+            .get(`${mcBase}/propose-flow/id/${id}`)
             .then(r => r.data);
     };
 
+    const getByUserEmails = (emails) => {
+        return $http
+            .post(`${personBase}/user-emails`, emails)
+            .then(r => r.data);
+    };
+
+
     return {
-        getById
+        getById,
+        getByUserEmails
     };
 }
 
@@ -41,5 +52,10 @@ export const ProposedFlowStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "executes getById"
+    },
+    getByUserEmails: {
+        serviceName,
+        serviceFnName: "getByUserEmails",
+        description: "finds people by a list of user emails"
     }
 };

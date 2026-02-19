@@ -56,6 +56,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkFalse;
@@ -446,6 +447,17 @@ public class PhysicalSpecificationDao {
         } else {
             return operationsForEntity;
         }
+    }
+
+    public List<Long> getLogicalFlowIdsBySpecificationId(long specificationId) {
+        return dsl
+                .selectDistinct(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
+                .from(PHYSICAL_FLOW)
+                .join(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId))
+                .and(PHYSICAL_FLOW_NOT_REMOVED)
+                .and(LOGICAL_NOT_REMOVED)
+                .fetch(PHYSICAL_FLOW.LOGICAL_FLOW_ID);
     }
 
 }

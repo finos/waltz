@@ -15,6 +15,7 @@
     export let filterStateKey;
 
     let showFilters = false;
+    let filterDropdownElement;
 
     const updateStateFilters = (filterKey) => {
         const selectedStates = $filters[filterStateKey].state.includes(filterKey);
@@ -74,10 +75,18 @@
         $filters[filterStateKey].state = [];
     }
 
+    function handleClickOutside(event) {
+        if (showFilters && filterDropdownElement && !filterDropdownElement.contains(event.target)) {
+            showFilters = false;
+        }
+    }
+
     $: clearFiltersDisabled = !($filters[filterStateKey]?.state.length || $filters[filterStateKey]?.proposer.length || $filters[filterStateKey]?.change.length);
 </script>
 
-<div class="filter-dropdown">
+<svelte:window on:click={handleClickOutside}/>
+
+<div class="filter-dropdown" bind:this={filterDropdownElement}>
     <button class="filter-dropdown-btn" on:click={toggleFilters}>
         {showFilters ? "Hide Filters" : "Show Filters"}
     </button>
@@ -157,7 +166,7 @@
     position: absolute;
     z-index: 10;
     background: white;
-    box-shadow: 0.25rem 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0.25rem 2px 8px rgba(0,0,0,0.08),-0.25rem 2px 8px rgba(0,0,0,0.08);
     border-radius: 8px;
     min-width: 320px;
     margin-top: 0.25rem;

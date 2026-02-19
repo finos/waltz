@@ -51,7 +51,6 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -84,6 +83,7 @@ import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.SOURCE_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -97,7 +97,6 @@ import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
@@ -437,7 +436,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         // 2.1. Assert -----------------------------------------------------------
         // Assert that the flow is now in SOURCE_APPROVED state
-        assertEquals(ProposedFlowWorkflowState.SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+        assertEquals(SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
 
         // Action command for target approval
         ProposedFlowActionCommand targetApproveCommand = ImmutableProposedFlowActionCommand.builder()
@@ -490,7 +489,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     }
 
     @Test
-    void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() {
+    void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() throws FlowCreationException, TransitionNotFoundException {
         // 1. Arrange ----------------------------------------------------------
         Reason reason = proposedFlowWorkflowHelper.getReason();
         EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
@@ -519,13 +518,82 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .comment("Rejected due to invalid permissions")
                 .build();
 
-        // 2. Act and Assert ----------------------------------------------------
-        assertThrows(TransitionPredicateFailedException.class, () ->
-                proposedFlowWorkflowService.proposedFlowAction(
-                        proposedFlowId,
-                        org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.REJECT,
-                        userName,
-                        rejectCommand));
+        // 2. Act ----------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.REJECT,
+                userName,
+                rejectCommand);
+
+        // 3. Assert ---------------------------------------------------
+        assertNotNull(proposedFlowResponse);
+        assertEquals("FAILURE", proposedFlowResponse.outcome().name());
+        assertEquals("REJECT Failed. The workflow may have been updated or you no longer have permissions to reject this item.", proposedFlowResponse.message());
     }
 
+    @Test
+    public void testCannotApproveProposedFlowTwice() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
+
+        // Create a proposed flow command for a new flow (CREATE proposal type)
+        ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
+                .source(appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a))
+                // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.CREATE)
+                .build();
+
+        String userName = mkName(USER_NAME, "user1");
+
+        // Propose the new flow
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        // Grant the user source and target approver permissions
+        Long personA = personHelper.createPerson(userName);
+
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_abcd");
+        involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, REJECT);
+
+        // Action command for source approval
+        ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by source approver")
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        // Assert that the flow is now in SOURCE_APPROVED state
+        // Simulate a source approver approving the flow
+        ProposedFlowResponse sourceApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                userName,
+                sourceApproveCommand);
+
+        // 2.1. Assert -----------------------------------------------------------
+        // Assert that the flow is now in SOURCE_APPROVED state
+        assertEquals(SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+
+        //Source approver again approving the flow should fail
+        // 2. Act ---------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.proposedFlowAction(proposedFlowId, APPROVE, userName, sourceApproveCommand);
+
+        // 3. Assert ---------------------------------------------------
+        assertNotNull(proposedFlowResponse);
+        assertEquals("FAILURE", proposedFlowResponse.outcome().name());
+        assertEquals("APPROVE Failed. The workflow may have been updated or you no longer have permissions to approve this item.", proposedFlowResponse.message());
+    }
 }

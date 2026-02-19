@@ -11,15 +11,21 @@
     const actionStatusPillDefs = {
         PENDING_APPROVALS: {
             name: "Pending Approvals",
-            color: "#8e8e56"
+            borderColor: "#8e8e56",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         SOURCE_APPROVED: {
             name: "Source Approved",
-            color: "#74a259"
+            borderColor: "#74a259",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         TARGET_APPROVED: {
             name: "Target Approved",
-            color: "#74a259"
+            borderColor: "#74a259",
+            textColor: "#000000",
+            bgColor: "#666666"
         }
     }
     const actionStatuses = Object.keys(actionStatusPillDefs);
@@ -27,19 +33,27 @@
     const historicalStatusPillDefs = {
         FULLY_APPROVED: {
             name: "Fully Approved",
-            color: "#5bb65d"
+            borderColor: "#5bb65d",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         SOURCE_REJECTED: {
             name: "Source Rejected",
-            color: "#c1664f"
+            borderColor: "#c1664f",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         TARGET_REJECTED: {
             name: "Target Rejected",
-            color: "#c1664f"
+            borderColor: "#c1664f",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         CANCELLED: {
             name: "Cancelled",
-            color: "#c16644"
+            borderColor: "#c16644",
+            textColor: "#000000",
+            bgColor: "#666666"
         }
     }
     const historicalStatuses = Object.keys(historicalStatusPillDefs)
@@ -47,26 +61,36 @@
     const changeTypePillDefs = {
         CREATE: {
             name: "Create",
-            color: "#267dda"
+            borderColor: "#267dda",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         EDIT: {
             name: "Edit",
-            color: "#716b9e"
+            borderColor: "#716b9e",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         DELETE: {
             name: "Delete",
-            color: "#da524b"
+            borderColor: "#da524b",
+            textColor: "#000000",
+            bgColor: "#666666"
         }
     }
 
     const proposerTypePillDefs = {
         USER: {
             name: "Proposed By You",
-            color: "#000000"
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
         },
         OTHERS: {
             name: "For Approval",
-            color: "#000000"
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
         }
     }
 

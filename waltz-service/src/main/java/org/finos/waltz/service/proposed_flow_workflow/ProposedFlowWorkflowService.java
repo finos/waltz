@@ -11,6 +11,7 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -57,6 +58,7 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_SUBMITTED = "Proposed Flow Submitted";
     private static final String PROPOSED_FLOW_ALREADY_EXIST = "Proposed Flow Already Exist";
     private static final String PHYSICAL_FLOW_ALREADY_EXIST = "Physical Flow Already Exist";
+    private static final String PROPOSED_FLOW_ACTION_SUCCESS = "Proposed Flow Action success";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
@@ -164,7 +166,11 @@ public class ProposedFlowWorkflowService {
     public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
-                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
+
+        String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
+        CommandOutcome outcome = SUCCESS;
+        ImmutableProposedFlowResponse.Builder builder = ImmutableProposedFlowResponse.builder();
         ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         checkNotNull(proposedFlow, "No proposed flow found");
 
@@ -222,12 +228,23 @@ public class ProposedFlowWorkflowService {
 
             // Refresh Return Object
             proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
+
+        } catch (TransitionPredicateFailedException e) {
+            errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
+            LOG.error(errorMessage, e);
+            outcome = FAILURE;
+            builder.message(errorMessage).outcome(outcome);
         } catch (Exception e) {
-            LOG.error("Error Occurred : {} ", e.getMessage());
-            throw e;
+            errorMessage = String.format("Failed to '%s' proposed flow.", transitionAction);
+            LOG.error(errorMessage, e);
+            outcome = FAILURE;
+            builder.message(errorMessage).outcome(outcome);
         }
 
-        return proposedFlow;
+        return ImmutableProposedFlowResponse.builder()
+                .from(proposedFlow)
+                .outcome(outcome)
+                .message(errorMessage).build();
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
