@@ -3,6 +3,7 @@
         deleteFlowReason,
         duplicateProposeFlowMessage,
         editDataTypeReason,
+        editValidationMessage,
         existingProposeFlowId
     } from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import Icon from "../../../common/svelte/Icon.svelte";
@@ -123,6 +124,13 @@
                     This will affect all associated physical flows.
                 </NoData>
             </div>
+            {#if $editValidationMessage}
+                <div class="small">
+                    <NoData type="error">
+                        {$editValidationMessage}
+                    </NoData>
+                </div>
+            {/if}
         {/if}
 
         {#if proposalType === PROPOSAL_TYPES.DELETE}
