@@ -35,23 +35,9 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
-import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
-import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
-import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow.DataFlowService;
@@ -61,13 +47,7 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
-import org.finos.waltz.test_common.helpers.AppHelper;
-import org.finos.waltz.test_common.helpers.InvolvementHelper;
-import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
-import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
-import org.finos.waltz.test_common.helpers.PersonHelper;
-import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
-import org.finos.waltz.test_common.helpers.ProposedFlowWorkflowHelper;
+import org.finos.waltz.test_common.helpers.*;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +61,9 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.REJECT;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.SOURCE_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
@@ -89,15 +71,10 @@ import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -169,8 +146,13 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     @Autowired
     private PhysicalFlowService pfSvc;
 
+    private ProposedFlowCommand baseCreateCommand;
+    private EntityReference source;
+    private EntityReference target;
+    private PhysicalSpecification spec;
+
     @BeforeEach
-    public void cleanUp(){
+    public void setUp() {
         dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
@@ -178,6 +160,25 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         dsl.deleteFrom(ENTITY_WORKFLOW_STATE).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+
+        source = appHelper.createNewApp("source", ouIds.a);
+        target = appHelper.createNewApp("target", ouIds.a1);
+        Long specId = psHelper.createPhysicalSpec(source, "baseSpec");
+        spec = psSvc.getById(specId);
+
+        baseCreateCommand = ImmutableProposedFlowCommand.builder()
+                .source(source)
+                .target(target)
+                .specification(spec)
+                .flowAttributes(ImmutableFlowAttributes.builder()
+                        .basisOffset(0)
+                        .frequency(FrequencyKindValue.of("DAILY"))
+                        .criticality(CriticalityValue.of("MEDIUM"))
+                        .transport(TransportKindValue.UNKNOWN)
+                        .build())
+                .proposalType(CREATE)
+                .reason(proposedFlowWorkflowHelper.getReason())
+                .build();
     }
 
     @Test
@@ -307,7 +308,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         logicalFlowDao.addFlow(flowToAdd);
 
         // 2. Act --------------------------------------------------------------
-        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
+        FlowIdResponse flowIdResponse = proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNull(flowIdResponse);
@@ -595,5 +596,58 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(proposedFlowResponse);
         assertEquals("FAILURE", proposedFlowResponse.outcome().name());
         assertEquals("APPROVE Failed. The workflow may have been updated or you no longer have permissions to approve this item.", proposedFlowResponse.message());
+    }
+
+    @Test
+    public void validateProposedFlow_shouldFailIfIdenticalProposalExists() {
+        // 1. Arrange: Create and save an initial proposal
+        ProposedFlowCommandResponse initialResponse = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+        assertEquals(CommandOutcome.SUCCESS, initialResponse.outcome(), "Initial proposal should be saved successfully");
+
+        // 2. Act: Validate a second, identical command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(baseCreateCommand, USER_NAME);
+
+        // 3. Assert: Validation should fail and return the ID of the existing proposal
+        assertNotNull(validationResponse, "Validation should fail for an identical proposal");
+        assertEquals(initialResponse.proposedFlowId(), validationResponse.id(), "Response should contain the ID of the existing proposal");
+    }
+
+    @Test
+    public void validateProposedFlow_shouldPassIfSpecificationIsDifferent() {
+        // 1. Arrange: Create and save an initial proposal
+        proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+
+        // Create a new command with a different specification
+        PhysicalSpecification differentSpec = psSvc.getById(psHelper.createPhysicalSpec(source, "differentSpec"));
+        ProposedFlowCommand commandWithDifferentSpec = ImmutableProposedFlowCommand
+                .copyOf(baseCreateCommand)
+                .withSpecification(differentSpec);
+
+        // 2. Act: Validate the new command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(commandWithDifferentSpec, USER_NAME);
+
+        // 3. Assert: Validation should pass
+        assertNull(validationResponse, "Validation should pass when specification is different");
+    }
+
+    @Test
+    public void validateProposedFlow_shouldPassIfFlowAttributeIsDifferent() {
+        // 1. Arrange: Create and save an initial proposal
+        proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+
+        // Create a new command with a different frequency
+        FlowAttributes differentAttributes = ImmutableFlowAttributes
+                .copyOf(baseCreateCommand.flowAttributes())
+                .withFrequency(FrequencyKindValue.of("WEEKLY"));
+
+        ProposedFlowCommand commandWithDifferentFrequency = ImmutableProposedFlowCommand
+                .copyOf(baseCreateCommand)
+                .withFlowAttributes(differentAttributes);
+
+        // 2. Act: Validate the new command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(commandWithDifferentFrequency, USER_NAME);
+
+        // 3. Assert: Validation should pass
+        assertNull(validationResponse, "Validation should pass when a flow attribute (e.g., frequency) is different");
     }
 }
