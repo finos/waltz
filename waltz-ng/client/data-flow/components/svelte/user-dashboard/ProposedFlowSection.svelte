@@ -9,6 +9,7 @@ import NoData from "../../../../common/svelte/NoData.svelte";
 import {getEntityState} from "../../../../common/entity-utils";
 import TextClipper from "../../../../common/svelte/TextClipper.svelte";
 import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
+import ProposedFlowLink from './ProposedFlowLink.svelte';
 
 export let userName;
 export let flows = [];
@@ -16,7 +17,20 @@ export let dataTypeIdToNameMap = {};
 export let statusPillDefs = {};
 export let changeTypePillDefs = {};
 export let proposerTypePillDefs = {};
+export let actionablePillDefs = {};
 export let currentTabText;
+
+const mockPermissions = [
+    {
+        "entityRef": {
+            "kind": "APPLICATION",
+            "id": 99999 // random id
+        },
+        "operations": ["APPROVE", "REJECT"] 
+    }
+];
+
+const operationsToAction = ["APPROVE", "REJECT"];
 
 const approvalType = {
     SOURCE_APPROVED: "SOURCE_APPROVED",
@@ -24,18 +38,58 @@ const approvalType = {
     FULLY_APPROVED: "FULLY_APPROVED"
 }
 
+const permissionsMap = new Map(
+    mockPermissions.map(p => [`${p.entityRef.kind}-${p.entityRef.id}`, p.operations])
+);
+
+const actionableStates = {
+    SOURCE_APPROVED: "SOURCE_APPROVED",
+    TARGET_APPROVED: "TARGET_APPROVED",
+    PENDING_APPROVALS: "PENDING_APPROVALS"
+}
+
+let myActionables = new Map();
+
+$: myActionables = new Map(
+    (flows ?? [])
+        .map(t => {
+            if (t?.workflowState.state === actionableStates.TARGET_APPROVED) {
+                // if i am the source approver
+                const permission = permissionsMap.get(`${t.flowDef.source.kind}-${t.flowDef.source.id}`);
+                if (permission && operationsToAction.every(op => permission.includes(op))) {
+                    return [t.id, true];
+                }
+            } else if (t?.workflowState.state === actionableStates.SOURCE_APPROVED) {
+                // if i am the target approver
+                const permission = permissionsMap.get(`${t.flowDef.target.kind}-${t.flowDef.target.id}`);
+                if (permission && operationsToAction.every(op => permission.includes(op))) {
+                    return [t.id, true];
+                }
+            } else if (t?.workflowState.state === actionableStates.PENDING_APPROVALS) {
+                // if i am either approver
+                let permission = permissionsMap.get(`${t.flowDef.source.kind}-${t.flowDef.source.id}`);
+                if (!permission) {
+                    permission = permissionsMap.get(`${t.flowDef.target.kind}-${t.flowDef.target.id}`);
+                }
+                if (permission && operationsToAction.every(op => permission.includes(op))) {
+                    return [t.id, true];
+                }
+            }
+
+            return undefined;
+        })
+        .filter(Boolean)
+);
+
 const columnDefs = [
     {
         field: "id",
         name: "Flow",
-        cellRendererComponent: ViewLinkLabelled,
+        cellRendererComponent: ProposedFlowLink,
         cellRendererProps: row => ({
-            state: "main.proposed-flow.view",
-            label: `${row.flowDef.source?.name} → ${row.flowDef.target?.name}`,
-            ctx: {
-                id: row.id
-            },
-            openInNewTab: false
+            flow: row,
+            showExclamation: myActionables.get(row.id),
+            currentTab: currentTabText
         }),
         sortable: true
     },
@@ -131,7 +185,7 @@ $: gridData = flows && flows.length
         let transformedSourceApproved = {at: "", by: ""};
         let transformedTargetApproved = {at: "", by: ""};
 
-        flow.workflowTransitionList.map(t => {
+        flow.workflowTransitionList?.forEach(t => {
                 if(t.toState === approvalType.SOURCE_APPROVED) {
                     transformedSourceApproved.at = new Date(t.lastUpdatedAt).toLocaleString();
                     transformedSourceApproved.by = t.lastUpdatedBy
@@ -160,16 +214,20 @@ $: filteredGridData = gridData
         .filter(d => (activeFilter.state.length === 0) || activeFilter.state.includes(d.workflowState.state))
         .filter(d => (activeFilter.change.length === 0) || activeFilter.change.includes(d.flowDef.proposalType))
         .filter(d => (activeFilter.proposer.length === 0) || activeFilter.proposer.includes(d.createdBy === userName ? "USER" : "OTHERS"))
+        .filter(d => (activeFilter.action.length === 0) || activeFilter.action.includes(myActionables?.has(d.id) ? "ACTIONABLE" : "ACTIONED"))
         .sort((a, b) => new Date(b.workflowState.lastUpdatedAt) - new Date(a.workflowState.lastUpdatedAt))
         .sort((a, b) => activeFilter.state.indexOf(a.workflowState.state) - activeFilter.state.indexOf(b.workflowState.state))
         .sort((a, b) => activeFilter.change.indexOf(a.flowDef.proposalType) - activeFilter.change.indexOf(b.flowDef.proposalType))
         .sort((a, b) => activeFilter.proposer.indexOf(a.createdBy === userName ? "USER" : "OTHERS")
             - activeFilter.proposer.indexOf(b.createdBy === userName ? "USER" : "OTHERS"))
+        .sort((a, b) => activeFilter.action.indexOf(myActionables.has(a.id) ? "ACTIONABLE" : "ACTIONED")
+            - activeFilter.action.indexOf(myActionables.has(b.id) ? "ACTIONABLE" : "ACTIONED"))
     : [];
 
 $: stateCounts = _.countBy(gridData, "workflowState.state");
 $: changeTypeCounts = _.countBy(gridData, "flowDef.proposalType");
 $: proposerCounts = _.countBy(gridData, (row) => row.createdBy === userName ? "USER" : "OTHERS");
+$: actionableCounts = _.countBy(gridData, (row) => myActionables.has(row.id) ? "ACTIONABLE" : "ACTIONED");
 
 $: filteredDataSize = filteredGridData.length;
 
@@ -191,6 +249,8 @@ $: isDataFiltered = (!(filteredDataSize === gridData.length) || (activeFilter.ch
                                  changeTypeCounts={changeTypeCounts}
                                  proposerPillDefs={proposerTypePillDefs}
                                  proposerPillCounts={proposerCounts}
+                                 actionablePillDefs={actionablePillDefs}
+                                 actionableCounts={actionableCounts}
                                  filterStateKey={currentTabText}/>
             <small class="text-muted">{isDataFiltered ? `Filtered: (${filteredDataSize})` : ``}</small>
             <GridWithCellRenderer columnDefs={columnDefs}

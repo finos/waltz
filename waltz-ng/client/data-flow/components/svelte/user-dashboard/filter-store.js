@@ -4,11 +4,13 @@ export const filters = writable({
     "Actionable": {
         state: [],
         change: [],
-        proposer: []
+        proposer: [],
+        action: []
     },
     "Historical": {
         state: [],
         change: [],
-        proposer: []
+        proposer: [],
+        action: []
     },
 })

@@ -12,6 +12,9 @@
     export let proposerPillDefs = {};
     export let proposerPillCounts = {};
 
+    export let actionablePillDefs = {};
+    export let actionableCounts = {};
+
     export let filterStateKey;
 
     let showFilters = false;
@@ -44,6 +47,15 @@
         }
     }
 
+    const updateActionFilters = (filterKey) => {
+        const selectedActions = $filters[filterStateKey].action.includes(filterKey);
+        if (selectedActions) {
+            $filters[filterStateKey].action = $filters[filterStateKey].action.filter(f => f !== filterKey);
+        } else {
+            $filters[filterStateKey].action = [...$filters[filterStateKey].action, filterKey];
+        }
+    };
+
     const handleStateFiltersKeyDown = (event, key) => {
         if(event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -64,6 +76,13 @@
             updateProposerFilters(key);
         }
     };
+
+    const handleActionFiltersKeyDown = (event, key) => {
+        if(event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            updateActionFilters(key);
+        }
+    }
 
     function toggleFilters() {
         showFilters = !showFilters;
@@ -152,6 +171,25 @@
                             pillKey={key}
                             cleanPill={!$filters[filterStateKey].change.includes(key)}
                             smallText={changeTypeCounts[key]}
+                        />
+                    </div>
+                    {/each}
+                </div>
+            </div>
+            <hr class="filter-divider" />
+            <div class="filter-group">
+                <h4>My Actionables</h4>
+                <div class="filter-pills">
+                    {#each Object.keys(actionablePillDefs) as key}
+                    <div
+                        role="button"
+                        tabindex="0"
+                        on:click={() => updateActionFilters(key)}
+                        on:keydown={(e) => handleActionFiltersKeyDown(e, key)}>
+                        <Pill pillDefs={actionablePillDefs}
+                            pillKey={key}
+                            cleanPill={!$filters[filterStateKey].action.includes(key)}
+                            smallText={actionableCounts[key]}
                         />
                     </div>
                     {/each}

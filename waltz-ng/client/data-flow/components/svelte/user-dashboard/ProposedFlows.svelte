@@ -94,6 +94,21 @@
         }
     }
 
+    const actionablePillDefs = {
+        ACTIONABLE: {
+            name: "Action Pending",
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
+        },
+        ACTIONED: {
+            name: "Already Actioned",
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
+        }
+    }
+
     const TABS = {
         ACTION: "Actionable",
         HISTORY: "Historical"
@@ -162,6 +177,7 @@
                              statusPillDefs={actionStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
+                             actionablePillDefs={actionablePillDefs}
                              currentTabText={TABS.ACTION}/>
         { :else if selectedTab === TABS.HISTORY }
         <ProposedFlowSection userName={userName}
@@ -170,6 +186,7 @@
                              statusPillDefs={historicalStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
+                             actionablePillDefs={actionablePillDefs}
                              currentTabText={TABS.HISTORY}/>
         {/if}
     </div>
