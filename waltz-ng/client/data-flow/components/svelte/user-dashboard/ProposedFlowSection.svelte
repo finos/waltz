@@ -19,67 +19,13 @@ export let changeTypePillDefs = {};
 export let proposerTypePillDefs = {};
 export let actionablePillDefs = {};
 export let currentTabText;
-
-const mockPermissions = [
-    {
-        "entityRef": {
-            "kind": "APPLICATION",
-            "id": 99999 // random id
-        },
-        "operations": ["APPROVE", "REJECT"] 
-    }
-];
-
-const operationsToAction = ["APPROVE", "REJECT"];
+export let myActionables = new Map();
 
 const approvalType = {
     SOURCE_APPROVED: "SOURCE_APPROVED",
     TARGET_APPROVED: "TARGET_APPROVED",
     FULLY_APPROVED: "FULLY_APPROVED"
 }
-
-const permissionsMap = new Map(
-    mockPermissions.map(p => [`${p.entityRef.kind}-${p.entityRef.id}`, p.operations])
-);
-
-const actionableStates = {
-    SOURCE_APPROVED: "SOURCE_APPROVED",
-    TARGET_APPROVED: "TARGET_APPROVED",
-    PENDING_APPROVALS: "PENDING_APPROVALS"
-}
-
-let myActionables = new Map();
-
-$: myActionables = new Map(
-    (flows ?? [])
-        .map(t => {
-            if (t?.workflowState.state === actionableStates.TARGET_APPROVED) {
-                // if i am the source approver
-                const permission = permissionsMap.get(`${t.flowDef.source.kind}-${t.flowDef.source.id}`);
-                if (permission && operationsToAction.every(op => permission.includes(op))) {
-                    return [t.id, true];
-                }
-            } else if (t?.workflowState.state === actionableStates.SOURCE_APPROVED) {
-                // if i am the target approver
-                const permission = permissionsMap.get(`${t.flowDef.target.kind}-${t.flowDef.target.id}`);
-                if (permission && operationsToAction.every(op => permission.includes(op))) {
-                    return [t.id, true];
-                }
-            } else if (t?.workflowState.state === actionableStates.PENDING_APPROVALS) {
-                // if i am either approver
-                let permission = permissionsMap.get(`${t.flowDef.source.kind}-${t.flowDef.source.id}`);
-                if (!permission) {
-                    permission = permissionsMap.get(`${t.flowDef.target.kind}-${t.flowDef.target.id}`);
-                }
-                if (permission && operationsToAction.every(op => permission.includes(op))) {
-                    return [t.id, true];
-                }
-            }
-
-            return undefined;
-        })
-        .filter(Boolean)
-);
 
 const columnDefs = [
     {
@@ -255,7 +201,8 @@ $: isDataFiltered = (!(filteredDataSize === gridData.length) || (activeFilter.ch
             <small class="text-muted">{isDataFiltered ? `Filtered: (${filteredDataSize})` : ``}</small>
             <GridWithCellRenderer columnDefs={columnDefs}
                                   rowData={filteredGridData}
-                                  clickable={false}/>
+                                  clickable={false}
+                                  gridSize={500}/>
         {/if}
     {:else}
         <LoadingPlaceholder/>

@@ -51,12 +51,21 @@ export function mkStore()  {
             null,
             {force});
 
+    const findPendingActionFlowsForPersonWhereSourceOrTargetApprover = (personId, force = false) => remote
+        .fetchViewData(
+            "GET",
+            `${BASE_URL}/propose-flow/pending-actions/person/${personId}`,
+            null,
+            null,
+            {force});
+
     return {
         proposeDataFlow,
         findProposedFlowsBySelector,
         transitionProposedFlow,
         findFlowPermissions,
-        getPhysicalFlowsCountForAssociatedLogicalFlow
+        getPhysicalFlowsCountForAssociatedLogicalFlow,
+        findPendingActionFlowsForPersonWhereSourceOrTargetApprover
     }
 }
 

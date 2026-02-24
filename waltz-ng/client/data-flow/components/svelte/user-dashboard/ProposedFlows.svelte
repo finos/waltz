@@ -138,6 +138,8 @@
         })
     }
 
+    // overall action pending
+    // [e.g. I may be a source approver, and someone from my team has approved it as a source approver but target approval is pending]
     $: actionableFlows = flows && flows.length
         ? flows.filter(f => actionStatuses.includes(f.workflowState.state))
         : [];
@@ -145,6 +147,13 @@
     $: historicalFlows = flows && flows.length
         ? flows.filter(f => historicalStatuses.includes(f.workflowState.state))
         : [];
+
+    // flows that require 'my' action
+    $: myActionableFlowsCall = proposeDataFlowRemoteStore
+        .findPendingActionFlowsForPersonWhereSourceOrTargetApprover(person.id);
+
+    $: myActionableFlowsMap = new Map($myActionableFlowsCall?.data?.map(t => [t, true])
+        .filter(Boolean));
 </script>
 
 <div class="waltz-tabs" style="padding-top: 1em">
@@ -178,7 +187,8 @@
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
                              actionablePillDefs={actionablePillDefs}
-                             currentTabText={TABS.ACTION}/>
+                             currentTabText={TABS.ACTION}
+                             myActionables={myActionableFlowsMap}/>
         { :else if selectedTab === TABS.HISTORY }
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
@@ -187,7 +197,8 @@
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
                              actionablePillDefs={actionablePillDefs}
-                             currentTabText={TABS.HISTORY}/>
+                             currentTabText={TABS.HISTORY}
+                             myActionables={myActionableFlowsMap}/>
         {/if}
     </div>
 </div>

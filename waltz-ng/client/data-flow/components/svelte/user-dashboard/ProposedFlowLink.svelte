@@ -20,11 +20,7 @@ const handleExclamationClick = (e) => {
 </script>
 
 <div>
-    <ViewLinkLabelled state="main.proposed-flow.view"
-        ctx={{id: flow?.id}}
-        openInNewTab={false}
-        label={`${flow?.flowDef?.source?.name} → ${flow?.flowDef?.target?.name}`}/>
-    
+
     {#if showExclamation}
         <Tooltip content={ProposedFlowLinkTooltipContent}>
             <span class="exclamation"
@@ -35,6 +31,11 @@ const handleExclamationClick = (e) => {
             </span>
         </Tooltip>
     {/if}
+
+    <ViewLinkLabelled state="main.proposed-flow.view"
+        ctx={{id: flow?.id}}
+        openInNewTab={false}
+        label={`${flow?.flowDef?.source?.name} → ${flow?.flowDef?.target?.name}`}/>
 </div>
 
 <style>
