@@ -8,16 +8,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
@@ -133,19 +124,19 @@ public class ProposedFlowWorkflowService {
     private ProposedFlowCommandResponse getDuplicateFlowResponse(ProposedFlowCommand command, FlowIdResponse response,
                                                                  EntityWorkflowDefinition workflowDefinition) {
         ImmutableProposedFlowCommandResponse.Builder builder = ImmutableProposedFlowCommandResponse.builder();
-        if(response.type().equals(PROPOSED_FLOW)) {
+        if (response.type().equals(PROPOSED_FLOW)) {
             builder.message(PROPOSED_FLOW_ALREADY_EXIST)
                     .proposedFlowId(response.id());
-        } else  {
+        } else {
             builder.message(PHYSICAL_FLOW_ALREADY_EXIST)
                     .physicalFlowId(response.id())
                     .proposedFlowId(0L);
         }
-        return  builder
-                    .outcome(FAILURE)
-                    .proposedFlowCommand(command)
-                    .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
-                    .build();
+        return builder
+                .outcome(FAILURE)
+                .proposedFlowCommand(command)
+                .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
+                .build();
 
     }
 
@@ -260,7 +251,6 @@ public class ProposedFlowWorkflowService {
     }
 
     /**
-     *
      * @param proposedFlowCommand
      * @param username
      * @return FlowIdResponse having id and type based on the matched case
@@ -269,7 +259,7 @@ public class ProposedFlowWorkflowService {
      */
     public FlowIdResponse validateProposedFlow(ProposedFlowCommand proposedFlowCommand, String username) {
 
-        switch (proposedFlowCommand.proposalType()){
+        switch (proposedFlowCommand.proposalType()) {
             case CREATE:
                 return validateProposedFlowForCreate(proposedFlowCommand, username);
             case EDIT:
@@ -301,28 +291,29 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    private FlowIdResponse validateProposedFlowForCreate(ProposedFlowCommand command, String username){
+    private FlowIdResponse validateProposedFlowForCreate(ProposedFlowCommand command, String username) {
         return command.logicalFlowId()
                 .map(id -> dataFlowService.getPhysicalFlowIfExist(command, username))
                 .filter(Objects::nonNull)
                 .map(flowId -> buildFlowIdResponse(flowId, EntityKind.PHYSICAL_FLOW))
                 .orElseGet(() -> proposedFlowDao.proposedFlowRecordsByProposalType(command)
                         .stream()
+                        .filter(record -> haveSamePhysicalAttributes(command, getFlowDefinition(record)))
                         .findFirst()
                         .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
                         .orElse(null));
     }
 
-    private FlowIdResponse buildFlowIdResponse(Long id, EntityKind flowType){
+    private FlowIdResponse buildFlowIdResponse(Long id, EntityKind flowType) {
         return ImmutableFlowIdResponse.builder()
                 .id(id)
                 .type(flowType)
                 .build();
     }
 
-    private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command){
-        checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
-        checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
+    private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command) {
+        checkNotNull(command.logicalFlowId().get(), "logical flow id can not be null");
+        checkNotNull(command.physicalFlowId().get(), "physical flow id can not be null");
         checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
@@ -338,9 +329,9 @@ public class ProposedFlowWorkflowService {
                 .orElse(null);
     }
 
-    private FlowIdResponse validateProposedFlowForDelete(ProposedFlowCommand command){
-        checkNotNull(command.physicalFlowId().get(),"physical flow id can not be null");
-        checkNotNull(command.logicalFlowId().get(),"logical flow id can not be null");
+    private FlowIdResponse validateProposedFlowForDelete(ProposedFlowCommand command) {
+        checkNotNull(command.physicalFlowId().get(), "physical flow id can not be null");
+        checkNotNull(command.logicalFlowId().get(), "logical flow id can not be null");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
@@ -365,4 +356,36 @@ public class ProposedFlowWorkflowService {
 
     }
 
+    /**
+     * Compares two proposed flow commands to see if their key physical attributes are identical.
+     *
+     * @param newProposal      The new proposal being submitted.
+     * @param existingProposal An existing proposal from the database.
+     * @return True if the specification ID and core flow attributes (offset, frequency, transport, criticality) match.
+     */
+    private boolean haveSamePhysicalAttributes(ProposedFlowCommand newProposal, ProposedFlowCommand existingProposal) {
+
+        boolean specIdMatches = Objects.equals(
+                existingProposal.specification().id(),
+                newProposal.specification().id());
+
+        // Compare physical flow attributes to see if they are the same
+        boolean attributesMatch = Objects.equals(
+                existingProposal.flowAttributes().name(),
+                newProposal.flowAttributes().name())
+                && Objects.equals(
+                existingProposal.flowAttributes().basisOffset(),
+                newProposal.flowAttributes().basisOffset())
+                && Objects.equals(
+                existingProposal.flowAttributes().frequency(),
+                newProposal.flowAttributes().frequency())
+                && Objects.equals(
+                existingProposal.flowAttributes().transport(),
+                newProposal.flowAttributes().transport())
+                && Objects.equals(
+                existingProposal.flowAttributes().criticality(),
+                newProposal.flowAttributes().criticality());
+
+        return specIdMatches && attributesMatch;
+    }
 }
