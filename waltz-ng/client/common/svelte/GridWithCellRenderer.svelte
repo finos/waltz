@@ -183,6 +183,7 @@
         top: 0;
         background-color: white;
         z-index: 1;
+        box-shadow: inset 0 -2px 0 #dddddd;
     }
 
     th.sortable {

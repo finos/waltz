@@ -92,6 +92,7 @@
         $filters[filterStateKey].proposer = [];
         $filters[filterStateKey].change = [];
         $filters[filterStateKey].state = [];
+        $filters[filterStateKey].action = [];
     }
 
     function handleClickOutside(event) {
@@ -100,7 +101,10 @@
         }
     }
 
-    $: clearFiltersDisabled = !($filters[filterStateKey]?.state.length || $filters[filterStateKey]?.proposer.length || $filters[filterStateKey]?.change.length);
+    $: clearFiltersDisabled = !($filters[filterStateKey]?.state.length
+        || $filters[filterStateKey]?.proposer.length
+        || $filters[filterStateKey]?.change.length
+        || $filters[filterStateKey]?.action.length);
 </script>
 
 <svelte:window on:click={handleClickOutside}/>
@@ -117,6 +121,25 @@
                         disabled={clearFiltersDisabled}>
                     <Icon name="xmark"/>Clear filters
                 </button>
+            </div>
+            <hr class="filter-divider" />
+            <div class="filter-group">
+                <h4>My Actionables</h4>
+                <div class="filter-pills">
+                    {#each Object.keys(actionablePillDefs) as key}
+                    <div
+                        role="button"
+                        tabindex="0"
+                        on:click={() => updateActionFilters(key)}
+                        on:keydown={(e) => handleActionFiltersKeyDown(e, key)}>
+                        <Pill pillDefs={actionablePillDefs}
+                            pillKey={key}
+                            cleanPill={!$filters[filterStateKey].action.includes(key)}
+                            smallText={actionableCounts[key]}
+                        />
+                    </div>
+                    {/each}
+                </div>
             </div>
             <hr class="filter-divider" />
             <div class="filter-group">
@@ -171,25 +194,6 @@
                             pillKey={key}
                             cleanPill={!$filters[filterStateKey].change.includes(key)}
                             smallText={changeTypeCounts[key]}
-                        />
-                    </div>
-                    {/each}
-                </div>
-            </div>
-            <hr class="filter-divider" />
-            <div class="filter-group">
-                <h4>My Actionables</h4>
-                <div class="filter-pills">
-                    {#each Object.keys(actionablePillDefs) as key}
-                    <div
-                        role="button"
-                        tabindex="0"
-                        on:click={() => updateActionFilters(key)}
-                        on:keydown={(e) => handleActionFiltersKeyDown(e, key)}>
-                        <Pill pillDefs={actionablePillDefs}
-                            pillKey={key}
-                            cleanPill={!$filters[filterStateKey].action.includes(key)}
-                            smallText={actionableCounts[key]}
                         />
                     </div>
                     {/each}

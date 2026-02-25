@@ -1,13 +1,18 @@
 import {writable} from "svelte/store";
 
+const TABS = {
+    ACTIVE: "Active",
+    COMPLETED: "Completed"
+}
+
 export const filters = writable({
-    "Actionable": {
+    [TABS.ACTIVE]: {
         state: [],
         change: [],
         proposer: [],
         action: []
     },
-    "Historical": {
+    [TABS.COMPLETED]: {
         state: [],
         change: [],
         proposer: [],

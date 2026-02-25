@@ -96,13 +96,13 @@
 
     const actionablePillDefs = {
         ACTIONABLE: {
-            name: "Action Pending",
+            name: "My Outstanding Actions",
             borderColor: "#000000",
             textColor: "#000000",
             bgColor: "#666666"
         },
         ACTIONED: {
-            name: "Already Actioned",
+            name: "My Completed Actions",
             borderColor: "#000000",
             textColor: "#000000",
             bgColor: "#666666"
@@ -110,11 +110,11 @@
     }
 
     const TABS = {
-        ACTION: "Actionable",
-        HISTORY: "Historical"
+        ACTIVE: "Active",
+        COMPLETED: "Completed"
     }
 
-    let selectedTab = TABS.ACTION;
+    let selectedTab = TABS.ACTIVE;
 
     let flows = [];
 
@@ -159,27 +159,27 @@
 <div class="waltz-tabs" style="padding-top: 1em">
     <input type="radio"
            bind:group={selectedTab}
-           value={TABS.ACTION}
-           id={TABS.ACTION}>
+           value={TABS.ACTIVE}
+           id={TABS.ACTIVE}>
     <label class="wt-label"
-           for={TABS.ACTION}>
-            <span><Icon name="pencil-square-o"/> {TABS.ACTION} Flows -
+           for={TABS.ACTIVE}>
+            <span><Icon name="pencil-square-o"/> {TABS.ACTIVE} Flows -
                 <small class="text-muted">{actionableFlows.length ?? 0}</small>
             </span>
     </label>
 
     <input type="radio"
            bind:group={selectedTab}
-           value={TABS.HISTORY}
-           id={TABS.HISTORY}>
+           value={TABS.COMPLETED}
+           id={TABS.COMPLETED}>
     <label class="wt-label"
-           for={TABS.HISTORY}>
-        <span><Icon name="clock"/> {TABS.HISTORY} Flows -
+           for={TABS.COMPLETED}>
+        <span><Icon name="clock"/> {TABS.COMPLETED} Flows -
             <small class="text-muted">{historicalFlows.length ?? 0}</small>
         </span>
     </label>
     <div class="wt-tab wt-active">
-        { #if selectedTab === TABS.ACTION }
+        { #if selectedTab === TABS.ACTIVE }
         <ProposedFlowSection userName={userName}
                              flows={actionableFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
@@ -187,9 +187,9 @@
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
                              actionablePillDefs={actionablePillDefs}
-                             currentTabText={TABS.ACTION}
+                             currentTabText={TABS.ACTIVE}
                              myActionables={myActionableFlowsMap}/>
-        { :else if selectedTab === TABS.HISTORY }
+        { :else if selectedTab === TABS.COMPLETED }
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
@@ -197,7 +197,7 @@
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
                              actionablePillDefs={actionablePillDefs}
-                             currentTabText={TABS.HISTORY}
+                             currentTabText={TABS.COMPLETED}
                              myActionables={myActionableFlowsMap}/>
         {/if}
     </div>
