@@ -9,6 +9,7 @@
     export let rowData = [];
     export let onSelectRow = () => console.log("selecting row");
     export let clickable = true;
+    export let gridSize = 300;
 
     let qry = null;
     let sortColumn = null;
@@ -104,7 +105,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class={_.size(rowData) > 6 ? "waltz-scroll-region-300" : ""} style="padding: 0">
+        <div class={_.size(rowData) > 6 ? `waltz-scroll-region-${gridSize}` : ""} style="padding: 0">
             <table class="table table-condensed table-hover small fixed-table">
                 <colgroup>
                     {#each columnDefs as col}
@@ -182,6 +183,7 @@
         top: 0;
         background-color: white;
         z-index: 1;
+        box-shadow: inset 0 -2px 0 #dddddd;
     }
 
     th.sortable {

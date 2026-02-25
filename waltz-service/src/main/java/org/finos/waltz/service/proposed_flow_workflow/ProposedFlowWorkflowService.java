@@ -365,4 +365,8 @@ public class ProposedFlowWorkflowService {
 
     }
 
+    public List<Long> fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(Long personId) {
+        return proposedFlowDao.fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(personId);
+    }
+
 }
