@@ -37,7 +37,8 @@ const columnDefs = [
             showExclamation: myActionables.get(row.id),
             currentTab: currentTabText
         }),
-        sortable: true
+        sortable: true,
+        width: "10%"
     },
     {
         field: "flowDef.source.name",
@@ -53,7 +54,8 @@ const columnDefs = [
             isEntityLink: true,
             entityKind: row.flowDef.source?.kind
         }),
-        sortable: true
+        sortable: true,
+        width: "5%"
     },
     {
         field: "flowDef.target.name",
@@ -69,7 +71,8 @@ const columnDefs = [
             isEntityLink: true,
             entityKind: row.flowDef.target.kind
         }),
-        sortable: true
+        sortable: true,
+        width: "5%"
     },
     {
         field: "dataTypes",
