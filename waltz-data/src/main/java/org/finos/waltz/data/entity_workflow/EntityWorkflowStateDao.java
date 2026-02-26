@@ -25,6 +25,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -94,15 +95,27 @@ public class EntityWorkflowStateDao {
         stateRecord.insert();
     }
 
-    public long updateState(Long workflowDefId, EntityReference ref, String user, String workflowState) {
+    public long updateStateTransactional(DSLContext dsl, Long workflowDefId, EntityReference ref, String user, String workflowState) {
         return dsl
-                .update(ENTITY_WORKFLOW_STATE)
-                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
-                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
-                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
-                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
-                .execute();
+            .update(ENTITY_WORKFLOW_STATE)
+            .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
+            .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+            .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
+            .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
+            .execute();
+    }
+
+    public EntityWorkflowState getProposedFlowWorkflowStateForUpdate(DSLContext tx, Long workflowId, EntityReference entityReference) {
+        return tx
+            .select(Tables.ENTITY_WORKFLOW_STATE.fields())
+            .from(Tables.ENTITY_WORKFLOW_STATE)
+            .where(Tables.ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+            .and(Tables.ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(entityReference.kind().name()))
+            .and(Tables.ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(entityReference.id()))
+            .forUpdate()
+            .noWait()
+            .fetchOne(TO_DOMAIN_MAPPER);
     }
 }
