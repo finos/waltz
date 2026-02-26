@@ -115,7 +115,6 @@ public class EntityWorkflowStateDao {
             .and(Tables.ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(entityReference.kind().name()))
             .and(Tables.ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(entityReference.id()))
             .forUpdate()
-            .noWait()
             .fetchOne(TO_DOMAIN_MAPPER);
     }
 }
