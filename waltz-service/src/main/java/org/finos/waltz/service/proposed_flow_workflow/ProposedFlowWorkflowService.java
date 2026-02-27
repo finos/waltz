@@ -236,7 +236,7 @@ public class ProposedFlowWorkflowService {
                 }
             });
         } catch (DataAccessException e) {
-            errorMessage.set(format("Cannot '%s' the flow, currently being actioned upon by another user. Please refresh and retry.", transitionAction));
+            errorMessage.set(format("Cannot '%s' the flow, currently being acted upon by another user. Please refresh and retry.", transitionAction));
             LOG.error(errorMessage.get(), e);
             outcome.set(FAILURE);
         } catch (Exception e) {
