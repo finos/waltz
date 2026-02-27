@@ -21,9 +21,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-
     <profiles>
-     
         <profile>
             <id>build-postgres</id>
             <activation><activeByDefault>false</activeByDefault></activation>
@@ -47,5 +45,26 @@
                 <database.catalog></database.catalog>
             </properties>
         </profile>
+
+        <profile>
+            <id>build-mssql-alt</id>
+            <activation><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <database.url>jdbc:sqlserver://localhost:1433;databaseName=waltz;encrypt=true;trustServerCertificate=true</database.url>
+                <database.user>sa</database.user>
+                <database.password>Waltz#123</database.password>
+                <database.schema>dbo</database.schema>
+                <database.catalog>waltz</database.catalog>
+            </properties>
+        </profile>
     </profiles>
+
+    <servers>
+        <server>
+            <id>jooq-pro</id>
+            <username>${env.JOOQ_USERNAME}</username>
+            <password>${env.JOOQ_PASSWORD}</password>
+        </server>
+    </servers>
+
 </settings>
