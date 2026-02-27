@@ -8,6 +8,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
@@ -28,6 +29,7 @@ import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredic
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +37,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.common.StringUtilities.safeEq;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
@@ -67,6 +71,7 @@ public class ProposedFlowWorkflowService {
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
+    private final DSLContext dsl;
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -86,9 +91,10 @@ public class ProposedFlowWorkflowService {
         this.proposedFlowDao = proposedFlowDao;
         this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
 //        Get the state machine from the definition
-        proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
+        this.proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
+        this.dsl = dslContext;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -168,83 +174,83 @@ public class ProposedFlowWorkflowService {
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
 
-        String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
-        CommandOutcome outcome = SUCCESS;
-        ImmutableProposedFlowResponse.Builder builder = ImmutableProposedFlowResponse.builder();
+        AtomicReference<String> errorMessage = new AtomicReference<>(PROPOSED_FLOW_ACTION_SUCCESS);
+        AtomicReference<CommandOutcome> outcome = new AtomicReference<>(SUCCESS);
         ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         checkNotNull(proposedFlow, "No proposed flow found");
 
-        // Check for approval/rejection permissions
-        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
-                username,
-                proposedFlow.flowDef().source(),
-                proposedFlow.flowDef().target()
-        );
-        boolean isSourceApprover = !flowPermission.sourceApprover().isEmpty();
-        boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
-        boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
+        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
-//        Fetch the current state
-        ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
+        // transaction with the lock on that EntityWorkFlowState row
+        try {
+            final ProposedFlowResponse finalProposedFlow = proposedFlow;
+            dsl.transaction(ctx -> {
+                DSLContext tx = ctx.dsl();
+                EntityWorkflowState entityWorkflowState = entityWorkflowService
+                    .getProposedFlowWorkflowStateForUpdate(tx, entityWorkflowDefinition.id().orElseThrow(), mkRef(PROPOSED_FLOW, proposedFlowId));
 
-        // 2. Get current state and build context
-        ProposedFlowWorkflowContext workflowContext =
-                new ProposedFlowWorkflowContext(
-                        proposedFlow.workflowState().workflowId(),
-                        proposedFlow.workflowState().entityReference(), username, proposedFlowActionCommand.comment())
-                        .setSourceApprover(isSourceApprover)
-                        .setTargetApprover(isTargetApprover)
-                        .setMaker(isMaker)
+                ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
+                    username,
+                    finalProposedFlow.flowDef().source(),
+                    finalProposedFlow.flowDef().target()
+                );
+
+                ProposedFlowWorkflowState currentState = valueOf(entityWorkflowState.state());
+
+                ProposedFlowWorkflowContext workflowContext =
+                    new ProposedFlowWorkflowContext(entityWorkflowState.workflowId(), entityWorkflowState.entityReference(), username, proposedFlowActionCommand.comment())
+                        .setSourceApprover(!flowPermission.sourceApprover().isEmpty())
+                        .setTargetApprover(!flowPermission.targetApprover().isEmpty())
+                        .setMaker(safeEq(finalProposedFlow.createdBy(), username))
                         .setCurrentState(currentState);
 
-        try {
-            // Fire the transitionAction
-            ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(
-                    currentState,
-                    transitionAction,
-                    workflowContext);
+                // get the new state after firing the transition onto the state machine
+                ProposedFlowWorkflowState newState = currentState;
+                try {
+                    newState = proposedFlowStateMachine.fire(
+                        currentState,
+                        transitionAction,
+                        workflowContext);
+                } catch (TransitionPredicateFailedException e) {
+                    errorMessage.set(format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb()));
+                    LOG.error(errorMessage.get(), e);
+                    outcome.set(FAILURE);
+                }
+                // persist the new state
+                entityWorkflowService.updateStateTransitionTransactional(tx, username, proposedFlowActionCommand.comment(),
+                    entityWorkflowState, currentState.name(), newState.name());
 
-            // if the transition not found, not permitted or new state == current state happen, abort
-            // Persist the new state.
-            entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
-                    proposedFlow.workflowState(), currentState.name(), newState.name());
-
-            ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
+                ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
                     .nextPossibleTransition(
-                            newState,
-                            transitionAction,
-                            workflowContext
-                                    .setCurrentState(newState)
-                                    .setPrevState(currentState))
+                        newState,
+                        transitionAction,
+                        workflowContext
+                            .setCurrentState(newState)
+                            .setPrevState(currentState))
                     .orElse(null);
 
-            if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
-                // auto switch to fully approved
-                proposedFlowOperations(proposedFlow, username);
-
-                entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
-                        proposedFlow.workflowState(), newState.name(), nextPossibleTransition.name());
-            }
-
-            // Refresh Return Object
-            proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
-
-        } catch (TransitionPredicateFailedException e) {
-            errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
-            LOG.error(errorMessage, e);
-            outcome = FAILURE;
-            builder.message(errorMessage).outcome(outcome);
+                if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
+                    proposedFlowOperations(finalProposedFlow, username);
+                    entityWorkflowService.updateStateTransitionTransactional(tx, username, proposedFlowActionCommand.comment(),
+                        entityWorkflowState, newState.name(), nextPossibleTransition.name());
+                }
+            });
+        } catch (DataAccessException e) {
+            errorMessage.set(format("Cannot '%s' the flow, currently being acted upon by another user. Please refresh and retry.", transitionAction));
+            LOG.error(errorMessage.get(), e);
+            outcome.set(FAILURE);
         } catch (Exception e) {
-            errorMessage = String.format("Failed to '%s' proposed flow.", transitionAction);
-            LOG.error(errorMessage, e);
-            outcome = FAILURE;
-            builder.message(errorMessage).outcome(outcome);
+            errorMessage.set(format("Failed to '%s' proposed flow.", transitionAction));
+            LOG.error(errorMessage.get(), e);
+            outcome.set(FAILURE);
         }
 
-        return ImmutableProposedFlowResponse.builder()
+        proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
+        return ImmutableProposedFlowResponse
+            .builder()
                 .from(proposedFlow)
-                .outcome(outcome)
-                .message(errorMessage).build();
+                .outcome(outcome.get())
+                .message(errorMessage.get()).build();
     }
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
