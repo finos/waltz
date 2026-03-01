@@ -33,12 +33,14 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectSeekStep2;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
+import org.jooq.Condition;
 
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -203,4 +205,219 @@ public class AccessLogDao {
                         .build());
     }
 
+    /**
+     * Get  access counts for a given period
+     */
+    public List<AccessLogSummary> findAccessLogSummary(String freq, String startDate, String endDate) {
+        Field<Integer> countsField = DSL.count(ACCESS_LOG.USER_ID).as("counts");
+        Field<Integer> distinctUserCountField = DSL.countDistinct(ACCESS_LOG.USER_ID).as("distinct_user_count");
+
+        Field<String> periodField;
+        switch (freq.toLowerCase()) {
+            case "day":
+                periodField = DSL.field("to_char({0}, 'YYYY-MM-DD')",
+                        String.class, ACCESS_LOG.CREATED_AT).as("period");
+                break;
+            case "week":
+                periodField = DSL.field("to_char(date_trunc('week', {0}), 'YYYY-MM-DD')",
+                        String.class, ACCESS_LOG.CREATED_AT).as("period");
+                break;
+            case "year":
+                periodField = DSL.field("to_char({0}, 'YYYY')",
+                        String.class, ACCESS_LOG.CREATED_AT).as("period");
+                break;
+            case "month":
+            default:
+                periodField = DSL.field("to_char({0}, 'YYYY-MM')",
+                        String.class, ACCESS_LOG.CREATED_AT).as("period");
+        }
+
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        return dsl
+                .select(countsField, distinctUserCountField, periodField)
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(periodField)
+                .orderBy(periodField)
+                .fetch(r -> ImmutableAccessLogSummary.builder()
+                        .counts(r.get("counts", Long.class))
+                        .distinctUserCount(r.get("distinct_user_count", Long.class))
+                        .period(r.get("period", String.class))
+                        .build());
+    }
+
+    /**
+     * Get top pages by access count for a given period
+     */
+    public List<AccessLogSummary> findTopPagesByAccess(String startDate, String endDate, int limit) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        return dsl
+                .select(ACCESS_LOG.STATE, DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(ACCESS_LOG.STATE)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .state(r.get(ACCESS_LOG.STATE))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get user activity heatmap by hour of day
+     */
+    public List<AccessLogSummary> findActivityByHourOfDay(String startDate, String endDate) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        Field<Integer> hourField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.HOUR);
+        
+        return dsl
+                .select(hourField.as("hour"), DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(hourField)
+                .orderBy(hourField)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .hour(r.get("hour", Integer.class))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get user activity by day of week
+     */
+    public List<AccessLogSummary> findActivityByDayOfWeek(String startDate, String endDate) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        Field<Integer> dayOfWeekField;
+        try {
+            dayOfWeekField = DSL.field(
+                "CASE " +
+                "WHEN EXTRACT(DOW FROM {0}) = 0 THEN 7 " +
+                "ELSE EXTRACT(DOW FROM {0}) " +
+                "END", Integer.class, ACCESS_LOG.CREATED_AT
+            );
+        } catch (Exception e) {
+            // Fallback to basic JOOQ approach
+            dayOfWeekField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.DAY_OF_WEEK);
+        }
+        
+        return dsl
+                .select(dayOfWeekField.as("day_of_week"), DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(dayOfWeekField)
+                .orderBy(dayOfWeekField)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .dayOfWeek(r.get("day_of_week", Integer.class))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get top active users by access count
+     */
+    public List<AccessLogSummary> findTopActiveUsers(String startDate, String endDate, int limit) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        return dsl
+                .select(ACCESS_LOG.USER_ID, DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(ACCESS_LOG.USER_ID)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .userId(r.get(ACCESS_LOG.USER_ID))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get session duration analytics (approximate based on access patterns)
+     */
+    public List<AccessLogSummary> findSessionDurations(String startDate, String endDate) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            condition = condition.and(ACCESS_LOG.CREATED_AT.between(
+                    Timestamp.valueOf(start.atStartOfDay()),
+                    Timestamp.valueOf(end.atTime(23, 59, 59))
+            ));
+        }
+
+        // Group sessions by user and day, calculate duration as time between first and last access
+        Field<String> dateField = DSL.field("to_char({0}, 'YYYY-MM-DD')", String.class, ACCESS_LOG.CREATED_AT);
+        Field<Timestamp> minTime = DSL.min(ACCESS_LOG.CREATED_AT);
+        Field<Timestamp> maxTime = DSL.max(ACCESS_LOG.CREATED_AT);
+        
+        return dsl
+                .select(ACCESS_LOG.USER_ID, dateField.as("date"), minTime, maxTime, DSL.count().as("page_views"))
+                .from(ACCESS_LOG)
+                .where(condition)
+                .groupBy(ACCESS_LOG.USER_ID, dateField)
+                .having(DSL.count().gt(1)) // Only sessions with multiple page views
+                .fetch(r -> {
+                    Timestamp min = r.get(minTime);
+                    Timestamp max = r.get(maxTime);
+                    long durationMinutes = (max.getTime() - min.getTime()) / (1000 * 60);
+                    
+                    return ImmutableAccessLogSummary
+                            .builder()
+                            .userId(r.get(ACCESS_LOG.USER_ID))
+                            .period(r.get("date", String.class))
+                            .counts(r.get("page_views", Long.class))
+                            .sessionDuration(durationMinutes)
+                            .build();
+                });
+    }
 }
