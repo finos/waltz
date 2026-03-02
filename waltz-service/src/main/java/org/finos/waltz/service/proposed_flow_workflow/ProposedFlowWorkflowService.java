@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.String.format;
@@ -187,30 +188,30 @@ public class ProposedFlowWorkflowService {
             dsl.transaction(ctx -> {
                 DSLContext tx = ctx.dsl();
                 EntityWorkflowState entityWorkflowState = entityWorkflowService
-                    .getProposedFlowWorkflowStateForUpdate(tx, entityWorkflowDefinition.id().orElseThrow(), mkRef(PROPOSED_FLOW, proposedFlowId));
+                        .getProposedFlowWorkflowStateForUpdate(tx, entityWorkflowDefinition.id().orElseThrow(), mkRef(PROPOSED_FLOW, proposedFlowId));
 
                 ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
-                    username,
-                    finalProposedFlow.flowDef().source(),
-                    finalProposedFlow.flowDef().target()
+                        username,
+                        finalProposedFlow.flowDef().source(),
+                        finalProposedFlow.flowDef().target()
                 );
 
                 ProposedFlowWorkflowState currentState = valueOf(entityWorkflowState.state());
 
                 ProposedFlowWorkflowContext workflowContext =
-                    new ProposedFlowWorkflowContext(entityWorkflowState.workflowId(), entityWorkflowState.entityReference(), username, proposedFlowActionCommand.comment())
-                        .setSourceApprover(!flowPermission.sourceApprover().isEmpty())
-                        .setTargetApprover(!flowPermission.targetApprover().isEmpty())
-                        .setMaker(safeEq(finalProposedFlow.createdBy(), username))
-                        .setCurrentState(currentState);
+                        new ProposedFlowWorkflowContext(entityWorkflowState.workflowId(), entityWorkflowState.entityReference(), username, proposedFlowActionCommand.comment())
+                                .setSourceApprover(!flowPermission.sourceApprover().isEmpty())
+                                .setTargetApprover(!flowPermission.targetApprover().isEmpty())
+                                .setMaker(safeEq(finalProposedFlow.createdBy(), username))
+                                .setCurrentState(currentState);
 
                 // get the new state after firing the transition onto the state machine
                 ProposedFlowWorkflowState newState = currentState;
                 try {
                     newState = proposedFlowStateMachine.fire(
-                        currentState,
-                        transitionAction,
-                        workflowContext);
+                            currentState,
+                            transitionAction,
+                            workflowContext);
                 } catch (TransitionPredicateFailedException e) {
                     errorMessage.set(format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb()));
                     LOG.error(errorMessage.get(), e);
@@ -218,21 +219,21 @@ public class ProposedFlowWorkflowService {
                 }
                 // persist the new state
                 entityWorkflowService.updateStateTransitionTransactional(tx, username, proposedFlowActionCommand.comment(),
-                    entityWorkflowState, currentState.name(), newState.name());
+                        entityWorkflowState, currentState.name(), newState.name());
 
                 ProposedFlowWorkflowState nextPossibleTransition = proposedFlowStateMachine
-                    .nextPossibleTransition(
-                        newState,
-                        transitionAction,
-                        workflowContext
-                            .setCurrentState(newState)
-                            .setPrevState(currentState))
-                    .orElse(null);
+                        .nextPossibleTransition(
+                                newState,
+                                transitionAction,
+                                workflowContext
+                                        .setCurrentState(newState)
+                                        .setPrevState(currentState))
+                        .orElse(null);
 
                 if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
                     proposedFlowOperations(finalProposedFlow, username);
                     entityWorkflowService.updateStateTransitionTransactional(tx, username, proposedFlowActionCommand.comment(),
-                        entityWorkflowState, newState.name(), nextPossibleTransition.name());
+                            entityWorkflowState, newState.name(), nextPossibleTransition.name());
                 }
             });
         } catch (DataAccessException e) {
@@ -247,7 +248,7 @@ public class ProposedFlowWorkflowService {
 
         proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         return ImmutableProposedFlowResponse
-            .builder()
+                .builder()
                 .from(proposedFlow)
                 .outcome(outcome.get())
                 .message(errorMessage.get()).build();
@@ -286,6 +287,18 @@ public class ProposedFlowWorkflowService {
                         "proposalType not supported: " + proposedFlowCommand.proposalType()
                 );
         }
+    }
+
+    public boolean isAppInvolvedInPendingApprovals(EntityReference appRef, String username, Long workflowId) {
+        return proposedFlowDao.isAppInvolvedInPendingApprovals(appRef, username, workflowId);
+    }
+
+    public boolean hasPendingCreations(EntityReference appRef, Long workflowId) {
+        return proposedFlowDao.hasPendingCreations(appRef, workflowId);
+    }
+
+    public Set<Long> findPhysicalFlowIdsInPendingProposals(Set<Long> logicalFlowIds, Long workflowId) {
+        return proposedFlowDao.findPhysicalFlowIdsInPendingProposals(logicalFlowIds, workflowId);
     }
 
     private void proposedFlowOperations(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.*;
@@ -50,7 +51,7 @@ public class AttestationPreCheckDao {
         this.dsl = checkNotNull(dsl, "DSL cannot be null");
     }
 
-    
+
     public LogicalFlowAttestationPreChecks calcLogicalFlowAttestationPreChecks(EntityReference ref) {
 
         Condition upstreamFlowsCondition = lf.TARGET_ENTITY_KIND.eq(ref.kind().name()).and(lf.TARGET_ENTITY_ID.eq(ref.id()));
@@ -155,7 +156,7 @@ public class AttestationPreCheckDao {
     }
 
     public ViewpointAttestationPreChecks calcViewpointAttestationPreChecks(EntityReference ref,
-                                                                                 Long categoryId) {
+                                                                           Long categoryId) {
 
         CommonTableExpression<Record3<Long, Boolean, Long>> viewpoints = DSL
                 .name("viewpoints")
@@ -172,9 +173,9 @@ public class AttestationPreCheckDao {
         CommonTableExpression<Record1<Long>> nonConcreteMappings = DSL
                 .name("non_concrete_mappings")
                 .as(DSL
-                    .select(viewpoints.field(0, Long.class))
-                    .from(viewpoints)
-                    .where(viewpoints.field(1, Boolean.class).isFalse()));
+                        .select(viewpoints.field(0, Long.class))
+                        .from(viewpoints)
+                        .where(viewpoints.field(1, Boolean.class).isFalse()));
 
         CommonTableExpression<Record2<String, Integer>> mappingCount = DSL
                 .name("mapping_count")
@@ -203,7 +204,7 @@ public class AttestationPreCheckDao {
                 .as(DSL
                         .select(DSL.val("TOTAL_ALLOCATION").as("chk"),
                                 DSL.coalesce(
-                                        DSL.sum(totalAllocation.field(0, Long.class)), 0)
+                                                DSL.sum(totalAllocation.field(0, Long.class)), 0)
                                         .as("count"))
                         .from(totalAllocation));
 
@@ -266,6 +267,22 @@ public class AttestationPreCheckDao {
         return builder.build();
     }
 
+    // Finds logical flows with deprecated data types for a given app
+    public Set<Long> findDeprecatedOrUnknownFlowIdsForEntity(EntityReference ref) {
+        Condition condition = lf.SOURCE_ENTITY_ID.eq(ref.id()).and(lf.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
+                .or(lf.TARGET_ENTITY_ID.eq(ref.id()).and(lf.TARGET_ENTITY_KIND.eq(ref.kind().name())));
+
+        return dsl
+                .selectDistinct(lfd.LOGICAL_FLOW_ID)
+                .from(lfd)
+                .innerJoin(dt).on(lfd.DECORATOR_ENTITY_ID.eq(dt.ID)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .innerJoin(lf).on(lfd.LOGICAL_FLOW_ID.eq(lf.ID))
+                .where(dt.DEPRECATED.isTrue().or(dt.UNKNOWN.isTrue()))
+                .and(condition)
+                .fetchSet(lfd.LOGICAL_FLOW_ID);
+    }
+
     private CommonTableExpression<Record1<Long>> mkInScopeFlowsQry(String cteName, Condition inScopeFlowsCondition) {
         return DSL
                 .name(cteName)
@@ -284,14 +301,14 @@ public class AttestationPreCheckDao {
         return DSL
                 .name(checkName)
                 .as(DSL
-                    .select(DSL.val(checkName).as("chk"),
-                            DSL.count().as("count"))
-                    .from(age)
-                    .where(age.APPLICATION_ID.eq(ref.id()))
-                    .and(age.GROUP_ID.eq(DSL
-                            .select(ag.ID)
-                            .from(ag)
-                            .where(ag.EXTERNAL_ID.eq(groupExtId)))));
+                        .select(DSL.val(checkName).as("chk"),
+                                DSL.count().as("count"))
+                        .from(age)
+                        .where(age.APPLICATION_ID.eq(ref.id()))
+                        .and(age.GROUP_ID.eq(DSL
+                                .select(ag.ID)
+                                .from(ag)
+                                .where(ag.EXTERNAL_ID.eq(groupExtId)))));
     }
 
 
