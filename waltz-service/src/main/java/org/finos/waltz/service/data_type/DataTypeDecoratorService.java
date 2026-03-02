@@ -45,6 +45,7 @@ import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
 import org.finos.waltz.model.logical_flow.ImmutableDataTypeDecoratorView;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
@@ -60,6 +61,8 @@ import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,6 +94,7 @@ import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 @Service
 public class DataTypeDecoratorService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DataTypeDecoratorService.class);
     private final ChangeLogService changeLogService;
     private final DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory;
     private final LogicalFlowDao logicalFlowDao;
@@ -149,9 +153,9 @@ public class DataTypeDecoratorService {
 
 
     public boolean updateDecorators(String userName,
-                                  EntityReference entityReference,
-                                  Set<Long> dataTypeIdsToAdd,
-                                  Set<Long> dataTypeIdsToRemove) {
+                                    EntityReference entityReference,
+                                    Set<Long> dataTypeIdsToAdd,
+                                    Set<Long> dataTypeIdsToRemove) {
 
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(entityReference, "entityReference cannot be null");
@@ -159,13 +163,13 @@ public class DataTypeDecoratorService {
         String currentDataTypeNames = getAssociatedDatatypeNamesAsCsv(entityReference);
 
         if (notEmpty(dataTypeIdsToAdd)) {
-            FunctionUtilities.time("add",  () -> addDecorators(userName, entityReference, dataTypeIdsToAdd));
+            FunctionUtilities.time("add", () -> addDecorators(userName, entityReference, dataTypeIdsToAdd));
         }
         if (notEmpty(dataTypeIdsToRemove)) {
-            FunctionUtilities.time("remove",  () -> removeDataTypeDecorator(userName, entityReference, dataTypeIdsToRemove));
+            FunctionUtilities.time("remove", () -> removeDataTypeDecorator(userName, entityReference, dataTypeIdsToRemove));
         }
 
-        FunctionUtilities.time("audit",  ()-> auditEntityDataTypeChanges(userName, entityReference, currentDataTypeNames));
+        FunctionUtilities.time("audit", () -> auditEntityDataTypeChanges(userName, entityReference, currentDataTypeNames));
         return true;
     }
 
@@ -195,8 +199,8 @@ public class DataTypeDecoratorService {
         return LOGICAL_DATA_FLOW.equals(entityKind)
                 ? getSelectorForLogicalFlow(dao, selectionOptions)
                 : dao.findByEntityIdSelector(
-                        genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
-                        Optional.ofNullable(entityKind));
+                genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
+                Optional.ofNullable(entityKind));
     }
 
 
@@ -206,7 +210,7 @@ public class DataTypeDecoratorService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        Collection<DataTypeDecorator> dataTypeDecorators = FunctionUtilities.time("mkDecorators",  ()-> mkDecorators(
+        Collection<DataTypeDecorator> dataTypeDecorators = FunctionUtilities.time("mkDecorators", () -> mkDecorators(
                 userName,
                 entityReference,
                 dataTypeIds));
@@ -215,7 +219,7 @@ public class DataTypeDecoratorService {
                 .getDao(entityReference.kind());
 
         // This must execute first so that the decorators exist
-        int[] result = FunctionUtilities.time("addDEcs",  ()->dao.addDecorators(dataTypeDecorators));
+        int[] result = FunctionUtilities.time("addDEcs", () -> dao.addDecorators(dataTypeDecorators));
 
         audit(format("Added data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
@@ -252,7 +256,7 @@ public class DataTypeDecoratorService {
 
 
     private void recalculateDataTypeUsageForApplications(EntityReference associatedEntityReference) {
-        if(LOGICAL_DATA_FLOW.equals(associatedEntityReference.kind())) {
+        if (LOGICAL_DATA_FLOW.equals(associatedEntityReference.kind())) {
             LogicalFlow flow = logicalFlowDao.getByFlowId(associatedEntityReference.id());
             dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
         }
@@ -344,7 +348,7 @@ public class DataTypeDecoratorService {
 
     private void auditEntityDataTypeChanges(String userName, EntityReference entityReference, String currentDataTypeNames) {
         String updatedDataTypeNames = getAssociatedDatatypeNamesAsCsv(entityReference);
-        switch(entityReference.kind()) {
+        switch (entityReference.kind()) {
             case LOGICAL_DATA_FLOW:
                 LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(entityReference.id());
                 String auditMessage = format("Logical Flow from %s to %s: Data types changed from [%s] to [%s]",
@@ -397,6 +401,7 @@ public class DataTypeDecoratorService {
 
     /**
      * Given a entity (e.g. logical flow or physical specification) produces a view of decorators and related assessments
+     *
      * @param parentEntityRef the reference of the parent page
      * @return DataTypeDecoratorView
      */
@@ -451,4 +456,26 @@ public class DataTypeDecoratorService {
         return ratingsCalculator.calculate(source, target, dataTypeIds);
     }
 
+    public void rippleDeletedDataTypesFromPhysicalFlowToLogicalFlow(String userName, long logicalFlowId, ProposalType proposalType) {
+        Set<Long> dataTypeIdsToRemove = physicalSpecificationDao.getOrphanDataTypeIdsForLogicalFlow(logicalFlowId);
+
+        removeDataTypeDecorator(userName, mkRef(LOGICAL_DATA_FLOW, logicalFlowId), dataTypeIdsToRemove);
+        LOG.info("Data types {} removed (rippled from physical flow {}) from logical flow {}", dataTypeIdsToRemove, proposalType.name().toLowerCase(), logicalFlowId);
+
+        if (!dataTypeIdsToRemove.isEmpty()) {
+            String message = format(
+                    "Data types %s removed (rippled from physical flow %s) from logical flow %s",
+                    dataTypeIdsToRemove,
+                    proposalType.name().toLowerCase(),
+                    logicalFlowId);
+
+            changeLogService.write(ImmutableChangeLog.builder()
+                    .parentReference(mkRef(LOGICAL_DATA_FLOW, logicalFlowId))
+                    .message(message)
+                    .userId(userName)
+                    .severity(Severity.INFORMATION)
+                    .operation(Operation.REMOVE)
+                    .build());
+        }
+    }
 }
