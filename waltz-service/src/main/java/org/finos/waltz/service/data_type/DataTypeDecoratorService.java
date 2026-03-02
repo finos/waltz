@@ -456,7 +456,7 @@ public class DataTypeDecoratorService {
         return ratingsCalculator.calculate(source, target, dataTypeIds);
     }
 
-    public void rippleDeletedDataTypesFromPhysicalFlowToLogicalFlow(String userName, long logicalFlowId, ProposalType proposalType) {
+    public void syncDeletedDataTypesFromPhysicalFlowToLogicalFlow(String userName, long logicalFlowId, ProposalType proposalType) {
         Set<Long> dataTypeIdsToRemove = physicalSpecificationDao.getOrphanDataTypeIdsForLogicalFlow(logicalFlowId);
 
         removeDataTypeDecorator(userName, mkRef(LOGICAL_DATA_FLOW, logicalFlowId), dataTypeIdsToRemove);

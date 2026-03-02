@@ -282,7 +282,6 @@ public class PhysicalSpecificationDao {
      * Takes a specification id and a user enacting the change.
      * This function ensures any logical flow associated to this specification has
      * the same (or a superset) of datatypes associated to it.
-     * <p>
      * This prevents 'drift' where the spec and logical flows do not align.
      *
      * @param userName

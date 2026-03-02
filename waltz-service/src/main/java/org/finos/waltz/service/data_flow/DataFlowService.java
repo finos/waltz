@@ -193,8 +193,8 @@ public class DataFlowService {
                 toAdd,
                 toRemove);
 
-        // ripple deleted data types from physical flow to logical flow
-        dataTypeDecoratorService.rippleDeletedDataTypesFromPhysicalFlowToLogicalFlow(username, physicalFlow.logicalFlowId(), proposedFlow.flowDef().proposalType());
+        // sync deleted data types from physical flow to logical flow
+        dataTypeDecoratorService.syncDeletedDataTypesFromPhysicalFlowToLogicalFlow(username, physicalFlow.logicalFlowId(), proposedFlow.flowDef().proposalType());
 
         saveEntityWorkflowResult(proposedFlow, mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()), username);
         return updatedDT;
@@ -248,7 +248,7 @@ public class DataFlowService {
             deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
         } else {
             // ripple deleted data types from physical flow to logical flow
-            dataTypeDecoratorService.rippleDeletedDataTypesFromPhysicalFlowToLogicalFlow(username, physicalFlow.logicalFlowId(), proposedFlow.flowDef().proposalType());
+            dataTypeDecoratorService.syncDeletedDataTypesFromPhysicalFlowToLogicalFlow(username, physicalFlow.logicalFlowId(), proposedFlow.flowDef().proposalType());
         }
         return ImmutableDeletePhysicalFlowResponse.builder()
                 .logicalFlowId(physicalFlow.logicalFlowId())
