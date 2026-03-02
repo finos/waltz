@@ -247,7 +247,7 @@ public class DataFlowService {
             //delete logical flow decorator
             deleteLogicalFlowDecorator(username, physicalFlow.logicalFlowId());
         } else {
-            // ripple deleted data types from physical flow to logical flow
+            // sync deleted data types from physical flow to logical flow
             dataTypeDecoratorService.syncDeletedDataTypesFromPhysicalFlowToLogicalFlow(username, physicalFlow.logicalFlowId(), proposedFlow.flowDef().proposalType());
         }
         return ImmutableDeletePhysicalFlowResponse.builder()
