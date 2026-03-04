@@ -75,7 +75,7 @@ public class DataFlowService {
      * Creates logical and physical flows from the ProposedFlow.
      *
      * @param proposedFlowId primary key of the ProposedFlow
-     * @param username       actor requesting the creation
+     * @param username actor requesting the creation
      * @return immutable response containing the created flows
      * @throws FlowCreationException if either creation step fails
      */
@@ -211,7 +211,7 @@ public class DataFlowService {
      * associated logical flow together with its data-type decorators.
      *
      * @param proposedFlow as input
-     * @param username     user performing the operation
+     * @param username user performing the operation
      * @return immutable response object with the ids of the deleted artefacts
      */
     public DeletePhysicalFlowResponse deletePhysicalFlow(ProposedFlowResponse proposedFlow, String username) {
