@@ -198,10 +198,10 @@ public class PhysicalSpecificationDao {
 
     public boolean isUsed(long id) {
         Field<Boolean> specUsed = DSL.when(
-                        exists(select(PHYSICAL_FLOW.ID)
-                                .from(PHYSICAL_FLOW)
-                                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
-                                .and(PHYSICAL_FLOW_NOT_REMOVED)),
+                exists(select(PHYSICAL_FLOW.ID)
+                        .from(PHYSICAL_FLOW)
+                        .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
+                        .and(PHYSICAL_FLOW_NOT_REMOVED)),
                         val(true))
                 .otherwise(false).as("spec_used");
 
@@ -318,20 +318,20 @@ public class PhysicalSpecificationDao {
 
             SelectJoinStep<? extends Record6<String, Long, String, String, String, String>> requiredChangeLogs = DSL
                     .select(
-                            val(EntityKind.LOGICAL_DATA_FLOW.name()),
-                            requiredQry.field(1, Long.class), // logical flow id
-                            concat("Propagated data type from specification to flow: ", requiredQry.field(2, String.class)),
-                            val(userName),
-                            val(Severity.INFORMATION.name()),
-                            val(Operation.ADD.name()))
+                        val(EntityKind.LOGICAL_DATA_FLOW.name()),
+                        requiredQry.field(1, Long.class), // logical flow id
+                        concat("Propagated data type from specification to flow: ", requiredQry.field(2, String.class)),
+                        val(userName),
+                        val(Severity.INFORMATION.name()),
+                        val(Operation.ADD.name()))
                     .from(requiredQry);
 
             SelectJoinStep<Record4<Long, String, Long, String>> requiredDecorators = DSL
                     .select(
-                            requiredQry.field(1, Long.class),
-                            val(EntityKind.DATA_TYPE.name()),
-                            requiredQry.field(0, Long.class),
-                            val(userName))
+                        requiredQry.field(1, Long.class),
+                        val(EntityKind.DATA_TYPE.name()),
+                        requiredQry.field(0, Long.class),
+                        val(userName))
                     .from(requiredQry);
 
             tx.insertInto(CHANGE_LOG)
