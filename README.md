@@ -40,9 +40,6 @@ Getting started
 - Spark framework (2.9.4) compatible with Tomcat 10
 - JDBC via JOOQ
 
-## Technical Upgrade Section
-- Please refer to the Waltz [Technical Upgrade](TechnicalUpgrade.md) page.
-
 ### Supported Databases
 
 - Postgres
