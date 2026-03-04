@@ -199,8 +199,8 @@ public class DataTypeDecoratorService {
         return LOGICAL_DATA_FLOW.equals(entityKind)
                 ? getSelectorForLogicalFlow(dao, selectionOptions)
                 : dao.findByEntityIdSelector(
-                genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
-                Optional.ofNullable(entityKind));
+                        genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
+                        Optional.ofNullable(entityKind));
     }
 
 
