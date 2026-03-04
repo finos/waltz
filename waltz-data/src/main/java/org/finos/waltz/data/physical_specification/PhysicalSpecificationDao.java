@@ -56,6 +56,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -92,9 +93,9 @@ public class PhysicalSpecificationDao {
     private static final PhysicalFlow pf = PHYSICAL_FLOW;
 
     public static final Field<String> owningEntityNameField = InlineSelectFieldFactory.mkNameField(
-                PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID,
-                PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND,
-                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR))
+                    PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID,
+                    PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR))
             .as("owning_name_field");
 
 
@@ -164,7 +165,6 @@ public class PhysicalSpecificationDao {
     }
 
 
-
     public PhysicalSpecification getById(long id) {
         return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -187,9 +187,9 @@ public class PhysicalSpecificationDao {
 
         Condition condition = PHYSICAL_SPECIFICATION.NAME.eq(flow.name())
                 .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().value()))
-                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
-                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
-                        .and(PHYSICAL_SPEC_NOT_REMOVED);
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
+                .and(PHYSICAL_SPEC_NOT_REMOVED);
 
         return basicSelectByCondition(condition)
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -202,7 +202,7 @@ public class PhysicalSpecificationDao {
                             .from(PHYSICAL_FLOW)
                             .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
                             .and(PHYSICAL_FLOW_NOT_REMOVED)),
-                    val(true))
+                        val(true))
                 .otherwise(false).as("spec_used");
 
         return dsl
@@ -282,12 +282,11 @@ public class PhysicalSpecificationDao {
      * Takes a specification id and a user enacting the change.
      * This function ensures any logical flow associated to this specification has
      * the same (or a superset) of datatypes associated to it.
-     *
      * This prevents 'drift' where the spec and logical flows do not align.
      *
      * @param userName
      * @param specificationId
-     * @return  number of updates made to logical flows
+     * @return number of updates made to logical flows
      */
     public int propagateDataTypesToLogicalFlows(String userName, long specificationId) {
         return dsl.transactionResult(ctx -> {
@@ -460,4 +459,26 @@ public class PhysicalSpecificationDao {
                 .fetch(PHYSICAL_FLOW.LOGICAL_FLOW_ID);
     }
 
+    public Set<Long> getOrphanDataTypeIdsForLogicalFlow(long logicalFlowId) {
+
+        // Query to get all data types from all physical flows under a logical flow
+        SelectConditionStep<Record1<Long>> dataTypesFromCurrentPhysicalFlows = dsl
+                .selectDistinct(psdt.DATA_TYPE_ID)
+                .from(psdt)
+                .innerJoin(pf).on(pf.SPECIFICATION_ID.eq(psdt.SPECIFICATION_ID))
+                .where(pf.LOGICAL_FLOW_ID.eq(logicalFlowId)
+                        .and(pf.IS_REMOVED.isFalse())
+                        .and(pf.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
+
+        // Query to get all data types currently decorating a logical flow
+        SelectConditionStep<Record1<Long>> dataTypesInLogicalFlowDecorator = dsl
+                .selectDistinct(lfd.DECORATOR_ENTITY_ID)
+                .from(lfd)
+                .where(lfd.LOGICAL_FLOW_ID.eq(logicalFlowId)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())));
+
+        Select<Record1<Long>> toRemoveQuery = dataTypesInLogicalFlowDecorator.except(dataTypesFromCurrentPhysicalFlows);
+
+        return new HashSet<>(dsl.fetchValues(toRemoveQuery));
+    }
 }
