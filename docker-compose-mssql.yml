@@ -1,0 +1,34 @@
+services:
+  waltz:
+    build:
+      context: .
+      dockerfile: Dockerfile.mssql
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      DB_HOST: sqlserver
+      DB_PORT: "1433"
+      DB_NAME: waltz
+      DB_USER: sa
+      DB_PASSWORD: "Waltz#123"
+      DB_SCHEME: dbo
+
+  sqlserver:
+    image: hmxlabs/mssql-fts:2022-latest
+    # note - this above image is a repackage of mssql and full text search.
+    # if desired it can be rebuilt locally, but it takes much longer (uncommment below)
+    #    build:
+    #      dockerfile: docker/Dockerfile_MSSQL
+
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "Waltz#123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+
+# example run commands
+# docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Waltz#123" -e "MSSQL_PID=Express"  -p 1433:1433 -d --name=sql mcr.microsoft.com/mssql/server:latest
+# docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Waltz#123" -e "MSSQL_PID=Express" -p 1433:1433 -d --name=mssql-waltz hmxlabs/mssql-fts:2022-latest

@@ -1,0 +1,272 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Waltz Build (dual)
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build-postgres:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: waltz
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5 
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven packages    
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Update Maven Project Version
+      if: ${{ github.ref_type == 'tag' }}
+      run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
+
+    - name: Generate effective POM
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests -Dverbose -Doutput=effective-pom-postgres.xml
+
+    - name: Upload effective POM
+      uses: actions/upload-artifact@v4
+      with:
+        name: effective-pom-postgres
+        path: effective-pom-postgres.xml
+
+    - name: Build with Maven (PostgreSQL)
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site -Dtarget.db=postgres -Ddb.provider=docker;
+
+    - name: Publish build
+      uses: actions/upload-artifact@v4
+      with:
+        name: waltz-web-postgres.war
+        path: waltz-web/target/waltz-web-jakarta.war
+
+    - name: Publish mocha results
+      uses: actions/upload-artifact@v4
+      with:
+        name: mocha-test-results-postgres.txt
+        path: waltz-ng/mocha-test-results.txt
+
+    - name: Publish liquibase changelogs
+      uses: actions/upload-artifact@v4
+      with:
+        name: liquibase-changelogs-postgres
+        path: waltz-schema/src/main/resources/liquibase/
+
+    - name: Publish Java Test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-results-postgres
+        path: target/site/
+
+    - name: Login to GitHub Registry
+      if: ${{ github.ref_type == 'tag' }}
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Docker meta
+      if: ${{ github.ref_type == 'tag' }}
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ghcr.io/${{ github.repository }}
+        flavor: latest=true
+        tags: |
+          type=ref,event=tag,enable=${{ github.ref_type == 'tag' }}
+          type=raw,value=postgres-${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
+          type=raw,value=postgres
+
+    - name: Build and push Docker image
+      if: ${{ github.ref_type == 'tag' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: ${{ github.ref_type == 'tag' }}
+        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+
+    - name: Rename for release
+      if: ${{ github.ref_type == 'tag' }}
+      run: |
+        cp waltz-web/target/waltz-web-jakarta.war waltz-web/target/waltz-web-postgres.war
+        cp waltz-web/target/waltz-web-jar-with-dependencies.jar waltz-web/target/waltz-web-jar-with-dependencies-postgres.jar
+
+    - name: Release
+      if: ${{ github.ref_type == 'tag' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          waltz-schema/target/liquibase-scripts.zip
+          waltz-web/target/waltz-web-postgres.war
+          waltz-web/target/waltz-web-jar-with-dependencies-postgres.jar
+
+
+  check-jooq-secrets:
+    runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.check.outputs.should-run }}
+    steps:
+    - name: Check jOOQ Secrets
+      id: check
+      run: |
+        if [[ -z "${{ secrets.JOOQ_USERNAME }}" || -z "${{ secrets.JOOQ_PASSWORD }}" ]]; then
+          echo "::warning::MSSQL build skipped: jOOQ secrets not configured. To enable, add JOOQ_USERNAME and JOOQ_PASSWORD secrets. See: https://github.com/finos/waltz/blob/master/docs/development/build.md"
+          echo "should-run=false" >> $GITHUB_OUTPUT
+        else
+          echo "should-run=true" >> $GITHUB_OUTPUT
+        fi
+
+  build-mssql-alt:
+    needs: check-jooq-secrets
+    if: needs.check-jooq-secrets.outputs.should-run == 'true'
+    runs-on: ubuntu-latest
+
+    services:
+      mssql-alt:
+        image: hmxlabs/mssql-fts:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Waltz#123
+          MSSQL_PID: "Express"
+        options: >-
+          --name mssql-alt
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Waltz#123 -C -Q 'SELECT 1'"
+          --health-interval=10s
+          --health-timeout=10s
+          --health-retries=30
+
+    steps:
+    - name: Ensure MSSQL database exists
+      run: |
+        set -e
+        docker exec mssql-alt bash -lc "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Waltz#123' -C -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\" \
+        || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Waltz#123' -Q \"IF DB_ID('waltz') IS NULL CREATE DATABASE [waltz];\""
+
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven packages    
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Update Maven Project Version
+      if: ${{ github.ref_type == 'tag' }}
+      run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-mssql-alt,waltz-mssql-alt;
+
+    - name: Generate effective POM
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests -Dverbose -Doutput=effective-pom-mssql-alt.xml
+
+    - name: Upload effective POM
+      uses: actions/upload-artifact@v4
+      with:
+        name: effective-pom-mssql-alt
+        path: effective-pom-mssql-alt.xml
+
+    - name: Build with Maven (MSSQL)
+      env:
+        JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
+        JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests clean package site -Dtarget.db=mssql -Ddb.provider=docker;
+
+    - name: Publish build
+      uses: actions/upload-artifact@v4
+      with:
+        name: waltz-web-mssql-alt.war
+        path: waltz-web/target/waltz-web-jakarta.war
+
+    - name: Publish mocha results
+      uses: actions/upload-artifact@v4
+      with:
+        name: mocha-test-results-mssql-alt.txt
+        path: waltz-ng/mocha-test-results.txt
+
+    - name: Publish liquibase changelogs
+      uses: actions/upload-artifact@v4
+      with:
+        name: liquibase-changelogs-mssql-alt
+        path: waltz-schema/src/main/resources/liquibase/
+
+    - name: Publish Java Test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: surefire-results-mssql-alt
+        path: target/site/
+
+    - name: Login to GitHub Registry
+      if: ${{ github.ref_type == 'tag' }}
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Docker meta
+      if: ${{ github.ref_type == 'tag' }}
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ghcr.io/${{ github.repository }}
+        flavor: latest=true
+        tags: |
+          type=ref,event=tag,enable=${{ github.ref_type == 'tag' }}
+          type=raw,value=mssql-alt-${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
+          type=raw,value=mssql-alt
+
+    - name: Build and push Docker image
+      if: ${{ github.ref_type == 'tag' }}
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: ${{ github.ref_type == 'tag' }}
+        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+
+    - name: Rename for release
+      if: ${{ github.ref_type == 'tag' }}
+      run: |
+        cp waltz-web/target/waltz-web-jakarta.war waltz-web/target/waltz-web-mssql-alt.war
+        cp waltz-web/target/waltz-web-jar-with-dependencies.jar waltz-web/target/waltz-web-jar-with-dependencies-mssql-alt.jar
+
+    - name: Release
+      if: ${{ github.ref_type == 'tag' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          waltz-schema/target/liquibase-scripts.zip
+          waltz-web/target/waltz-web-mssql-alt.war
+          waltz-web/target/waltz-web-jar-with-dependencies-mssql-alt.jar

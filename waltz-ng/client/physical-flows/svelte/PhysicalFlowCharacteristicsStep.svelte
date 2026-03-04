@@ -144,72 +144,64 @@
                 <div class="form-group">
                     <label for="name">
                         Name
+                        <span class="text-muted small"
+                              style="font-style: italic; color: #999999; margin-left: 1em;">
+                              Name to describe this physical flow
+                        </span>
                     </label>
                     <input class="form-control"
                            id="name"
                            bind:value={workingCopy.name}/>
                 </div>
-                <div class="help-block">
-                    Name to describe this physical flow.
-                </div>
 
                 <EnumSelect options={transportKinds}
                             bind:value={workingCopy.transport}
                             mandatory="true"
-                            name="Transport">
-                    <div slot="help">
-                        Describes how that data is transferred between the source and target.
-                    </div>
-                </EnumSelect>
+                            name="Transport"
+                            description="Describes how that data is transferred between the source and target."/>
 
                 <EnumSelect options={frequencyKinds}
                             bind:value={workingCopy.frequency}
                             mandatory="true"
-                            name="Frequency">
-                    <div slot="help">
-                        Describes how often (on average) the data is transferred between the source and target.
-                    </div>
-                </EnumSelect>
+                            name="Frequency"
+                            description="Describes how often (on average) the data is transferred between the source and target."/>
 
                 <EnumSelect options={physicalFlowCriticalityKinds}
                             bind:value={workingCopy.criticality}
                             mandatory="true"
-                            name="Criticality">
-                    <div slot="help">
-                        An indicator of the importance of this flow
-                    </div>
-                </EnumSelect>
+                            name="Criticality"
+                            description="An indicator of the importance of this flow"/>
 
 
                 <!--Basis offset select-->
                 <BasisOffsetSelect bind:value={workingCopy.basisOffset}
-                                   bind:customValue={workingCopy.customBasisOffset}>
-                    <div slot="help">
-                        Describes the time from a trigger event for the data transfer to take place. Defaults to T.
-                    </div>
-                </BasisOffsetSelect>
+                                   bind:customValue={workingCopy.customBasisOffset}
+                                   description="Describes the time from a trigger event for the data transfer to take place. Defaults to T."/>
 
                 <div class="form-group">
                     <label for="description">
                         Description
+                        <span class="text-muted small"
+                              style="font-style: italic; color: #999999; margin-left: 1em;">
+                              Description of the flow
+                        </span>
                     </label>
                     <textarea class="form-control"
                               id="description"
                               rows="2"
                               bind:value={workingCopy.description}/>
                 </div>
-                <div class="help-block">Description of the flow</div>
-
                 <div class="form-group">
                     <label for="external-id">
                         External Id
+                        <span class="text-muted small"
+                              style="font-style: italic; color: #999999; margin-left: 1em;">
+                              External identifier for this flow
+                        </span>
                     </label>
                     <input class="form-control"
                            id="external-id"
                            bind:value={workingCopy.externalId}/>
-                </div>
-                <div class="help-block">
-                    External identifier for this flow
                 </div>
 
                 <button class="btn btn-skinny"
