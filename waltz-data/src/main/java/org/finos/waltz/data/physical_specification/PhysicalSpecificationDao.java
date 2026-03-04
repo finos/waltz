@@ -202,8 +202,8 @@ public class PhysicalSpecificationDao {
                             .from(PHYSICAL_FLOW)
                             .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
                             .and(PHYSICAL_FLOW_NOT_REMOVED)),
-                            val(true))
-                    .otherwise(false).as("spec_used");
+                        val(true))
+                .otherwise(false).as("spec_used");
 
         return dsl
                 .select(specUsed)
