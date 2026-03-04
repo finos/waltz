@@ -384,7 +384,7 @@ public class ProposedFlowDao {
                                         .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
                         ));
 
-        // List.copyOf creates an unmodifiable list; use a mutable copy before adding TARGET_APPROVED
+
         List<ProposedFlowWorkflowState> endStatesAndTagetApproved = new ArrayList<>(END_STATES);
         endStatesAndTagetApproved.add(TARGET_APPROVED);
 
