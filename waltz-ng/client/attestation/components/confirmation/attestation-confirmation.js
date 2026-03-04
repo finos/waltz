@@ -21,6 +21,7 @@ import {initialiseData, invokeFunction} from "../../../common/index";
 import template from "./attestation-confirmation.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants";
 
 
 const bindings = {
@@ -34,7 +35,6 @@ const bindings = {
 const initialState = {
     disabled: false,
     attesting: false,
-    settings: null,
     dataFlowProposalsEnabled: null,
     onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ attestation),
     onCancel: () => console.log("default onCancel handler for attestation-confirmation")
@@ -89,13 +89,10 @@ function controller($q, serviceBroker, settingsService) {
     vm.$onInit = () => {
         switch (vm.attestationKind) {
             case "LOGICAL_DATA_FLOW":
-                serviceBroker
-                    .loadViewData(CORE_API.SettingsStore.findAll, [])
-                    .then(r => {
-                        vm.settings = r.data;
-                        vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
-                    })
-                    .then(() => {
+                settingsService
+                    .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME,'false')
+                    .then(dataFlowProposalSettingValue => {
+                        vm.dataFlowProposalsEnabled = dataFlowProposalSettingValue === 'true';
                         if (vm.dataFlowProposalsEnabled) {
                             validateLogicalFlowsWithProposedFlow();
                         } else {
