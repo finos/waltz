@@ -128,7 +128,7 @@ public class AttestationPreCheckService {
         List<String> failures = new ArrayList<>();
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
-        // Rule 1: Block if user is an approver for any pending flow for this app
+        // Rule 1: Block if user is a target approver for upstream pending flow for this app
         if (proposedFlowWorkflowService.isAppInvolvedInPendingApprovals(entityRef, username, workflowDefinition.id().get())) {
 
             failures.add(mkFailureMessage(
@@ -155,6 +155,7 @@ public class AttestationPreCheckService {
             return failures;
         }
 
+        // Rule 3: If there are unknown/deprecated upstream flows, block unless a removal is pending
         if ((preChecks.deprecatedCount() > 0 && !preChecks.exemptFromDeprecatedCheck()) ||
                 (preChecks.unknownCount() > 0 && !preChecks.exemptFromUnknownCheck())) {
             Set<Long> deprecatedOrUnknownFlowIds = attestationPreCheckDao.findDeprecatedOrUnknownFlowIdsForEntity(entityRef);
