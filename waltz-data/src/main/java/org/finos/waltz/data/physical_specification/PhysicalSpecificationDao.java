@@ -198,12 +198,12 @@ public class PhysicalSpecificationDao {
 
     public boolean isUsed(long id) {
         Field<Boolean> specUsed = DSL.when(
-                exists(select(PHYSICAL_FLOW.ID)
-                        .from(PHYSICAL_FLOW)
-                        .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
-                        .and(PHYSICAL_FLOW_NOT_REMOVED)),
-                        val(true))
-                .otherwise(false).as("spec_used");
+                    exists(select(PHYSICAL_FLOW.ID)
+                            .from(PHYSICAL_FLOW)
+                            .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
+                            .and(PHYSICAL_FLOW_NOT_REMOVED)),
+                            val(true))
+                    .otherwise(false).as("spec_used");
 
         return dsl
                 .select(specUsed)
