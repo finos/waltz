@@ -509,4 +509,8 @@ public class PhysicalFlowService {
     public int getPhysicalFlowsCountForAssociatedLogicalFlow(long physicalFlowId) {
         return physicalFlowDao.getPhysicalFlowSCountForAssociatedLogicalFlow(physicalFlowId);
     }
+
+    public Set<Long> findPhysicalFlowIdsWithProblematicDataTypes(Set<Long> logicalFlowIds) {
+        return physicalFlowDao.findPhysicalFlowIdsWithProblematicDataTypes(logicalFlowIds);
+    }
 }

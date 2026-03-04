@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.String.format;
@@ -287,6 +288,18 @@ public class ProposedFlowWorkflowService {
                         "proposalType not supported: " + proposedFlowCommand.proposalType()
                 );
         }
+    }
+
+    public boolean isAppInvolvedInPendingApprovals(EntityReference appRef, String username, Long workflowId) {
+        return proposedFlowDao.isAppInvolvedInPendingApprovals(appRef, username, workflowId);
+    }
+
+    public boolean hasPendingCreations(EntityReference appRef, Long workflowId) {
+        return proposedFlowDao.hasPendingCreations(appRef, workflowId);
+    }
+
+    public Set<Long> findPhysicalFlowIdsInPendingProposals(Set<Long> logicalFlowIds, Long workflowId) {
+        return proposedFlowDao.findPhysicalFlowIdsInPendingProposals(logicalFlowIds, workflowId);
     }
 
     private void proposedFlowOperations(ProposedFlowResponse proposedFlow, String username) throws FlowCreationException {
