@@ -160,7 +160,7 @@ public class AttestationPreCheckService {
                 (preChecks.unknownCount() > 0 && !preChecks.exemptFromUnknownCheck())) {
             Set<Long> deprecatedOrUnknownFlowIds = attestationPreCheckDao.findDeprecatedOrUnknownFlowIdsForEntity(entityRef);
             Set<Long> deprecatedOrUnknownPhysicalFlowIds = physicalFlowService.findPhysicalFlowIdsWithProblematicDataTypes(deprecatedOrUnknownFlowIds);
-            Set<Long> proposedPhysicalFlowIds = proposedFlowWorkflowService.findPhysicalFlowIdsInPendingProposals(deprecatedOrUnknownPhysicalFlowIds, workflowDefinition.id().get());
+            Set<Long> proposedPhysicalFlowIds = proposedFlowWorkflowService.findPhysicalFlowIdsInPendingProposals(deprecatedOrUnknownFlowIds, workflowDefinition.id().get());
             if (!Objects.equals(deprecatedOrUnknownPhysicalFlowIds, proposedPhysicalFlowIds)) {
                 failures.add(mkFailureMessage(
                         messageTemplates,
