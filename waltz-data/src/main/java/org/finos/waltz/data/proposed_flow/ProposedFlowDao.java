@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +61,8 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.APPROVE;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposalType.*;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.TARGET_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.Tables.PERSON;
@@ -335,7 +338,7 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
                         .and(proposalTypeCondition)
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
                         .fetchInto(ProposedFlowRecord.class);
         return records;
     }
@@ -364,11 +367,9 @@ public class ProposedFlowDao {
                         .and(INVOLVEMENT.ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND))
                         .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name())));
 
-        // Condition to check if the app is the source or target of the flow
-        Condition appIsSourceOrTarget = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(appRef.id())
-                .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(appRef.kind().name()))
-                .or(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(appRef.id())
-                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(appRef.kind().name())));
+        // Condition to check if the app is the target of the flow
+        Condition appIsTarget = PROPOSED_FLOW.TARGET_ENTITY_ID.eq(appRef.id())
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(appRef.kind().name()));
 
         // Create a table reference to the CTE to be used in the main query
         Table<?> up = userPermissionsCte.as("up");
@@ -379,11 +380,13 @@ public class ProposedFlowDao {
                         .from(up)
                         .where(up.field("operation", String.class).in("APPROVE", "REJECT"))
                         .and(
-                                (up.field("entity_kind", String.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                        .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
-                                        .or(up.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                                                .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
+                                up.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                        .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
                         ));
+
+
+        List<ProposedFlowWorkflowState> endStatesAndTagetApproved = new ArrayList<>(END_STATES);
+        endStatesAndTagetApproved.add(TARGET_APPROVED);
 
         // Build the final query
         Integer count = dsl
@@ -393,8 +396,8 @@ public class ProposedFlowDao {
                 .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
                         .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
-                .where(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
-                .and(appIsSourceOrTarget)
+                .where(ENTITY_WORKFLOW_STATE.STATE.notIn(endStatesAndTagetApproved))
+                .and(appIsTarget)
                 .and(userIsApprover)
                 .fetchOne(0, Integer.class);
         return count != null && count > 0;
@@ -412,7 +415,7 @@ public class ProposedFlowDao {
                         .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
                 .where(PROPOSED_FLOW.PROPOSAL_TYPE.eq(ProposalType.CREATE.name()))
-                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
                 .and(condition)
                 .fetchOne(0, Integer.class);
         return count != null && count > 0;
@@ -450,7 +453,7 @@ public class ProposedFlowDao {
                 .where(PROPOSED_FLOW.PROPOSAL_TYPE.in(
                         ProposalType.EDIT.name(),
                         ProposalType.DELETE.name()))
-                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
                 .and(logicalFlowMatch)
                 // Use the templated field for the IS NOT NULL check as well
                 .and(physicalFlowIdField.isNotNull())

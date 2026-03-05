@@ -289,8 +289,7 @@ public class AttestationPreCheckDao {
 
     // Finds logical flows with deprecated data types for a given app
     public Set<Long> findDeprecatedOrUnknownFlowIdsForEntity(EntityReference ref) {
-        Condition condition = lf.SOURCE_ENTITY_ID.eq(ref.id()).and(lf.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
-                .or(lf.TARGET_ENTITY_ID.eq(ref.id()).and(lf.TARGET_ENTITY_KIND.eq(ref.kind().name())));
+        Condition condition = lf.TARGET_ENTITY_ID.eq(ref.id()).and(lf.TARGET_ENTITY_KIND.eq(ref.kind().name()));
 
         return dsl
                 .selectDistinct(lfd.LOGICAL_FLOW_ID)
