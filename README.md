@@ -36,12 +36,9 @@ Getting started
 ### Server
 
 - Java 17 (OpenJDK)
-- Embedded Jetty or WAR file (tested on Tomcat 7/8)
-- Spark framework
+- Embedded Jetty or WAR file (tested on Tomcat 10)
+- Spark framework (2.9.4) compatible with Tomcat 10
 - JDBC via JOOQ
-
-See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full list of Java dependencies.
-
 
 ### Supported Databases
 
