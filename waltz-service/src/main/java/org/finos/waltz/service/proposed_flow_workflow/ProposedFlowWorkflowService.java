@@ -206,7 +206,7 @@ public class ProposedFlowWorkflowService {
                         .setCurrentState(currentState);
 
                 // get the new state after firing the transition onto the state machine
-                ProposedFlowWorkflowState newState;
+                ProposedFlowWorkflowState newState = currentState;
                 try {
                     newState = proposedFlowStateMachine.fire(
                         currentState,
@@ -216,7 +216,6 @@ public class ProposedFlowWorkflowService {
                     errorMessage.set(format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb()));
                     LOG.error(errorMessage.get(), e);
                     outcome.set(FAILURE);
-                    return;
                 }
                 // persist the new state
                 entityWorkflowService.updateStateTransitionTransactional(tx, username, proposedFlowActionCommand.comment(),
