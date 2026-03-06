@@ -20,7 +20,7 @@
                 ctx: {
                     id: row.id
                 },
-                openInNewTab: true
+                openInNewTab: false
             })
         },
         {
@@ -33,7 +33,7 @@
                 ctx: {
                     id: row.source.id
                 },
-                openInNewTab: true,
+                openInNewTab: false,
                 isEntityLink: true,
                 entityKind: row.source.kind
             })
@@ -48,7 +48,7 @@
                 ctx: {
                     id: row.target.id
                 },
-                openInNewTab: true,
+                openInNewTab: false,
                 isEntityLink: true,
                 entityKind: row.target.kind
             })

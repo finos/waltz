@@ -36,4 +36,5 @@ export const editDataTypeReason = writable(null);
 export const deleteFlowReason = writable(null);
 export const duplicateProposeFlowMessage = writable(null);
 export const existingProposeFlowId = writable(null);
+export const editValidationMessage = writable(null);
 

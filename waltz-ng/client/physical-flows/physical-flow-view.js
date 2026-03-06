@@ -31,6 +31,7 @@ import ReasonSelection from "../data-types/components/usage-panel/ReasonSelectio
 import {
     deleteFlowReason,
     duplicateProposeFlowMessage,
+    editDataTypeReason,
     existingProposeFlowId
 } from "../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
 import pageInfo from "../svelte-stores/page-navigation-store";
@@ -194,6 +195,14 @@ function controller($q,
                 addToHistory(historyStore, vm.physicalFlow, vm.specification);
             });
     };
+
+    $scope.$on("$destroy", () => {
+        duplicateProposeFlowMessage.set(null);
+        existingProposeFlowId.set(null);
+        deleteFlowReason.set(null);
+        editDataTypeReason.set(null);
+    });
+
 
     const launchCommand = () => {
 

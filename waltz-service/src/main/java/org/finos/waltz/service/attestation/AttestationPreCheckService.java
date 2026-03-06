@@ -1,6 +1,11 @@
 package org.finos.waltz.service.attestation;
 
+import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.model.EntityReference;
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -20,12 +27,21 @@ public class AttestationPreCheckService {
 
     private final AttestationPreCheckDao attestationPreCheckDao;
     private final SettingsService settingsService;
+    private final ProposedFlowWorkflowService proposedFlowWorkflowService;
+    private final PhysicalFlowService physicalFlowService;
+    private final EntityWorkflowService entityWorkflowService;
 
     @Autowired
     public AttestationPreCheckService(AttestationPreCheckDao attestationPreCheckDao,
-                                      SettingsService settingsService) {
+                                      SettingsService settingsService,
+                                      ProposedFlowWorkflowService proposedFlowWorkflowService,
+                                      PhysicalFlowService physicalFlowService,
+                                      EntityWorkflowService entityWorkflowService) {
         this.attestationPreCheckDao = checkNotNull(attestationPreCheckDao, "AttestationPreCheckEvaluatorDao cannot be null");
         this.settingsService = checkNotNull(settingsService, "settingsService cannot be null");
+        this.proposedFlowWorkflowService = proposedFlowWorkflowService;
+        this.physicalFlowService = physicalFlowService;
+        this.entityWorkflowService = entityWorkflowService;
     }
 
 
@@ -106,6 +122,56 @@ public class AttestationPreCheckService {
         return failures;
     }
 
+    public List<String> calcLogicalFlowPreCheckFailuresWithProposed(EntityReference entityRef, String username) {
+        Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.logical-flow.fail");
+
+        List<String> failures = new ArrayList<>();
+        EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
+
+        // Rule 1: Block if user is a target approver for upstream pending flow for this app
+        if (proposedFlowWorkflowService.isAppInvolvedInPendingApprovals(entityRef, username, workflowDefinition.id().get())) {
+
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.logical-flow.fail.pending.approval",
+                    "Cannot attest as there are pending flows requiring your app's approval. Please review them first.",
+                    0));
+            return failures;
+        }
+
+        // 1. Get the base pre-check results
+        LogicalFlowAttestationPreChecks preChecks = attestationPreCheckDao.calcLogicalFlowAttestationPreChecks(entityRef);
+
+
+        // Rule 2: If there are no flows, block unless a creation is pending
+        if (preChecks.flowCount() == 0 && !preChecks.exemptFromFlowCountCheck()) {
+            if (!proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
+                failures.add(mkFailureMessage(
+                        messageTemplates,
+                        "attestation.logical-flow.fail.count",
+                        "Cannot attest as there are no recorded relevant flows",
+                        preChecks.flowCount()));
+            }
+            return failures;
+        }
+
+        // Rule 3: If there are unknown/deprecated upstream flows, block unless a removal is pending
+        if ((preChecks.deprecatedCount() > 0 && !preChecks.exemptFromDeprecatedCheck()) ||
+                (preChecks.unknownCount() > 0 && !preChecks.exemptFromUnknownCheck())) {
+            Set<Long> deprecatedOrUnknownFlowIds = attestationPreCheckDao.findDeprecatedOrUnknownFlowIdsForEntity(entityRef);
+            Set<Long> deprecatedOrUnknownPhysicalFlowIds = physicalFlowService.findPhysicalFlowIdsWithProblematicDataTypes(deprecatedOrUnknownFlowIds);
+            Set<Long> proposedPhysicalFlowIds = proposedFlowWorkflowService.findPhysicalFlowIdsInPendingProposals(deprecatedOrUnknownFlowIds, workflowDefinition.id().get());
+            if (!Objects.equals(deprecatedOrUnknownPhysicalFlowIds, proposedPhysicalFlowIds)) {
+                failures.add(mkFailureMessage(
+                        messageTemplates,
+                        "attestation.logical-flow.fail.deprecated",
+                        "Cannot attest as there are deprecated/unknown data type usages (%d violation/s)",
+                        preChecks.deprecatedCount() + preChecks.unknownCount()));
+            }
+        }
+
+        return failures;
+    }
 
     private String mkFailureMessage(Map<String, String> messageTemplates,
                                     String messageKey,

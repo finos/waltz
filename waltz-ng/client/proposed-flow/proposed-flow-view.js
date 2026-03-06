@@ -27,6 +27,7 @@ import { CORE_API } from "../common/services/core-api-utils";
 
 const initialState = {
     proposedFlow: null,
+    personsArray:null,
     FlowWizard,
     ProposedFlowDetails,
     ProposedFlowActions,
@@ -57,10 +58,30 @@ function controller($q,
                     vm.proposedFlow = r.data;
                     vm.usedDataTypes = (vm.proposedFlow?.flowDef?.dataTypeIds || []).map(id => ({ dataTypeId: id }));
                     vm.dataTypeHelpText = "Data types used by this flow.";
+
+                    const transitions = vm.proposedFlow?.workflowTransitionList;
+                    if (transitions && Array.isArray(transitions) && transitions.length > 0) {
+                        const emails = transitions.map(t => t.lastUpdatedBy);
+                        const uniqueEmails = [...new Set(emails.filter(Boolean))]; // Filters out falsy values and gets unique emails
+
+                        if (uniqueEmails.length > 0) {
+                            loadPerson(uniqueEmails);
+                        }
+                    }
                 });
     }
 
-     vm.$onInit = () => {
+    const loadPerson = (emails) => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.ProposedFlowStore.getByUserEmails,
+                [emails]) // Note: arguments are wrapped in an array
+            .then(r => {
+                vm.personsArray = r.data;
+            });
+    };
+
+    vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
         loadProposedFlow();
     };

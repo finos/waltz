@@ -6,8 +6,8 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {createEventDispatcher, onMount} from "svelte";
     import {ratingSchemeStore} from "../../../../svelte-stores/rating-schemes";
-    import RatingPicker from "../../../../common/svelte/RatingPicker.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import DropdownPicker from "../../../../common/svelte/DropdownPicker.svelte";
 
     export let ratingSchemeExtId;
 
@@ -28,6 +28,9 @@
     });
 
     function save() {
+        if (!workingCopy.rating?.length) {
+            return;
+        }
         $proposalReason = workingCopy;
         openNextSection();
     }
@@ -52,30 +55,35 @@
         activeMode = Modes.SELECT;
     }
 
+
+    function onReasonSelect(item) {
+        workingCopy.rating = item ? [item] : [];
+        dispatch("select", { ratingSchemeItems: workingCopy.rating });
+    }
+
     $: ratingSchemeCall = ratingSchemeStore.loadAll();
     $: done = workingCopy.rating[0] && true;
 
     $: expanded = _.includes($expandedSections, sections.REASON);
     $: ratingScheme = $ratingSchemeCall?.data.filter(t => t.externalId === ratingSchemeExtId)[0];
-
-    function onRatingsSelect(evt) {
-        workingCopy.rating = evt.detail;
-        const emittedEvent = {ratingSchemeItems: workingCopy.rating};
-        dispatch("select", emittedEvent);
-    }
+    $: ratingItems = (ratingScheme?.ratings ?? []).map(r => ({
+        ...r,
+        displayText: `${r?.name ?? ""} - ${r?.description ?? ""}`
+    }));
+    $: selectedReason = workingCopy.rating?.[0] ?? null;
 
 </script>
 
 <StepHeader label="Reason"
             icon="lightbulb-o"
-            checked={$proposalReason}
+            checked={$proposalReason?.rating?.length}
             {expanded}
             onToggleExpanded={toggleSection}/>
 
 {#if expanded}
     <div class="step-body">
 
-        {#if $proposalReason}
+        {#if $proposalReason?.rating?.[0]?.name && done}
 
             <div>
                 <div style="font-weight: lighter">Selected Reason: {$proposalReason.rating[0].name}</div>
@@ -104,10 +112,11 @@
                 <form on:submit|preventDefault={save}>
                     {#if ratingScheme}
                         {#if ratingScheme.ratings?.length}
-                        <RatingPicker scheme={ratingScheme}
-                                      isMultiSelect={false}
-                                      selectedRatings={workingCopy.rating}
-                                      on:select={onRatingsSelect}/>
+                            <DropdownPicker items={ratingItems}
+                                            selectedItem={selectedReason}
+                                            onSelect={onReasonSelect}
+                                            defaultMessage={"Select a reason"}/>
+
                         {:else}
                             <NoData>Reasons have not been defined.</NoData>
                         {/if}
@@ -119,6 +128,7 @@
                         {/if}
                     {/if}
 
+                    <br>
                     <button class="btn btn-skinny"
                             disabled={!done}
                             on:click={() => save()}>

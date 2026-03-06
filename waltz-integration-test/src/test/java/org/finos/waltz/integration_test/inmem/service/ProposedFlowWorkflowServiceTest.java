@@ -35,24 +35,24 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
-import org.finos.waltz.model.physical_flow.FrequencyKindValue;
-import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
+import org.finos.waltz.model.physical_flow.FrequencyKindValue;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.TransportKindValue;
+import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.FlowIdResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.schema.tables.ProposedFlow;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow.DataFlowService;
@@ -62,46 +62,45 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
-import org.finos.waltz.test_common.helpers.AppHelper;
-import org.finos.waltz.test_common.helpers.InvolvementHelper;
-import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
-import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
-import org.finos.waltz.test_common.helpers.PersonHelper;
-import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
-import org.finos.waltz.test_common.helpers.ProposedFlowWorkflowHelper;
+import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
+import org.finos.waltz.test_common.helpers.*;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.REJECT;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.SOURCE_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowWorkflowServiceTest.class);
     private final String USER_NAME = "testUser";
 
     @Autowired
@@ -170,15 +169,39 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     @Autowired
     private PhysicalFlowService pfSvc;
 
+    private ProposedFlowCommand baseCreateCommand;
+    private EntityReference source;
+    private EntityReference target;
+    private PhysicalSpecification spec;
+
     @BeforeEach
-    public void cleanUp(){
-        dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
+    public void setUp() {
+        dsl.deleteFrom(ProposedFlow.PROPOSED_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
         dsl.deleteFrom(LOGICAL_FLOW).execute();
         dsl.deleteFrom(ENTITY_WORKFLOW_STATE).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+
+        source = appHelper.createNewApp("source", ouIds.a);
+        target = appHelper.createNewApp("target", ouIds.a1);
+        Long specId = psHelper.createPhysicalSpec(source, "baseSpec");
+        spec = psSvc.getById(specId);
+
+        baseCreateCommand = ImmutableProposedFlowCommand.builder()
+                .source(source)
+                .target(target)
+                .specification(spec)
+                .flowAttributes(ImmutableFlowAttributes.builder()
+                        .basisOffset(0)
+                        .frequency(FrequencyKindValue.of("DAILY"))
+                        .criticality(CriticalityValue.of("MEDIUM"))
+                        .transport(TransportKindValue.UNKNOWN)
+                        .build())
+                .proposalType(CREATE)
+                .reason(proposedFlowWorkflowHelper.getReason())
+                .build();
     }
 
     @Test
@@ -308,7 +331,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         logicalFlowDao.addFlow(flowToAdd);
 
         // 2. Act --------------------------------------------------------------
-        FlowIdResponse flowIdResponse =  proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
+        FlowIdResponse flowIdResponse = proposedFlowWorkflowService.validateProposedFlow(command, USER_NAME);
 
         // 3. Assert -----------------------------------------------------------
         assertNull(flowIdResponse);
@@ -398,7 +421,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(ProposalType.CREATE)
+                .proposalType(CREATE)
                 .build();
 
         String userName = mkName(USER_NAME, "user1");
@@ -437,7 +460,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         // 2.1. Assert -----------------------------------------------------------
         // Assert that the flow is now in SOURCE_APPROVED state
-        assertEquals(ProposedFlowWorkflowState.SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+        assertEquals(SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
 
         // Action command for target approval
         ProposedFlowActionCommand targetApproveCommand = ImmutableProposedFlowActionCommand.builder()
@@ -490,7 +513,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
     }
 
     @Test
-    void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() {
+    void proposedFlowAction_rejectionWithInvalidPermissions_throwsException() throws FlowCreationException, TransitionNotFoundException {
         // 1. Arrange ----------------------------------------------------------
         Reason reason = proposedFlowWorkflowHelper.getReason();
         EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
@@ -505,7 +528,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
                 .dataTypeIds(dataTypeIdSet)
-                .proposalType(ProposalType.CREATE)
+                .proposalType(CREATE)
                 .build();
 
         String userName = mkName(USER_NAME, "user1");
@@ -519,13 +542,231 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 .comment("Rejected due to invalid permissions")
                 .build();
 
-        // 2. Act and Assert ----------------------------------------------------
-        assertThrows(TransitionPredicateFailedException.class, () ->
-                proposedFlowWorkflowService.proposedFlowAction(
-                        proposedFlowId,
-                        org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.REJECT,
-                        userName,
-                        rejectCommand));
+        // 2. Act ----------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                ProposedFlowWorkflowTransitionAction.REJECT,
+                userName,
+                rejectCommand);
+
+        // 3. Assert ---------------------------------------------------
+        assertNotNull(proposedFlowResponse);
+        assertEquals("FAILURE", proposedFlowResponse.outcome().name());
+        assertEquals("REJECT Failed. The workflow may have been updated or you no longer have permissions to reject this item.", proposedFlowResponse.message());
     }
 
+    @Test
+    public void testCannotApproveProposedFlowTwice() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
+
+        // Create a proposed flow command for a new flow (CREATE proposal type)
+        ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
+                .source(appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a))
+                .target(appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a))
+                // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(CREATE)
+                .build();
+
+        String userName = mkName(USER_NAME, "user1");
+
+        // Propose the new flow
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        // Grant the user source and target approver permissions
+        Long personA = personHelper.createPerson(userName);
+
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_abcd");
+        involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, REJECT);
+
+        // Action command for source approval
+        ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by source approver")
+                .build();
+
+        // 2. Act --------------------------------------------------------------
+        // Assert that the flow is now in SOURCE_APPROVED state
+        // Simulate a source approver approving the flow
+        ProposedFlowResponse sourceApprovedFlow = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                userName,
+                sourceApproveCommand);
+
+        // 2.1. Assert -----------------------------------------------------------
+        // Assert that the flow is now in SOURCE_APPROVED state
+        assertEquals(SOURCE_APPROVED.name(), sourceApprovedFlow.workflowState().state(), "Flow should be in SOURCE_APPROVED state");
+
+        //Source approver again approving the flow should fail
+        // 2. Act ---------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.proposedFlowAction(proposedFlowId, APPROVE, userName, sourceApproveCommand);
+
+        // 3. Assert ---------------------------------------------------
+        assertNotNull(proposedFlowResponse);
+        assertEquals("FAILURE", proposedFlowResponse.outcome().name());
+        assertEquals("APPROVE Failed. The workflow may have been updated or you no longer have permissions to approve this item.", proposedFlowResponse.message());
+    }
+
+    @Test
+    public void validateProposedFlow_shouldFailIfIdenticalProposalExists() {
+        // 1. Arrange: Create and save an initial proposal
+        ProposedFlowCommandResponse initialResponse = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+        assertEquals(CommandOutcome.SUCCESS, initialResponse.outcome(), "Initial proposal should be saved successfully");
+
+        // 2. Act: Validate a second, identical command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(baseCreateCommand, USER_NAME);
+
+        // 3. Assert: Validation should fail and return the ID of the existing proposal
+        assertNotNull(validationResponse, "Validation should fail for an identical proposal");
+        assertEquals(initialResponse.proposedFlowId(), validationResponse.id(), "Response should contain the ID of the existing proposal");
+    }
+
+    @Test
+    public void validateProposedFlow_shouldPassIfSpecificationIsDifferent() {
+        // 1. Arrange: Create and save an initial proposal
+        proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+
+        // Create a new command with a different specification
+        PhysicalSpecification differentSpec = psSvc.getById(psHelper.createPhysicalSpec(source, "differentSpec"));
+        ProposedFlowCommand commandWithDifferentSpec = ImmutableProposedFlowCommand
+                .copyOf(baseCreateCommand)
+                .withSpecification(differentSpec);
+
+        // 2. Act: Validate the new command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(commandWithDifferentSpec, USER_NAME);
+
+        // 3. Assert: Validation should pass
+        assertNull(validationResponse, "Validation should pass when specification is different");
+    }
+
+    @Test
+    public void validateProposedFlow_shouldPassIfFlowAttributeIsDifferent() {
+        // 1. Arrange: Create and save an initial proposal
+        proposedFlowWorkflowService.proposeNewFlow(USER_NAME, baseCreateCommand);
+
+        // Create a new command with a different frequency
+        FlowAttributes differentAttributes = ImmutableFlowAttributes
+                .copyOf(baseCreateCommand.flowAttributes())
+                .withFrequency(FrequencyKindValue.of("WEEKLY"));
+
+        ProposedFlowCommand commandWithDifferentFrequency = ImmutableProposedFlowCommand
+                .copyOf(baseCreateCommand)
+                .withFlowAttributes(differentAttributes);
+
+        // 2. Act: Validate the new command
+        FlowIdResponse validationResponse = proposedFlowWorkflowService.validateProposedFlow(commandWithDifferentFrequency, USER_NAME);
+
+        // 3. Assert: Validation should pass
+        assertNull(validationResponse, "Validation should pass when a flow attribute (e.g., frequency) is different");
+    }
+
+    @Test
+    public void multipleUsersCannotActOnFlowAtTheSameTime() throws FlowCreationException, TransitionNotFoundException {
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
+
+        EntityReference sourceRef = appHelper.createNewApp(mkName(USER_NAME, "concurrent_src"), ouIds.a);
+        EntityReference targetRef = appHelper.createNewApp(mkName(USER_NAME, "concurrent_tgt"), ouIds.a1);
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(sourceRef)
+                .target(targetRef)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(CREATE)
+                .build();
+
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, command);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+        assertNotNull(proposedFlowId, "Proposed flow should be created");
+
+        String userA = mkName(USER_NAME, "concurrent_user_a");
+        String userB = mkName(USER_NAME, "concurrent_user_b");
+        Long personA = personHelper.createPerson(userA);
+        Long personB = personHelper.createPerson(userB);
+
+        long involvementKind = involvementHelper.mkInvolvementKind("rel_abcde");
+        involvementHelper.createInvolvement(personA, involvementKind, sourceRef);
+        involvementHelper.createInvolvement(personB, involvementKind, targetRef);
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
+        permissionHelper.setupPermissionGroupForProposedFlow(sourceRef, ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(targetRef, ig, USER_NAME, Operation.APPROVE);
+
+        ProposedFlowActionCommand approveCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment("Approved by source approver")
+                .build();
+
+        CountDownLatch startGate = new CountDownLatch(1);
+        CountDownLatch doneGate = new CountDownLatch(2);
+
+        List<ProposedFlowResponse> responses = new ArrayList<>();
+        List<Throwable> failures = new ArrayList<>();
+
+        Runnable approveTaskUserA = () -> mkRunnableTask(startGate, doneGate, proposedFlowId, responses, failures, approveCommand, userA);
+        Runnable approveTaskUserB = () -> mkRunnableTask(startGate, doneGate, proposedFlowId, responses, failures, approveCommand, userB);
+
+        Thread thread1 = new Thread(approveTaskUserA, "approve-user-a");
+        Thread thread2 = new Thread(approveTaskUserB, "approve-user-b");
+
+        thread1.start();
+        thread2.start();
+
+        try {
+            startGate.countDown();
+            assertTrue(doneGate.await(10, TimeUnit.SECONDS), "Concurrent approve tasks did not finish in time");
+        } catch (InterruptedException e) {
+            LOG.error("Thread interrupted", e);
+            Thread.currentThread().interrupt();
+        }
+
+        assertTrue(failures.isEmpty(), "Unexpected thread failure occurred, check logs for DB/transaction errors");
+        assertEquals(2, responses.size(), "Expected one response per user action");
+    }
+
+    private void mkRunnableTask(CountDownLatch startGate,
+                                CountDownLatch doneGate,
+                                Long proposedFlowId,
+                                List<ProposedFlowResponse> responses,
+                                List<Throwable> failures,
+                                ProposedFlowActionCommand approveCommand,
+                                String user) {
+        try {
+            startGate.await(5, TimeUnit.SECONDS);
+            ProposedFlowResponse response = proposedFlowWorkflowService.proposedFlowAction(
+                proposedFlowId,
+                APPROVE,
+                user,
+                approveCommand);
+            synchronized (responses) {
+                responses.add(response);
+            }
+        } catch (Exception e) {
+            LOG.error("Concurrent approve failed for user {}", user, e);
+            synchronized (failures) {
+                failures.add(e);
+            }
+        } finally {
+            doneGate.countDown();
+        }
+    }
 }

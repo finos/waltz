@@ -126,7 +126,6 @@ function _execute(method, url, data) {
     return mkPromise(method, url, data);
 }
 
-
 const appCache = new Cache("App");
 const viewCache = new Cache("View");
 

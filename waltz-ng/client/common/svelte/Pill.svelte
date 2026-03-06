@@ -10,15 +10,17 @@
     export let cleanPill = false; // toggles between dark and light text
     export let clickable = false;
 
-    $: pillColor = pillDefs[pillKey].color;
+    $: pillBorderColor = pillDefs[pillKey].borderColor;
     $: pillText = pillDefs[pillKey].name;
+    $: pillTextColor = pillDefs[pillKey].textColor;
+    $: pillBgColor = pillDefs[pillKey].bgColor;
 </script>
 
 {#if pillDefs && pillKey}
     <div class:pill={!cleanPill}
          class:pill-clean={cleanPill}
          class:clickable={clickable}
-         style="--pillColor: {pillColor}"
+         style="--pillBgColor: {pillBgColor} ; --pillTextColor: {pillTextColor}; --pillBorderColor: {pillBorderColor}"
          title={pillText}>
         {pillText}
         <small>
@@ -29,8 +31,8 @@
 
 <style>
     .pill {
-        background: var(--pillColor);
-        border: 0.15rem solid var(--pillColor);
+        background: var(--pillBgColor);
+        border: 0.15rem solid var(--pillBgColor);
         border-radius: 0rem;
         padding: 0.25rem 0.5rem;
         width: max-content;
@@ -43,11 +45,11 @@
 
     .pill-clean {
         background: white;
-        border: 0.15rem solid var(--pillColor);
+        border: 0.15rem solid var(--pillBorderColor);
         border-radius: 0rem;
         padding: 0.25rem 0.5rem;
         width: max-content;
-        color: var(--pillColor);
+        color: var(--pillTextColor);
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;

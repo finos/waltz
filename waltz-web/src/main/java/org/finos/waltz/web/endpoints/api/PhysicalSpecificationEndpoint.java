@@ -28,6 +28,7 @@ import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.PhysicalSpecificationEditResponse;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.web.DatumRoute;
@@ -111,6 +112,12 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 ":id",
                 "permissions");
 
+        String validateForEditPath = mkPath(
+                BASE_URL,
+                "id",
+                ":id",
+                "validate-edit");
+
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
@@ -138,6 +145,9 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 getId(request),
                 getUsername(request));
 
+        DatumRoute<PhysicalSpecificationEditResponse> validateForEditRoute =
+                (request, response) -> specificationService.validateSpecificationForEdit(getId(request));
+
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByIdsPath, findByIdsRoute);
 
@@ -150,6 +160,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForDatum(updateAttributePath, this::updateAttribute);
 
         deleteForDatum(deletePath, this::deleteSpecification);
+        getForDatum(validateForEditPath, validateForEditRoute);
     }
 
 
