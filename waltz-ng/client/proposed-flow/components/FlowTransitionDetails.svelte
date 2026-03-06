@@ -4,9 +4,17 @@
     import { formatDate, stateMeta, sortByField } from "../utils";
 
     export let proposedFlow;
+    export let personsArray = []; // Expect an array of people
+
     $: workflowTransitionList = proposedFlow?.workflowTransitionList
-    ? sortByField(proposedFlow.workflowTransitionList, 'lastUpdatedAt', 'asc')
-    : [];
+        ? sortByField(proposedFlow.workflowTransitionList, 'lastUpdatedAt', 'asc')
+        : [];
+
+    // Helper to find the person object corresponding to an email
+    const getPersonByEmail = (email) => {
+        if (!personsArray || !email) return null;
+        return personsArray.find(p => p.email === email);
+    };
 
     let openIdx = null;
 </script>
@@ -19,6 +27,7 @@
     </NoData>
   {:else}
     {#each workflowTransitionList as transition, idx}
+        {@const personForTransition = getPersonByEmail(transition.lastUpdatedBy)}
         <div class="accordion-item">
             <button
                 class="accordion-header"
@@ -46,7 +55,18 @@
                         <tr><th>From State</th><td>{transition.fromState || '-'}</td></tr>
                         <tr><th>To State</th><td>{transition.toState}</td></tr>
                         <tr><th>Last Updated At</th><td>{formatDate(transition.lastUpdatedAt)}</td></tr>
-                        <tr><th>Last Updated By</th><td>{transition.lastUpdatedBy}</td></tr>
+                        <tr>
+                            <th>Last Updated By</th>
+                            <td>
+                                {#if personForTransition && personForTransition.id}
+                                    <a href={`person/id/${personForTransition.id}`}>
+                                        {transition.lastUpdatedBy}
+                                    </a>
+                                {:else}
+                                    {transition.lastUpdatedBy}
+                                {/if}
+                            </td>
+                        </tr>
                         <tr><th>Reason</th><td>{transition.reason}</td></tr>
                         <tr><th>Provenance</th><td>{transition.provenance}</td></tr>
                     </table>

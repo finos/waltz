@@ -17,59 +17,77 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
 import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.ProposedFlow;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
-import org.jooq.*;
-import org.jooq.Record;
+import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record;
+import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
-import org.jooq.CommonTableExpression;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectFieldOrAsterisk;
-import org.jooq.SelectJoinStep;
 import org.jooq.SelectUnionStep;
 import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
-import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.Operation.APPROVE;
+import static org.finos.waltz.model.Operation.REJECT;
+import static org.finos.waltz.model.proposed_flow.ProposalType.*;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.TARGET_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementGroupEntry.INVOLVEMENT_GROUP_ENTRY;
 import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW;
-import static  org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static  org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
-import static  org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
+import static org.jooq.impl.DSL.exists;
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.name;
-import static org.jooq.impl.DSL.table;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.selectOne;
 
 @Repository
 public class ProposedFlowDao {
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
+    private static final List<String> ACTION_PENDING_SOURCE_APPROVER_STATE = Arrays.asList(
+            ProposedFlowWorkflowState.PENDING_APPROVALS.name(),
+            ProposedFlowWorkflowState.TARGET_APPROVED.name());
+    private static final List<String> ACTION_PENDING_TARGET_APPROVER_STATE = Arrays.asList(
+            ProposedFlowWorkflowState.PENDING_APPROVALS.name(),
+            ProposedFlowWorkflowState.SOURCE_APPROVED.name());
 
     private final DSLContext dsl;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
@@ -196,21 +214,45 @@ public class ProposedFlowDao {
         CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
                 name("current_person").fields("id", "employee_id", "email").as(currentPerson);
         // --- Optional subordinate CTE if needed
-        CommonTableExpression<Record3<Long, String, String>> personScopeCte;
-        personScopeCte = getPersonScope(includeSubordinates, currentPerson);
+        CommonTableExpression<Record3<Long, String, String>> personScopeCte = getPersonScope(includeSubordinates, currentPerson);
         // table reference for unified CTE
-        Table<Record> personScopeTbl = table(name("person_scope")).as("ps");
-        SelectJoinStep<?> invJoin = dsl.selectOne().from(INVOLVEMENT);
+        Table<?> personScopeTbl = personScopeCte.as("ps");
+
+        // CTE to find permission-based involvements for PROPOSED_FLOW
+        CommonTableExpression<Record3<String, Long, String>> userPermissionsCte = name("userPermissions")
+                .fields("entity_kind", "entity_id", "operation")
+                .as(select(INVOLVEMENT.ENTITY_KIND, INVOLVEMENT.ENTITY_ID, PERMISSION_GROUP_INVOLVEMENT.OPERATION)
+                        .from(PERMISSION_GROUP_INVOLVEMENT)
+                        .join(INVOLVEMENT_GROUP_ENTRY)
+                        .on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
+                        .join(INVOLVEMENT)
+                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
+                        .join(INVOLVEMENT_KIND)
+                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                        .join(PERSON)
+                        .on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                        .where(PERSON.IS_REMOVED.eq(false))
+                        .and(PERSON.EMPLOYEE_ID.eq(select(field(name("employee_id"), String.class)).from(personScopeCte)))
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND))
+                        .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name())));
+
+        SelectConditionStep<?> involvements = dsl.selectOne().from(userPermissionsCte)
+                .where(
+                        (userPermissionsCte.field("entity_kind", String.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                                .and(userPermissionsCte.field("entity_id", Long.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
+                                .or
+                                        (userPermissionsCte.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                                .and(userPermissionsCte.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
+                );
         if (includeSubordinates) {
-            invJoin = invJoin
-                    .join(INVOLVEMENT_KIND)
-                    .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+            involvements = involvements
                     .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
         }
         // --- Build the shared query
         return dsl
                 .with(currentPersonCte)
                 .with(personScopeCte)
+                .with(userPermissionsCte)
                 .select(selectFields)
                 .from(PROPOSED_FLOW)
                 .join(ENTITY_WORKFLOW_STATE)
@@ -219,20 +261,11 @@ public class ProposedFlowDao {
                 .join(ENTITY_WORKFLOW_TRANSITION)
                 .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
                 .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .whereExists(
-                    invJoin
-                        .join(personScopeTbl)
-                        .on(INVOLVEMENT.EMPLOYEE_ID.eq(field(name("ps", "employee_id"), String.class)))
-                        .where(
-                            INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
-                            .or(INVOLVEMENT.ENTITY_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                            .and(INVOLVEMENT.ENTITY_ID.eq(PROPOSED_FLOW.SOURCE_ENTITY_ID))))
-                )
+                .whereExists(involvements)
                 .or(PROPOSED_FLOW.CREATED_BY.in(
-                    dsl
-                      .select(field(name("email"), String.class))
-                      .from(personScopeTbl))
+                        dsl
+                                .select(field(name("email"), String.class))
+                                .from(personScopeTbl))
                 )
                 .fetch();
     }
@@ -262,11 +295,11 @@ public class ProposedFlowDao {
                 .on(PERSON_HIERARCHY.MANAGER_ID.eq(field(name("cp", "employee_id"), String.class)))
                 .where(PERSON.IS_REMOVED.eq(false))
                 .union(
-                    dsl
-                        .select(field(name("id"), Long.class),
-                        field(name("employee_id"), String.class),
-                        field(name("email"), String.class))
-                        .from(currentPerson));
+                        dsl
+                                .select(field(name("id"), Long.class),
+                                        field(name("employee_id"), String.class),
+                                        field(name("email"), String.class))
+                                .from(currentPerson));
     }
 
 
@@ -305,19 +338,136 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(proposedFlowCommand.target().id()))
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(proposedFlowCommand.target().kind().name()))
                         .and(proposalTypeCondition)
-                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(ProposedFlowWorkflowState.END_STATES))
+                        .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
                         .fetchInto(ProposedFlowRecord.class);
         return records;
     }
 
+    // Checks if the app is a source/target for any flow where the current user is an approver
+    public boolean isAppInvolvedInPendingApprovals(EntityReference appRef, String username, Long workflowId) {
+        // CTE to find the current user's employee_id from their username (email)
+        var personEmployeeId = select(PERSON.EMPLOYEE_ID)
+                .from(PERSON)
+                .where(PERSON.EMAIL.eq(username)
+                        .and(PERSON.IS_REMOVED.isFalse()));
+
+        // CTE to find all specific permissions for that user related to proposed flows
+        CommonTableExpression<?> userPermissionsCte = name("userPermissions")
+                .fields("entity_kind", "entity_id", "operation")
+                .as(dsl.select(
+                                INVOLVEMENT.ENTITY_KIND,
+                                INVOLVEMENT.ENTITY_ID,
+                                PERMISSION_GROUP_INVOLVEMENT.OPERATION)
+                        .from(PERMISSION_GROUP_INVOLVEMENT)
+                        .join(INVOLVEMENT_GROUP_ENTRY)
+                        .on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
+                        .join(INVOLVEMENT)
+                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
+                        .where(INVOLVEMENT.EMPLOYEE_ID.eq(personEmployeeId)) // Filter involvements for the current user
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND))
+                        .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name())));
+
+        // Condition to check if the app is the target of the flow
+        Condition appIsTarget = PROPOSED_FLOW.TARGET_ENTITY_ID.eq(appRef.id())
+                        .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(appRef.kind().name()));
+
+        // Create a table reference to the CTE to be used in the main query
+        Table<?> up = userPermissionsCte.as("up");
+
+        // Condition to check if the user has APPROVE/REJECT permissions on the flow's source or target
+        Condition userIsApprover = exists(
+                selectOne()
+                        .from(up)
+                        .where(up.field("operation", String.class).in("APPROVE", "REJECT"))
+                        .and(
+                                up.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                        .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                        ));
+
+
+        List<ProposedFlowWorkflowState> endStatesAndTagetApproved = new ArrayList<>(END_STATES);
+        endStatesAndTagetApproved.add(TARGET_APPROVED);
+
+        // Build the final query
+        Integer count = dsl
+                .with(userPermissionsCte)
+                .selectCount()
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .where(ENTITY_WORKFLOW_STATE.STATE.notIn(endStatesAndTagetApproved))
+                .and(appIsTarget)
+                .and(userIsApprover)
+                .fetchOne(0, Integer.class);
+        return count != null && count > 0;
+    }
+
+    // Checks if there are any pending flows of kind 'CREATE' for the given app
+    public boolean hasPendingCreations(EntityReference appRef, Long workflowId) {
+        Condition condition = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(appRef.id()).and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(appRef.kind().name()))
+                .or(PROPOSED_FLOW.TARGET_ENTITY_ID.eq(appRef.id()).and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(appRef.kind().name())));
+
+        Integer count = dsl
+                .selectCount()
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .where(PROPOSED_FLOW.PROPOSAL_TYPE.eq(ProposalType.CREATE.name()))
+                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
+                .and(condition)
+                .fetchOne(0, Integer.class);
+        return count != null && count > 0;
+    }
+
+    public Set<Long> findPhysicalFlowIdsInPendingProposals(Set<Long> logicalFlowIds, Long workflowId) {
+
+        if (logicalFlowIds == null || logicalFlowIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        // Field representing the 'logicalFlowId' extracted from the JSON
+        Field<Long> logicalFlowIdField = DSL.field(
+                "JSON_VALUE({0}, {1})",
+                Long.class,
+                PROPOSED_FLOW.FLOW_DEF,
+                DSL.val("$.logicalFlowId"));
+
+        // Condition to filter proposals based on the logicalFlowId
+        Condition logicalFlowMatch = logicalFlowIdField.in(logicalFlowIds);
+
+        // Field representing the 'physicalFlowId' extracted from the JSON
+        Field<Long> physicalFlowIdField = DSL.field(
+                "JSON_VALUE({0}, {1})",
+                Long.class,
+                PROPOSED_FLOW.FLOW_DEF,
+                DSL.val("$.physicalFlowId"));
+
+        return dsl
+                .selectDistinct(physicalFlowIdField)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .where(PROPOSED_FLOW.PROPOSAL_TYPE.in(
+                        ProposalType.EDIT.name(),
+                        ProposalType.DELETE.name()))
+                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
+                .and(logicalFlowMatch)
+                // Use the templated field for the IS NOT NULL check as well
+                .and(physicalFlowIdField.isNotNull())
+                .fetchSet(physicalFlowIdField);
+    }
+
     private Condition getProposalTypeCondition(ProposalType proposalType) {
         Condition proposalTypeCondition;
-        if(proposalType == CREATE)
+        if (proposalType == CREATE)
             proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.eq(CREATE.name());
-        else if(proposalType == EDIT || proposalType == DELETE)
+        else if (proposalType == EDIT || proposalType == DELETE)
             proposalTypeCondition = PROPOSED_FLOW.PROPOSAL_TYPE.in(EDIT.name(), DELETE.name());
         else
-            throw new IllegalArgumentException("Unexpected proposal type: "+ proposalType);
+            throw new IllegalArgumentException("Unexpected proposal type: " + proposalType);
         return proposalTypeCondition;
     }
 
@@ -327,6 +477,66 @@ public class ProposedFlowDao {
                 .flatMap(EntityWorkflowDefinition::id)
                 .orElseThrow(() -> new NoSuchElementException("Workflow not found"));
     }
+
+    public List<Long> fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(Long personId) {
+        Long workflowId = fetchWorkflowID();
+        TableField<ProposedFlowRecord, String> targetEntityKind = PROPOSED_FLOW.TARGET_ENTITY_KIND;
+        TableField<ProposedFlowRecord, String> sourceEntityKind = PROPOSED_FLOW.SOURCE_ENTITY_KIND;
+        TableField<ProposedFlowRecord, Long> targetEntityId = PROPOSED_FLOW.TARGET_ENTITY_ID;
+        TableField<ProposedFlowRecord, Long> sourceEntityId = PROPOSED_FLOW.SOURCE_ENTITY_ID;
+
+        List<Long> pendingActionsWhenSource = mkWorkflowQueryForState(dsl, personId, workflowId, ACTION_PENDING_SOURCE_APPROVER_STATE, sourceEntityKind, sourceEntityId);
+        List<Long> pendingActionsWhenTarget = mkWorkflowQueryForState(dsl, personId, workflowId, ACTION_PENDING_TARGET_APPROVER_STATE, targetEntityKind, targetEntityId);
+
+        return Stream.concat(pendingActionsWhenSource.stream(), pendingActionsWhenTarget.stream())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public long fetchCountPendingActionFlowsForPersonWhereSourceOrTargetApprover(Long personId) {
+        return fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(personId).size();
+    }
+
+    private List<Long> mkWorkflowQueryForState(DSLContext tx, Long personId, Long workflowId, List<String> stateNames, TableField<ProposedFlowRecord, String> entityKindField, TableField<ProposedFlowRecord, Long> entityIdField) {
+
+        // CTE to locate person and employee id for permission check
+        CommonTableExpression<Record2<String, Long>> personCte = name("personCTE")
+                .fields("employee_id", "id")
+                .as(tx.select(PERSON.EMPLOYEE_ID, PERSON.ID)
+                        .from(PERSON)
+                        .where(PERSON.ID.eq(personId)));
+
+        // CTE to find permission-based involvements for PROPOSED_FLOW
+        CommonTableExpression<Record3<String, Long, String>> userPermissionsCte = name("userPermissions")
+                .fields("entity_kind", "entity_id", "operation")
+                .as(tx.select(INVOLVEMENT.ENTITY_KIND, INVOLVEMENT.ENTITY_ID, PERMISSION_GROUP_INVOLVEMENT.OPERATION)
+                        .from(PERMISSION_GROUP_INVOLVEMENT)
+                        .join(INVOLVEMENT_GROUP_ENTRY)
+                        .on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
+                        .join(INVOLVEMENT)
+                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
+                        .join(PERSON)
+                        .on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                        .where(PERSON.IS_REMOVED.eq(false))
+                        .and(PERSON.EMPLOYEE_ID.eq(select(field(name("employee_id"), String.class)).from(personCte)))
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND))
+                        .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name())));
+
+        return tx
+                .with(personCte)
+                .with(userPermissionsCte)
+                .selectDistinct(PROPOSED_FLOW.ID)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .and(ENTITY_WORKFLOW_STATE.STATE.in(stateNames))
+                .join(userPermissionsCte)
+                .on(userPermissionsCte.field("entity_kind", String.class).eq(entityKindField))
+                .and(userPermissionsCte.field("entity_id", Long.class).eq(entityIdField))
+                .and(userPermissionsCte.field("operation", String.class).in(APPROVE.name(), REJECT.name()))
+                .fetch(ProposedFlow.PROPOSED_FLOW.ID);
+
+    }
 }
-
-

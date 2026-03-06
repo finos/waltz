@@ -49,6 +49,7 @@ public class AttestationPreCheckEndpoint implements Endpoint {
     public void register() {
         String logicalFlowCheckPath = WebUtilities.mkPath(BASE_URL, "logical-flow", "entity", ":kind", ":id");
         String viewpointCheckPath = WebUtilities.mkPath(BASE_URL, "viewpoint", "entity", ":kind", ":id", "category", ":categoryId");
+        String logicalFlowWithProposedCheckPath = WebUtilities.mkPath(BASE_URL, "logical-flow-with-proposed", "entity", ":kind", ":id");
 
         ListRoute<String> logicalFlowCheckRoute =
                 (req, res) -> attestationPreCheckService.calcLogicalFlowPreCheckFailures(WebUtilities.getEntityReference(req));
@@ -61,7 +62,15 @@ public class AttestationPreCheckEndpoint implements Endpoint {
                     return attestationPreCheckService.calcViewpointPreCheckFailures(entityReference, attestedEntityId);
                 };
 
+        ListRoute<String> logicalFlowWithProposedCheckRoute =
+                (req, res) -> {
+                    EntityReference ref = WebUtilities.getEntityReference(req);
+                    String username = WebUtilities.getUsername(req);
+                    return attestationPreCheckService.calcLogicalFlowPreCheckFailuresWithProposed(ref, username);
+                };
+
         EndpointUtilities.getForList(logicalFlowCheckPath, logicalFlowCheckRoute);
         EndpointUtilities.getForList(viewpointCheckPath, viewpointFlowCheckRoute);
+        EndpointUtilities.getForList(logicalFlowWithProposedCheckPath, logicalFlowWithProposedCheckRoute);
     }
 }

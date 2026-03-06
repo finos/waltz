@@ -61,7 +61,7 @@
                     <li>
                         <button class="btn-skinny"
                                 on:click={() => selectItem(item)}>
-                            <span class="force-wrap">{item?.name}</span>
+                            <span class="force-wrap">{item?.displayText || item?.name}</span>
                         </button>
                     </li>
                 {/each}

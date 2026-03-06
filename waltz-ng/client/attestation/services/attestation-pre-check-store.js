@@ -39,10 +39,19 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const logicalFlowWithProposedFlowCheck = (ref) => {
+        checkIsEntityRef(ref);
+
+        return $http
+            .get(`${base}/logical-flow-with-proposed/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    }
+
 
     return {
         logicalFlowCheck,
-        viewpointCheck
+        viewpointCheck,
+        logicalFlowWithProposedFlowCheck
     };
 }
 
@@ -66,6 +75,11 @@ export const AttestationPreCheckStore_API = {
         serviceName,
         serviceFnName: 'viewpointCheck',
         description: 'viewpointCheck for a given entity [ref]'
+    },
+    logicalFlowWithProposedFlowCheck: {
+        serviceName,
+        serviceFnName: 'logicalFlowWithProposedFlowCheck',
+        description: 'logicalFlowWithProposedFlowCheck for a given entity [ref]'
     }
 };
 

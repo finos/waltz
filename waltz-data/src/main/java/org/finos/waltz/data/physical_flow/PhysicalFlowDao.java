@@ -55,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -206,7 +207,7 @@ public class PhysicalFlowDao {
 
         Condition nameCondition = flow.name() == null
                 ? PHYSICAL_FLOW.NAME.isNull()
-                :PHYSICAL_FLOW.NAME.eq(flow.name());
+                : PHYSICAL_FLOW.NAME.eq(flow.name());
 
         Condition sameFlow = PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId())
                 .and(nameCondition)
@@ -596,7 +597,7 @@ public class PhysicalFlowDao {
                 .limit(options.limit())
                 .getQuery();
 
-                return query.fetch(r -> {
+        return query.fetch(r -> {
             PhysicalFlow flow = PhysicalFlowDao.TO_DOMAIN_MAPPER.map(r);
             return ImmutablePhysicalFlow
                     .copyOf(flow)
@@ -623,5 +624,31 @@ public class PhysicalFlowDao {
                         ))
                         .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))
         ).value1();
+    }
+
+    public Set<Long> findPhysicalFlowIdsWithProblematicDataTypes(Set<Long> logicalFlowIds) {
+
+        if (logicalFlowIds == null || logicalFlowIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        // Define aliases for clarity
+        org.finos.waltz.schema.tables.PhysicalFlow pf = PHYSICAL_FLOW.as("pf");
+        org.finos.waltz.schema.tables.PhysicalSpecDataType psdt = PHYSICAL_SPEC_DATA_TYPE.as("psdt");
+        org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
+
+        return dsl
+                .selectDistinct(pf.ID)
+                .from(pf)
+                // Join physical flow to its data types via the specification
+                .join(psdt).on(pf.SPECIFICATION_ID.eq(psdt.SPECIFICATION_ID))
+                .join(dt).on(psdt.DATA_TYPE_ID.eq(dt.ID))
+                .where(pf.LOGICAL_FLOW_ID.in(logicalFlowIds))
+                // Filter for the problematic data types
+                .and(dt.DEPRECATED.isTrue().or(dt.UNKNOWN.isTrue()))
+                // Ensure we only consider active flows
+                .and(pf.IS_REMOVED.isFalse())
+                .and(pf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .fetchSet(pf.ID);
     }
 }

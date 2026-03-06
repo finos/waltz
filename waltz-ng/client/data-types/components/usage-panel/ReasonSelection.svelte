@@ -3,6 +3,7 @@
         deleteFlowReason,
         duplicateProposeFlowMessage,
         editDataTypeReason,
+        editValidationMessage,
         existingProposeFlowId
     } from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store";
     import Icon from "../../../common/svelte/Icon.svelte";
@@ -13,6 +14,7 @@
     import {PROPOSAL_TYPES} from "../../../common/constants";
     import {proposeDataFlowRemoteStore} from "../../../svelte-stores/propose-data-flow-remote-store";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
 
 
     export let ratingSchemeExtId;
@@ -42,8 +44,11 @@
         }
     });
 
-    function save() {
+    function save(event) {
         if (proposalType === PROPOSAL_TYPES.DELETE) {
+            if (event?.submitter?.dataset?.action !== "submit") {
+                return;
+            }
             $deleteFlowReason = workingCopy;
             proposeDeleteFlow()
         } else if (proposalType === PROPOSAL_TYPES.EDIT) {
@@ -67,11 +72,16 @@
         : null;
 
     $: physicalFlowCount = $physcialFlowCountStore?.data
+    $: ratingItems = (ratingScheme?.ratings ?? []).map(r => ({
+        ...r,
+        displayText: `${r?.name ?? ""}-${r?.description ?? ""}`
+    }));
 
-    function onRatingsSelect(evt) {
-        workingCopy.rating = evt.detail;
-        const emittedEvent = {ratingSchemeItems: workingCopy.rating};
-        dispatch("select", emittedEvent);
+    $: selectedReason = workingCopy.rating?.[0] ?? null;
+
+    function onReasonSelect(item) {
+        workingCopy.rating = item ? [item] : [];
+        dispatch("select", { ratingSchemeItems: workingCopy.rating });
         if (proposalType === PROPOSAL_TYPES.EDIT) {
             save();
         }
@@ -92,10 +102,12 @@
     <form on:submit|preventDefault={save}>
         {#if ratingScheme}
             {#if ratingScheme.ratings?.length}
-                <RatingPicker scheme={ratingScheme}
-                              isMultiSelect={false}
-                              selectedRatings={workingCopy.rating}
-                              on:select={onRatingsSelect}/>
+                <div class="reason-dropdown">
+                    <DropdownPicker items={ratingItems}
+                                    selectedItem={selectedReason}
+                                    onSelect={onReasonSelect}
+                                    defaultMessage={"Select a reason"}/>
+                </div>
             {:else}
                 <NoData>Reasons have not been defined.</NoData>
             {/if}
@@ -112,6 +124,13 @@
                     This will affect all associated physical flows.
                 </NoData>
             </div>
+            {#if $editValidationMessage}
+                <div class="small">
+                    <NoData type="error">
+                        {$editValidationMessage}
+                    </NoData>
+                </div>
+            {/if}
         {/if}
 
         {#if proposalType === PROPOSAL_TYPES.DELETE}
@@ -127,6 +146,7 @@
             {/if}
             <div style="display: flex; justify-content: flex-end;margin: 0;gap: 0.5rem">
                 <button class="btn btn-sm btn-primary"
+                        data-action="submit"
                         disabled={!workingCopy?.rating?.length || $existingProposeFlowId}>
                     Submit
                 </button>
@@ -141,10 +161,16 @@
                 <NoData type="error">
                     {$duplicateProposeFlowMessage}
                     <br>
-                    <a href={$existingProposeFlowId} target="_blank" rel="noreferrer">Go to Flow</a>
+                    <a href={$existingProposeFlowId} rel="noreferrer">Go to Flow</a>
                 </NoData>
             </div>
         {/if}
 
     </form>
 {/if}
+
+<style>
+    .reason-dropdown {
+        margin-bottom: 1rem;
+    }
+</style>

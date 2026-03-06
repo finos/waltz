@@ -67,7 +67,9 @@
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.showReason(true)">
                        Propose Delete
                     </button>
-                    <button class="btn btn-xs btn-warning"
+                    <button
+                            ng-if="!ctrl.dataFlowProposalsEnabled"
+                            class="btn btn-xs btn-warning"
                             ng-disabled="! (ctrl.mentions | isEmpty)"
                             ng-click="ctrl.onShowMarkAsDuplicate()">
                         Cleanup Duplicates
@@ -329,11 +331,11 @@
 
             </div>
             <div class="waltz-sub-section-controls">
-                <span ng-if="!ctrl.dataFlowProposalsEnabled && ctrl.canEdit">
+                <span ng-if="ctrl.canEdit">
                     <span>|</span>
 
                     <a ng-click="ctrl.visibility.overviewEditor = true"
-                       ng-if="! ctrl.visibility.overviewEditor && !ctrl.dataFlowProposalsEnabled"
+                       ng-if="! ctrl.visibility.overviewEditor"
                        class="clickable">
                         <span ng-if="ctrl.physicalFlow.isReadOnly"
                               title="The flow is locked, only limited fields will be editable">

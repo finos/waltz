@@ -25,9 +25,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
 import ReasonSelection from "./ReasonSelection.svelte"
-import {duplicateProposeFlowMessage, editDataTypeReason, existingProposeFlowId} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
+import {
+    duplicateProposeFlowMessage,
+    editDataTypeReason,
+    editValidationMessage,
+    existingProposeFlowId
+} from "../../../data-flow/components/svelte/propose-data-flow/propose-data-flow-store"
 import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
-import {PROPOSAL_TYPES} from "../../../common/constants";
+import {PROPOSAL_OUTCOMES, PROPOSAL_TYPES} from "../../../common/constants";
 import {buildProposalFlowCommand} from "../../../common/utils/propose-flow-command-util";
 
 const bindings = {
@@ -66,10 +71,28 @@ function controller(serviceBroker, userService, $q) {
     const reload = (force = false) => {
         loadUsageData($q, serviceBroker, vm.parentEntityRef, force)
             .then(usageData => vm.used = usageData);
+        editValidationMessage.set(null)
+        vm.reset();
     };
 
+    const checkEditValidation = ()=>{
+        serviceBroker
+            .loadViewData(CORE_API.ProposedFlowStore.editValidation,
+                [vm.parentFlow.specificationId],
+                {force: true})
+            .then(r => {
+                const response = r.data;
+                if(response.outcome === PROPOSAL_OUTCOMES.FAILURE){
+                    editValidationMessage.set(response.message);
+                    vm.isProposeDisabled = true;
+                }
+                else{
+                    vm.isProposeDisabled = false;
+                }
+            })
+    }
+
     vm.$onInit = () => {
-        let dataFlowProposalsRatingSchemeSetting="";
         const settingsPromise = serviceBroker
             .loadViewData(CORE_API.SettingsStore.findAll, [])
             .then(r => {
@@ -79,6 +102,9 @@ function controller(serviceBroker, userService, $q) {
                 vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
 
             });
+
+        checkEditValidation();
+
 
         existingProposeFlowId.subscribe((value)=>{
             vm.isProposeDisabled = !_.isNil(value);
@@ -109,10 +135,14 @@ function controller(serviceBroker, userService, $q) {
 
     vm.onHideEdit = () => {
         vm.visibility.editor = false;
+        vm.reset();
+    };
+
+    vm.reset = () => {
         editDataTypeReason.set(null);
         duplicateProposeFlowMessage.set(null);
         existingProposeFlowId.set(null);
-    };
+    }
 
     editDataTypeReason.subscribe(value => {
         vm.selectedReason = value;

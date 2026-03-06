@@ -12,34 +12,49 @@
     export let proposerPillDefs = {};
     export let proposerPillCounts = {};
 
+    export let actionablePillDefs = {};
+    export let actionableCounts = {};
+
+    export let filterStateKey;
+
     let showFilters = false;
+    let filterDropdownElement;
 
     const updateStateFilters = (filterKey) => {
-        const selectedStates = $filters.state.includes(filterKey);
+        const selectedStates = $filters[filterStateKey].state.includes(filterKey);
         if (selectedStates) {
-            $filters.state = $filters.state.filter(f => f !== filterKey);
+            $filters[filterStateKey].state = $filters[filterStateKey].state.filter(f => f !== filterKey);
         } else {
-            $filters.state = [...$filters.state, filterKey];
+            $filters[filterStateKey].state = [...$filters[filterStateKey].state, filterKey];
         }
     };
 
     const updateChangeFilters = (filterKey) => {
-        const selectedChanges = $filters.change.includes(filterKey);
+        const selectedChanges = $filters[filterStateKey].change.includes(filterKey);
         if (selectedChanges) {
-            $filters.change = $filters.change.filter(f => f !== filterKey);
+            $filters[filterStateKey].change = $filters[filterStateKey].change.filter(f => f !== filterKey);
         } else {
-            $filters.change = [...$filters.change, filterKey];
+            $filters[filterStateKey].change = [...$filters[filterStateKey].change, filterKey];
         }
     };
 
     const updateProposerFilters = (filterKey) => {
-        const selectedUsers = $filters.proposer.includes(filterKey);
+        const selectedUsers = $filters[filterStateKey].proposer.includes(filterKey);
         if (selectedUsers) {
-            $filters.proposer = $filters.proposer.filter(f => f !== filterKey);
+            $filters[filterStateKey].proposer = $filters[filterStateKey].proposer.filter(f => f !== filterKey);
         } else {
-            $filters.proposer = [...$filters.proposer, filterKey];
+            $filters[filterStateKey].proposer = [...$filters[filterStateKey].proposer, filterKey];
         }
     }
+
+    const updateActionFilters = (filterKey) => {
+        const selectedActions = $filters[filterStateKey].action.includes(filterKey);
+        if (selectedActions) {
+            $filters[filterStateKey].action = $filters[filterStateKey].action.filter(f => f !== filterKey);
+        } else {
+            $filters[filterStateKey].action = [...$filters[filterStateKey].action, filterKey];
+        }
+    };
 
     const handleStateFiltersKeyDown = (event, key) => {
         if(event.key === "Enter" || event.key === " ") {
@@ -62,20 +77,39 @@
         }
     };
 
+    const handleActionFiltersKeyDown = (event, key) => {
+        if(event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            updateActionFilters(key);
+        }
+    }
+
     function toggleFilters() {
         showFilters = !showFilters;
     }
 
     const resetFilters = () => {
-        $filters.proposer = [];
-        $filters.change = [];
-        $filters.state = [];
+        $filters[filterStateKey].proposer = [];
+        $filters[filterStateKey].change = [];
+        $filters[filterStateKey].state = [];
+        $filters[filterStateKey].action = [];
     }
 
-    $: clearFiltersDisabled = !($filters.state.length || $filters.proposer.length || $filters.change.length);
+    function handleClickOutside(event) {
+        if (showFilters && filterDropdownElement && !filterDropdownElement.contains(event.target)) {
+            showFilters = false;
+        }
+    }
+
+    $: clearFiltersDisabled = !($filters[filterStateKey]?.state.length
+        || $filters[filterStateKey]?.proposer.length
+        || $filters[filterStateKey]?.change.length
+        || $filters[filterStateKey]?.action.length);
 </script>
 
-<div class="filter-dropdown">
+<svelte:window on:click={handleClickOutside}/>
+
+<div class="filter-dropdown" bind:this={filterDropdownElement}>
     <button class="filter-dropdown-btn" on:click={toggleFilters}>
         {showFilters ? "Hide Filters" : "Show Filters"}
     </button>
@@ -90,6 +124,25 @@
             </div>
             <hr class="filter-divider" />
             <div class="filter-group">
+                <h4>My Actionables</h4>
+                <div class="filter-pills">
+                    {#each Object.keys(actionablePillDefs) as key}
+                    <div
+                        role="button"
+                        tabindex="0"
+                        on:click={() => updateActionFilters(key)}
+                        on:keydown={(e) => handleActionFiltersKeyDown(e, key)}>
+                        <Pill pillDefs={actionablePillDefs}
+                            pillKey={key}
+                            cleanPill={!$filters[filterStateKey].action.includes(key)}
+                            smallText={actionableCounts[key]}
+                        />
+                    </div>
+                    {/each}
+                </div>
+            </div>
+            <hr class="filter-divider" />
+            <div class="filter-group">
                 <h4>Proposal Type</h4>
                 <div class="filter-pills">
                     {#each Object.keys(proposerPillDefs) as key}
@@ -100,7 +153,7 @@
                             on:keydown={(e) => handleProposerFiltersKeyDown(e, key)}>
                             <Pill pillDefs={proposerPillDefs}
                                   pillKey={key}
-                                  cleanPill={!$filters.proposer.includes(key)}
+                                  cleanPill={!$filters[filterStateKey].proposer.includes(key)}
                                   smallText={proposerPillCounts[key]}
                                   clickable={true}
                             />
@@ -120,7 +173,7 @@
                         on:keydown={(e) => handleStateFiltersKeyDown(e, key)}>
                         <Pill pillDefs={pillDefs}
                             pillKey={key}
-                            cleanPill={!$filters.state.includes(key)}
+                            cleanPill={!$filters[filterStateKey].state.includes(key)}
                             smallText={stateCounts[key]}
                         />
                     </div>
@@ -139,7 +192,7 @@
                         on:keydown={(e) => handleChangeFiltersKeyDown(e, key)}>
                         <Pill pillDefs={changePillDefs}
                             pillKey={key}
-                            cleanPill={!$filters.change.includes(key)}
+                            cleanPill={!$filters[filterStateKey].change.includes(key)}
                             smallText={changeTypeCounts[key]}
                         />
                     </div>
@@ -155,7 +208,7 @@
     position: absolute;
     z-index: 10;
     background: white;
-    box-shadow: 0.25rem 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0.25rem 2px 8px rgba(0,0,0,0.08),-0.25rem 2px 8px rgba(0,0,0,0.08);
     border-radius: 8px;
     min-width: 320px;
     margin-top: 0.25rem;
