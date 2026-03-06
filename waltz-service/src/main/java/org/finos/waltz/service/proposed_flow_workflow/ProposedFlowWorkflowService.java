@@ -182,12 +182,6 @@ public class ProposedFlowWorkflowService {
 
         EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
-        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
-            username,
-            proposedFlow.flowDef().source(),
-            proposedFlow.flowDef().target()
-        );
-
         // transaction with the lock on that EntityWorkFlowState row
         try {
             final ProposedFlowResponse finalProposedFlow = proposedFlow;
@@ -195,6 +189,12 @@ public class ProposedFlowWorkflowService {
                 DSLContext tx = ctx.dsl();
                 EntityWorkflowState entityWorkflowState = entityWorkflowService
                     .getProposedFlowWorkflowStateForUpdate(tx, entityWorkflowDefinition.id().orElseThrow(), mkRef(PROPOSED_FLOW, proposedFlowId));
+
+                ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
+                    username,
+                    finalProposedFlow.flowDef().source(),
+                    finalProposedFlow.flowDef().target()
+                );
 
                 ProposedFlowWorkflowState currentState = valueOf(entityWorkflowState.state());
 
