@@ -33,7 +33,6 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,6 +106,22 @@ public class EntityWorkflowService {
         changeLogService.write(changeLogList);
     }
 
+    public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
+                                      String currentState, String newState) {
+        entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
+                username, newState);
+        entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
+                username, currentState, newState, reason);
+
+        List<ChangeLog> changeLogList = Arrays.asList(
+                mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                        format("Entity Workflow State changed to %s", newState)),
+                mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                        format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
+        );
+        changeLogService.write(changeLogList);
+    }
+
     public void createEntityWorkflowResult(Long entityWorkflowDefinitionId, EntityReference workflowEntity, EntityReference resultEntity, String username) {
         entityWorkflowResultDao.create(entityWorkflowDefinitionId, workflowEntity, resultEntity, username);
     }
@@ -127,25 +142,4 @@ public class EntityWorkflowService {
                 .severity(Severity.INFORMATION)
                 .build();
     }
-
-    public EntityWorkflowState getProposedFlowWorkflowStateForUpdate(DSLContext dsl, Long workflowId, EntityReference ref) {
-        return entityWorkflowStateDao.getProposedFlowWorkflowStateForUpdate(dsl, workflowId, ref);
-    }
-
-    public void updateStateTransitionTransactional(DSLContext dsl, String username, String reason, EntityWorkflowState workflowState,
-                                      String currentState, String newState) {
-        entityWorkflowStateDao.updateStateTransactional(dsl, workflowState.workflowId(), workflowState.entityReference(),
-            username, newState);
-        entityWorkflowTransitionDao.createWorkflowTransitionTransactional(dsl, workflowState.workflowId(), workflowState.entityReference(),
-            username, currentState, newState, reason);
-
-        List<ChangeLog> changeLogList = Arrays.asList(
-            mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                format("Entity Workflow State changed to %s", newState)),
-            mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
-        );
-        changeLogService.write(changeLogList);
-    }
-
 }
