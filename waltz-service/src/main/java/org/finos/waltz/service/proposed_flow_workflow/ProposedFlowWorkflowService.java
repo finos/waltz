@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
