@@ -10,7 +10,6 @@ import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
-import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -34,7 +33,7 @@ import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
-
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
 public class ProposedFlowWorkflowEndpoint implements Endpoint {
@@ -58,6 +57,7 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         postForDatum(mkPath(BASE_URL, ":id", ":action"), this::proposedFlowAction);
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
+        getForList(mkPath(BASE_URL, "propose-flow", "pending-actions", "person", ":personId"), this::findPendingActionFlowsForPersonWhereSourceOrTargetApprover);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -75,7 +75,7 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         return proposedFlowWorkflowService.getProposedFlows(readIdSelectionOptionsFromBody(request));
     }
 
-    public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+    public ProposedFlowResponse proposedFlowAction(Request request, Response response) throws IOException, FlowCreationException, TransitionNotFoundException {
         String action = checkNotNull(request.params("action"), "Action not specified");
         ProposedFlowWorkflowTransitionAction proposedFlowAction = checkNotNull(findByVerb(action), "Invalid action");
         ProposedFlowActionCommand proposedFlowActionCommand = readBody(request, ProposedFlowActionCommand.class);
@@ -91,5 +91,10 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         EntityReference entityRef = getEntityReference(request, "entityKind", "entityId");
         return proposedFlowWorkflowService.getUserPermissionsForEntityRef(username, entityRef);
+    }
+
+    public List<Long> findPendingActionFlowsForPersonWhereSourceOrTargetApprover(Request request, Response response) {
+        Long personId = WebUtilities.getLong(request, "personId");
+        return proposedFlowWorkflowService.fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(personId);
     }
 }

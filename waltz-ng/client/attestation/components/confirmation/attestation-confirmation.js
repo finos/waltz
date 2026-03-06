@@ -20,6 +20,8 @@ import {initialiseData, invokeFunction} from "../../../common/index";
 
 import template from "./attestation-confirmation.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants";
 
 
 const bindings = {
@@ -33,6 +35,7 @@ const bindings = {
 const initialState = {
     disabled: false,
     attesting: false,
+    dataFlowProposalsEnabled: null,
     onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ attestation),
     onCancel: () => console.log("default onCancel handler for attestation-confirmation")
 };
@@ -64,6 +67,15 @@ function controller($q, serviceBroker, settingsService) {
                 : disableSubmission(failures))
     }
 
+    function validateLogicalFlowsWithProposedFlow() {
+        serviceBroker
+            .loadViewData(CORE_API.AttestationPreCheckStore.logicalFlowWithProposedFlowCheck, [vm.parentEntityRef])
+            .then(r => r.data)
+            .then(failures =>  _.isEmpty(failures)
+                ? enableSubmission()
+                : disableSubmission(failures))
+    }
+
     function validateViewpoints() {
         const categoryId = _.get(vm, ["attestedEntityRef", "id"]);
         serviceBroker
@@ -77,45 +89,55 @@ function controller($q, serviceBroker, settingsService) {
     vm.$onInit = () => {
         switch (vm.attestationKind) {
             case "LOGICAL_DATA_FLOW":
-                validateLogicalFlows();
+                settingsService
+                    .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME,'false')
+                    .then(dataFlowProposalSettingValue => {
+                        vm.dataFlowProposalsEnabled = dataFlowProposalSettingValue === 'true';
+                        if (vm.dataFlowProposalsEnabled) {
+                            validateLogicalFlowsWithProposedFlow();
+                        } else {
+                            validateLogicalFlows();
+                        }
+                    })
                 break;
             case "MEASURABLE_CATEGORY":
                 settingsService
-                .findOrDefault("settings.attestation.pre-checks.enabled.for.categories", '')
-                .then(categoriesJson => {
-                    const categoryId = _.get(vm, ["attestedEntityRef", "id"]);
-                    let categoriesToValidate = [];
-                    try {
-                        categoriesToValidate = JSON.parse(categoriesJson);
-                    } catch (e) {
-                        categoriesToValidate = [];
-                    }
+                    .findOrDefault("settings.attestation.pre-checks.enabled.for.categories", '')
+                    .then(categoriesJson => {
+                        const categoryId = _.get(vm, ["attestedEntityRef", "id"]);
+                        let categoriesToValidate = [];
+                        try {
+                            categoriesToValidate = JSON.parse(categoriesJson);
+                        } catch (e) {
+                            categoriesToValidate = [];
+                        }
 
-                    vm.prechecksEnabled = categoriesToValidate.some(c => c.categoryId === categoryId);
-                    if (vm.prechecksEnabled) {
-                        serviceBroker
-                            .loadAppData(
-                                CORE_API.ApplicationStore.getById,
-                                [vm.parentEntityRef.id]
-                            )
-                            .then(r => {
-                                if (r.data) {
-                                    vm.overallRating = r.data.overallRating;
-                                }
-                            });
-                        validateViewpoints();
-                    } else {
+                        vm.prechecksEnabled = categoriesToValidate.some(c => c.categoryId === categoryId);
+                        if (vm.prechecksEnabled) {
+                            serviceBroker
+                                .loadAppData(
+                                    CORE_API.ApplicationStore.getById,
+                                    [vm.parentEntityRef.id]
+                                )
+                                .then(r => {
+                                    if (r.data) {
+                                        vm.overallRating = r.data.overallRating;
+                                    }
+                                });
+                            validateViewpoints();
+                        } else {
+                            enableSubmission();
+                        }
+                    })
+                    .catch(() => {
+                        vm.prechecksEnabled = false;
                         enableSubmission();
-                    }
-                })
-                .catch(() => {
-                    vm.prechecksEnabled = false;
-                    enableSubmission();
-                });
+                    });
                 break;
             default:
                 enableSubmission();
         }
+
     };
 
     vm.confirm = (attestation) => {

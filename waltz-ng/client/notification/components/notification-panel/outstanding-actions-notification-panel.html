@@ -1,6 +1,5 @@
-<span ng-repeat="summary in $ctrl.summaries">
+<span ng-repeat="summary in $ctrl.summaries" class="woanp-notification-wrapper">
     <a ui-sref="{{summary.uiStateName}}"
-       style="margin-right: 1em"
        class="woanp-notification clickable">
         <waltz-icon name="{{summary.icon}}"></waltz-icon>
         <span ng-bind="summary.label"></span>
