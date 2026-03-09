@@ -81,7 +81,7 @@ public class EntityWorkflowTransitionDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public void createWorkflowTransitionTransactional(DSLContext dsl, Long entityWorkflowDefId, EntityReference ref, String username,
+    public void createWorkflowTransition(Long entityWorkflowDefId, EntityReference ref, String username,
                                          String from, String to, String reason) {
         EntityWorkflowTransitionRecord transitionRecord = dsl.newRecord(ENTITY_WORKFLOW_TRANSITION);
         transitionRecord.setWorkflowId(entityWorkflowDefId);
@@ -104,10 +104,5 @@ public class EntityWorkflowTransitionDao {
                 .where(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
                 .orderBy(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-    public void createWorkflowTransition(Long entityWorkflowDefId, EntityReference ref, String username,
-                                         String from, String to, String reason) {
-        createWorkflowTransitionTransactional(dsl, entityWorkflowDefId, ref, username, from, to, reason);
     }
 }
