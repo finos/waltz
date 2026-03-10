@@ -25,8 +25,11 @@
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME, PROPOSAL_TYPES} from "../../../../common/constants"
-    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
+    import {
+        DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME,
+        DATAFLOW_PROPOSAL_SETTING_NAME,
+        PROPOSAL_TYPES
+    } from "../../../../common/constants"
     import {displayError} from "../../../../common/error-utils";
     import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
     import {handleProposalValidation} from "../../../../common/utils/proposalValidation";
@@ -41,8 +44,17 @@
     $: dataFlowProposalSetting = $settingsCall.data
         .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
         [0];
-    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
-    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingScheme($settingsCall.data);
+
+    $: dataFlowProposalsEnabled = undefined;
+    $: if ($settingsCall?.data) {
+        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
+        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
+    }
+    $: dataFlowProposalsRatingSchemeExtId = null;
+    $: if ($settingsCall?.data) {
+        const setting = $settingsCall.data.filter(t => t.name === DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME);
+        dataFlowProposalsRatingSchemeExtId = setting?.length > 0 ? setting[0].value : null;
+    }
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?

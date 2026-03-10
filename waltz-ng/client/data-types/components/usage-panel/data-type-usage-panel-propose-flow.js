@@ -50,7 +50,6 @@ const initialState = {
         editor: false,
         controls: false
     },
-    settings:null,
     ReasonSelection,
     ratingsScheme:null,
     ratingSchemeExtId:null,
@@ -64,7 +63,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, userService, $q) {
+function controller(serviceBroker, userService, $q, settingsService) {
     const vm = initialiseData(this, initialState);
 
 
@@ -93,15 +92,14 @@ function controller(serviceBroker, userService, $q) {
     }
 
     vm.$onInit = () => {
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
-
-                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings)
-
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
+        getDataFlowProposalsRatingScheme(settingsService)
+            .then(ratingSchemes => {
+                vm.ratingSchemeExtId = ratingSchemes;
+            })
 
         checkEditValidation();
 
@@ -223,7 +221,8 @@ function controller(serviceBroker, userService, $q) {
 controller.$inject = [
     "ServiceBroker",
     "UserService",
-    "$q"
+    "$q",
+    "SettingsService"
 ];
 
 

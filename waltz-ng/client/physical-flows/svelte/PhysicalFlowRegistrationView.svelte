@@ -49,10 +49,11 @@
     let settingsCall = settingsStore.loadAll();
 
     $: $nestedEnums = nestEnums($enumsCall.data);
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
-        [0];
-    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+    $: dataFlowProposalsEnabled = undefined;
+    $: if ($settingsCall?.data) {
+        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
+        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
+    }
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
@@ -177,7 +178,7 @@
             </div>
 
             <div class="selection-step">
-                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalSetting}/>
+                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalsEnabled}/>
             </div>
 
             <div class="selection-step">

@@ -60,10 +60,11 @@
     let actionSectionState = ActionSectionStates.LIST;
 
     let settingsCall=settingsStore.loadAll();
-    let isSettingsLoaded;
-
-    $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
-    $: dataFlowProposalsEnabled = isSettingsLoaded?isDataFlowProposalsEnabled($settingsCall.data):undefined;
+    $: dataFlowProposalsEnabled = undefined;
+    $: if ($settingsCall?.data) {
+        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
+        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
+    }
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
