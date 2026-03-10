@@ -20,15 +20,15 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-//@Configuration
-//@ComponentScan(basePackages = {
-//        "org.finos.waltz.data",
-//        "org.finos.waltz.service"
-//
-//}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
-//@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-//@PropertySource("classpath:integration-test.properties")
-@Deprecated
+@Configuration
+@Profile("!waltz-zonky")
+@ComponentScan(basePackages = {
+        "org.finos.waltz.data",
+        "org.finos.waltz.service"
+
+}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
+@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
+@PropertySource("classpath:integration-test.properties")
 public class DIInMemoryTestConfiguration {
 
     @Bean
