@@ -135,7 +135,7 @@
                 </div>
                 <div class="swiper-slide">
                     <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
-                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/18_compliance_tracking.png" alt="Business unit technology footprint">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/20_org_app_compliance.png" alt="Business unit technology footprint">
                         <div class="space-y-3 mt-auto pt-6">
                             <h3 class="text-3xl font-semibold text-white text-left">Org-to-App Compliance</h3>
                             <p class="text-slate-200 text-lg">
@@ -201,6 +201,17 @@
                 </div>
                 <div class="swiper-slide">
                     <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/18_kpis.png" alt="Business unit technology footprint">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">KPI's and Metrics</h3>
+                            <p class="text-slate-200 text-lg">
+                                Define and track your own architecture metrics. Measure the proportion of applications with golden source data, or the percentage of applications in scope for a regulatory program.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
                         <img class="w-full h-[32rem] object-contain rounded-md" src="site/img/integration_architecture.png" alt="Integrated system flows">
                         <div class="space-y-3 mt-auto pt-6">
                             <h3 class="text-3xl font-semibold text-white text-left">Integrates, Doesn't Replace</h3>
@@ -218,7 +229,7 @@
     </section>
 
     <!-- FEATURES -->
-
+    <!--
     <section class="bg-gray-50 py-16">
         <div class="max-w-6xl mx-auto px-6">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Features</h2>
@@ -314,7 +325,7 @@
             </div>
         </div>
     </section>
-
+    -->
 
     <!-- BUILT FOR THE PROBLEMS -->
     <section class="py-16" style="background-color: #2e3444;">
@@ -408,73 +419,60 @@
         </div>
     </section>
 
-    <!-- TECHNICAL DETAILS -->
+    <!-- GET INVOLVED -->
     <section class="max-w-6xl mx-auto px-6 py-16">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Technical Details</h2>
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-3xl font-bold text-gray-800">Get Involved</h2>
+            <p class="text-gray-700 text-base mt-3">
+                Waltz is built in the open by practitioners across the enterprise architecture community. Whether you want to shape the roadmap,
+                contribute code, or share how you use Waltz, you’re welcome.
+            </p>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-            <div class="p-4">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">
-                    <i class="fa fa-desktop mr-2 text-blue-500"></i>Client Side
-                </h4>
-                <p class="text-gray-600 text-base mb-2">
-                    Waltz is accessed via a web browser. Modern web browsers are supported. We have explicitly tested on:
-                </p>
-                <ul class="list-disc list-inside text-base text-gray-600 mb-3">
-                    <li>Chrome</li>
-                    <li>Firefox</li>
-                    <li>Safari</li>
-                    <li>IE 11+</li>
-                </ul>
-                    <p class="text-gray-600 text-base">
-                    The application makes heavy use of AngularJS, lodash and D3 for interaction.
-                    Bootstrap and Fontawesome for look n' feel and is built using Webpack and SASS.
-                </p>
-
-                <h4 class="text-lg font-semibold text-gray-800 mt-8 mb-3">
-                    <i class="fa fa-unlock-alt mr-2 text-blue-500"></i>Security
-                </h4>
-                <p class="text-gray-600 text-base mb-2">
-                    Waltz has a pluggable security system and can <em>authenticate</em> users
-                    against a built in set of user profiles or integrate with external
-                    systems such as SSO. Contact us for more details.
-                </p>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Join the Waltz mailing list</h3>
                 <p class="text-gray-600 text-base">
-                    Once authenticated, users can be granted discrete privileges within the
-                    application for <em>authorization</em> purposes. New users can be granted
-                    a default set of permissions; we recommend a generous set of defaults
-                    as Waltz works best when a diverse set of users contribute their knowledge.
+                    Subscribe to updates and releases.
                 </p>
+                <div class="mt-4">
+                    <a href="mailto:waltz+subscribe@lists.finos.org" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+                        Subscribe to updates
+                    </a>
+                </div>
             </div>
-
-            <div class="p-4">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">
-                    <i class="fa fa-server mr-2 text-blue-500"></i>Server Side
-                </h4>
-                <p class="text-gray-600 text-base mb-2">
-                    Waltz is built as a Java based web application. We currently
-                    deploy to (embedded) Jetty and to Apache Tomcat (10+) server. JDK 17
-                    is required to build and run Waltz.
-                </p>
-                <p class="text-gray-600 text-base mb-2">
-                    We recommend a 64 bit JVM running with a minimum of 1GB heap.
-                </p>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Collaborate on GitHub</h3>
                 <p class="text-gray-600 text-base">
-                    Under the covers Waltz uses Spark Framework to expose endpoints,
-                    Spring for dependency injection, JOOQ for database access and we
-                    use Immutables for representing the domain object layer.
+                    Report issues, request features, and contribute improvements.
                 </p>
-
-                <h4 class="text-lg font-semibold text-gray-800 mt-8 mb-3">
-                    <i class="fa fa-database mr-2 text-blue-500"></i>Database
-                </h4>
-                <p class="text-gray-600 text-base">
-                    Waltz is being built to support PostgreSQL (currently supported),
-                    and Microsoft SQL Server (supported — however you will need to purchase
-                    a license for JOOQ to compile and build the system).
-                </p>
+                <div class="mt-4">
+                    <a href="https://github.com/finos/waltz" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+                        Visit GitHub
+                    </a>
+                </div>
             </div>
-
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Attend community sessions</h3>
+                <p class="text-gray-600 text-base">
+                    Find working sessions and roadmap discussions in the FINOS calendar.
+                </p>
+                <div class="mt-4">
+                    <a href="https://calendar.google.com/calendar/u/0/embed?src=finos.org_fac8mo1rfc6ehscg0d80fi8jig@group.calendar.google.com" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+                        View community calendar
+                    </a>
+                </div>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Share your use case</h3>
+                <p class="text-gray-600 text-base">
+                    Tell us how your team uses Waltz.
+                </p>
+                <div class="mt-4">
+                    <a href="mailto:kamran@hmxlabs.io" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+                        Share your use case
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
