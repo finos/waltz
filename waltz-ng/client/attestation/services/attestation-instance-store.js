@@ -32,6 +32,13 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const attestEntityForUserWithProposed = (cmd) => {
+        return $http
+            .post(`${base}/attest-entity-with-proposed`, cmd)
+            .then(r => r.data);
+    };
+
+
     const findByRunId = (id) => {
         return $http
             .get(`${base}/run/${id}`)
@@ -94,7 +101,8 @@ export function store($http, baseApiUrl) {
         findBySelector,
         findApplicationInstancesForKindAndSelector,
         findApplicationAttestationSummary,
-        cleanupOrphans
+        cleanupOrphans,
+        attestEntityForUserWithProposed
     };
 }
 
@@ -163,5 +171,10 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: "cleanupOrphans",
         description: "clean up orphan attestations and recipients for applications that no longer exist"
+    },
+    attestEntityForUserWithProposed: {
+        serviceName,
+        serviceFnName: "attestEntityForUserWithProposed",
+        description: "attest existing/create new attestation for user for maker checker"
     }
 };

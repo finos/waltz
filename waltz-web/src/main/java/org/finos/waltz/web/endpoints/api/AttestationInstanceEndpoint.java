@@ -77,6 +77,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String reassignRecipientsPath = mkPath(BASE_URL, "reassign-recipients");
         String getCountsOfRecipientsToReassignPath = mkPath(BASE_URL, "reassign-counts");
+        String attestEntityForUserPathWithProposed = mkPath(BASE_URL, "attest-entity-with-proposed");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
@@ -124,7 +125,9 @@ public class AttestationInstanceEndpoint implements Endpoint {
                 -> attestationInstanceService.findAttestationInstanceSummaryForSelector(readBody(request, ApplicationAttestationInstanceInfo.class)));
 
         DatumRoute<Boolean> attestEntityForUserRoute =
-                (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req));
+                (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req), false);
+        DatumRoute<Boolean> attestEntityForUserRouteWithProposed =
+                (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req), true);
 
         postForDatum(attestInstancePath, attestInstanceRoute);
         postForDatum(attestEntityForUserPath, attestEntityForUserRoute);
@@ -141,6 +144,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         postForDatum(reassignRecipientsPath, this::reassignRecipientsRoute);
         getForDatum(getCountsOfRecipientsToReassignPath, this::getCountsOfRecipientsToReassign);
+        postForDatum(attestEntityForUserPathWithProposed, attestEntityForUserRouteWithProposed);
     }
 
 

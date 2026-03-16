@@ -21,6 +21,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
 import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
+import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../common/constants";
 
 
 function mkAttestationCommand(parentRef, attestedEntityKind, attestedEntityId){
@@ -41,17 +42,22 @@ function mkAttestationCommand(parentRef, attestedEntityKind, attestedEntityId){
  * @paran attestedEntityId (optional)
  * @return Promise
  */
-export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityId) {
-
+export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityId, settingsService) {
+    let dataFlowProposalsEnabled;
     const attestationCommand = mkAttestationCommand(
         parentEntityRef,
         attestedEntityKind,
         attestedEntityId);
 
-    return serviceBroker
-        .execute(
-            CORE_API.AttestationInstanceStore.attestEntityForUser,
-            [attestationCommand]);
+    settingsService
+        .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME,'false')
+        .then(dataFlowProposalSettingValue => {
+            dataFlowProposalsEnabled = dataFlowProposalSettingValue === 'true';
+        });
+
+    return dataFlowProposalsEnabled ?
+        serviceBroker.execute(CORE_API.AttestationInstanceStore.attestEntityForUserWithProposed, [attestationCommand])
+        : serviceBroker .execute(CORE_API.AttestationInstanceStore.attestEntityForUser, [attestationCommand]);
 }
 
 
