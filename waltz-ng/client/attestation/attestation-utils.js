@@ -43,21 +43,20 @@ function mkAttestationCommand(parentRef, attestedEntityKind, attestedEntityId){
  * @return Promise
  */
 export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityId, settingsService) {
-    let dataFlowProposalsEnabled;
     const attestationCommand = mkAttestationCommand(
         parentEntityRef,
         attestedEntityKind,
         attestedEntityId);
 
-    settingsService
-        .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME,'false')
+    return settingsService
+        .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME, "false")
         .then(dataFlowProposalSettingValue => {
-            dataFlowProposalsEnabled = dataFlowProposalSettingValue === 'true';
+            const dataFlowProposalsEnabled = dataFlowProposalSettingValue === "true";
+            const endpoint = dataFlowProposalsEnabled
+                ? CORE_API.AttestationInstanceStore.attestEntityForUserWithProposed
+                : CORE_API.AttestationInstanceStore.attestEntityForUser;
+            return serviceBroker.execute(endpoint, [attestationCommand]);
         });
-
-    return dataFlowProposalsEnabled ?
-        serviceBroker.execute(CORE_API.AttestationInstanceStore.attestEntityForUserWithProposed, [attestationCommand])
-        : serviceBroker .execute(CORE_API.AttestationInstanceStore.attestEntityForUser, [attestationCommand]);
 }
 
 

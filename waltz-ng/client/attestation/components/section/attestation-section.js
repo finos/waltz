@@ -87,7 +87,8 @@ function mkAttestationSections(baseSections = [], attestations = [], unattestedC
 
 function controller($q,
                     $scope,
-                    serviceBroker) {
+                    serviceBroker,
+                    settingsService) {
 
     const vm = initialiseData(this, initialState);
     const today = new Date();
@@ -141,7 +142,7 @@ function controller($q,
             .all([runsPromise, instancesPromise, unattestedChangesPromise, permissionGroupPromise])
             .then(([runs, instances, unattestedChanges, permissions]) => {
                 vm.attestations = mkAttestationData(runs, instances);
-                vm.allUnattestedChanges = unattestedChanges && unattestedChanges.length ? unattestedChanges : [] 
+                vm.allUnattestedChanges = unattestedChanges && unattestedChanges.length ? unattestedChanges : []
                 vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
                 vm.permissions = permissions;
             });
@@ -163,10 +164,11 @@ function controller($q,
             // It's main use is for thing like measurable categories
             const maybeAttestedEntityId = _.get(vm, ["activeAttestationSection", "attestedEntityRef", "id"]);
             return attest(
-                    serviceBroker,
-                    vm.parentEntityRef,
-                    vm.activeAttestationSection.type,
-                    maybeAttestedEntityId)
+                serviceBroker,
+                vm.parentEntityRef,
+                vm.activeAttestationSection.type,
+                maybeAttestedEntityId,
+                settingsService)
                 .then(() => {
                     toasts.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);
@@ -232,7 +234,8 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$scope",
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 
