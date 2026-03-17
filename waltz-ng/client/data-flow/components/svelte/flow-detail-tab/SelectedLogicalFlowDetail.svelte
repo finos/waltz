@@ -13,7 +13,7 @@
     import {createEventDispatcher} from "svelte";
     import toastStore from "../../../../svelte-stores/toast-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../../common/constants";
+    import {isDataFlowProposalsEnabledWithSettingsArray} from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -64,13 +64,8 @@
     let flowClassificationsByCode = {};
 
     let settingsCall=settingsStore.loadAll();
-
-    $: dataFlowProposalsEnabled = undefined;
-    $: if ($settingsCall?.data) {
-        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
-        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
-    }
-
+    $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
+    $: dataFlowProposalsEnabled = isSettingsLoaded? isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data) : undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;

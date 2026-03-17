@@ -34,6 +34,10 @@
     import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
     import {handleProposalValidation} from "../../../../common/utils/proposalValidation";
     import {onDestroy} from "svelte";
+    import {
+        getDataFlowProposalsRatingSchemeWithSettingsArray,
+        isDataFlowProposalsEnabledWithSettingsArray
+    } from "../../../../common/utils/settings-util";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
@@ -41,20 +45,8 @@
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
 
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
-        [0];
-
-    $: dataFlowProposalsEnabled = undefined;
-    $: if ($settingsCall?.data) {
-        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
-        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
-    }
-    $: dataFlowProposalsRatingSchemeExtId = null;
-    $: if ($settingsCall?.data) {
-        const setting = $settingsCall.data.filter(t => t.name === DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME);
-        dataFlowProposalsRatingSchemeExtId = setting?.length > 0 ? setting[0].value : null;
-    }
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data);
+    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingSchemeWithSettingsArray($settingsCall.data);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -138,7 +130,7 @@
                 </NoData>
             {:else}
                 <div class="selection-step">
-                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
+                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalsEnabled}/>
                 </div>
 
                 <div class="selection-step">

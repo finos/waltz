@@ -17,7 +17,7 @@
     import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
     import SuggestedDataTypeTreeSelector from "./SuggestedDataTypeTreeSelector.svelte";
     import {settingsStore} from "../../../svelte-stores/settings-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants";
+    import {isDataFlowProposalsEnabledWithSettingsArray} from "../../../common/utils/settings-util";
 
 
     export let primaryEntityReference;
@@ -128,11 +128,7 @@
 
     let settingsCall = settingsStore.loadAll();
 
-    $: dataFlowProposalsEnabled = undefined;
-    $: if ($settingsCall?.data) {
-        const setting = $settingsCall.data.find(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME);
-        dataFlowProposalsEnabled = (setting?.value ?? "false") === "true";
-    }
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data);
 
 </script>
 
