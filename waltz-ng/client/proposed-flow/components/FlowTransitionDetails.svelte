@@ -59,7 +59,9 @@
                             <th>Last Updated By</th>
                             <td>
                                 {#if personForTransition && personForTransition.id}
-                                    <a href={`/person/id/${personForTransition.id}`}>{transition.lastUpdatedBy}</a>
+                                    <a href={`person/id/${personForTransition.id}`}>
+                                        {transition.lastUpdatedBy}
+                                    </a>
                                 {:else}
                                     {transition.lastUpdatedBy}
                                 {/if}

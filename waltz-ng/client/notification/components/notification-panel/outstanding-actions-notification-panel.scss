@@ -16,6 +16,12 @@
  *
  */
 
+.woanp-notification-wrapper {
+    display: inline-flex;
+    margin: 0.25em 0.5em;
+    vertical-align: top;
+}
+
 .woanp-notification {
     background-color: #fafafa;
     text-decoration: none;
@@ -48,4 +54,3 @@
         color: #119521
     }
 }
-

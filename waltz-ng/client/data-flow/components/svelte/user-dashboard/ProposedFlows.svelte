@@ -94,12 +94,27 @@
         }
     }
 
-    const TABS = {
-        ACTION: "Actionable",
-        HISTORY: "Historical"
+    const actionablePillDefs = {
+        ACTIONABLE: {
+            name: "My Outstanding Actions",
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
+        },
+        ACTIONED: {
+            name: "My Completed Actions",
+            borderColor: "#000000",
+            textColor: "#000000",
+            bgColor: "#666666"
+        }
     }
 
-    let selectedTab = TABS.ACTION;
+    const TABS = {
+        ACTIVE: "Active",
+        COMPLETED: "Completed"
+    }
+
+    let selectedTab = TABS.ACTIVE;
 
     let flows = [];
 
@@ -123,6 +138,8 @@
         })
     }
 
+    // overall action pending
+    // [e.g. I may be a source approver, and someone from my team has approved it as a source approver but target approval is pending]
     $: actionableFlows = flows && flows.length
         ? flows.filter(f => actionStatuses.includes(f.workflowState.state))
         : [];
@@ -130,47 +147,58 @@
     $: historicalFlows = flows && flows.length
         ? flows.filter(f => historicalStatuses.includes(f.workflowState.state))
         : [];
+
+    // flows that require 'my' action
+    $: myActionableFlowsCall = proposeDataFlowRemoteStore
+        .findPendingActionFlowsForPersonWhereSourceOrTargetApprover(person.id);
+
+    $: myActionableFlowsMap = new Map($myActionableFlowsCall?.data?.map(t => [t, true])
+        .filter(Boolean));
 </script>
 
 <div class="waltz-tabs" style="padding-top: 1em">
     <input type="radio"
            bind:group={selectedTab}
-           value={TABS.ACTION}
-           id={TABS.ACTION}>
+           value={TABS.ACTIVE}
+           id={TABS.ACTIVE}>
     <label class="wt-label"
-           for={TABS.ACTION}>
-            <span><Icon name="pencil-square-o"/> {TABS.ACTION} Flows -
+           for={TABS.ACTIVE}>
+            <span><Icon name="pencil-square-o"/> {TABS.ACTIVE} Flows -
                 <small class="text-muted">{actionableFlows.length ?? 0}</small>
             </span>
     </label>
 
     <input type="radio"
            bind:group={selectedTab}
-           value={TABS.HISTORY}
-           id={TABS.HISTORY}>
+           value={TABS.COMPLETED}
+           id={TABS.COMPLETED}>
     <label class="wt-label"
-           for={TABS.HISTORY}>
-        <span><Icon name="clock"/> {TABS.HISTORY} Flows -
+           for={TABS.COMPLETED}>
+        <span><Icon name="clock"/> {TABS.COMPLETED} Flows -
             <small class="text-muted">{historicalFlows.length ?? 0}</small>
         </span>
     </label>
     <div class="wt-tab wt-active">
-        { #if selectedTab === TABS.ACTION }
+        { #if selectedTab === TABS.ACTIVE }
         <ProposedFlowSection userName={userName}
                              flows={actionableFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
                              statusPillDefs={actionStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
-                             currentTabText={TABS.ACTION}/>
-        { :else if selectedTab === TABS.HISTORY }
+                             actionablePillDefs={actionablePillDefs}
+                             currentTabText={TABS.ACTIVE}
+                             myActionables={myActionableFlowsMap}/>
+        { :else if selectedTab === TABS.COMPLETED }
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
                              statusPillDefs={historicalStatusPillDefs}
                              changeTypePillDefs={changeTypePillDefs}
                              proposerTypePillDefs={proposerTypePillDefs}
-                             currentTabText={TABS.HISTORY}/>
+                             actionablePillDefs={actionablePillDefs}
+                             currentTabText={TABS.COMPLETED}
+                             myActionables={myActionableFlowsMap}/>
         {/if}
     </div>
 </div>

@@ -20,8 +20,7 @@ import _ from "lodash";
 import {color} from "d3-color";
 
 
-function pickWorst(ratings = []) {
-    const sortedByBadness = [ "DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION" ];
+function pickWorst(ratings = [], sortedByBadness = [ "DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION" ]) {
     const worst = _.find(sortedByBadness, x => _.includes(ratings, x));
 
     return worst || "NO_OPINION";
@@ -37,7 +36,9 @@ export default [
                 const flowId = d.data.id;
                 const flowDecorators = decoratorsByFlowId[flowId] || [];
                 const ratings = _.map(flowDecorators, "rating");
-                return pickWorst(ratings);
+                // note: we can use the domain() because when it is retrieved, it is already sorted by position & name
+                // -> ref: flow-classification-utils.loadFlowClassificationRatings
+                return pickWorst(ratings, flowClassificationColors.domain());
             };
 
             return {
