@@ -153,7 +153,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> aiSvc.attestForEntity(user, cmd),
+                () -> aiSvc.attestForEntity(user, cmd, false),
                 "Should not be able to attest as no flows");
     }
 

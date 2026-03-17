@@ -161,7 +161,7 @@ public class AttestationPreCheckService {
             Set<Long> deprecatedOrUnknownFlowIds = attestationPreCheckDao.findDeprecatedOrUnknownFlowIdsForEntity(entityRef);
             Set<Long> deprecatedOrUnknownPhysicalFlowIds = physicalFlowService.findPhysicalFlowIdsWithProblematicDataTypes(deprecatedOrUnknownFlowIds);
             Set<Long> proposedPhysicalFlowIds = proposedFlowWorkflowService.findPhysicalFlowIdsInPendingProposals(deprecatedOrUnknownFlowIds, workflowDefinition.id().get());
-            if (!Objects.equals(deprecatedOrUnknownPhysicalFlowIds, proposedPhysicalFlowIds)) {
+            if (deprecatedOrUnknownPhysicalFlowIds.isEmpty() || !Objects.equals(deprecatedOrUnknownPhysicalFlowIds, proposedPhysicalFlowIds)) {
                 failures.add(mkFailureMessage(
                         messageTemplates,
                         "attestation.logical-flow.fail.deprecated",
