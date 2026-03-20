@@ -33,8 +33,9 @@
     import Toggle from "../../common/svelte/Toggle.svelte";
     import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
     import {settingsStore} from "../../svelte-stores/settings-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../common/constants"
-    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../common/utils/settings-util";
+    import {
+        isDataFlowProposalsEnabledWithSettingsArray
+    } from "../../common/utils/settings-util";
 
     export let primaryEntityRef = {};
 
@@ -49,10 +50,7 @@
     let settingsCall = settingsStore.loadAll();
 
     $: $nestedEnums = nestEnums($enumsCall.data);
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
-        [0];
-    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data);
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
@@ -177,7 +175,7 @@
             </div>
 
             <div class="selection-step">
-                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalSetting}/>
+                <LogicalFlowSelectionStep {primaryEntityRef} {dataFlowProposalsEnabled}/>
             </div>
 
             <div class="selection-step">

@@ -21,7 +21,6 @@ import {initialiseData, invokeFunction} from "../../../common/index";
 import template from "./attestation-confirmation.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
-import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants";
 
 
 const bindings = {
@@ -89,10 +88,9 @@ function controller($q, serviceBroker, settingsService) {
     vm.$onInit = () => {
         switch (vm.attestationKind) {
             case "LOGICAL_DATA_FLOW":
-                settingsService
-                    .findOrDefault(DATAFLOW_PROPOSAL_SETTING_NAME,'false')
-                    .then(dataFlowProposalSettingValue => {
-                        vm.dataFlowProposalsEnabled = dataFlowProposalSettingValue === 'true';
+                isDataFlowProposalsEnabled(settingsService)
+                    .then(value => {
+                        vm.dataFlowProposalsEnabled = value;
                         if (vm.dataFlowProposalsEnabled) {
                             validateLogicalFlowsWithProposedFlow();
                         } else {
