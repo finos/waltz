@@ -212,11 +212,11 @@ public class AttestationInstanceService {
     }
 
 
-    public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
+    public boolean attestForEntity(String username, AttestEntityCommand createCommand, boolean withProposedFlow) {
         checkAttestationPermission(username, createCommand);
 
         if(createCommand.attestedEntityKind() == EntityKind.LOGICAL_DATA_FLOW){
-            checkLogicalFlowsCanBeAttested(createCommand);
+            checkLogicalFlowsCanBeAttested(createCommand, withProposedFlow, username);
         }
 
         if(createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY) {
@@ -285,8 +285,9 @@ public class AttestationInstanceService {
     }
 
 
-    private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand) {
-        List<String> failures = attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
+    private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand, boolean withProposedFlow, String username) {
+        List<String> failures = withProposedFlow ? attestationPreCheckService.calcLogicalFlowPreCheckFailuresWithProposed(createCommand.entityReference(), username)
+                : attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
         checkEmpty(
                 failures,
                 () -> format(
