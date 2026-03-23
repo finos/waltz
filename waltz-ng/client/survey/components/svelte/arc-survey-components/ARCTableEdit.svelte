@@ -293,7 +293,7 @@
 <div class="save-response">
     <button class="btn btn-success"
             disabled={savingResponse}
-            on:click={saveJsonResponse}>
+            on:click={debouncedAutoSave}>
         {#if savingResponse}
             <i class="fa fa-spin fa-spinner"></i> Saving...
         {:else}
