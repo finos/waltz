@@ -45,7 +45,7 @@ class Cache {
     }
 
     init(key, d) {
-        return this.cacheData.set(key, writable({ data: d, error: null, status: "loading" }));
+        return this.cacheData.set(key, writable({ data: d, error: null, status: REMOTE_API_STATUS.LOADING }));
     }
 
     set(key, d) {
