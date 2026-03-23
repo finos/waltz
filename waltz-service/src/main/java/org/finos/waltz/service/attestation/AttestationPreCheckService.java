@@ -142,7 +142,7 @@ public class AttestationPreCheckService {
         // 1. Get the base pre-check results
         LogicalFlowAttestationPreChecks preChecks = attestationPreCheckDao.calcLogicalFlowAttestationPreChecks(entityRef);
 
-
+        boolean hasPendingProposals = false;
         // Rule 2: If there are no flows, block unless a creation is pending
         if (preChecks.flowCount() == 0 && !preChecks.exemptFromFlowCountCheck()) {
             if (!proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
@@ -151,6 +151,8 @@ public class AttestationPreCheckService {
                         "attestation.logical-flow.fail.count",
                         "Cannot attest as there are no recorded relevant flows",
                         preChecks.flowCount()));
+            } else {
+                hasPendingProposals = true;
             }
             return failures;
         }
@@ -167,7 +169,17 @@ public class AttestationPreCheckService {
                         "attestation.logical-flow.fail.deprecated",
                         "Cannot attest as there are deprecated/unknown data type usages (%d violation/s)",
                         preChecks.deprecatedCount() + preChecks.unknownCount()));
+            } else {
+                hasPendingProposals = true;
             }
+        }
+
+        if (failures.isEmpty() && hasPendingProposals) {
+            failures.add(mkFailureMessage(
+                    messageTemplates,
+                    "attestation.logical-flow.pending.proposed-flow.message",
+                    "Given you have pending flow(s), you are still able to attest",
+                    0));
         }
 
         return failures;
