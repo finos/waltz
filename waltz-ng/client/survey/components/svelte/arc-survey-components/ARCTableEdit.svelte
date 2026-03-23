@@ -208,11 +208,7 @@
 
     const autoSave = () => {
         if(!currentResponse) {
-            if(!arcs.length) {
-                saveJsonResponse();
-            } else {
-                saveJsonResponse();
-            }
+            saveJsonResponse();
         } else {
             if(!isEqual(currentResponse, mkPayload())) {
                 saveJsonResponse();
