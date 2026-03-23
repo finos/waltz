@@ -102,7 +102,7 @@
 <br/>
 {#if isArcsLoaded}
     {#if mode === MODES.EDIT}
-        <ARCTableEdit arcs={arcs}
+        <ARCTableEdit {arcs}
                       {arcHierarchy}
                       {tableHeadings}
                       {url}
