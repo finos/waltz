@@ -19,6 +19,7 @@
 import {$http} from "../common/WaltzHttp";
 import stringify from "json-stable-stringify";
 import {get as rawGet, writable} from "svelte/store";
+import {REMOTE_API_STATUS} from "../common/constants";
 
 
 class Cache {
@@ -48,11 +49,11 @@ class Cache {
     }
 
     set(key, d) {
-        return this._setWithStatus(key, d, "loaded");
+        return this._setWithStatus(key, d, REMOTE_API_STATUS.LOADED);
     }
 
     clearForKey(key, d) {
-        return this._setWithStatus(key, d, "loading");
+        return this._setWithStatus(key, d, REMOTE_API_STATUS.LOADING);
     }
 
     _setWithStatus(key, d, status) {

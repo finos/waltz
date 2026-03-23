@@ -30,6 +30,8 @@
     import {onDestroy} from "svelte";
     import ARCTableView from "./ARCTableView.svelte";
     import {mkResponseObject} from "./arc-survey-utils";
+    import {isEqual} from "lodash";
+    import {debounce} from "../../../../system/svelte/utils/debounce";
 
     export let arcs;
     export let arcHierarchy;
@@ -43,6 +45,17 @@
 
     let savingResponse = false;
     let startedOver = false;
+    let dirty = false;
+    let tableSaved = false;
+
+    const setDirty = (value) => {
+        if(dirty && value) {
+            setDirty(false);
+            setDirty(true);
+        } else {
+            dirty = value;
+        }
+    }
 
     const getArcRow = (arcId) => {
         return $arcSurveyState.find(t => t.entityRef.id === arcId);
@@ -73,6 +86,7 @@
             };
             $arcSurveyState = [...$arcSurveyState, responseObject];
         }
+        setDirty(true);
     }
 
     const selectTreeItem = (arcId, item) => {
@@ -82,6 +96,7 @@
             }
             return t;
         })
+        setDirty(true);
     }
 
     const deselectTreeItem = (arcId, item) => {
@@ -94,7 +109,13 @@
             }
             return t;
         })
+        setDirty(true);
     }
+
+    const mkPayload = () => ({
+        responseType: "ARC",
+        responses: [...$arcSurveyState]
+    });
 
     const validateSubmission = () => {
         if(!$arcSurveyState.length) {
@@ -150,35 +171,58 @@
     const onStartOver = () => {
         startedOver = true;
         $arcSurveyState = arcs.map(t => mkResponseObject(t));
+        setDirty(false);
+        tableSaved = true;
     }
 
     const saveJsonResponse = () => {
         try {
+            savingResponse = true;
+
             validateSubmission();
 
             $invalidRows = [];
 
-            const payload = {
-                responseType: "ARC",
-                responses: [...$arcSurveyState]
-            }
+            const payload = mkPayload();
 
-            savingResponse = true;
             surveyInstanceStore
                 .saveResponse(instanceId, {questionId: question.id, jsonResponse: JSON.stringify(payload)})
                 .then(() => {
                     savingResponse = false;
                     toastStore.success("Table saved successfully.");
                     startedOver = false;
+                    setDirty(false);
+                    tableSaved = true;
                 })
                 .catch((e) => {
                     savingResponse = false;
                     console.error({error: e});
+                    setDirty(false);
                 });
         } catch (e) {
             displayError("Error saving response.");
+            savingResponse = false;
+            setDirty(false);
         }
     }
+
+    const autoSave = () => {
+        if(!currentResponse) {
+            if(!arcs.length) {
+                saveJsonResponse();
+            } else {
+                saveJsonResponse();
+            }
+        } else {
+            if(!isEqual(currentResponse, mkPayload())) {
+                saveJsonResponse();
+            }
+        }
+    }
+
+    const debouncedAutoSave = debounce(autoSave, 5000);
+
+    $: dirty && debouncedAutoSave();
 
     onDestroy(() => {
         $arcSurveyState = [];
@@ -258,6 +302,16 @@
     </button>
     <p class="help-block">Please periodically save the changes you have made.</p>
 </div>
+{:else if tableSaved}
+    <NoData type="info">
+        You have already filled the table, filling it again would require you to
+        <button class="btn btn-skinny" on:click={onStartOver}>start over.</button>
+    </NoData>
+    <ARCTableView arcs={arcs}
+                  arcHierarchy={arcHierarchy}
+                  {tableHeadings}
+                  {url}
+                  {dropdownDefinition}/>
 {:else}
     <NoData type="info">
         You have already filled the table, filling it again would require you to
