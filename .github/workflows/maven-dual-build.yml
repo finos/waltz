@@ -46,7 +46,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Generate effective POM
-      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests -Dverbose -Doutput=effective-pom-postgres.xml
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests,waltz-zonky -Dverbose -Doutput=effective-pom-postgres.xml
 
     - name: Upload effective POM
       uses: actions/upload-artifact@v4
@@ -55,7 +55,7 @@ jobs:
         path: effective-pom-postgres.xml
 
     - name: Build with Maven (PostgreSQL)
-      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site -Dtarget.db=postgres -Ddb.provider=docker;
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests,waltz-zonky clean package site -Dtarget.db=postgres -Ddb.provider=docker;
 
     - name: Publish build
       uses: actions/upload-artifact@v4
@@ -189,7 +189,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-mssql-alt,waltz-mssql-alt;
 
     - name: Generate effective POM
-      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests -Dverbose -Doutput=effective-pom-mssql-alt.xml
+      run: mvn help:effective-pom -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests,waltz-zonky -Dverbose -Doutput=effective-pom-mssql-alt.xml
 
     - name: Upload effective POM
       uses: actions/upload-artifact@v4
@@ -201,7 +201,7 @@ jobs:
       env:
         JOOQ_USERNAME: ${{ secrets.JOOQ_USERNAME }}
         JOOQ_PASSWORD: ${{ secrets.JOOQ_PASSWORD }}
-      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests clean package site -Dtarget.db=mssql -Ddb.provider=docker;
+      run: mvn -X -U help:effective-settings -B -ntp -s .build.settings.xml -Pbuild-mssql-alt,waltz-mssql-alt,integration-tests,waltz-zonky clean package site -Dtarget.db=mssql -Ddb.provider=docker;
 
     - name: Publish build
       uses: actions/upload-artifact@v4

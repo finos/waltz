@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem;
+package org.finos.waltz.integration_test.zonky;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -34,6 +34,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Configuration
+@Profile("waltz-zonky")
 @ComponentScan(basePackages = {
         "org.finos.waltz.data",
         "org.finos.waltz.service"

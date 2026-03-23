@@ -26,7 +26,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DIZonkyTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {TestConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 public abstract class BaseInMemoryIntegrationTest {
 
     static {

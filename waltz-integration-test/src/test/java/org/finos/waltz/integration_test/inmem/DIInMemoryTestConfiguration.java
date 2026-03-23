@@ -6,6 +6,8 @@ import liquibase.integration.spring.SpringLiquibase;
 import org.finos.waltz.common.ExcludeFromIntegrationTesting;
 import org.finos.waltz.data.DBExecutorPool;
 import org.finos.waltz.data.DBExecutorPoolInterface;
+import org.finos.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameCase;
@@ -20,15 +22,19 @@ import org.springframework.jmx.support.RegistrationPolicy;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-//@Configuration
-//@ComponentScan(basePackages = {
-//        "org.finos.waltz.data",
-//        "org.finos.waltz.service"
-//
-//}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
-//@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-//@PropertySource("classpath:integration-test.properties")
-@Deprecated
+@Configuration
+@ComponentScan(basePackages = {
+        "org.finos.waltz.data",
+        "org.finos.waltz.service",
+        "org.finos.waltz.test_common"
+    },
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class),
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {DIBaseConfiguration.class, DIConfiguration.class})
+    }
+)
+@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
+@PropertySource("classpath:integration-test.properties")
 public class DIInMemoryTestConfiguration {
 
     @Bean
@@ -53,7 +59,7 @@ public class DIInMemoryTestConfiguration {
 
 
     @Bean
-    //@Autowired
+    @Autowired
     public DSLContext dsl(DataSource dataSource) {
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
