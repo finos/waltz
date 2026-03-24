@@ -41,6 +41,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.ADD;
 import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -97,11 +98,13 @@ public class EntityWorkflowService {
         entityWorkflowTransitionDao.createWorkflowTransition(entityWorkflowDefinitionId, ref,
                 username, prevState, newState, transitionReason);
 
+        String proposedFlowIdSuffix = mkProposedFlowIdSuffix(ref);
+
         List<ChangeLog> changeLogList = Arrays.asList(
-                mkChangeLog(ref, username, ADD, "New Workflow Created"),
-                mkChangeLog(ref, username, ADD, format("Entity Workflow State changed to %s", newState)),
+                mkChangeLog(ref, username, ADD, format("New Workflow Created %s", proposedFlowIdSuffix)),
+                mkChangeLog(ref, username, ADD, format("Entity Workflow State changed for %s to %s", proposedFlowIdSuffix, newState)),
                 mkChangeLog(ref, username, ADD,
-                        format("Entity Workflow Transition saved with from: %s to: %s State", PROPOSED_CREATE, newState))
+                        format("Entity Workflow Transition saved for %s with from: %s to: %s State", proposedFlowIdSuffix, PROPOSED_CREATE, newState))
         );
         changeLogService.write(changeLogList);
     }
@@ -113,13 +116,22 @@ public class EntityWorkflowService {
         entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
                 username, currentState, newState, reason);
 
+        String proposedFlowIdSuffix = mkProposedFlowIdSuffix(workflowState.entityReference());
+
         List<ChangeLog> changeLogList = Arrays.asList(
                 mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format("Entity Workflow State changed to %s", newState)),
+                        format("Entity Workflow State changed for %s to %s", proposedFlowIdSuffix, newState)),
                 mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
+                        format("Entity Workflow Transition saved for %s with from: %s to: %s State", proposedFlowIdSuffix, currentState, newState))
         );
         changeLogService.write(changeLogList);
+    }
+
+    private String mkProposedFlowIdSuffix(EntityReference ref) {
+        if (ref != null && PROPOSED_FLOW.equals(ref.kind())) {
+            return format(" [proposedFlowId=%d]", ref.id());
+        }
+        return "";
     }
 
     public void createEntityWorkflowResult(Long entityWorkflowDefinitionId, EntityReference workflowEntity, EntityReference resultEntity, String username) {
