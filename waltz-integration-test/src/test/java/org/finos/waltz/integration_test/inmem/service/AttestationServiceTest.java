@@ -81,7 +81,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         dsl.deleteFrom(ATTESTATION_RUN).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
-        dsl.deleteFrom(APPLICATION).execute();
     }
 
     @Test
