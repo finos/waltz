@@ -11,7 +11,7 @@ import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
 
     private final String stem = "pgst";
 
-    @BeforeEach
+    @AfterEach
     void cleanUp() {
         dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
         dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();

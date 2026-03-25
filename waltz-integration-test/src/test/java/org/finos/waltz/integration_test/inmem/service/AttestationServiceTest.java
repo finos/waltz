@@ -31,7 +31,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +77,8 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     private DSLContext dsl;
 
 
-    @BeforeEach
-    public void setup() {
+    @AfterEach
+    public void cleanup() {
         dsl.deleteFrom(ATTESTATION_INSTANCE).execute();
         dsl.deleteFrom(ATTESTATION_RUN).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
