@@ -10,7 +10,15 @@ import org.finos.waltz.model.assessment_rating.AssessmentDefinitionRatingOperati
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.AssessmentHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
+import org.finos.waltz.test_common.helpers.UserHelper;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +28,10 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
+import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,7 +63,25 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
     @Autowired
     private UserHelper userHelper;
 
+    @Autowired
+    private DSLContext dsl;
+
     private final String stem = "arpc";
+
+    @BeforeEach
+    public void setup() {
+        dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
+        dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(APPLICATION).execute();
+        dsl.deleteFrom(ASSESSMENT_RATING).execute();
+        dsl.deleteFrom(ASSESSMENT_DEFINITION).execute();
+        dsl.deleteFrom(RATING_SCHEME_ITEM).execute();
+    }
 
 
     @Test

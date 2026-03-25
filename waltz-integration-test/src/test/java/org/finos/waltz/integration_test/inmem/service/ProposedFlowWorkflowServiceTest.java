@@ -82,7 +82,13 @@ import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.SOURCE_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
 import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.PROPOSED_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -171,13 +177,18 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @BeforeEach
     public void setUp() {
-        dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
+        dsl.deleteFrom(PROPOSED_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
         dsl.deleteFrom(LOGICAL_FLOW).execute();
         dsl.deleteFrom(ENTITY_WORKFLOW_STATE).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
 
         source = appHelper.createNewApp("source", ouIds.a);
         target = appHelper.createNewApp("target", ouIds.a1);
