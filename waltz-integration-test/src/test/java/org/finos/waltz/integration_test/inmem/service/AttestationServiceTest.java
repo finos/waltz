@@ -155,7 +155,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     public void cannotAttestIfNoFlows() {
         long invId = involvementHelper.mkInvolvementKind(mkName("cannotAttestIfNoFlows"));
         String user = mkUserId("cannotAttestIfNotAssociated");
-        EntityReference appRef = mkNewAppRef();
+        EntityReference appRef = appHelper.createNewApp(mkName("a"), ouIds.a);
 
         involvementHelper.createInvolvement(
                 personHelper.createPerson(user),

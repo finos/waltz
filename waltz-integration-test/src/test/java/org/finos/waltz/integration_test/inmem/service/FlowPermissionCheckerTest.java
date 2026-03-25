@@ -18,6 +18,7 @@ import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.finos.waltz.test_common.helpers.PhysicalFlowHelper;
 import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
 import org.finos.waltz.test_common.helpers.UserHelper;
+import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,13 @@ import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
-import static org.finos.waltz.schema.Tables.PERMISSION_GROUP;
-import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_ENTRY;
-import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_INVOLVEMENT;
-import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
+import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,6 +75,9 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private UserHelper userHelper;
 
+    @Autowired
+    private DSLContext dsl;
+
     private final String stem = "fpc";
 
     @BeforeEach
@@ -82,6 +89,9 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(PHYSICAL_FLOW).execute();
+        dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
         dsl.deleteFrom(APPLICATION).execute();
     }
 

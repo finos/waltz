@@ -20,7 +20,12 @@ import java.util.Set;
 
 import static org.finos.waltz.model.Operation.APPROVE;
 import static org.finos.waltz.model.Operation.REJECT;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementGroup.INVOLVEMENT_GROUP;
+import static org.finos.waltz.schema.tables.InvolvementGroupEntry.INVOLVEMENT_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
+import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
 import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
@@ -51,10 +56,14 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
 
     @BeforeEach
     void cleanUp() {
-
         dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(APPLICATION).execute();
     }
 
     @Test
