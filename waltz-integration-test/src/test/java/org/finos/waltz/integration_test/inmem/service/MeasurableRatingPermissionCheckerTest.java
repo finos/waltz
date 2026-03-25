@@ -413,6 +413,79 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
     }
 
     @Test
+    public void findMeasurableRatingReplacementPermissionsWithReadOnlyRating() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String adminRoleName = mkName(stem, "adminRoleName");
+
+        long catId = measurableHelper.createMeasurableCategory(mkName(stem, "replacement permission checker"), adminRoleName);
+        long m1 = measurableHelper.createMeasurable("m1", catId);
+
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        long decommId = measurableHelper.createDecomm(mrId1);
+        measurableHelper.updateMeasurableReadOnly(appA, m1);
+
+        userHelper.createUserWithRoles(u1, adminRoleName);
+
+        Set<Operation> readOnlyRatingsShouldNotRestrictEditingDecomms = measurableRatingPermissionChecker.findMeasurableRatingReplacementPermissions(decommId, u1);
+
+        assertEquals(
+                asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
+                readOnlyRatingsShouldNotRestrictEditingDecomms,
+                "Read only rating should not restrict operations on rating replacements");
+    }
+
+    @Test
+    public void findMeasurableRatingPermissionsWithNonEditableCategory() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String adminRoleName = mkName(stem, "adminRoleName");
+
+        long catId = measurableHelper.createMeasurableCategory(mkName(stem, "rating permission checker"), adminRoleName);
+        long m1 = measurableHelper.createMeasurable("m1", catId);
+
+        measurableHelper.createRating(appA, m1);
+        measurableHelper.updateCategoryNotEditable(catId);
+
+        userHelper.createUserWithRoles(u1, adminRoleName);
+
+        Set<Operation> nonEditableCategoryShouldStillAllowRatingsToBeEdited = measurableRatingPermissionChecker.findMeasurableRatingPermissions(appA, m1, u1);
+
+        assertEquals(
+                asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
+                nonEditableCategoryShouldStillAllowRatingsToBeEdited,
+                "Non-editable category should still allow ratings to be edited operations");
+    }
+
+    @Test
+    public void findMeasurableRatingDecommPermissionsWithNonEditableCategory() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String adminRoleName = mkName(stem, "adminRoleName");
+
+        long catId = measurableHelper.createMeasurableCategory(mkName(stem, "decom permission checker"), adminRoleName);
+        long m1 = measurableHelper.createMeasurable("m1", catId);
+
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        measurableHelper.updateCategoryNotEditable(catId);
+
+        userHelper.createUserWithRoles(u1, adminRoleName);
+
+        Set<Operation> nonEditableCategoryShouldStillAllowRatingsToBeEdited = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
+
+        assertEquals(
+                asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
+                nonEditableCategoryShouldStillAllowRatingsToBeEdited,
+                "Non-editable category should still allow decoms to be edited operations");
+    }
+
+    @Test
     public void findMeasurableRatingReplacementPermissionsWithNonEditableCategory() {
 
         String u1 = mkName(stem, "user1");

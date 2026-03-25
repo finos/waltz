@@ -31,7 +31,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,6 @@ import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
@@ -76,8 +75,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private DSLContext dsl;
 
-
-    @AfterEach
+    @BeforeEach
     public void cleanup() {
         dsl.deleteFrom(ATTESTATION_INSTANCE).execute();
         dsl.deleteFrom(ATTESTATION_RUN).execute();
@@ -85,7 +83,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         dsl.deleteFrom(PERSON).execute();
         dsl.deleteFrom(APPLICATION).execute();
     }
-
 
     @Test
     public void basicRunCreation() {
