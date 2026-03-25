@@ -105,8 +105,8 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
         long nonPrivKind = involvementHelper.mkInvolvementKind(mkName(stem, "non_privileged"));
-
- //     assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
+        //Commented below line as it fails in teamcity builds and passes in local build, need to check later
+        //assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
 
         permissionHelper.setupSpecificPermissionGroupForApp(appB, privKind, stem);
 
@@ -190,7 +190,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         Set<Permission> permissionsForOperationOnEntityKind = filter(
                 permissionGroupService.findPermissionsForParentReference(appA, u1),
                 p -> p.operation() == Operation.ATTEST);
-
+        //Commented below line as it fails in teamcity builds and passes in local build, need to check later
 //        assertEquals(
 //                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
 //                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
