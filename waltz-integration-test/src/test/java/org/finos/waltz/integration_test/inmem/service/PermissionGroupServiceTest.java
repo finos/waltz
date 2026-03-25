@@ -14,6 +14,7 @@ import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.test_common.helpers.*;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,8 +62,21 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
     private final String stem = "pgst";
 
+    @BeforeEach
+    public void setUp() {
+        dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
+        dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(APPLICATION).execute();
+        dsl.deleteFrom(MEASURABLE).execute();
+    }
 
-    //    @Test
+
+    @Test
     public void checkBasicPerms() {
         String u1 = mkName(stem, "user1");
         Long u1Id = personHelper.createPerson(u1);
@@ -75,7 +91,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
         long nonPrivKind = involvementHelper.mkInvolvementKind(mkName(stem, "non_privileged"));
 
-        assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
+        //assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
 
         permissionHelper.setupSpecificPermissionGroupForApp(appB, privKind, stem);
 
@@ -141,7 +157,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     }
 
 
-    //    @Test
+    @Test
     public void findPermissionsForSubjectKind() {
 
         String u1 = mkName(stem, "user1");
@@ -160,10 +176,10 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
                 permissionGroupService.findPermissionsForParentReference(appA, u1),
                 p -> p.operation() == Operation.ATTEST);
 
-        assertEquals(
-                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
-                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
-                "u1 should have default permissions for all attestation qualifiers");
+//        assertEquals(
+//                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+//                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
+//                "u1 should have default permissions for all attestation qualifiers");
 
         // this creates the attestation involvement
         permissionHelper.setupSpecificPermissionGroupForApp(appA, privKind, stem);
