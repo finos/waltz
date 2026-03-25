@@ -38,9 +38,7 @@ import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
 import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.finos.waltz.test_common.helpers.UserHelper;
 import org.immutables.value.Value;
-import org.jooq.DSLContext;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -53,12 +51,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
-import static org.finos.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -104,9 +96,6 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private RatingSchemeService schemeService;
 
-    @Autowired
-    private DSLContext dsl;
-
     @Value.Immutable
     interface OneOffRipplerTestConfig {
         EntityReference fromRef();
@@ -117,16 +106,6 @@ public class AssessmentRatingServiceTest extends BaseInMemoryIntegrationTest {
 
         Set<Long> ratingItemIds();
 
-    }
-
-    @BeforeEach
-    public void setup() {
-        dsl.deleteFrom(ASSESSMENT_RATING).execute();
-        dsl.deleteFrom(ASSESSMENT_DEFINITION).execute();
-        dsl.deleteFrom(RATING_SCHEME_ITEM).execute();
-        dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
-        dsl.deleteFrom(PHYSICAL_FLOW).execute();
-        dsl.deleteFrom(LOGICAL_FLOW).execute();
     }
 
     @Test
