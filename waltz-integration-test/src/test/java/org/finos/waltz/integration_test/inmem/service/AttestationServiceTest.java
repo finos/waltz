@@ -31,6 +31,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +44,17 @@ import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -67,6 +75,16 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private DSLContext dsl;
+
+
+    @BeforeEach
+    public void setup() {
+        dsl.deleteFrom(ATTESTATION_INSTANCE).execute();
+        dsl.deleteFrom(ATTESTATION_RUN).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
+        dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(APPLICATION).execute();
+    }
 
 
     @Test
