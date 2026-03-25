@@ -6,21 +6,18 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
+import org.finos.waltz.model.scheduled_job.JobKey;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
@@ -33,9 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
@@ -44,11 +41,11 @@ import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
+import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
 import static org.finos.waltz.model.command.CommandOutcome.SUCCESS;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
-import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
+import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.*;
 
 
 @Service
@@ -60,6 +57,8 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_ALREADY_EXIST = "Proposed Flow Already Exist";
     private static final String PHYSICAL_FLOW_ALREADY_EXIST = "Physical Flow Already Exist";
     private static final String PROPOSED_FLOW_ACTION_SUCCESS = "Proposed Flow Action success";
+    private static final String SYSTEM_USER = "admin";
+    private static final String TIME_OUT_REASON = "Auto cancelled; pending for more than 30 days";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
@@ -68,6 +67,9 @@ public class ProposedFlowWorkflowService {
     private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
+    private final ChangeLogService changeLogService;
+    private final SettingsService settingsService;
+
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -75,7 +77,9 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService) {
+                                DataFlowService dataFlowService, ChangeLogService changeLogService, SettingsService settingsService) {
+        this.changeLogService = changeLogService;
+        this.settingsService = settingsService;
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
@@ -186,7 +190,7 @@ public class ProposedFlowWorkflowService {
         boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
 
 //        Fetch the current state
-        ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
+        ProposedFlowWorkflowState currentState = ProposedFlowWorkflowState.valueOf(proposedFlow.workflowState().state());
 
         // 2. Get current state and build context
         ProposedFlowWorkflowContext workflowContext =
@@ -413,5 +417,121 @@ public class ProposedFlowWorkflowService {
                 newProposal.flowAttributes().criticality());
 
         return specIdMatches && attributesMatch;
+    }
+
+    public void pendingFlowsTimeOut(JobKey jobKey) {
+        //will have to check how to give a default value for this
+        int effectiveTimeoutDays = 30;
+
+        Optional<String> settingValue = settingsService.getValue(jobKey.name());
+        if (settingValue.isPresent()) {
+            try {
+                effectiveTimeoutDays = Integer.parseInt(settingValue.get());
+            } catch (NumberFormatException e) {
+                LOG.warn("Invalid timeout days value in settings for jobKey {}: {}.",
+                        jobKey, settingValue.get());
+            }
+        }
+        LOG.info("Running pending proposed flow timeout job with timeoutDays={}", effectiveTimeoutDays);
+
+        int processedCount = autoCancelPendingProposedFlows(
+                effectiveTimeoutDays,
+                SYSTEM_USER,
+                TIME_OUT_REASON);
+
+        LOG.info("Completed pending proposed flow timeout job. processedCount={}", processedCount);
+    }
+    public int autoCancelPendingProposedFlows(int timeoutDays,
+                                              String username,
+                                              String reason) {
+
+        List<ProposedFlowDao.TimeoutCandidate> candidates =
+                proposedFlowDao.findPendingTimeoutCandidatesOlderThanDays(timeoutDays);
+
+        if (candidates.isEmpty()) {
+            return 0;
+        }
+
+        List<ProposedFlowDao.TimeoutTransition> transitions = new ArrayList<>();
+
+
+        for (ProposedFlowDao.TimeoutCandidate candidate : candidates) {
+            try {
+
+                ProposedFlowWorkflowState currentState =
+                        ProposedFlowWorkflowState.valueOf(candidate.currentState);
+
+                ProposedFlowWorkflowContext workflowContext =
+                        new ProposedFlowWorkflowContext(
+                                candidate.workflowId,
+                                mkRef(PROPOSED_FLOW, candidate.proposedFlowId),
+                                username,
+                                reason)
+                                .setSourceApprover(true)
+                                .setTargetApprover(true)
+                                .setMaker(true)
+                                .setCurrentState(currentState);
+
+                ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(
+                        currentState,
+                        TIME_OUT,
+                        workflowContext);
+
+                transitions.add(new ProposedFlowDao.TimeoutTransition(
+                        candidate.workflowId,
+                        candidate.proposedFlowId,
+                        currentState.name(),
+                        newState.name()));
+            }
+            catch (TransitionPredicateFailedException e) {
+                LOG.warn("Skipping timeout for proposed flow {} due to transition predicate failure", candidate.proposedFlowId, e);
+            }
+            catch (Exception e) {
+                LOG.error("Failed to auto-cancel proposed flow {}", candidate.proposedFlowId, e);
+            }
+        }
+
+        if (transitions.isEmpty()) {
+            return 0;
+        }
+        int processedCount = proposedFlowDao.batchApplyTimeoutTransitions(transitions, username, reason);
+        if (processedCount > 0) {
+            writeTimeoutChangeLogs(transitions.subList(0, Math.min(processedCount, transitions.size())), username);
+        }
+        return processedCount;
+    }
+    private void writeTimeoutChangeLogs(List<ProposedFlowDao.TimeoutTransition> transitions,
+                                        String username) {
+        List<ChangeLog> logs = transitions.stream()
+                .flatMap(t -> {
+                    String idSuffix = format(" [proposedFlowId=%d]", t.proposedFlowId);
+                    return Stream.of(
+                            mkTimeoutChangeLog(
+                                    t.proposedFlowId,
+                                    username,
+                                    format("Entity Workflow State for %s changed to %s", idSuffix, t.toState)),
+                            mkTimeoutChangeLog(
+                                    t.proposedFlowId,
+                                    username,
+                                    format("Entity Workflow Transition saved with from: %s to: %s State for %s",
+                                            t.fromState,
+                                            t.toState,
+                                            idSuffix))
+                    );
+                })
+                .collect(Collectors.toList());
+
+        changeLogService.write(logs);
+    }
+    private ImmutableChangeLog mkTimeoutChangeLog(long proposedFlowId,
+                                                  String username,
+                                                  String message) {
+        return ImmutableChangeLog.builder()
+                .parentReference(mkRef(PROPOSED_FLOW, proposedFlowId))
+                .message(message)
+                .userId(username)
+                .operation(UPDATE)
+                .severity(Severity.INFORMATION)
+                .build();
     }
 }
