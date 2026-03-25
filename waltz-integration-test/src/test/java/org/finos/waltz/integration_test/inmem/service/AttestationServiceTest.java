@@ -133,8 +133,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         assertFalse(isEmpty(instances));
     }
 
-
-    //    @Test
+    @Test
     public void cannotAttestIfNoFlows() {
         long invId = involvementHelper.mkInvolvementKind(mkName("cannotAttestIfNoFlows"));
         String user = mkUserId("cannotAttestIfNotAssociated");

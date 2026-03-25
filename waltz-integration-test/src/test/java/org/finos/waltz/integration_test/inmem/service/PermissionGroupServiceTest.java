@@ -12,7 +12,11 @@ import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.MeasurableHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,10 +31,21 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.PERMISSION_GROUP_INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Service
 public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
@@ -91,7 +106,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
         long nonPrivKind = involvementHelper.mkInvolvementKind(mkName(stem, "non_privileged"));
 
-        //assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
+ //     assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
 
         permissionHelper.setupSpecificPermissionGroupForApp(appB, privKind, stem);
 

@@ -100,7 +100,7 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
 
         Set<Operation> takesDefaults = flowPermissionChecker.findPermissionsForFlow(flowAB.id().get(), u1);
-        //assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group"); // created via changelog
+ //     assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group"); // created via changelog
 
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
         permissionHelper.setupPermissionGroupEntry(appB, pg.getId());
