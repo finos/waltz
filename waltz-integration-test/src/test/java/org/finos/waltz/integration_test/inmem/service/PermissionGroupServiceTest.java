@@ -29,7 +29,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.filter;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT;
