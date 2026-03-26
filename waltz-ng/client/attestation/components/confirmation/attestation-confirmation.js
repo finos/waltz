@@ -58,12 +58,12 @@ function controller($q, serviceBroker, settingsService) {
         vm.disabled = false;
     }
 
-    function disableSubmissionForProposedFlow(response) {
+    function disableSubmissionWithProposedFlow(response) {
         vm.message = response.message;
         vm.disabled = true;
     }
 
-    function enableSubmissionForProposedFlow(response) {
+    function enableSubmissionWithProposedFlow(response) {
         vm.message = response.message;
         vm.disabled = false;
     }
@@ -82,8 +82,8 @@ function controller($q, serviceBroker, settingsService) {
             .loadViewData(CORE_API.AttestationPreCheckStore.logicalFlowWithProposedFlowCheck, [vm.parentEntityRef])
             .then(r => r.data)
             .then(response =>  response.outcome === PROPOSAL_OUTCOMES.SUCCESS
-                ? enableSubmissionForProposedFlow(response)
-                : disableSubmissionForProposedFlow(response))
+                ? enableSubmissionWithProposedFlow(response)
+                : disableSubmissionWithProposedFlow(response))
     }
 
     function validateViewpoints() {
