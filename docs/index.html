@@ -21,7 +21,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Waltz is an open source enterprise architecture platform that maps applications, data flows, capabilities and ownership to support regulatory responses, audit readiness, and risk reduction.">
+    <meta name="description" content="Waltz is an open source enterprise architecture platform that turns fragmented technology data into a connected map of applications, flows, capabilities and ownership for faster decisions, audit readiness, and risk reduction.">
     <title>FINOS - Waltz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
@@ -82,9 +82,9 @@
         <div class="flex flex-col md:flex-row items-center gap-4 max-w-3xl mx-auto mb-12">
             <img src="site/img/question_nodes.jpg" class="w-32 flex-shrink-0 rounded" alt="Question" />
             <p class="text-gray-700 text-xl text-left">
-                Waltz is the open source platform that gives your organisation a <strong>living, connected map</strong> of the
-                technology landscape: applications, data flows, people, capabilities and change initiatives in one place. <br><br>
-                It helps leaders, architects, engineering teams and risk functions align decisions with evidence.
+                Waltz is the open source platform that turns fragmented architecture information into a <strong>living, connected map</strong>
+                of applications, data flows, people, capabilities and change initiatives. <br><br>
+                It helps enterprise architecture, engineering, portfolio and risk teams answer critical questions with evidence instead of spreadsheets.
             </p>
         </div>
     </section>
@@ -124,8 +124,8 @@
         <div class="text-center max-w-3xl mx-auto mb-12">
             <h2 class="text-3xl font-bold text-gray-900">Waltz Connects the Dots</h2>
             <p class="text-gray-700 text-lg mt-3">
-                A structured wiki for your architecture<br>
-                <strong>open</strong> to everyone, <strong>enriched</strong> by everyone.
+                Turn scattered architecture data into a shared operating model for change, governance and risk.<br>
+                <strong>Open</strong> to the organisation, <strong>enriched</strong> by the people closest to the estate.
             </p>
         </div>
 
@@ -237,104 +237,6 @@
         </div>
     </section>
 
-    <!-- FEATURES -->
-    <!--
-    <section class="bg-gray-50 py-16">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Features</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/02_app_view.png" alt="App View">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-map-o mr-2 text-blue-500"></i>See your applications
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        Waltz presents data about each application and how it connects to
-                        capabilities, organisational units, people, servers, data types and more.
-                        Once linked, relationships become navigable and decision ready.
-                    </p>
-                    <p class="text-gray-600 text-base mt-2">
-                        Information can be augmented manually to increase the completeness and
-                        accuracy of application views used by architects, delivery teams and auditors.
-                    </p>
-                </div>
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/05_person_view.png" alt="Person View">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-file-text-o mr-2 text-blue-500"></i>Aggregate Views
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        Once applications have been linked to entities (such as
-                        organisational units, people and capabilities) you can
-                        navigate through dynamic views which show aggregate summaries
-                        of related applications, costs, ownership and criticality.
-                    </p>
-                </div>
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/03_detail-app_flows.png" alt="App Flows">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-random mr-2 text-blue-500"></i>See how an application is connected
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        How an application is connected to other applications in your organisation
-                        is a central part of Waltz. We can describe upstream and downstream
-                        applications along with the data types exchanged.
-                    </p>
-                    <p class="text-gray-600 text-base mt-2">
-                        As this topology is created you can define authoritative sources
-                        for data types and see which applications source data from approved
-                        golden sources, supporting data governance and regulatory reporting.
-                    </p>
-                </div>
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/07_detail-group_flows.png" alt="Group Flows">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-random mr-2 text-blue-500"></i>See how your organisation is connected
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        Building upon an individual application's connections we can start to
-                        view how applications are connected when they are aggregated.
-                    </p>
-                    <p class="text-gray-600 text-base mt-2">
-                        If authoritative sources have been defined an organisational-unit level
-                        scorecard shows what proportion of logical data flows are sourced from
-                        strategic systems, helping prioritize remediation and investment.
-                    </p>
-                </div>
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/09_entity_stats.png" alt="Entity Stats">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-pie-chart mr-2 text-blue-500"></i>Statistics
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        Define your own sets of statistics and use Waltz to navigate
-                        collected values by the structural entities relevant to you,
-                        supporting portfolio health, risk and compliance reporting.
-                    </p>
-                </div>
-
-                <div class="p-4">
-                    <img class="w-full rounded shadow mb-4" src="site/img/screenshots/08_group_edit.png" alt="Group Edit">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        <i class="fa fa-folder mr-2 text-blue-500"></i>Create and share custom groups
-                    </h3>
-                    <p class="text-gray-600 text-base">
-                        Waltz allows you to create custom, ad-hoc groups of applications. This
-                        feature is often used to quickly understand a subset of your application
-                        portfolio. For instance you may wish to create a group containing
-                        SOX relevant applications or systems in scope for DORA, GDPR or PCI DSS.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-    -->
 
     <!-- BUILT FOR THE PROBLEMS -->
     <section class="py-16" style="background-color: #2e3444;">
@@ -392,6 +294,9 @@
     <!-- USED BY -->
     <section class="max-w-6xl mx-auto px-6 py-16">
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Used by</h2>
+        <p class="text-gray-700 text-lg text-center max-w-3xl mx-auto mb-12">
+            Waltz is used by teams working through regulatory scope, application rationalisation, lineage and major transformation in complex enterprise environments.
+        </p>
         <div class="flex flex-wrap justify-center items-center gap-12">
             <a href="https://www.db.com/" target="_blank">
                 <img src="site/img/users/deutschebank_logo.png" class="h-32 w-auto object-contain" alt="Deutsche Bank">
@@ -402,6 +307,26 @@
             <a href="https://hmxlabs.io/data/" target="_blank">
                 <img src="site/img/users/hmxlabs_logo.png" class="h-8 w-auto object-contain" alt="HMX Labs">
             </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Faster regulatory responses</h3>
+                <p class="text-gray-600 text-lg">
+                    Bring ownership, topology and data flow evidence together so regulatory and audit questions can be answered in days instead of weeks.
+                </p>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Clearer rationalisation decisions</h3>
+                <p class="text-gray-600 text-lg">
+                    See duplication, criticality, capability coverage and dependencies in one place to focus consolidation work where it will create the most value.
+                </p>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Better transformation planning</h3>
+                <p class="text-gray-600 text-lg">
+                    Connect applications, capabilities, flows and future-state change so transformation programmes can plan with fewer surprises and stronger evidence.
+                </p>
+            </div>
         </div>
         <div class="mt-8 text-center">
             <a href="mailto:waltz+owner@lists.finos.org?subject=Waltz: Add Company" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
@@ -418,8 +343,8 @@
                 <img class="mx-auto w-32 mb-6" alt="Demo website" src="site/img/waltz_badge_negative_bw_300px.png">
             </a>
             <p class="text-gray-200 text-lg leading-relaxed">
-                We have a <a href="https://demo.waltz.finos.org/" target="_blank" class="text-blue-300 hover:text-blue-100 underline">demonstration website</a> available.
-                Sample data is provided to explore key flows, applications and ownership relationships.
+                Explore the <a href="https://demo.waltz.finos.org/" target="_blank" class="text-blue-300 hover:text-blue-100 underline">demonstration website</a>
+                with realistic sample data covering applications, ownership, flows, reporting and change views.
             </p>
         </div>
     </section>
