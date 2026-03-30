@@ -107,8 +107,22 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
         long nonPrivKind = involvementHelper.mkInvolvementKind(mkName(stem, "non_privileged"));
-        //Commented below line as it fails in teamcity builds and passes in local build, need to check later
-        //assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
+
+        PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
+        dsl.update(PERMISSION_GROUP)
+                .set(PERMISSION_GROUP.IS_DEFAULT, true)
+                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
+                .execute();
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.LOGICAL_DATA_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
+        assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
 
         permissionHelper.setupSpecificPermissionGroupForApp(appB, privKind, stem);
 
@@ -187,16 +201,46 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         Long u1Id = personHelper.createPerson(u1);
 
-        long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
+        PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
+        dsl.update(PERMISSION_GROUP)
+                .set(PERMISSION_GROUP.IS_DEFAULT, true)
+                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
+                .execute();
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.LOGICAL_DATA_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.PHYSICAL_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.MEASURABLE_RATING,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
 
         Set<Permission> permissionsForOperationOnEntityKind = filter(
                 permissionGroupService.findPermissionsForParentReference(appA, u1),
                 p -> p.operation() == Operation.ATTEST);
-        //Commented below line as it fails in teamcity builds and passes in local build, need to check later
-//        assertEquals(
-//                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
-//                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
-//                "u1 should have default permissions for all attestation qualifiers");
+
+        assertEquals(
+                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
+                "u1 should have default permissions for all attestation qualifiers");
+
+        long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
         // this creates the attestation involvement
         permissionHelper.setupSpecificPermissionGroupForApp(appA, privKind, stem);
@@ -224,7 +268,6 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
                 map(withExtraPermissions, Permission::subjectKind),
                 "u1 should flow permissions only as they have the extra involvement required for logical flows but inherit none of the defaults");
     }
-
 
     @Test
     public void findSupportedMeasurableCategoryAttestations() {
@@ -296,7 +339,6 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals(asSet(categoryId), categoryIds, "has permission flag reflects which categories can be attested");
     }
 
-
     private CheckPermissionCommand mkLogicalFlowAttestCommand(String u, EntityReference app) {
         return ImmutableCheckPermissionCommand
                 .builder()
@@ -308,7 +350,6 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .user(u)
                 .build();
     }
-
 
     private CheckPermissionCommand mkMeasurableCategoryAttestCommand(String u, Long categoryId, EntityReference app) {
         return ImmutableCheckPermissionCommand

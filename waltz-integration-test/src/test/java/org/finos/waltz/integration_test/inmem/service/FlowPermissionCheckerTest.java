@@ -118,14 +118,27 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         LogicalFlow flowAB = flowHelper.createLogicalFlow(appA, appB);
         LogicalFlow flowBC = flowHelper.createLogicalFlow(appB, appC);
 
+        PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
+        dsl.update(PERMISSION_GROUP)
+                .set(PERMISSION_GROUP.IS_DEFAULT, true)
+                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
+                .execute();
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.LOGICAL_DATA_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
+        Set<Operation> takesDefaults = flowPermissionChecker.findPermissionsForFlow(flowAB.id().get(), u1);
+        assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group");
+
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
-
-        Set<Operation> takesDefaults = flowPermissionChecker.findPermissionsForFlow(flowAB.id().get(), u1);
-       //Commented below line as it fails in teamcity builds and passes in local build, need to check later
-       //assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group"); // created via changelog
 
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
         permissionHelper.setupPermissionGroupEntry(appB, pg.getId());
