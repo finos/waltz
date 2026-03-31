@@ -119,11 +119,7 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         LogicalFlow flowBC = flowHelper.createLogicalFlow(appB, appC);
 
         PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
-        dsl.update(PERMISSION_GROUP)
-                .set(PERMISSION_GROUP.IS_DEFAULT, true)
-                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
-                .execute();
-
+        permissionHelper.createDefaultPermGroup(defaultPg.getId());
         permissionHelper.setupPermissionGroupInvolvement(
                 null,
                 defaultPg.getId(),

@@ -109,11 +109,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         long nonPrivKind = involvementHelper.mkInvolvementKind(mkName(stem, "non_privileged"));
 
         PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
-        dsl.update(PERMISSION_GROUP)
-                .set(PERMISSION_GROUP.IS_DEFAULT, true)
-                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
-                .execute();
-
+        permissionHelper.createDefaultPermGroup(defaultPg.getId());
         permissionHelper.setupPermissionGroupInvolvement(
                 null,
                 defaultPg.getId(),
@@ -202,11 +198,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         Long u1Id = personHelper.createPerson(u1);
 
         PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
-        dsl.update(PERMISSION_GROUP)
-                .set(PERMISSION_GROUP.IS_DEFAULT, true)
-                .where(PERMISSION_GROUP.ID.eq(defaultPg.getId()))
-                .execute();
-
+        permissionHelper.createDefaultPermGroup(defaultPg.getId());
         permissionHelper.setupPermissionGroupInvolvement(
                 null,
                 defaultPg.getId(),
