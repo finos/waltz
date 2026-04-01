@@ -37,4 +37,5 @@ public abstract class EntityWorkflowState implements
     public abstract long workflowId();
     public abstract EntityReference entityReference();
     public abstract String state();
+    public abstract Long version();
 }

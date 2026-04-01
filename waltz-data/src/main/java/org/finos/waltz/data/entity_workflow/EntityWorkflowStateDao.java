@@ -55,6 +55,7 @@ public class EntityWorkflowStateDao {
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .provenance(r.getProvenance())
+                .version(r.getVersion())
                 .build();
     };
 
@@ -91,18 +92,21 @@ public class EntityWorkflowStateDao {
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        stateRecord.setVersion(1L);
         stateRecord.insert();
     }
 
-    public long updateState(Long workflowDefId, EntityReference ref, String user, String workflowState) {
+    public long updateState(Long workflowDefId, EntityReference ref, String user, EntityWorkflowState workflowState) {
         return dsl
                 .update(ENTITY_WORKFLOW_STATE)
-                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState)
+                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState.state())
                 .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
+                .set(ENTITY_WORKFLOW_STATE.VERSION, (workflowState.version() + 1L))
                 .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
+                        .and(ENTITY_WORKFLOW_STATE.VERSION.eq(workflowState.version()))
                 .execute();
     }
 }
