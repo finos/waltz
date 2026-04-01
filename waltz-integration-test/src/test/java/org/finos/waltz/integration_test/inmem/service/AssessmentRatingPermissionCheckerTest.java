@@ -10,7 +10,13 @@ import org.finos.waltz.model.assessment_rating.AssessmentDefinitionRatingOperati
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.AssessmentHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
+import org.finos.waltz.test_common.helpers.UserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
