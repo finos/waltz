@@ -25,6 +25,7 @@ import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
@@ -167,7 +168,7 @@ public class ProposedFlowWorkflowService {
     public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
-                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
 
         String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
         CommandOutcome outcome = SUCCESS;
@@ -185,7 +186,7 @@ public class ProposedFlowWorkflowService {
         boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
         boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
 
-//        Fetch the current state
+        // Fetch the current state
         ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
 
         // 2. Get current state and build context
@@ -220,6 +221,9 @@ public class ProposedFlowWorkflowService {
                     .orElse(null);
 
             if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
+                // refresh as after getting second approval the `proposedFlow` object contains the older version number
+                // in the proposedFlow.workflowState().version() field
+                proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
                 // auto switch to fully approved
                 proposedFlowOperations(proposedFlow, username);
 
@@ -235,7 +239,13 @@ public class ProposedFlowWorkflowService {
             LOG.error(errorMessage, e);
             outcome = FAILURE;
             builder.message(errorMessage).outcome(outcome);
-        } catch (Exception e) {
+        } catch (TransitionUpdateFailedException e) {
+            errorMessage = String.format("Failed to '%s' proposed flow. The workflow may have updated.", transitionAction);
+            LOG.error(errorMessage, e);
+            outcome = FAILURE;
+            builder.message(errorMessage).outcome(outcome);
+        }
+        catch (Exception e) {
             errorMessage = String.format("Failed to '%s' proposed flow.", transitionAction);
             LOG.error(errorMessage, e);
             outcome = FAILURE;

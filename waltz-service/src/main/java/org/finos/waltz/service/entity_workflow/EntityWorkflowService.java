@@ -32,7 +32,9 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -110,9 +112,16 @@ public class EntityWorkflowService {
     }
 
     public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
-                                      String currentState, String newState) {
-        entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
-                username, newState);
+                                      String currentState, String newState) throws TransitionUpdateFailedException {
+        long updatedRows = entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
+                username, ImmutableEntityWorkflowState
+                        .copyOf(workflowState)
+                        .withState(newState));
+
+        if(updatedRows == 0L) {
+            throw new TransitionUpdateFailedException("Workflow state update failed.");
+        }
+
         entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
                 username, currentState, newState, reason);
 

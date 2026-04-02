@@ -47,16 +47,29 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
+import org.finos.waltz.test_common.helpers.ProposedFlowWorkflowHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
@@ -77,6 +90,8 @@ import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowWorkflowServiceTest.class);
 
     private final String USER_NAME = "testUser";
 
@@ -649,5 +664,95 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         // 3. Assert: Validation should pass
         assertNull(validationResponse, "Validation should pass when a flow attribute (e.g., frequency) is different");
+    }
+
+    @Test
+    public void validateNoConcurrentActionsOnProposedFlows() {
+        /*
+            Step 1. Create a flow, with the user as source and target approver
+            Step 2. Parallelly execute approval actions
+            Step 3. One Action succeeds, the other fails
+         */
+
+        String testStem = mkName("validateNoConcurrentActionsOnProposedFlows");
+        ProposedFlowCommandResponse proposedFlowCommandResponse = proposedFlowWorkflowService.proposeNewFlow(testStem, baseCreateCommand);
+
+
+        Long personA = personHelper.createPerson(testStem);
+
+        long involvementKind = involvementHelper.mkInvolvementKind("_rel");
+        involvementHelper.createInvolvement(personA, involvementKind, baseCreateCommand.source());
+        involvementHelper.createInvolvement(personA, involvementKind, baseCreateCommand.target());
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, "_rel_ig");
+
+        permissionHelper.setupPermissionGroupForProposedFlow(baseCreateCommand.source(), ig, "_rel_pg", Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(baseCreateCommand.target(), ig, "_rel_pg", Operation.APPROVE);
+
+        List<ProposedFlowResponse> failures = new ArrayList<>();
+        List<ProposedFlowResponse> responses = new ArrayList<>();
+
+        // Run actions in parallel
+        CountDownLatch start = new CountDownLatch(1);
+        CountDownLatch end = new CountDownLatch(2);
+
+        Runnable approveTaskA = () -> mkRunnable(proposedFlowCommandResponse.proposedFlowId(), testStem, responses, failures, start, end);
+        Runnable approveTaskB = () -> mkRunnable(proposedFlowCommandResponse.proposedFlowId(), testStem, responses, failures, start, end);
+        new Thread(approveTaskA, "task_A").start();
+        new Thread(approveTaskB, "task_B").start();
+
+        try {
+            start.countDown();
+            assertTrue(end.await(10, TimeUnit.SECONDS), "Concurrent approve tasks did not finish in time");
+        } catch (InterruptedException e) {
+            LOG.error("Thread interrupted", e);
+            Thread.currentThread().interrupt();
+        }
+
+        assertEquals(1, responses.size());
+        assertEquals(1, failures.size());
+
+        // further non-concurrent action should lead to a fully approved state
+        ProposedFlowResponse fullyApprovedActionResponse = proposedFlowWorkflowService.proposedFlowAction(proposedFlowCommandResponse.proposedFlowId(),
+                APPROVE,
+                testStem,
+                ImmutableProposedFlowActionCommand
+                    .builder()
+                    .comment(format("Approved by %s", testStem))
+                    .build());
+
+        assertEquals(FULLY_APPROVED.name(), fullyApprovedActionResponse.workflowState().state());
+    }
+
+    private void mkRunnable(Long flowId,
+                                String user,
+                                List<ProposedFlowResponse> responses,
+                                List<ProposedFlowResponse> failures,
+                                CountDownLatch start,
+                                CountDownLatch end) {
+        try {
+            start.await(5, TimeUnit.SECONDS);
+            ProposedFlowResponse proposedFlowActionResponse = proposedFlowWorkflowService.proposedFlowAction(flowId,
+                    APPROVE,
+                    user,
+                    ImmutableProposedFlowActionCommand
+                            .builder()
+                            .comment(format("Approved by %s", user))
+                            .build());
+
+            if(proposedFlowActionResponse.outcome() == CommandOutcome.SUCCESS) {
+                synchronized (responses) {
+                    responses.add(proposedFlowActionResponse);
+                }
+            } else {
+                synchronized (failures) {
+                    failures.add(proposedFlowActionResponse);
+                }
+            }
+        } catch (InterruptedException e) {
+            LOG.error("Thread interrupted", e);
+        } finally {
+            end.countDown();
+        }
     }
 }
