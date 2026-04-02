@@ -92,7 +92,6 @@ public class EntityWorkflowStateDao {
         stateRecord.setProvenance("waltz");
         stateRecord.setLastUpdatedBy(username);
         stateRecord.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
-        stateRecord.setVersion(1L);
         stateRecord.insert();
     }
 

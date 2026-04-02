@@ -27,7 +27,13 @@
 
     <changeSet id="20260401-1" author="jainshrk">
         <addColumn tableName="entity_workflow_state">
-            <column name="version" type="bigint" defaultValueNumeric="0"/>
+            <column name="version"
+                    type="bigint"
+                    defaultValueNumeric="0"
+                    valueNumeric="0"/>
         </addColumn>
+        <addNotNullConstraint tableName="entity_workflow_state"
+                              columnDataType="bigint"
+                              columnName="version"/>
     </changeSet>
 </databaseChangeLog>
