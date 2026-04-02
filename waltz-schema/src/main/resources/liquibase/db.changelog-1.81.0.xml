@@ -25,7 +25,7 @@
         <tagDatabase tag="v1.80.1"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-    <changeSet id="20260401-1" author="jainshrk">
+    <changeSet id="20260401-5397-1" author="jainshrk">
         <addColumn tableName="entity_workflow_state">
             <column name="version"
                     type="bigint"
