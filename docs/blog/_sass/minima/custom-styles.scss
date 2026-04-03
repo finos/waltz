@@ -1,0 +1,113 @@
+// Custom overrides for the Waltz blog post listing
+
+// Post list item: card-style with border, padding and shadow
+.post-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.post-item {
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #4a90d9;
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Meta row: date + category tags on same line
+.post-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.post-meta {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.post-category {
+  font-size: 0.75rem;
+  background: #eef4fb;
+  color: #4a90d9;
+  border-radius: 3px;
+  padding: 1px 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// Post title: keep it readable, not huge
+.post-item-title {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+  line-height: 1.4;
+
+  .post-link {
+    display: inline;
+    font-size: inherit;
+    color: #2c5f9e;
+    font-weight: 600;
+
+    &:hover {
+      color: #1a3f6f;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Excerpt: plain, moderate size, muted
+.post-excerpt {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 12px;
+
+  // Suppress any stray heading tags that slip through
+  h1, h2, h3, h4 {
+    font-size: 0.95rem;
+    font-weight: normal;
+    margin: 0;
+  }
+}
+
+// Read more link
+.read-more {
+  font-size: 0.875rem;
+  color: #4a90d9;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: #1a3f6f;
+  }
+}
+
+// Post page: keep h1 inside post content proportionate
+.post-content {
+  h1 {
+    font-size: 1.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.3rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+}
+

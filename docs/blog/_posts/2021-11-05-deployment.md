@@ -9,6 +9,8 @@ categories: waltz deployment screencast
 
 In October 2021 we gave a short talk at the FINOS members-only meetup in London which detailed how to get Waltz up and running quickly.
 
+<!--more-->
+
 We have re-recorded the session and have posted it up onto YouTube. 
 
 Topics covered:

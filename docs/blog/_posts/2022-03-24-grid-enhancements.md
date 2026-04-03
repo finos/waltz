@@ -14,6 +14,8 @@ Notable enhancements are:
 - app group / data type / metadata column support
 - improved filtering and sharing grids with other users
 
+<!--more-->
+
 The screencast below gives an overview of grids; how to use them and how to create them.
 
 

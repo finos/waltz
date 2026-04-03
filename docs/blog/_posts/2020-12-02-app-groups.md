@@ -9,6 +9,8 @@ categories: waltz
 
 Application groups are a useful feature to quickly create ad-hoc collections of applications for analysis.  Apps can be added individually or in bulk via a simple front end.
 
+<!--more-->
+
 The screencast below shows the fetaure in action.  
 
 [![Waltz: App Groups](http://img.youtube.com/vi/OfpkqNEzVoE/0.jpg)](http://www.youtube.com/watch?v=OfpkqNEzVoE)

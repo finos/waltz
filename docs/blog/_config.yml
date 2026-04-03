@@ -1,0 +1,16 @@
+title: waltz
+description: Enterprise Information Service
+theme: minima
+baseurl: /blog
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-gist
+  - jemoji
+  - jekyll-mentions
+  - jekyll-include-cache
+
+# Show short previews for post listings on the home page.
+show_excerpts: true
+excerpt_separator: "<!--more-->"

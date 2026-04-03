@@ -8,6 +8,8 @@ categories: waltz
 # Screencast: Flow Diagrams and Overlays
 In this post we will look at the new _Flow Diagrams_ features introduced as part of [Waltz 1.34](https://github.com/finos/waltz/releases/tag/1.34).
 
+<!--more-->
+
 
 ## Flow Diagrams
 Flow diagrams have been part of Waltz for several years. In the 1.34 release we have taken the opportunity to rework their interface and add an overlay feature.  

@@ -10,6 +10,8 @@ categories: waltz
 To promote data quality Waltz supports attestations.
 In this short screencast Mark will walk you through how to ensure attestations are completed accurately.  
 
+<!--more-->
+
 [![Waltz: Mapping](http://img.youtube.com/vi/dZVWKXxzZWQ/0.jpg)](https://www.youtube.com/watch?v=dZVWKXxzZWQ)
 
 

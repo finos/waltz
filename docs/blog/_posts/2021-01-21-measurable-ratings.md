@@ -9,6 +9,8 @@ categories: waltz
 
 Waltz allows users to map applications to multiple taxonomies using custom rating schemes.  This lets you describe different sets of characteristics about applications.
 
+<!--more-->
+
 In this screencast Mark will take you through how to enter this data into Waltz.  
 
 [![Waltz: Mapping](http://img.youtube.com/vi/wDHuELvvxM4/0.jpg)](https://www.youtube.com/watch?v=wDHuELvvxM4)

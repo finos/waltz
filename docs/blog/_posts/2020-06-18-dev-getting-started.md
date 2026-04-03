@@ -10,4 +10,6 @@ categories: waltz dev
 If you would like to set Waltz up in a development environment check 
 out this screencast:
 
+<!--more-->
+
 [Setting Up Waltz from scratch for developers](https://www.youtube.com/watch?v=-wiZK3jOZ2E)  (YouTube)

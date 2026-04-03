@@ -8,6 +8,8 @@ categories: waltz
 # Tutorial: Creating Conditional Surveys
 In this tutorial we will look at the new _Custom Environments_ feature introduced as part of [Waltz 1.32](https://github.com/finos/waltz/releases/tag/1.32).
 
+<!--more-->
+
 
 ## Custom Environments
 Custom environments can be used to group together databases and servers to express a user-defined environment - for example SIT, UAT etc.

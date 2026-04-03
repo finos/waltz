@@ -10,6 +10,8 @@ categories: waltz screencast
 In this screencast [Mark Guerriero](https://www.linkedin.com/in/mark-guerriero-2289421a/) 
 walks you through creating/removing and editing Logical flows in Waltz. 
 
+<!--more-->
+
 Click the image below to watch the video
 [![Waltz: Introducing Favourites](http://img.youtube.com/vi/6MhKcnzxngA/0.jpg)](https://www.youtube.com/watch?v=6MhKcnzxngA "Waltz: Detailing Logicial Flows")
 

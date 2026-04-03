@@ -9,6 +9,8 @@ categories: waltz dev
 
 Surveys continue to be one of the most used features of Waltz.  However, some users are being asked to complete or approve many, many surveys.   To help users understand what is being asked of them, and the associated deadlines, we have reworked the survey screens to make things clearer.
 
+<!--more-->
+
 The screencast below shows then enhancement in action.
 
 [![Waltz: Survey Improvements](http://img.youtube.com/vi/kbOC01e3aTI/0.jpg)](http://www.youtube.com/watch?v=kbOC01e3aTI)
