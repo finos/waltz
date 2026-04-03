@@ -2,7 +2,7 @@
 layout: post
 title:  "Screencast: Survey Improvements"
 date:   2022-02-10
-categories: waltz dev
+categories: waltz dev screencast
 ---
 
 # Waltz 1.39 Survey Improvements
@@ -13,7 +13,7 @@ Surveys continue to be one of the most used features of Waltz.  However, some us
 
 The screencast below shows then enhancement in action.
 
-[![Waltz: Survey Improvements](http://img.youtube.com/vi/kbOC01e3aTI/0.jpg)](http://www.youtube.com/watch?v=kbOC01e3aTI)
+{% include youtube.html id="kbOC01e3aTI" title="Waltz Survey Improvements" %}
 
 
 

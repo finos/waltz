@@ -15,5 +15,5 @@ of the ddl files in Waltz.
 
 <!--more-->
 
-[![Waltz Dev: Schema Modifications](http://img.youtube.com/vi/rIAJd-Ko8YA/0.jpg)](http://www.youtube.com/watch?v=rIAJd-Ko8YA "Waltz Dev: Schema Modifications")
+{% include youtube.html id="rIAJd-Ko8YA" title="Waltz Dev Schema Modifications" %}
 

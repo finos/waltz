@@ -13,7 +13,7 @@ takes us through creating/removing and editing physical flows in Waltz.
 <!--more-->
 
 Click the image below to watch the video
-[![Waltz: Introducing Physical Flows](http://img.youtube.com/vi/YMka-1-zA1M/0.jpg)](https://www.youtube.com/watch?v=YMka-1-zA1M&list=PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4 "Waltz: Detailing Logicial Flows")
+{% include youtube.html id="YMka-1-zA1M" list="PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4" title="Waltz Detailing Physical Flows" %}
 
 If you have questions please contact us via [Github issues](https://github.com/finos/waltz/issues/).
 

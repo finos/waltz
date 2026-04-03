@@ -13,7 +13,7 @@ walks you through creating/removing and editing Logical flows in Waltz.
 <!--more-->
 
 Click the image below to watch the video
-[![Waltz: Introducing Favourites](http://img.youtube.com/vi/6MhKcnzxngA/0.jpg)](https://www.youtube.com/watch?v=6MhKcnzxngA "Waltz: Detailing Logicial Flows")
+{% include youtube.html id="6MhKcnzxngA" title="Waltz Detailing Logical Flows" %}
 
 
 If you have questions please contact us via [Github issues](https://github.com/finos/waltz/issues/).

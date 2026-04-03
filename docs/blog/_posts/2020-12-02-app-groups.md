@@ -2,7 +2,7 @@
 layout: post
 title:  "Screencast: Creating App Groups"
 date:   2020-12-02
-categories: waltz 
+categories: waltz screencast
 ---
 
 # Screencast: Creating App Groups
@@ -13,7 +13,7 @@ Application groups are a useful feature to quickly create ad-hoc collections of 
 
 The screencast below shows the fetaure in action.  
 
-[![Waltz: App Groups](http://img.youtube.com/vi/OfpkqNEzVoE/0.jpg)](http://www.youtube.com/watch?v=OfpkqNEzVoE)
+{% include youtube.html id="OfpkqNEzVoE" title="Waltz App Groups" %}
 
 
 

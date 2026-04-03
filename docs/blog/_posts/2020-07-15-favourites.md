@@ -14,7 +14,7 @@ release (due late July 2020).
 
 Click the image below to watch the video
 
-[![Waltz: Introducing Favourites](http://img.youtube.com/vi/8rgda-DH15A/0.jpg)](http://www.youtube.com/watch?v=8rgda-DH15A "Waltz: Introducing Favourites")
+{% include youtube.html id="8rgda-DH15A" title="Waltz Introducing Favourites" %}
 
 
 This new feature allows you to quickly add applications into an (automatically created)

@@ -25,7 +25,7 @@ Topics covered:
 
 ## Screencast
 
-[![Waltz: Deployment - getting started](http://img.youtube.com/vi/iTFf9DyKz_s/0.jpg)](https://www.youtube.com/watch?v=iTFf9DyKz_s&list=PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4)
+{% include youtube.html id="iTFf9DyKz_s" list="PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4" title="Waltz Deployment Getting Started" %}
 
 ## Resources
 

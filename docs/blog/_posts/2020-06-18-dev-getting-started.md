@@ -2,7 +2,7 @@
 layout: post
 title:  "Screencast: Developers - Getting Started"
 date:   2020-06-18
-categories: waltz dev
+categories: waltz dev screencast
 ---
 
 # Screencast: Developers - Getting Started
@@ -12,4 +12,4 @@ out this screencast:
 
 <!--more-->
 
-[Setting Up Waltz from scratch for developers](https://www.youtube.com/watch?v=-wiZK3jOZ2E)  (YouTube)
+{% include youtube.html id="-wiZK3jOZ2E" title="Setting Up Waltz from Scratch for Developers" %}

@@ -2,7 +2,7 @@
 layout: post
 title:  "Screencast: Report Grid Improvements"
 date:   2022-03-24
-categories: waltz
+categories: waltz screencast
 ---
 
 # Waltz 1.40 Report Grid Enhancements
@@ -19,7 +19,7 @@ Notable enhancements are:
 The screencast below gives an overview of grids; how to use them and how to create them.
 
 
-[![Waltz: Report Grids](http://img.youtube.com/vi/q-n5aUQgc9o/0.jpg)](http://www.youtube.com/watch?v=q-n5aUQgc9o)
+{% include youtube.html id="q-n5aUQgc9o" title="Waltz Report Grids" %}
 
 
 

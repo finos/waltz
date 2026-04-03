@@ -11,6 +11,7 @@ DEST="${2:-${HOME}/waltz-blog-dev/}"
 SYNC_INTERVAL="${SYNC_INTERVAL:-1}"
 JEKYLL_HOST="${JEKYLL_HOST:-127.0.0.1}"
 JEKYLL_PORT="${JEKYLL_PORT:-4000}"
+JEKYLL_INCREMENTAL="${JEKYLL_INCREMENTAL:-1}"
 
 if [[ ! -x "$SYNC_SCRIPT" ]]; then
   echo "Missing or non-executable sync script: $SYNC_SCRIPT" >&2
@@ -47,4 +48,20 @@ trap cleanup EXIT INT TERM
 echo "Serving from $DEST"
 echo "Open: http://${JEKYLL_HOST}:${JEKYLL_PORT}/blog/"
 
-exec bundle exec jekyll serve --livereload --incremental --host "$JEKYLL_HOST" --port "$JEKYLL_PORT"
+JEKYLL_ARGS=(
+  exec
+  jekyll
+  serve
+  --livereload
+  --host "$JEKYLL_HOST"
+  --port "$JEKYLL_PORT"
+)
+
+if [[ "$JEKYLL_INCREMENTAL" == "1" ]]; then
+  echo "Mode: incremental rebuilds"
+  JEKYLL_ARGS+=(--incremental)
+else
+  echo "Mode: full rebuilds"
+fi
+
+exec bundle "${JEKYLL_ARGS[@]}"

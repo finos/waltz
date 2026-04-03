@@ -2,7 +2,7 @@
 layout: post
 title:  "Tutorial: Creating Custom Environments"
 date:   2021-04-28
-categories: waltz
+categories: waltz screencast
 ---
 
 # Tutorial: Creating Conditional Surveys
@@ -16,7 +16,7 @@ Custom environments can be used to group together databases and servers to expre
 
 ## Demonstration
 
-[![Waltz: Custom Environments](http://img.youtube.com/vi/fQY68pNTOJ4/0.jpg)](https://www.youtube.com/watch?v=fQY68pNTOJ4&list=PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4)
+{% include youtube.html id="fQY68pNTOJ4" list="PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4" title="Waltz Custom Environments" %}
 
 ## Usage
 You must have an involvement to an application if you wish to create or edit its environments and associated assets, these can be

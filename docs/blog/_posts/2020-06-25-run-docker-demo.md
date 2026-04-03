@@ -13,4 +13,4 @@ to quickly install and run a demo instance of Waltz
 
 <!--more-->
 
-[Waltz Running: Installing a demo of Waltz](https://www.youtube.com/watch?v=FW5kzmHqOso)  (YouTube)
+{% include youtube.html id="FW5kzmHqOso" title="Waltz Running Installing a Demo of Waltz" %}

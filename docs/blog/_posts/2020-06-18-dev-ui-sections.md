@@ -11,4 +11,4 @@ This screencast walks you through how sections in the UI are configured and adde
 
 <!--more-->
 
-[Waltz Dev: adding UI sections](https://www.youtube.com/watch?v=UJHP3FNLx98)  (YouTube)
+{% include youtube.html id="UJHP3FNLx98" title="Waltz Dev Adding UI Sections" %}
