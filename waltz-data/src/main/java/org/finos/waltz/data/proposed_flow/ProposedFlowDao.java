@@ -22,8 +22,6 @@ import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Record3;
@@ -33,7 +31,6 @@ import org.jooq.SelectFieldOrAsterisk;
 import org.jooq.SelectUnionStep;
 import org.jooq.Table;
 import org.jooq.TableField;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +118,7 @@ public class ProposedFlowDao {
         return proposedFlowRecord.getId();
     }
 
-    public int updateProposedFlowIds(long proposedFlowId, Long logicalFlowId, Long physicalFlowId, Long specificationId) {
+    public int updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(long proposedFlowId, Long logicalFlowId, Long physicalFlowId, Long specificationId) {
         return dsl.update(PROPOSED_FLOW)
                 .set(PROPOSED_FLOW.LOGICAL_FLOW_ID, logicalFlowId)
                 .set(PROPOSED_FLOW.PHYSICAL_FLOW_ID, physicalFlowId)

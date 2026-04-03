@@ -239,7 +239,7 @@ public class ProposedFlowWorkflowService {
             Optional.of(proposedFlow)
                     .filter(pf -> pf.flowDef().proposalType() == ProposalType.CREATE)
                     .filter(pf -> valueOf(pf.workflowState().state()) == ProposedFlowWorkflowState.FULLY_APPROVED)
-                    .ifPresent(pf -> proposedFlowDao.updateProposedFlowIds(
+                    .ifPresent(pf -> proposedFlowDao.updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(
                             pf.id(),
                             pf.logicalFlowId(),
                             pf.physicalFlowId(),
