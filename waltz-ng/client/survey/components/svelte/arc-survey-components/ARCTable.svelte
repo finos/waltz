@@ -28,7 +28,7 @@
 
     export let instanceId;
     export let question;
-    export let currentResponse = "";
+    export let currentResponse;
     export let mode;
     export let linkedEntityKind = null;
     export let linkedEntityId = null;
