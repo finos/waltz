@@ -32,7 +32,9 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.ADD;
 import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -52,6 +55,9 @@ public class EntityWorkflowService {
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowResultDao entityWorkflowResultDao;
+    private static final String STATE_CHANGE_LOG = "Entity Workflow State changed for [proposedFlowId=%d] to %s";
+    private static final String TRANSITION_CHANGE_LOG = "Entity Workflow Transition saved for [proposedFlowId=%d] with from: %s to: %s State";
+    private static final String CREATE_FLOW_CHANGE_LOG = "New Workflow Created with [proposedFlowId=%d]";
 
     @Autowired
     public EntityWorkflowService(ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
@@ -98,26 +104,32 @@ public class EntityWorkflowService {
                 username, prevState, newState, transitionReason);
 
         List<ChangeLog> changeLogList = Arrays.asList(
-                mkChangeLog(ref, username, ADD, "New Workflow Created"),
-                mkChangeLog(ref, username, ADD, format("Entity Workflow State changed to %s", newState)),
-                mkChangeLog(ref, username, ADD,
-                        format("Entity Workflow Transition saved with from: %s to: %s State", PROPOSED_CREATE, newState))
+                mkChangeLog(ref, username, ADD, format(CREATE_FLOW_CHANGE_LOG,ref.id())),
+                mkChangeLog(ref, username, ADD, format(STATE_CHANGE_LOG, ref.id(), newState)),
+                mkChangeLog(ref, username, ADD, format(TRANSITION_CHANGE_LOG, ref.id(), PROPOSED_CREATE, newState))
         );
         changeLogService.write(changeLogList);
     }
 
     public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
-                                      String currentState, String newState) {
-        entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
-                username, newState);
+                                      String currentState, String newState) throws TransitionUpdateFailedException {
+        long updatedRows = entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
+                username, ImmutableEntityWorkflowState
+                        .copyOf(workflowState)
+                        .withState(newState));
+
+        if(updatedRows == 0L) {
+            throw new TransitionUpdateFailedException("Workflow state update failed.");
+        }
+
         entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
                 username, currentState, newState, reason);
 
         List<ChangeLog> changeLogList = Arrays.asList(
                 mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format("Entity Workflow State changed to %s", newState)),
+                        format(STATE_CHANGE_LOG, workflowState.entityReference().id(), newState)),
                 mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format("Entity Workflow Transition saved with from: %s to: %s State", currentState, newState))
+                        format(TRANSITION_CHANGE_LOG, workflowState.entityReference().id(), currentState, newState))
         );
         changeLogService.write(changeLogList);
     }
