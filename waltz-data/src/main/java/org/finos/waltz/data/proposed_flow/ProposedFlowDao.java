@@ -442,10 +442,10 @@ public class ProposedFlowDao {
         return dsl
                 .selectDistinct(PROPOSED_FLOW.PHYSICAL_FLOW_ID)
                 .from(PROPOSED_FLOW)
-                .join(ENTITY_WORKFLOW_STATE).on(EntityKind.PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
+                .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
                         .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
-                .where(EntityKind.PROPOSED_FLOW.PROPOSAL_TYPE.in(
+                .where(PROPOSED_FLOW.PROPOSAL_TYPE.in(
                         ProposalType.EDIT.name(),
                         ProposalType.DELETE.name()))
                 .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
