@@ -713,19 +713,19 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 APPROVE,
                 testStem,
                 ImmutableProposedFlowActionCommand
-                    .builder()
-                    .comment(format("Approved by %s", testStem))
-                    .build());
+                        .builder()
+                        .comment(format("Approved by %s", testStem))
+                        .build());
 
         assertEquals(FULLY_APPROVED.name(), fullyApprovedActionResponse.workflowState().state());
     }
 
     private void mkRunnable(Long flowId,
-                                String user,
-                                List<ProposedFlowResponse> responses,
-                                List<ProposedFlowResponse> failures,
-                                CountDownLatch start,
-                                CountDownLatch end) {
+                            String user,
+                            List<ProposedFlowResponse> responses,
+                            List<ProposedFlowResponse> failures,
+                            CountDownLatch start,
+                            CountDownLatch end) {
         try {
             start.await(5, TimeUnit.SECONDS);
             ProposedFlowResponse proposedFlowActionResponse = proposedFlowWorkflowService.proposedFlowAction(flowId,
@@ -750,5 +750,40 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         } finally {
             end.countDown();
         }
+    }
+
+    @Test
+    public void testProposedFlowRecordHas_logicalFlowId_physicalFlowId_specificationId() {
+
+        // 1. Arrange ----------------------------------------------------------
+        Reason reason = proposedFlowWorkflowHelper.getReason();
+        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
+        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
+        Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
+
+        ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
+                .source(mkRef(APPLICATION, 101))
+                .target(mkRef(APPLICATION, 202))
+                .logicalFlowId(12345)
+                .physicalFlowId(12345)
+                .reason(reason)
+                .specification(physicalSpecification)
+                .flowAttributes(flowAttributes)
+                .dataTypeIds(dataTypeIdSet)
+                .proposalType(ProposalType.valueOf("CREATE"))
+                .build();
+
+        ProposedFlowCommandResponse response = proposedFlowWorkflowService.proposeNewFlow(USER_NAME, command);
+
+        // 2. Act --------------------------------------------------------------
+        ProposedFlowResponse proposedFlowResponse = proposedFlowWorkflowService.getProposedFlowResponseById(response.proposedFlowId());
+
+        // 3. Assert -----------------------------------------------------------
+        assertNotNull(response);
+        assertNotNull(proposedFlowResponse);
+        assertNotNull(proposedFlowResponse.logicalFlowId());
+        assertNotNull(proposedFlowResponse.physicalFlowId());
+        assertNotNull(proposedFlowResponse.specificationId());
     }
 }

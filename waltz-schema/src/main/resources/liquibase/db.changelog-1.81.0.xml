@@ -36,4 +36,37 @@
                               columnDataType="bigint"
                               columnName="version"/>
     </changeSet>
+
+    <changeSet id="20260401-5432-1" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="logical_flow_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="logical_flow_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260401-5432-2" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="physical_flow_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="physical_flow_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260401-5432-3" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="specification_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="specification_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
