@@ -713,19 +713,19 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
                 APPROVE,
                 testStem,
                 ImmutableProposedFlowActionCommand
-                    .builder()
-                    .comment(format("Approved by %s", testStem))
-                    .build());
+                        .builder()
+                        .comment(format("Approved by %s", testStem))
+                        .build());
 
         assertEquals(FULLY_APPROVED.name(), fullyApprovedActionResponse.workflowState().state());
     }
 
     private void mkRunnable(Long flowId,
-                                String user,
-                                List<ProposedFlowResponse> responses,
-                                List<ProposedFlowResponse> failures,
-                                CountDownLatch start,
-                                CountDownLatch end) {
+                            String user,
+                            List<ProposedFlowResponse> responses,
+                            List<ProposedFlowResponse> failures,
+                            CountDownLatch start,
+                            CountDownLatch end) {
         try {
             start.await(5, TimeUnit.SECONDS);
             ProposedFlowResponse proposedFlowActionResponse = proposedFlowWorkflowService.proposedFlowAction(flowId,
