@@ -153,48 +153,49 @@
                         <label for="name">
                             Name
                             <small class="text-muted">(required)</small>
+                            <span class="text-muted small"
+                                  style="font-style: italic; color: #999999; margin-left: 1em;">
+                                  Name of this specification
+                            </span>
                         </label>
-
                         <input class="form-control"
                                autocomplete="waltz-no-autocomplete"
                                type="text"
                                id="name"
                                bind:value={workingCopy.name}/>
                     </div>
-                    <div class="help-block">
-                        Name of this specification
+                    <div class="form-group">
+                        <EnumSelect options={dataFormatKinds}
+                                    bind:value={workingCopy.format}
+                                    mandatory="true"
+                                    name="Format"
+                                    description="Describes the structure of the data being transferred">
+                        </EnumSelect>
                     </div>
-
-                    <EnumSelect options={dataFormatKinds}
-                                bind:value={workingCopy.format}
-                                mandatory="true"
-                                name="Format">
-                        <div slot="help">
-                            Describes the structure of the data being transferred
-                        </div>
-                    </EnumSelect>
-
                     <div class="form-group">
                         <label for="description">
                             Description
+                            <span class="text-muted small"
+                                  style="font-style: italic; color: #999999; margin-left: 1em;">
+                                  Description of the specification
+                            </span>
                         </label>
                         <textarea class="form-control"
                                   id="description"
                                   rows="2"
                                   bind:value={workingCopy.description}/>
                     </div>
-                    <div class="help-block">Description of the specification</div>
-
                     <div class="form-group">
                         <label for="external-id">
                             External Id
+                            <span class="text-muted small"
+                                  style="font-style: italic; color: #999999; margin-left: 1em;">
+                                  External identifier for this specification
+                            </span>
                         </label>
                         <input class="form-control"
                                id="external-id"
                                bind:value={workingCopy.externalId}/>
-                    </div>
-                    <div class="help-block">
-                        External identifier for this specification
                     </div>
 
                     <button class="btn btn-skinny"

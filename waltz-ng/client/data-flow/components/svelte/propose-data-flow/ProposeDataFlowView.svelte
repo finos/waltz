@@ -104,7 +104,7 @@
             });
     }
 
-    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && !_.isEmpty($dataTypes) && !$skipDataTypes);
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && $proposalReason && !_.isEmpty($dataTypes));
     $: onDestroy(()=>resetStore())
 </script>
 
@@ -138,7 +138,7 @@
                 </div>
 
                 <div class="selection-step">
-                    <DataTypeSelectionStep primaryEntityRef={sourceEntity}/>
+                    <DataTypeSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalsEnabled}/>
                 </div>
 
                 <div class="selection-step">
@@ -157,7 +157,7 @@
                     <NoData type="error">
                         {$duplicateProposeFlowMessage}
                         <br>
-                        <a href={$existingProposeFlowId} target="_blank" rel="noreferrer">Go to Flow</a>
+                        <a href={$existingProposeFlowId} rel="noreferrer">Go to Flow</a>
                     </NoData>
                 </div>
                 {/if}

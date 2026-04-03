@@ -3,11 +3,15 @@
 
     export let value;
     export let customValue;
+    export let description = "";
 
 </script>
 
 <label for="basis-offset">
     Basis Offset
+    <span class="text-muted small" style="font-style: italic; color: #999999; margin-left: 1em;">
+        {description}
+    </span>
 </label>
 
 <select id="basis-offset"

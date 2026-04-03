@@ -21,377 +21,530 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Waltz - Enterprise architecture on the wire">
+    <meta name="description" content="Waltz is an open source enterprise architecture platform that turns fragmented technology data into a connected map of applications, flows, capabilities and ownership for faster decisions, audit readiness, and risk reduction.">
     <title>FINOS - Waltz</title>
-    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
-<!--[if lte IE 8]>
-
-    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/grids-responsive-old-ie-min.css">
-
-<![endif]-->
-<!--[if gt IE 8]><!-->
-    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/grids-responsive-min.css">
-<!--<![endif]-->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://use.fontawesome.com/b2532e0cae.js"></script>
-    <!--[if lte IE 8]>
-    <link rel="stylesheet" href="site/css/layouts/marketing-old-ie.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="site/css/layouts/marketing.css">
-    <!--<![endif]-->
+    <style>
+        .waltz-swiper .swiper-pagination-bullet {
+            background-color: #94a3b8;
+            opacity: 1;
+        }
+        .waltz-swiper .swiper-pagination-bullet-active {
+            background-color: #38bdf8;
+        }
+    </style>
 </head>
-<body>
-<div class="header">
-    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
-        <span class="pure-menu-heading" href="">
-            <img height='22px'
-                 class="pure-img-responsive"
-                 src="site/img/waltz_badge_bw_145px.png">
-        </span>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0G2YB07622"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-        <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">Home</a></li>
-            <li class="pure-menu-item"><a href="/blog/index.html" class="pure-menu-link">Blog</a></li>
-            <li class="pure-menu-item"><a href="https://github.com/finos/waltz/issues/new" class="pure-menu-link">Contact</a></li>
-            <li class="pure-menu-item"><a href="https://github.com/finos/waltz" class="pure-menu-link">Github</a></li>
-            <li class="pure-menu-item"><a href="https://demo.waltz.finos.org" class="pure-menu-link">Waltz Demo</a></li>
-        </ul>
-    </div>
-</div>
+    gtag('config', 'G-0G2YB07622');
+</script>
+<body class="font-sans text-gray-700 bg-white">
 
-<div class="splash-container"
-     style="background-repeat: no-repeat; background-size: cover; background-image: url(site/img/cover_image.png)">
-    <div class="splash">
-        <img class="pure-img-responsive"
-             src="site/img/waltz_badge_mono_600px.png">
-        <p class="splash-subhead" style="color: white; margin-top: 40px; font-size: larger">
-            Enterprise Architecture on the Wire
+<!-- NAV -->
+<nav class="fixed top-0 left-0 right-0 z-50 shadow flex items-center justify-between px-6 py-3" style="background-color: #2a3142;">
+    <span>
+        <img height="22" class="h-6" src="site/img/waltz_badge_bw_145px.png" alt="Waltz Logo">
+    </span>
+    <ul class="flex flex-wrap gap-x-6 text-base font-medium">
+        <li><a href="#" class="text-slate-200 hover:text-blue-300 transition-colors">Home</a></li>
+        <li><a href="/blog/index.html" class="text-slate-200 hover:text-blue-300 transition-colors">Blog</a></li>
+        <li><a href="https://github.com/finos/waltz/issues/new" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Contact</a></li>
+        <li><a href="https://github.com/finos/waltz" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Github</a></li>
+        <li><a href="https://demo.waltz.finos.org" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Waltz Demo</a></li>
+    </ul>
+</nav>
+
+<!-- HERO / SPLASH -->
+<div class="pt-14 min-h-96 flex items-center justify-center bg-cover bg-center bg-no-repeat"
+     style="background-image: url(site/img/cover_image.png)">
+    <div class="text-center px-6 py-12">
+        <img class="mx-auto max-w-sm w-full" src="site/img/waltz_badge_mono_600px.png" alt="Waltz">
+        <p class="mt-10 text-white">
+            <span class="block text-3xl font-semibold">Your Enterprise Architecture</span>
+            <span class="block text-xl mt-2">Visible. Connected. Understood.</span>
         </p>
     </div>
 </div>
 
+<!-- MAIN CONTENT WRAPPER -->
+<div>
 
-<div class="content-wrapper">
-
-    <div class="content">
-        <!-- WHAT IS WALTZ -->
-        <h2 class="content-head is-center">What is Waltz ?</h2>
-
-        <div class="pure-g">
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-
-                <h3 class="content-subhead">
-                    <i class="fa fa-map-o"></i>
-                    Overview
-                </h3>
-                <p>
-                    In a nutshell Waltz allows you to visualize and define
-                    your organisation's technology landscape.  Think of it
-                    like a structured Wiki for your architecture.
-                </p>
-            </div>
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                <h3 class="content-subhead">
-                    <i class="fa fa-file-text-o"></i>
-                    Crowd source your architecture
-                </h3>
-                <p>
-                    A core belief behind Waltz is that technology information should be
-                    accessible by everyone within your organisation.  Furthermore
-                    employees are your best source of information about your technology
-                    landscape and should therefore be empowered to enhance and correct
-                    data.
-                </p>
-            </div>
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                <h3 class="content-subhead">
-                    <i class="fa fa-th-large"></i>
-                    Building blocks
-                </h3>
-                <p>
-                    Waltz blends information about your apps, capabilities,
-                    organisational units, people and more to build out a comprehensive
-                    set of views that allow you to focus on the details or zoom
-                    out to see the big picture.
-                </p>
-            </div>
-
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                <h3 class="content-subhead">
-                    <i class="fa fa-check-square-o"></i>
-                    Your model
-                </h3>
-                <p>
-                    Waltz is domain agnostic.  Define the models and structures that make
-                    sense for your organisation.
-                </p>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="content">
-        <!-- WHAT IS WALTZ -->
-        <h2 class="content-head is-center">Features</h2>
-
-        <div class="pure-g">
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/02_app_view.png">
-                    <i class="fa fa-map-o"></i>
-                    See your applications
-                </h3>
-                <p>
-                    Waltz presents data about your application.  Applications
-                    can be linked to capabilities, organisational units, people,
-                    servers, data types and more.   Once linked, the data
-                    is displayed and relationships can be navigated.
-                </p>
-                <p>
-                    Information in Waltz can be augmented manually to increase the
-                    value, comprehensiveness and accuracy of your application views.
-                </p>
-            </div>
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/05_person_view.png">
-                    <i class="fa fa-file-text-o"></i>
-                    Aggregate Views
-                </h3>
-                <p>
-                    Once applications have been linked to entities (such as
-                    organisational units, people and capabilities) you can
-                    navigate through dynamic views which show aggregate summaries
-                    of related applications etc.
-                </p>
-            </div>
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/03_detail-app_flows.png">
-                    <i class="fa fa-random"></i>
-                    See how an application is connected
-                </h3>
-                <p>
-                    How an application is connected to other applications in your organisation
-                    is a central part of Waltz.  We can describe upstream and downstream
-                    applications along with the data types exchanged.
-                </p>
-                <p>
-                    As this topology is created you may start to define authoritative sources
-                    for datatypes and see which applications are sourcing their data from approved
-                    golden sources.
-                </p>
-            </div>
-
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/07_detail-group_flows.png">
-                    <i class="fa fa-random"></i>
-                    See how your organisation is connected
-                </h3>
-                <p>
-                    Building upon an individual applications connections we can start to
-                    view how applications are connected when they are aggregated.
-                </p>
-                <p>
-                    If authoritative sources have been defined a organisational-unit level
-                    scorecard is produced showing what proportion of your logical data
-                    flows are being sourced from strategic systems.
-                </p>
-            </div>
-
-
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/09_entity_stats.png">
-                    <i class="fa fa-pie-chart"></i>
-                    Statistics
-                </h3>
-                <p>
-                    Define your own sets of statistic definitions and then
-                    use Waltz to navigate though the collected values
-                    using the structural entities relevant to you.
-                </p>
-            </div>
-
-            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-                <h3 class="content-subhead">
-                    <img class="pure-img-responsive"
-                         src="site/img/screenshots/08_group_edit.png">
-                    <i class="fa fa-folder"></i>
-                    Create and share custom groups
-                </h3>
-                <p>
-                    Waltz allows you to create custom, ad-hoc groups of applications.  This
-                    feature is often used to quickly understand a subset of your application
-                    portfolio.  For instance you may wish to create a group containing
-                    SOX relevant applications.
-                </p>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="ribbon l-box-lrg pure-g">
-        <!-- DEMO -->
-        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-4"></div>
-        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2">
-            <img class="pure-img-responsive"
-                 alt="Demo website"
-                 width="160"
-                 src="site/img/waltz_badge_negative_bw_300px.png">
-            <a href="https://demo.waltz.finos.org/" style="text-decoration: none">
-                <h2 class="is-center content-head content-head-ribbon" style="color: #a8cbf5;">
-                    Demo
-                </h2>
-            </a>
-            <p>
-                We have a <a href="https://demo.waltz.finos.org/" style="color: #a8cbf5">
-                demonstration website</a> available.
-                <i>Please</i> note that sample data is currently being created so not all features are demonstrated.
+    <!-- WHAT IS WALTZ -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">What is Waltz?</h2>
+        <div class="flex flex-col md:flex-row items-center gap-4 max-w-3xl mx-auto mb-12">
+            <img src="site/img/question_nodes.jpg" class="w-32 flex-shrink-0 rounded" alt="Question" />
+            <p class="text-gray-700 text-xl text-left">
+                Waltz is the open source platform that turns fragmented architecture information into a <strong>living, connected map</strong>
+                of applications, data flows, people, capabilities and change initiatives. <br><br>
+                It helps enterprise architecture, engineering, portfolio and risk teams answer critical questions with evidence instead of spreadsheets.
             </p>
         </div>
-        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-4"></div>
-    </div>
+    </section>
 
-
-    <div class="content">
-        <!-- HOW WALT FITS IN -->
-        <h2 class="content-head is-center">How Waltz fits into the EA Tooling landscape</h2>
-        <div class="pure-g">
-            <div class="l-box pure-u-1 pure-u-md-1-1">
-                <p>
-                    Waltz is designed to complement existing architecture-related solutions in your organisation
-                    (such as PowerDesigner, Archimate, Sparx or other Enterprise Architecture tools);
-                    it complements these solutions and enables integration with them as the need arises.
-                    Waltz is not intended to be a golden source of data other than for data attributes
-                    derived uniquely in the tool (e.g. ‘Estate Complexity’ score).
-                </p>
-
-                <p>
-                    As a general principle, Waltz presents read-only information about the organisation
-                    by aggregating data from numerous backend systems.  Where information is not readily
-                    available Waltz does provide basic edit capabilities to facilitate data capture.
-                </p>
-            </div>
-
-
-        </div>
-    </div>
-
-    <div class="ribbon l-box-lrg pure-g">
-        <!-- OPEN SOURCE -->
-        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2">
-            <img class="pure-img-responsive"
-                 alt="Hosted on Github"
-                 width="160"
-                 src="site/img/GitHub_icon_120px.png">
-            <img class="pure-img-responsive"
-                 alt="Built by Travis"
-                 width="160"
-                 src="site/img/TravisCI-Mascot-grey.png">
-            <br>
-
-        </div>
-    </div>
-
-    <div class="content">
-        <!-- TECH DETAILS -->
-        <h2 class="content-head is-center">Technical Details</h2>
-
-        <div class="pure-g">
-            <div class="l-box-lrg pure-u-1 pure-u-md-1-2">
-                <h4>
-                    <i class="fa fa-desktop"></i>
-                    Client Side</h4>
-                <p>
-                    Waltz is accessed via a web browser. Modern web browers are
-                    supported.  We have explicitly tested on:
-                    <ul>
-                        <li>Chrome</li>
-                        <li>Firefox</li>
-                        <li>Safari</li>
-                        <li>IE 11+</li>
-                    </ul>
-                </p>
-                <p>
-                    The application makes heavy use of AngularJS, lodash and D3 for interaction.
-                    Bootstrap and Fontawesome for look n' feel and is built using Webpack and SASS.
-                </p>
-
-                <h4>
-                    <i class="fa fa-unlock-alt"></i>
-                    Security
-                </h4>
-                <p>
-                    Waltz has a pluggable security system and can <i>authenticate</i> users
-                    against a built in set of user profiles or integrate with external
-                    systems such as SSO.  Contact us for more details.
-                </p>
-                <p>
-                    One authenticated users can be granted discrete privileges within the
-                    application for <i>authorization</i> purposes.  New uses can be granted
-                    a default set of permissions, we recommend using a generous set of
-                    defaults as Waltz works best when a diverse set of users contribute their
-                    knowledge.
-                </p>
-            </div>
-
-            <div class="l-box-lrg pure-u-1 pure-u-md-1-2">
-                <h4>
-                    <i class="fa fa-server"></i>
-                    Server Side
-                </h4>
-                <p>
-                    Waltz is built as a Java based web application.  We currently
-                    deploy to (embedded) Jetty and to Apache Tomcat (8+) server.  JDK 8
-                    is required to build and run Waltz.
-                </p>
-                <p>
-                    We recommend a 64 bit JVM running with a minimum of 1GB heap.
-                </p>
-                <p>
-                    Under the covers Waltz uses Spark Framework to expose endpoints,
-                    Spring for dependency injection, JOOQ for database access and we
-                    use Immutables for representing the domain object layer.
-                </p>
-
-                <h4>
-                    <i class="fa fa-database"></i>
-                    Database</h4>
-                <p>
-                    Waltz is being built to support MariaDB (currently supported),
-                    PostgreSQL (in progress) and Microsoft SQL Server (supported -however
-                    you will need to purchase a license for JOOQ to compile and build the
-                    system).
-                </p>
+    <!-- PROBLEM STATEMENT -->
+    <section class="py-16" style="background-color: #2e3444;">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-200 mb-6">Why We Built Waltz</h2>
+            <p class="text-gray-200 text-lg text-center max-w-3xl mx-auto mb-12">
+                Enterprise teams need to make high-impact technology decisions quickly, but architecture data is often fragmented,
+                hard to trust, and hard to connect across systems. Waltz addresses these core pains.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <img class="w-full h-40 object-cover rounded mb-4" src="site/img/hard_to_navigate.png" alt="Scattered architecture data">
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">Fragmented &amp; Outdated Data</h3>
+                    <p class="text-gray-600 text-lg">
+                        Critical architecture information lives in spreadsheets, disconnected tools, and tribal knowledge, making a reliable current-state view hard to maintain.
+                    </p>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <img class="w-full h-40 object-cover rounded mb-4" src="site/img/map_aerial_view.jpg" alt="Disconnected systems and navigation">
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">Slow, Cross-System Analysis</h3>
+                    <p class="text-gray-600 text-lg">
+                        Answering simple questions about capabilities, applications, data flows, and ownership often requires stitching together evidence from many systems.
+                    </p>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <img class="w-full h-40 object-cover rounded mb-4" src="site/img/incomplete_topology.png" alt="Incomplete topology" />
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">Audit &amp; Regulatory Pressure</h3>
+                    <p class="text-gray-600 text-lg">
+                        Regulatory and risk programmes like DORA, MiFID and Basel require accurate, explainable topology and lineage evidence, but many organisations struggle to produce it on demand.
+                    </p>
+                </div>
             </div>
         </div>
+    </section>
 
-    </div>
+    <!-- WALTZ CONNECTS THE DOTS -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-3xl font-bold text-gray-900">Waltz Connects the Dots</h2>
+            <p class="text-gray-700 text-lg mt-3">
+                Turn scattered architecture data into a shared operating model for change, governance and risk.<br>
+                <strong>Open</strong> to the organisation, <strong>enriched</strong> by the people closest to the estate.
+            </p>
+        </div>
 
-    <div class="footer l-box is-center">
-     
-        <a href="https://www.finos.org">
-            <img class="pure-img-responsive"
-                 alt="Demo website"
-                 width="75"
-                 src="site/img/finos_wordmark.svg">
-            <h3 style="color: #a8cbf5; text-decoration: none;">Proud Project of the Fintech Open Source Foundation</h3>
+        <div class="swiper waltz-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/17_living_architecture.png" alt="Integrated system flows">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Living Architecture Map</h3>
+                            <p class="text-slate-200 text-lg">
+                                Visualise your entire application estate and how every system connects, from logical data flows to physical implementations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/20_org_app_compliance.png" alt="Business unit technology footprint">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Org-to-App Compliance</h3>
+                            <p class="text-slate-200 text-lg">
+                                Navigate from a business unit to its full technology footprint instantly — costs, capabilities, data sources and team ownership.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/12_data_flows.png" alt="Data lineage and flows">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Data Lineage &amp; Golden Sources</h3>
+                            <p class="text-slate-200 text-lg">
+                                Track upstream and downstream data flows across your entire organisation. Identify authoritative data sources and flag non-compliant consumers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/16_edit_support.png" alt="People and ownership view">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Crowdsourced Accuracy</h3>
+                            <p class="text-slate-200 text-lg">
+                                Empower every employee to contribute and correct architecture data. The best source of information about your landscape is the people who work in it.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/14_roadmaps.png" alt="Future state architecture">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Roadmaps &amp; Future State</h3>
+                            <p class="text-slate-200 text-lg">
+                                Document planned application changes, retirements, and replacements. Align your technology roadmap with your strategy.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/19_surveys.png" alt="Assessment and data capture">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Surveys &amp; Assessments</h3>
+                            <p class="text-slate-200 text-lg">
+                                Issue targeted questionnaires to application owners. Collect structured data for compliance programmes, rationalisation exercises, and audits.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/15_report_grid.png" alt="Aggregated reporting">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Custom Report Grids</h3>
+                            <p class="text-slate-200 text-lg">
+                                Build powerful aggregated views. Slice your technology estate by any taxonomy, org unit, or data type — no SQL required.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-cover rounded-md" src="site/img/screenshots/18_kpis.png" alt="Business unit technology footprint">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">KPIs and Metrics</h3>
+                            <p class="text-slate-200 text-lg">
+                                Define and track your own architecture metrics. Measure the proportion of applications with golden source data, or the percentage of applications in scope for a regulatory programme.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="rounded-xl bg-slate-900 p-6 shadow-lg h-full min-h-[700px] flex flex-col">
+                        <img class="w-full h-[32rem] object-contain rounded-md" src="site/img/integration_architecture.png" alt="Integrated system flows">
+                        <div class="space-y-3 mt-auto pt-6">
+                            <h3 class="text-3xl font-semibold text-white text-left">Integrates, Doesn't Replace</h3>
+                            <p class="text-slate-200 text-lg">
+                                Waltz complements PowerDesigner, Archimate, Sparx and other EA tools. Aggregate data from your existing systems without ripping anything out.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination mt-6"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </section>
+
+
+    <!-- BUILT FOR THE PROBLEMS -->
+    <section class="py-16" style="background-color: #2e3444;">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-200 mb-12">Built for the Problems That Matter Most</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm min-h-[260px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-semibold text-gray-900 mb-4">Regulatory Compliance</h3>
+                            <p class="text-gray-600 text-lg">
+                                Generate application topology reports required for DORA, MiFID II, BCBS 239 and other regulatory programmes in minutes, not weeks.
+                            </p>
+                        </div>
+                        <img class="w-full md:w-40 h-28 object-contain rounded-md" src="site/img/business_cases/reg_compliance.png" alt="Regulatory compliance topology">
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm min-h-[260px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-semibold text-gray-900 mb-4">Application Rationalisation</h3>
+                            <p class="text-gray-600 text-lg">
+                                Identify duplicated capabilities, legacy applications, and cost-saving consolidation opportunities across your entire estate.
+                            </p>
+                        </div>
+                        <img class="w-full md:w-40 h-28 object-contain rounded-md" src="site/img/business_cases/app_rationalisation.png" alt="Application portfolio grouping">
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm min-h-[260px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-semibold text-gray-900 mb-4">Data Lineage &amp; Governance</h3>
+                            <p class="text-gray-600 text-lg">
+                                Track critical data flows from source to consumer. Define golden sources and measure compliance against them.
+                            </p>
+                        </div>
+                        <img class="w-full md:w-40 h-28 object-contain rounded-md" src="site/img/business_cases/lineage_governance.png" alt="Data lineage flows">
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm min-h-[260px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-semibold text-gray-900 mb-4">M&amp;A and Transformation Programmes</h3>
+                            <p class="text-gray-600 text-lg">
+                                Quickly understand the technology landscape of acquired entities. Model future-state architectures for major programmes.
+                            </p>
+                        </div>
+                        <img class="w-full md:w-40 h-28 object-contain rounded-md" src="site/img/business_cases/transformation_programmes.png" alt="Future-state architecture">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- USED BY -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Used by</h2>
+        <p class="text-gray-700 text-lg text-center max-w-3xl mx-auto mb-12">
+            Waltz is used by teams working through regulatory scope, application rationalisation, lineage and major transformation in complex enterprise environments.
+        </p>
+        <div class="flex flex-wrap justify-center items-center gap-12">
+            <a href="https://www.db.com/" target="_blank">
+                <img src="site/img/users/deutschebank_logo.png" class="h-32 w-auto object-contain" alt="Deutsche Bank">
+            </a>
+            <a href="https://www.natwest.com/" target="_blank">
+                <img src="site/img/users/natwest_logo.png" class="h-32 w-auto object-contain" alt="NatWest">
+            </a>
+            <a href="https://hmxlabs.io/data/" target="_blank">
+                <img src="site/img/users/hmxlabs_logo.png" class="h-8 w-auto object-contain" alt="HMX Labs">
+            </a>
+        </div>
+        <div class="max-w-4xl mx-auto mt-12 rounded-xl border border-slate-200 bg-slate-50 p-8 shadow-sm">
+            <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-2">Case Study</div>
+            <h3 class="text-2xl font-semibold text-gray-900">
+                <a href="https://hmxlabs.io/data/case-study/data-lineage-provenance.html"
+                   target="_blank"
+                   class="hover:text-sky-700 transition-colors">
+                    Data Lineage &amp; Provenance
+                </a>
+            </h3>
+            <p class="mt-4 text-lg leading-relaxed text-gray-700">
+                This case study shows how Waltz helps organisations turn fragmented architecture and data lineage information into an auditable, decision-ready view.
+                The result is faster regulatory response, clearer ownership, and stronger confidence in change programmes.
+            </p>
+            <div class="mt-6">
+                <a href="https://hmxlabs.io/data/case-study/data-lineage-provenance.html"
+                   target="_blank"
+                   class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                    Read the case study
+                </a>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <a href="mailto:waltz+owner@lists.finos.org?subject=Waltz: Add Company" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                Add your company
+            </a>
+        </div>
+    </section>
+
+    <!-- RECOGNITION & COVERAGE -->
+    <section class="py-16" style="background-color: #2e3444;">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-blue-200 mb-6">Recognition &amp; Coverage</h2>
+            <p class="text-gray-200 text-lg text-center max-w-3xl mx-auto mb-12">
+                Waltz has been recognised by FINOS, covered by external industry publications, and discussed by contributors and adopters across the ecosystem.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">FINOS</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">OpenUK Award</h3>
+                    <p class="text-gray-600 text-lg">
+                        Waltz received industry recognition through the OpenUK Finance Award, adding independent validation beyond the project itself.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://www.finos.org/blog/finos-waltz-project-takes-home-top-finance-prize-at-openuk-awards" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read the announcement
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">FinTech Futures</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">FinTech Futures</h3>
+                    <p class="text-gray-600 text-lg">
+                        FinTech Futures covered Deutsche Bank's decision to open source Waltz, helping position the project in a wider financial technology context.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://www.fintechfutures.com/baas/deutsche-bank-waltzes-into-open-source-space" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read the article
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">The Stack</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">The Stack</h3>
+                    <p class="text-gray-600 text-lg">
+                        The Stack highlighted Deutsche Bank's open source approach and the role Waltz plays in that broader enterprise engineering story.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://www.thestack.technology/deutsche-bank-waltz-distinguished-engineer-peter-thomas/" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read the article
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">Deutsche Bank</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">Deutsche Bank</h3>
+                    <p class="text-gray-600 text-lg">
+                        Deutsche Bank's own announcement remains one of the clearest statements of why Waltz was opened up and where it was being applied.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://www.db.com/news/detail/20180207-deutsche-bank-takes-next-step-in-open-source-journey" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read Deutsche Bank's post
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">NatWest</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">NatWest</h3>
+                    <p class="text-gray-600 text-lg">
+                        NatWest publicly highlighted code contribution by its Markets teams to Waltz, providing a visible signal of adoption and participation beyond the original contributing organisation.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://www.linkedin.com/posts/declan-ogorman_were-delighted-to-be-recognised-by-the-fintech-activity-7008805244058877952-2UQ9?utm_source=share&utm_medium=member_desktop&rcm=ACoAAAK4tt0Bz3PAsb01Zqqa_dwMLN-8vfxXF18" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read the announcement
+                        </a>
+                    </div>
+                </div>
+                <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg min-h-[320px] h-full flex flex-col">
+                    <div class="text-sm font-semibold uppercase tracking-wide text-sky-700 mb-3">HMx Labs</div>
+                    <h3 class="text-3xl font-semibold text-gray-900 mb-4">HMx Labs</h3>
+                    <p class="text-gray-600 text-lg">
+                        HMx Labs is actively engaged with Waltz, offering support, education, consultancy, and bespoke enhancements for enterprise needs.
+                    </p>
+                    <div class="mt-auto pt-6">
+                        <a href="https://cloudhpc.news/hmx-labs-waltz/" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                            Read the HMx Labs article
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-10 max-w-4xl mx-auto rounded-lg border border-slate-600 bg-slate-800/40 p-6">
+                <h3 class="text-2xl font-semibold text-blue-200 mb-3">Background &amp; Community Material</h3>
+                <p class="text-gray-200 text-lg">
+                    For broader context, see the original FINOS introduction to Waltz and the FINOS write-up covering the Waltz team’s public project presentation.
+                </p>
+                <div class="mt-4 flex flex-wrap gap-4">
+                    <a href="https://www.finos.org/blog/introduction-to-finos-waltz" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        Introduction to FINOS Waltz
+                    </a>
+                    <a href="https://www.finos.org/blog/waltz-team-introducing-waltz-an-open-enterprise-project" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        Waltz Team Event Write-up
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GET INVOLVED -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-3xl font-bold text-gray-800">Get Involved</h2>
+            <p class="text-gray-700 text-lg mt-3">
+                Waltz is built in the open by practitioners across the enterprise architecture community. Whether you want to shape the roadmap,
+                contribute code, or share how you use Waltz, you’re welcome.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Join the Waltz mailing list</h3>
+                <p class="text-gray-600 text-lg">
+                    Subscribe to updates and releases.
+                </p>
+                <div class="mt-auto pt-6">
+                    <a href="mailto:waltz+subscribe@lists.finos.org" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        Subscribe to updates
+                    </a>
+                </div>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Collaborate on GitHub</h3>
+                <p class="text-gray-600 text-lg">
+                    Report issues, request features, and contribute improvements.
+                </p>
+                <div class="mt-auto pt-6">
+                    <a href="https://github.com/finos/waltz" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        Visit GitHub
+                    </a>
+                </div>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Attend community sessions</h3>
+                <p class="text-gray-600 text-lg">
+                    Find working sessions and roadmap discussions in the FINOS calendar.
+                </p>
+                <div class="mt-auto pt-6">
+                    <a href="https://calendar.google.com/calendar/u/0/embed?src=finos.org_fac8mo1rfc6ehscg0d80fi8jig@group.calendar.google.com" target="_blank" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        View community calendar
+                    </a>
+                </div>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Share your use case</h3>
+                <p class="text-gray-600 text-lg">
+                    Tell us how your team uses Waltz.
+                </p>
+                <div class="mt-auto pt-6">
+                    <a href="mailto:waltz+owner@lists.finos.org?subject=Waltz: Share use case" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-700 hover:shadow-sm hover:shadow-sky-500/10">
+                        Share your use case
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEMO (ribbon) -->
+    <section class="text-white py-16" style="background-color: #2e3444;">
+        <div class="max-w-md mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-blue-200 mb-8">Demo</h2>
+            <a href="https://demo.waltz.finos.org/" target="_blank" class="inline-block transition hover:-translate-y-0.5">
+                <img class="mx-auto w-32 mb-6" alt="Demo website" src="site/img/waltz_badge_negative_bw_300px.png">
+            </a>
+            <p class="text-gray-200 text-lg leading-relaxed">
+                Explore the <a href="https://demo.waltz.finos.org/" target="_blank" class="text-blue-300 hover:text-blue-100 underline">demonstration website</a>
+                with realistic sample data covering applications, ownership, flows, reporting and change views.
+            </p>
+        </div>
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="text-gray-300 text-center py-10 px-6" style="background-color: #22283a;">
+        <a href="https://www.finos.org" class="inline-block mb-4">
+            <img class="mx-auto w-16 mb-2" alt="FINOS" src="site/img/finos_wordmark.svg">
+            <h3 class="text-blue-200 text-base font-medium">Proud Project of the Fintech Open Source Foundation</h3>
         </a>
-        <section ><a href="https://www.finos.org/privacy-policy" style="color: #a8cbf5; text-decoration: none;">FINOS Privacy Policy</a></section>
-        <section >Copyright @ 2020 Waltz / FINOS</section>
-    </div>
-
+        <div class="mt-2 text-base">
+            <a href="https://www.finos.org/privacy-policy" class="text-blue-300 hover:text-blue-100 underline">FINOS Privacy Policy</a>
+        </div>
+        <div class="mt-1 text-base text-gray-400">Copyright &copy; 2020 Waltz / FINOS</div>
+    </footer>
 
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const waltzSwiper = new Swiper(".waltz-swiper", {
+            slidesPerView: 1,
+            spaceBetween: 24,
+            loop: true,
+            autoplay: {
+                delay: 8000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+            },
+            pagination: {
+                el: ".waltz-swiper .swiper-pagination",
+                clickable: true
+            },
+            navigation: {
+                nextEl: ".waltz-swiper .swiper-button-next",
+                prevEl: ".waltz-swiper .swiper-button-prev"
+            },
+            breakpoints: {}
+        });
+    </script>
 </body>
 </html>

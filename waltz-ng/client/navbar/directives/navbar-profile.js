@@ -111,8 +111,12 @@ function controller($interval,
             })
             .then(r => {
                 const notificationSummaries = r.data.summary;
-                vm.notificationCountTotal = _.sumBy(notificationSummaries, "count");
-                vm.notificationsCountsByKind = _.keyBy(notificationSummaries, "kind");
+                // Only include proposed flow notifications in the total when the feature flag is enabled
+                const summariesForTotal = vm.dataFlowProposalsEnabled
+                    ? notificationSummaries
+                    : notificationSummaries.filter(s => s.kind !== "PROPOSED_FLOW");
+                vm.notificationCountTotal = _.sumBy(summariesForTotal, "count");
+                vm.notificationsCountsByKind = _.keyBy(summariesForTotal, "kind");
                 $scope.notificationMessage = r.data.message;
             });
     };

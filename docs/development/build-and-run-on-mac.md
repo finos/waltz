@@ -4,7 +4,7 @@ Welcome! This guide is to walk you through setting up your development environme
 This document describes how to:
 1. install Homebrew package manager
 1. install git
-1. install Java Development Kit 8 (OpenJDK)
+1. install Java Development Kit 17 (OpenJDK)
 1. install maven
 1. install Node.js
 1. install PostgreSQL and create the Waltz database
@@ -15,153 +15,132 @@ This document describes how to:
 This guide is made on 3rd February, 2023 with all versions of the components being latest at this point in time. As you may use this guide later in time, the versions can be different, but the following order and logic will be still applicable.
 
 # Step 1. Install Homebrew
-To install required dependencies on MacOS, use the Homebrew package manager. To check wether Homebrew is installed on your local machine, run the `brew --version` command in your Terminal
-user@macbook ~ % brew --version
+
+Waltz uses [Homebrew](https://brew.sh/) to install dependencies on macOS.
+
+**Check if Homebrew is installed:**
 ```bash
-Homebrew 3.6.20
-Homebrew/homebrew-core (git revision c7c38c40e91; last commit 2023-02-02)
-Homebrew/homebrew-cask (git revision cc05495e4c; last commit 2023-02-03)
+brew --version
 ```
 
-If you don't have Homebrew installed, then go to https://brew.sh/ and follow the installation steps.
+**Install Homebrew** (if not already installed):
+
+Visit https://brew.sh/ and follow the installation instructions.
 
 # Step 2. Install git
-MacOS comes with git provided, which can be checked via the `git --version` command
-```bash
-user@macbook ~ % git --version
-git version 2.24.1 (Apple Git-126)
-```
-if you don't have git installed, then install it via homebrew, using `brew install git` command in your Terminal.
 
-# Step 3. Install JDK 8
-To check wether Java Developer Kit version 8 is installed on your local machine, run the `java -version` command in your Terminal.
+macOS typically comes with git pre-installed.
 
+**Check if git is installed:**
 ```bash
-It should be Oracle JDK 8, it does not work with OpenJDK@8
-user@macbook ~ % java -version
-openjdk version "1.8.0_362"
-OpenJDK Runtime Environment (build 1.8.0_362-bre_2023_01_22_03_32-b00)
-OpenJDK 64-Bit Server VM (build 25.362-b00, mixed mode)
+git --version
 ```
 
-If you don't have JDK 8 installed, then install it via homebrew, using `brew install openjdk@8` then `export JAVA_HOME=/usr/local/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home` command in your Terminal.
-
-# Step 4. Install maven
-To check wether maven is installed on your local machine, run the `mvn --version` command in your Terminal. It is important that your maven points to JDK 8, otherwise your Waltz build will fail.
-
+**Install git** (if not already installed):
 ```bash
-user@macbook waltz % mvn --version
-Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)
-Maven home: /usr/local/Cellar/maven/3.8.7/libexec
-Java version: 1.8.0_362, vendor: Homebrew, runtime: /usr/local/Cellar/openjdk@8/1.8.0+362/libexec/openjdk.jdk/Contents/Home/jre
-Default locale: en_GB, platform encoding: UTF-8
-OS name: "mac os x", version: "13.1", arch: "x86_64", family: "mac"
+brew install git
 ```
 
-If you don't have maven installed, then install it via homebrew, using `brew install maven` command in your Terminal.
+# Step 3. Install JDK 17
+
+Waltz requires Java Development Kit 17 (OpenJDK). **Java 17 is required** - newer versions (18+) may cause annotation processing failures during compilation.
+
+**Check if JDK 17 is installed:**
+```bash
+java -version
+```
+
+**Install JDK 17** (if not already installed):
+```bash
+brew install openjdk@17
+```
+
+**Set JAVA_HOME** (add to your `~/.zshrc` or `~/.bashrc`):
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+> **Important:** If you have multiple Java versions installed, Maven will use whatever version is set in `JAVA_HOME`. If you see compilation errors about missing `Immutable*` classes (e.g., `ImmutableEntityReference`, `TransportKindValue`), it's likely because you're using a Java version newer than 17. Verify with `mvn --version` that Java 17 is being used.
+
+# Step 4. Install Maven
+
+Maven is used to build Waltz. It must be configured to use JDK 17.
+
+**Check if Maven is installed:**
+```bash
+mvn --version
+```
+
+Verify the output shows `Java version: 17.x.x`. If it shows a different Java version, ensure `JAVA_HOME` is set correctly.
+
+**Install Maven** (if not already installed):
+```bash
+brew install maven
+```
 
 
 # Step 5. Install Node.js
-To check wether Node.js is installed on your local machine, run the `node --version` command in your Terminal. It is important that your maven points to JDK 8, otherwise your Waltz build will fail.
 
+Node.js is required for building the Waltz front-end.
+
+**Check if Node.js is installed:**
 ```bash
-user@macbook waltz % node --version
-v19.6.0
+node --version
 ```
 
-If you don't have Node.js installed, then install it via homebrew, using `brew install node` command in your Terminal.
+**Install Node.js** (if not already installed):
+```bash
+brew install node
+```
 
 # Step 6. Install PostgreSQL
 
-To check wether PostgreSQL is installed on your local machine, run the `psql -V` command in your Terminal.
-
+**Check if PostgreSQL is installed:**
 ```bash
-user@macbook ~ % psql -V
-psql (PostgreSQL) 14.6 (Homebrew)
+psql -V
 ```
 
-If you don't have PostgreSQL installed, then install it via homebrew, using `brew install postgresql` command in your Terminal. Once PostgreSQL has been installed, create a folder to keep the database related files in then initialise the database with this folder. In this example, we will create a folder called 'waltz-db'. you have to init the database first using `initdb -D ./waltz-db` command in your Terminal.
-
+**Install PostgreSQL** (if not already installed):
 ```bash
-# in this example, we use the 'waltz-db' folder to store the PostgreSQL database files in
-WALTZ_DB_FOLDER=waltz-db
-
-# create the new folder
-user@macbook waltz-fork % mkdir $WALTZ_DB_FOLDER
-
-# initialise the PostgreSQL database in this folder
-user@macbook waltz-fork % initdb -D ./$WALTZ_DB_FOLDER 
-The files belonging to this database system will be owned by user "user".
-This user must also own the server process.
-
-The database cluster will be initialized with locale "en_GB.UTF-8".
-The default database encoding has accordingly been set to "UTF8".
-The default text search configuration will be set to "english".
-
-Data page checksums are disabled.
-
-fixing permissions on existing directory ./waltz-db ... ok
-creating subdirectories ... ok
-selecting dynamic shared memory implementation ... posix
-selecting default max_connections ... 100
-selecting default shared_buffers ... 128MB
-selecting default time zone ... Europe/London
-creating configuration files ... ok
-running bootstrap script ... ok
-performing post-bootstrap initialization ... ok
-syncing data to disk ... ok
-
-initdb: warning: enabling "trust" authentication for local connections
-You can change this by editing pg_hba.conf or using the option -A, or
---auth-local and --auth-host, the next time you run initdb.
-
-Success. You can now start the database server using:
-
-    pg_ctl -D ./waltz-db -l logfile start
-
-user@macbook waltz-fork % 
+brew install postgresql
 ```
 
-Once the database is created, we can start the PostgreSQL engine:
+## Initialize and Start the Database
 
+**Create a folder for database files and initialize:**
 ```bash
-# start the database engine
-user@macbook waltz-fork % pg_ctl -D ./waltz-db -l waltz-db.log start
-waiting for server to start.... done
-server started
-
-# track log file output (optional)
-user@macbook waltz-fork % tail -f ./waltz-db.log 
-2023-02-03 11:57:16.772 GMT [2532] LOG:  starting PostgreSQL 14.6 (Homebrew) on x86_64-apple-darwin22.1.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.202), 64-bit
-2023-02-03 11:57:16.774 GMT [2532] LOG:  listening on IPv6 address "::1", port 5432
-2023-02-03 11:57:16.774 GMT [2532] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2023-02-03 11:57:16.775 GMT [2532] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
-2023-02-03 11:57:16.778 GMT [2533] LOG:  database system was shut down at 2023-02-03 11:51:49 GMT
-2023-02-03 11:57:16.781 GMT [2532] LOG:  database system is ready to accept connections
+mkdir waltz-db
+initdb -D ./waltz-db
 ```
 
-Now that the database is up and running, we can connect to the database first then create the Waltz database scheme.
+**Start the PostgreSQL server:**
+```bash
+pg_ctl -D ./waltz-db -l waltz-db.log start
+```
 
+**Create the Waltz database:**
 ```bash
 psql postgres -c "create database waltz"
-CREATE DATABASE
 ```
 
-# Step 7. Configure maven profile for PostgreSQL database connection details
+# Step 7. Configure Maven Profile
 
-In order for the jOOQ Waltz component to be able to generate Java code from your database and let you build type safe SQL queries through its fluent API, we have to configure a maven profile, providing connection details to the PostreSQL database.
+Waltz uses Maven profiles to provide database connection details for jOOQ code generation and Liquibase schema management. You need to configure **two profiles**:
 
-This profile can be added to the maven settings located in your `~/.m2/settings.xml` file. After adding the database connection details, your settings.xml file can look like this
+1. **Database vendor profile** (defined in the project's `pom.xml`): `waltz-postgres`, `waltz-h2`, `waltz-mariadb`, or `waltz-mssql`
+2. **Database connection profile** (defined in your local `~/.m2/settings.xml`): Contains your specific connection details
+
+**Create or edit `~/.m2/settings.xml`:**
 
 ```xml
 <settings>
     <profiles>
-        <!-- Waltz PostgreSQL database profile for development -->
         <profile>
             <id>dev-postgres</id>
             <properties>
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
-                <database.user>user</database.user>
+                <database.user>your_username</database.user>
                 <database.password></database.password>
                 <database.schema>public</database.schema>
             </properties>
@@ -170,86 +149,54 @@ This profile can be added to the maven settings located in your `~/.m2/settings.
 </settings>
 ```
 
-# Step 8. Build Waltz from source code
+Replace `your_username` with your macOS username (or the PostgreSQL user you created).
 
-Now that all dependencies have been installed, the database is set up and configured, we can build Waltz from source code. This should be relatively easy to do so, as first we clone the source code repository then run the build command from the Terminal.
+> **Important:** Without this configuration, the Maven build will fail with errors like:
+> - `'dependencies.dependency.groupId' for ${jooq.group}:jooq:jar with value '${jooq.group}' does not match a valid id pattern`
+> - `Property 'database.url' must be specified`
+>
+> These errors indicate that the required Maven profiles are not activated or configured.
 
+# Step 8. Build Waltz
+
+**Clone the Waltz repository:**
 ```bash
-# clone Waltz source code repository
-user@macbook waltz-fork % git clone git@github.com:finos/waltz.git
-
-Cloning into 'waltz'...
-remote: Enumerating objects: 165819, done.
-remote: Counting objects: 100% (1987/1987), done.
-remote: Compressing objects: 100% (703/703), done.
-remote: Total 165819 (delta 820), reused 1869 (delta 784), pack-reused 163832
-Receiving objects: 100% (165819/165819), 49.41 MiB | 14.32 MiB/s, done.
-Resolving deltas: 100% (88392/88392), done.
-
-# change directory to the waltz main folder
-user@macbook waltz-fork % cd waltz
-
-# run the build
-user@macbook waltz % mvn clean compile -P waltz-postgres,dev-postgres
-# this process can take some time and will produce lots of log messages
-# so we only show you the last few lines of the build so you can check your build
-# was successful
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary for waltz 1.47-SNAPSHOT:
-[INFO] 
-[INFO] waltz .............................................. SUCCESS [  0.801 s]
-[INFO] waltz-common ....................................... SUCCESS [  1.288 s]
-[INFO] waltz-model ........................................ SUCCESS [  7.843 s]
-[INFO] waltz-schema ....................................... SUCCESS [  8.426 s]
-[INFO] waltz-data ......................................... SUCCESS [  4.215 s]
-[INFO] waltz-service ...................................... SUCCESS [  2.152 s]
-[INFO] waltz-web .......................................... SUCCESS [  2.359 s]
-[INFO] waltz-test-common .................................. SUCCESS [  0.383 s]
-[INFO] waltz-jobs ......................................... SUCCESS [  2.785 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  30.354 s
-[INFO] Finished at: 2023-02-03T16:06:08Z
-[INFO] ------------------------------------------------------------------------
+git clone git@github.com:finos/waltz.git
+cd waltz
 ```
+
+**Build Waltz:**
+```bash
+mvn clean compile -P waltz-postgres,dev-postgres
+```
+
+> **Note:** You must specify both profiles:
+> - `waltz-postgres` - the database vendor profile (from `pom.xml`)
+> - `dev-postgres` - your connection profile (from `~/.m2/settings.xml`)
+
+The build may take a few minutes. A successful build will end with `BUILD SUCCESS`.
+
+**Alternative: Quick start with H2 in-memory database**
+
+If you don't want to set up PostgreSQL, you can use the H2 in-memory database profile for a quick build:
+```bash
+mvn clean compile -P waltz-h2,dev-h2-inmem
+```
+
+> **Note:** The H2 profile is useful for development and testing, but data will not persist between runs.
 # Step 9. Run Waltz
 
-Now that we have built Waltz from source code, we can attempt to package and run it. This is very similar to building Waltz, and it is only to execute a maven command which packages up the Waltz code, create a configuration file setting up Waltz properties then execute a java command which starts Waltz from the Terminal.
-
+**Package Waltz:**
 ```bash
-# change directory to the waltz main folder
-user@macbook waltz-fork % cd waltz
-
-# run the packaging
-user@macbook waltz % mvn clean package -P waltz-postgres,dev-postgres
-# this process can take some time and will produce lots of log messages
-# so we only show you the last few lines of the package so you can check your build
-# was successful
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary for waltz 1.47-SNAPSHOT:
-[INFO] 
-[INFO] waltz .............................................. SUCCESS [  0.774 s]
-[INFO] waltz-common ....................................... SUCCESS [  8.387 s]
-[INFO] waltz-model ........................................ SUCCESS [  9.819 s]
-[INFO] waltz-schema ....................................... SUCCESS [ 10.296 s]
-[INFO] waltz-data ......................................... SUCCESS [  5.079 s]
-[INFO] waltz-service ...................................... SUCCESS [  3.022 s]
-[INFO] waltz-web .......................................... SUCCESS [02:24 min]
-[INFO] waltz-test-common .................................. SUCCESS [  0.541 s]
-[INFO] waltz-jobs ......................................... SUCCESS [  8.253 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  03:10 min
-[INFO] Finished at: 2023-02-03T16:22:47Z
-[INFO] ------------------------------------------------------------------------
+mvn clean package -P waltz-postgres,dev-postgres
 ```
 
-Waltz loads it's configuration from the Java classpaths and if no configuration found there then it falls back to the user's `~/.waltz/waltz.properties` file. The Waltz configuration properties file can have several parameters to set based on your custom needs. The following is an example configuration file.
-```
+## Configure Waltz Properties
+
+**Create `~/.waltz/waltz.properties`:**
+```properties
 database.url=jdbc:postgresql://localhost:5432/waltz
-database.user=user
+database.user=your_username
 database.password=
 database.schema=waltz
 database.driver=org.postgresql.Driver
@@ -257,36 +204,19 @@ jooq.dialect=POSTGRES
 
 database.pool.max=16
 
-waltz.from.email=user@macbook.com
-waltz.base.url=http://localhost:8000/
+waltz.from.email=your_email@example.com
+waltz.base.url=http://localhost:8443/
 ```
 
-We are now ready to start Waltz from the Terminal:
+Replace `your_username` and `your_email@example.com` with your details.
 
+**Start Waltz:**
 ```bash
-# change directory to the waltz main folder
-user@macbook waltz-fork % cd waltz
-
-# start Waltz (with your configuration file being in ~/.waltz/waltz.properties)
-user@macbook waltz % $JAVA_HOME/bin/java -cp ./waltz-web/target/waltz-web-jar-with-dependencies.jar org.finos.waltz.web.Main 
-
-
-    :::       :::     :::     :::    ::::::::::: ::::::::: 
-    :+:       :+:   :+: :+:   :+:        :+:          :+:  
-    +:+       +:+  +:+   +:+  +:+        +:+         +:+   
-    +#+  +:+  +#+ +#++:++#++: +#+        +#+        +#+    
-    +#+ +#+#+ +#+ +#+     +#+ +#+        +#+       +#+     
-     #+#+# #+#+#  #+#     #+# #+#        #+#      #+#      
-      ###   ###   ###     ### ########## ###     #########
-
- 
---WALTZ---------------------------------------------
-Home is: /Users/user
-Listening on port: 8443
-SSL Enabled: false
-----------------------------------------------------
+$JAVA_HOME/bin/java -cp ./waltz-web/target/waltz-web-jar-with-dependencies.jar org.finos.waltz.web.Main
 ```
 
-If you get a error saying Java not found, then revisit the step where we installed JDK 8 and set the JAVA_HOME variable. Perhaps you have to reset this JAVA_HOME variable again.
+> **Note:** If you get a "Java not found" error, ensure `JAVA_HOME` is set correctly (see Step 3).
+
 # Congratulations!
-Now you can start exploring Waltz by opening [http://localhost:8443/](http://localhost:8443/)!
+
+Waltz is now running! Open [http://localhost:8443/](http://localhost:8443/) in your browser.

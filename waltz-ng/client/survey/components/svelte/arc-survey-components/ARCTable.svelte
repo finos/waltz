@@ -19,7 +19,7 @@
 <script>
     import {arcSurveyState} from "./ARCSurveyState";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
-    import {ARC_DROPDOWN_DEFINITION, ARC_EXTERNAL_URL} from "../../../../common/constants";
+    import {ARC_DROPDOWN_DEFINITION, ARC_EXTERNAL_URL, REMOTE_API_STATUS} from "../../../../common/constants";
     import {architectureRequiredChangeStore} from "../../../../svelte-stores/architecture-required-changes";
     import {mkRef} from "../../../../common/entity-utils";
     import ARCTableEdit from "./ARCTableEdit.svelte";
@@ -28,7 +28,7 @@
 
     export let instanceId;
     export let question;
-    export let currentResponse = "";
+    export let currentResponse;
     export let mode;
     export let linkedEntityKind = null;
     export let linkedEntityId = null;
@@ -68,6 +68,8 @@
         && architectureRequiredChangeStore
         .findForLinkedEntityHierarchy(mkRef(linkedEntityKind, linkedEntityId));
 
+    $: isArcsLoaded = $arcHierarchyCall?.status === REMOTE_API_STATUS.LOADED;
+
     // a parent becomes the main arc for each row
     $: arcs = $arcHierarchyCall?.data.filter(t => !t.externalParentId);
 
@@ -98,22 +100,23 @@
 </script>
 
 <br/>
-{#if mode === MODES.EDIT}
-    <ARCTableEdit {arcs}
-                  {arcHierarchy}
-                  {tableHeadings}
-                  {url}
-                  {dropdownDefinition}
-                  {dropdownItems}
-                  currentResponse={parsedCurrentResponse ?? undefined}
-                  {instanceId}
-                  {question}/>
-{:else}
-    <ARCTableView arcs={parsedCurrentResponse?.map(t => t.entityRef)}
-                  arcHierarchy={parsedCurrentResponse?.flatMap(t => t.response)}
-                  {tableHeadings}
-                  {url}
-                  {dropdownDefinition}/>
+{#if isArcsLoaded}
+    {#if mode === MODES.EDIT}
+        <ARCTableEdit {arcs}
+                      {arcHierarchy}
+                      {tableHeadings}
+                      {url}
+                      {dropdownDefinition}
+                      {dropdownItems}
+                      currentResponse={parsedCurrentResponse ?? undefined}
+                      {instanceId}
+                      {question}/>
+    {:else}
+        <ARCTableView arcs={parsedCurrentResponse?.map(t => t.entityRef)}
+                      arcHierarchy={parsedCurrentResponse?.flatMap(t => t.response)}
+                      {tableHeadings}
+                      {url}
+                      {dropdownDefinition}/>
+    {/if}
 {/if}
-
 <br/>

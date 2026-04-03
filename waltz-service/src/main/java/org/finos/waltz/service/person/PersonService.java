@@ -29,6 +29,7 @@ import org.finos.waltz.model.person.PersonKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -130,4 +131,8 @@ public class PersonService {
         return personDao.findActivePeopleByEmails(emails);
     }
 
+    public List<Person> getByUserEmails(Collection<String> emails) {
+        checkNotNull(emails, "emails cannot be null");
+        return personDao.getByUserEmails(emails);
+    }
 }

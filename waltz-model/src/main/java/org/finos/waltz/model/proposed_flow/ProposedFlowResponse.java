@@ -3,6 +3,7 @@ package org.finos.waltz.model.proposed_flow;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.immutables.value.Value;
@@ -36,5 +37,11 @@ public abstract class ProposedFlowResponse {
 
     @Nullable
     public abstract Long specificationId();
+
+    @Nullable
+    public abstract CommandOutcome outcome();
+
+    @Nullable
+    public abstract String message();
 
 }

@@ -24,6 +24,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
+import { isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
 const bindings = {
@@ -41,6 +42,8 @@ const initialState = {
         editor: false,
         controls: false
     },
+    settings:null,
+    dataFlowProposalsEnabled:null
 };
 
 
@@ -53,6 +56,13 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
+
+        const settingsPromise = serviceBroker
+            .loadViewData(CORE_API.SettingsStore.findAll, [])
+            .then(r => {
+                vm.settings = r.data;
+                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
+            });
         const decoratedRef = vm.parentEntityRef
             ? vm.parentEntityRef
             : mkRef(entity.PHYSICAL_SPECIFICATION.key, vm.parentFlow.specificationId);

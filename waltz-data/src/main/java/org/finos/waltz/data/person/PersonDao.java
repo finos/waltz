@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -118,6 +119,22 @@ public class PersonDao {
                 .limit(1)
                 .fetchOne(personMapper);
     }
+
+    /**
+     * Finds people by user emails. If duplicates returns active one. Otherwise returns first.
+     * @param emails  email addresses of users
+     * @return List of Person objects
+     */
+    public List<Person> getByUserEmails(Collection<String> emails) {
+        checkNotNull(emails, "Cannot find people without emails");
+        return dsl
+                .select(PERSON.fields())
+                .from(PERSON)
+                .where(PERSON.EMAIL.in(emails))
+                .orderBy(PERSON.IS_REMOVED)
+                .fetch(personMapper);
+    }
+
     public List<String> findAllEmails(){
         return dsl.select(PERSON.EMAIL)
                 .from(PERSON)

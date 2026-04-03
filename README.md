@@ -11,15 +11,17 @@ Learn more
     - now part of the [Linux Foundation](https://www.linuxfoundation.org/blog/2020/04/finos-joins-the-linux-foundation/)
 
 Getting started
- - [Building](docs/development/build.md) 
+ - [Building](docs/development/build.md)
+ - [Building on Mac](docs/development/build-and-run-on-mac.md)
  - [Running](waltz-web/README.md)
  - [Docker](docker/README.md)
+.
 
 ---
 [![FINOS Hosted Platform - Waltz Demo](https://img.shields.io/badge/FINOS%20Hosted%20Platform-Waltz%20Demo-blue)](https://demo.waltz.finos.org/)
 [![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)](https://github.com/finos/waltz/actions)
 [![Latest Version](https://badgers.space/github/release/finos/waltz)](https://github.com/finos/waltz/releases)
-[![FINOS - Active](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-active.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Active)
+[![FINOS - Graduated](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-graduated.svg)](https://community.finos.org/docs/governance/lifecycle-stages/graduated)
 
 ## Corporate Contributors
 
@@ -33,13 +35,10 @@ Getting started
 
 ### Server
 
-- Java 8
-- Embedded Jetty or WAR file (tested on Tomcat 7/8)
-- Spark framework
+- Java 17 (OpenJDK)
+- Embedded Jetty or WAR file (tested on Tomcat 10)
+- Spark framework (2.9.4) compatible with Tomcat 10
 - JDBC via JOOQ
-
-See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full list of Java dependencies.
-
 
 ### Supported Databases
 

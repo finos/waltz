@@ -1,12 +1,18 @@
-version: "3.9"
-    
 services:
-  waltz:
-    image: ghcr.io/finos/waltz:latest
+  waltz-postgres:
+    image: ghcr.io/finos/waltz:postgres
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      platforms:
+#        - linux/amd64
+#        - linux/arm64
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   postgres:
     image: postgres:16
@@ -16,3 +22,15 @@ services:
       POSTGRES_PASSWORD: waltz
     ports:
       - 5432:5432
+    volumes:
+      - waltz_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -U waltz -d waltz
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+volumes:
+  waltz_pgdata:

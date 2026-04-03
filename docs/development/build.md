@@ -8,7 +8,7 @@ Waltz is built using [Maven](https://maven.apache.org/).
 
 - [Git](https://git-scm.com/)
 - [Maven 3](https://maven.apache.org/)
-- [JDK 8+](http://www.oracle.com/technetwork/java/javase/overview/index.html) (see note below)
+- [JDK 17](http://www.oracle.com/technetwork/java/javase/overview/index.html) (see note below)
 - [Node](https://nodejs.org/en/)
   - [NPM](https://www.npmjs.com/) v6+
 - [Sass](http://sass-lang.com/)
@@ -17,10 +17,11 @@ Waltz is built using [Maven](https://maven.apache.org/).
   - [Postgres](https://www.postgresql.org/)
 - [Liquibase](http://www.liquibase.org/) (recommended but not essential)
 - [_jOOQ Pro_](https://www.jooq.org/download/) (if using Microsoft SQL Server) 
+- Tomcat 10
 
 
 **Note**:
-When developing on JDK 9+ please ensure all class imports are explicit.
+When developing on JDK 17 please ensure all class imports are explicit.
 This is to prevent collisions between `java.lang.Record` and `org.jooq.Record` which can cause compilation errors (see issue: [#6678](https://github.com/finos/waltz/issues/6678))
 
 
@@ -30,7 +31,7 @@ It is recommended that you clone the repository on GitHub to maintain your own f
 
 ## Preparing the database
 
-For **Postgres** create a new daabase
+For **Postgres** create a new database
 ```
 create database waltz;
 ```
@@ -95,15 +96,46 @@ Typically one of two maven targets is executed.  For the first run (and whenever
 
 When running either variant you must provide the names of two profiles, firstly the generic database profile (either `waltz-postgres` or `waltz-mssql`) and the specific profile created in your `~/.m2/settings.xml` file (in the example above either `dev-postgres` or `dev-mssql`).
 
+Note: `waltz-mssql-alt` uses the newer Microsoft SQL Server driver and is intended to
+be the default going forward. The `waltz-mssql` profile remains for legacy users but
+is expected to change in a future release.
+
 ### Examples (using aliases)
 
 Below are some example maven command lines.  We typically register the command as an alias to save time.
 
 ```
 alias compile-postgres='mvn clean compile -P waltz-postgres,dev-postgres'
-alias compile-mssql='mvn clean compile -P waltz-mssql,dev-mssql'
+alias compile-mssql='mvn clean compile -P waltz-mssql-alt,dev-mssql'
 alias pkg-postgres='mvn clean package -P waltz-postgres,dev-postgres'
-alias pkg-mssql='mvn clean package -P waltz-mssql,dev-mssql'
+alias pkg-mssql='mvn clean package -P waltz-mssql-alt,dev-mssql'
+```
+
+## Integration tests
+
+Integration tests run in the `waltz-integration-test` module and are enabled via the
+`integration-tests` Maven profile. The tests support Postgres and MSSQL targets and
+can run using Docker (TestContainers) or embedded/fallback modes.
+
+Two system properties control the target database and provider:
+
+- `-Dtarget.db=postgres|mssql`
+- `-Ddb.provider=docker|embedded|auto`
+
+Defaults (when properties are not supplied):
+
+- `target.db` defaults to `mssql`
+- `db.provider` defaults to `embedded`
+
+When `target.db=mssql` and `db.provider=embedded`, the integration tests use H2 in
+MSSQL compatibility mode (they do not start a real SQL Server instance).
+
+Example commands (from repo root):
+
+```
+mvn clean package -P waltz-postgres,dev-postgres,integration-tests -Dtarget.db=postgres -Ddb.provider=docker
+mvn clean package -P waltz-mssql-alt,dev-mssql,integration-tests -Dtarget.db=mssql -Ddb.provider=docker
+mvn clean package -P waltz-postgres,dev-postgres,integration-tests -Dtarget.db=postgres -Ddb.provider=embedded
 ```
 
 
@@ -113,3 +145,22 @@ alias pkg-mssql='mvn clean package -P waltz-mssql,dev-mssql'
 mvn versions:set -DnewVersion=1.1.10
 mvn versions:commit
 ```
+
+# Technical Upgrade Info :
+# Java 17 Upgrade
+
+- Waltz has been upgraded to run on Java 17, moving from Java 8.
+- Developer Actions
+    - Please ensure your local development environment is configured to use JDK 17.
+    - Update your IDE settings (e.g., IntelliJ, Eclipse) to point to the JDK 17 installation.
+
+## Framework Upgrade
+- The web framework, Spark Java, has been upgraded from version 2.7.1 to 2.9.4.
+- Developer Impact
+    - There are no immediate code changes required for developers. The upgrade is backward compatible with our existing usage.
+    - This change helps keep Waltz current and secure by using a more recent version of its core web framework.
+
+## Key Changes
+- See [pom.xml](https://github.com/finos/waltz/pull/7400/changes#diff-9c5fb3d1b7e3b0f54bc5c4182965c4fe1f9023d449017cece3005d3f90e8e4d8) for a full list of Java dependencies against Java & Sparx upgrade.
+
+

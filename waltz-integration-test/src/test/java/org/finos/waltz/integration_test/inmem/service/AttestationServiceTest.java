@@ -24,13 +24,24 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdCommandResponse;
-import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.attestation.AttestEntityCommand;
+import org.finos.waltz.model.attestation.AttestationCreateSummary;
+import org.finos.waltz.model.attestation.AttestationInstance;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationStatus;
+import org.finos.waltz.model.attestation.ImmutableAttestEntityCommand;
+import org.finos.waltz.model.attestation.ImmutableAttestationRunCreateCommand;
+import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.service.attestation.AttestationRunService;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +55,16 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -68,6 +86,16 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private DSLContext dsl;
 
+    @Autowired
+    private PermissionGroupHelper permissionHelper;
+
+    @BeforeEach
+    public void cleanup() {
+        dsl.deleteFrom(ATTESTATION_INSTANCE).execute();
+        dsl.deleteFrom(ATTESTATION_RUN).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
+        dsl.deleteFrom(PERSON).execute();
+    }
 
     @Test
     public void basicRunCreation() {
@@ -133,12 +161,11 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         assertFalse(isEmpty(instances));
     }
 
-
-    //    @Test
+    @Test
     public void cannotAttestIfNoFlows() {
         long invId = involvementHelper.mkInvolvementKind(mkName("cannotAttestIfNoFlows"));
         String user = mkUserId("cannotAttestIfNotAssociated");
-        EntityReference appRef = mkNewAppRef();
+        EntityReference appRef = appHelper.createNewApp(mkName("a"), ouIds.a);
 
         involvementHelper.createInvolvement(
                 personHelper.createPerson(user),
@@ -151,9 +178,19 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .entityReference(appRef)
                 .build();
 
+        PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
+        permissionHelper.createDefaultPermGroup(defaultPg.getId());
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.LOGICAL_DATA_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
         assertThrows(
                 IllegalArgumentException.class,
-                () -> aiSvc.attestForEntity(user, cmd),
+                () -> aiSvc.attestForEntity(user, cmd, false),
                 "Should not be able to attest as no flows");
     }
 
