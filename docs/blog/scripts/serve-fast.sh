@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Serve the blog from a fast WSL-local mirror while periodically syncing edits from Windows.
+# Serve the docs site from a fast WSL-local mirror while periodically syncing edits from Windows.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SYNC_SCRIPT="${SCRIPT_DIR}/sync-to-wsl.sh"
-BLOG_ROOT_DEFAULT="$(cd "${SCRIPT_DIR}/.." && pwd)/"
+DOCS_ROOT_DEFAULT="$(cd "${SCRIPT_DIR}/../.." && pwd)/"
 
-SRC="${1:-$BLOG_ROOT_DEFAULT}"
-DEST="${2:-${HOME}/waltz-blog-dev/}"
+SRC="${1:-$DOCS_ROOT_DEFAULT}"
+DEST="${2:-${HOME}/waltz-docs-dev/}"
 SYNC_INTERVAL="${SYNC_INTERVAL:-1}"
 JEKYLL_HOST="${JEKYLL_HOST:-127.0.0.1}"
 JEKYLL_PORT="${JEKYLL_PORT:-4000}"
@@ -24,6 +24,7 @@ fi
 cd "$DEST"
 
 # Keep gems local to the mirror.
+export BUNDLE_GEMFILE="$DEST/blog/Gemfile"
 bundle config set --local path "vendor/bundle" >/dev/null
 bundle install >/dev/null
 
@@ -52,6 +53,7 @@ JEKYLL_ARGS=(
   exec
   jekyll
   serve
+  --config _config.yml
   --livereload
   --host "$JEKYLL_HOST"
   --port "$JEKYLL_PORT"

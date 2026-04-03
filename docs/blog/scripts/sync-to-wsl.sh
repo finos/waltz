@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Incrementally sync blog sources from Windows mount to a fast WSL-local mirror.
+# Incrementally sync docs sources from Windows mount to a fast WSL-local mirror.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BLOG_ROOT_DEFAULT="$(cd "${SCRIPT_DIR}/.." && pwd)/"
-SRC_DEFAULT="$BLOG_ROOT_DEFAULT"
-DEST_DEFAULT="${HOME}/waltz-blog-dev/"
+DOCS_ROOT_DEFAULT="$(cd "${SCRIPT_DIR}/../.." && pwd)/"
+SRC_DEFAULT="$DOCS_ROOT_DEFAULT"
+DEST_DEFAULT="${HOME}/waltz-docs-dev/"
 
 SRC="${1:-$SRC_DEFAULT}"
 DEST="${2:-$DEST_DEFAULT}"
@@ -34,7 +34,7 @@ if [[ "$DRY_RUN" == "1" ]]; then
   RSYNC_ARGS+=(--dry-run)
 fi
 
-echo "Syncing blog source"
+echo "Syncing docs source"
 echo "  from: $SRC"
 echo "    to: $DEST"
 
