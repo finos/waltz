@@ -83,7 +83,8 @@
         <h2.version>2.2.220</h2.version>
         <hikari.version>3.4.5</hikari.version>
         <immutables.version>2.9.3</immutables.version>
-        <jackson.version>2.15.2</jackson.version>
+        <jackson.version>2.21.1</jackson.version>
+        <jackson.annotations.version>2.21</jackson.annotations.version>
         <jackson-jsr310.version>2.15.2</jackson-jsr310.version>
         <java.version>17</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
@@ -173,7 +174,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson.annotations.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
