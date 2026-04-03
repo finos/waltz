@@ -120,4 +120,10 @@ public class PermissionGroupHelper {
         return ig;
     }
 
+    public void createDefaultPermGroup(Long pgId) {
+        dsl.update(PERMISSION_GROUP)
+                .set(PERMISSION_GROUP.IS_DEFAULT, true)
+                .where(PERMISSION_GROUP.ID.eq(pgId))
+                .execute();
+    }
 }

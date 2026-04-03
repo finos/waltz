@@ -22,7 +22,13 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupDetail;
+import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.AppGroupMember;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
+import org.finos.waltz.model.app_group.ImmutableAppGroup;
+import org.finos.waltz.model.app_group.ImmutableAppGroupMember;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.app_group.AppGroupSubscription;
 import org.junit.jupiter.api.Test;
@@ -33,7 +39,11 @@ import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
 
