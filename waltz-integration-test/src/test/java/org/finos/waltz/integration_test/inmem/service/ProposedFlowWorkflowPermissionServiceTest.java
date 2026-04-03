@@ -51,7 +51,6 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
 
     @BeforeEach
     void cleanUp() {
-
         dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();

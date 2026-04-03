@@ -32,16 +32,15 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
-import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
 import org.finos.waltz.model.physical_flow.ImmutableFlowAttributes;
+import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_flow.ImmutablePhysicalFlowCreateCommand;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
-import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
@@ -85,9 +84,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
-import static org.finos.waltz.data.proposed_flow.ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
-import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
@@ -95,6 +92,7 @@ import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULL
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.SOURCE_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.PROPOSED_FLOW;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -185,13 +183,18 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @BeforeEach
     public void setUp() {
-        dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
+        dsl.deleteFrom(PROPOSED_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_FLOW).execute();
         dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
         dsl.deleteFrom(LOGICAL_FLOW).execute();
         dsl.deleteFrom(ENTITY_WORKFLOW_STATE).execute();
         dsl.deleteFrom(INVOLVEMENT).execute();
         dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
 
         source = appHelper.createNewApp("source", ouIds.a);
         target = appHelper.createNewApp("target", ouIds.a1);
@@ -411,13 +414,14 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertEquals(physicalId, flowIdResponse.id());
     }
 */
-    //@Test//TODO: this test case is passing in local but failing in github finos, need to fix this issue later
+
+    @Test
     void twoStepApproval_shouldTransitionToFullyApproved_andCallOperation() throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
 
         // 1. Arrange ----------------------------------------------------------
         Reason reason = proposedFlowWorkflowHelper.getReason();
-        EntityReference owningEntity = proposedFlowWorkflowHelper.getOwningEntity();
-        PhysicalSpecification physicalSpecification = proposedFlowWorkflowHelper.getPhysicalSpecification(owningEntity);
+        Long specId = psHelper.createPhysicalSpec(source, "twoStepApproval_shouldTransitionToFullyApproved_andCallOperation");
+        PhysicalSpecification physicalSpecification = psSvc.getById(specId);
         FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
@@ -475,34 +479,6 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         ProposedFlowActionCommand targetApproveCommand = ImmutableProposedFlowActionCommand.builder()
                 .comment("Approved by target approver")
                 .build();
-
-        EntityWorkflowDefinition entityWorkflowDefinition = entityWorkflowService.searchByName(PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
-        entityWorkflowStateDao.createWorkflowState(entityWorkflowDefinition.id().get(), mkRef(PROPOSED_FLOW, proposedFlowId), USER_NAME, FULLY_APPROVED.name(), "test");
-
-        //Create new logical flow, physical specification and physical flow
-        EntityReference a = createCommand.source();
-        EntityReference b = createCommand.target();
-
-        LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
-        Long specId = psHelper.createPhysicalSpec(a, mkName("create"));
-        PhysicalSpecification spec = psSvc.getById(specId);
-
-        ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKindValue.of("DAILY"))
-                .criticality(CriticalityValue.of("MEDIUM"))
-                .transport(TransportKindValue.UNKNOWN)
-                .basisOffset(0)
-                .build();
-
-        ImmutablePhysicalFlowCreateCommand physicalFlwCreateCommand = ImmutablePhysicalFlowCreateCommand.builder()
-                .logicalFlowId(ab.entityReference().id())
-                .specification(spec)
-                .flowAttributes(flowAttrs)
-                .build();
-
-        PhysicalFlowCreateCommandResponse createResp = pfSvc.create(physicalFlwCreateCommand, mkName("create"));
-        assertEquals(CommandOutcome.SUCCESS, createResp.outcome(), "Can successfully create physical flows");
-
 
         // 3. Act --------------------------------------------------------------
         // Simulate a target approver approving the flow
