@@ -114,8 +114,20 @@ public class ProposedFlowDao {
         proposedFlowRecord.setTargetEntityId(proposedFlowCommand.target().id());
         proposedFlowRecord.setTargetEntityKind(proposedFlowCommand.target().kind().name());
         proposedFlowRecord.setProposalType(proposedFlowCommand.proposalType().name());
+        proposedFlowCommand.logicalFlowId().ifPresent(proposedFlowRecord::setLogicalFlowId);
+        proposedFlowCommand.physicalFlowId().ifPresent(proposedFlowRecord::setPhysicalFlowId);
+        proposedFlowCommand.specification().id().ifPresent(proposedFlowRecord::setSpecificationId);
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
+    }
+
+    public int updateProposedFlowIds(long proposedFlowId, Long logicalFlowId, Long physicalFlowId, Long specificationId) {
+        return dsl.update(PROPOSED_FLOW)
+                .set(PROPOSED_FLOW.LOGICAL_FLOW_ID, logicalFlowId)
+                .set(PROPOSED_FLOW.PHYSICAL_FLOW_ID, physicalFlowId)
+                .set(PROPOSED_FLOW.SPECIFICATION_ID, specificationId)
+                .where(PROPOSED_FLOW.ID.eq(proposedFlowId))
+                .execute();
     }
 
     public ProposedFlowResponse getProposedFlowResponseById(long id) {
@@ -138,17 +150,17 @@ public class ProposedFlowDao {
                             .stream()
                             .filter(e -> e.kind().equals(LOGICAL_DATA_FLOW))
                             .findFirst()
-                            .map(EntityReference::id).orElse(flowDefinition.logicalFlowId().orElse(null)))
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getLogicalFlowId()))
                     .physicalFlowId(entityWorkflowView.entityWorkflowResultList()
                             .stream()
                             .filter(e -> e.kind().equals(PHYSICAL_FLOW))
                             .findFirst()
-                            .map(EntityReference::id).orElse(flowDefinition.physicalFlowId().orElse(null)))
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getPhysicalFlowId()))
                     .specificationId(entityWorkflowView.entityWorkflowResultList()
                             .stream()
                             .filter(e -> e.kind().equals(PHYSICAL_SPECIFICATION))
                             .findFirst()
-                            .map(EntityReference::id).orElse(flowDefinition.specification().id().orElse(null)))
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getSpecificationId()))
                     .build();
 
         } catch (JsonProcessingException e) {
@@ -427,37 +439,19 @@ public class ProposedFlowDao {
             return Collections.emptySet();
         }
 
-        // Field representing the 'logicalFlowId' extracted from the JSON
-        Field<Long> logicalFlowIdField = DSL.field(
-                "JSON_VALUE({0}, {1})",
-                Long.class,
-                PROPOSED_FLOW.FLOW_DEF,
-                DSL.val("$.logicalFlowId"));
-
-        // Condition to filter proposals based on the logicalFlowId
-        Condition logicalFlowMatch = logicalFlowIdField.in(logicalFlowIds);
-
-        // Field representing the 'physicalFlowId' extracted from the JSON
-        Field<Long> physicalFlowIdField = DSL.field(
-                "JSON_VALUE({0}, {1})",
-                Long.class,
-                PROPOSED_FLOW.FLOW_DEF,
-                DSL.val("$.physicalFlowId"));
-
         return dsl
-                .selectDistinct(physicalFlowIdField)
+                .selectDistinct(PROPOSED_FLOW.PHYSICAL_FLOW_ID)
                 .from(PROPOSED_FLOW)
-                .join(ENTITY_WORKFLOW_STATE).on(PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
+                .join(ENTITY_WORKFLOW_STATE).on(EntityKind.PROPOSED_FLOW.ID.eq(ENTITY_WORKFLOW_STATE.ENTITY_ID)
                         .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
                         .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
-                .where(PROPOSED_FLOW.PROPOSAL_TYPE.in(
+                .where(EntityKind.PROPOSED_FLOW.PROPOSAL_TYPE.in(
                         ProposalType.EDIT.name(),
                         ProposalType.DELETE.name()))
                 .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
-                .and(logicalFlowMatch)
-                // Use the templated field for the IS NOT NULL check as well
-                .and(physicalFlowIdField.isNotNull())
-                .fetchSet(physicalFlowIdField);
+                .and(PROPOSED_FLOW.LOGICAL_FLOW_ID.in(logicalFlowIds))
+                .and(PROPOSED_FLOW.PHYSICAL_FLOW_ID.isNotNull())
+                .fetchSet(PROPOSED_FLOW.PHYSICAL_FLOW_ID);
     }
 
     private Condition getProposalTypeCondition(ProposalType proposalType) {
