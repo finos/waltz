@@ -1,0 +1,45 @@
+---
+layout: default
+---
+<article class="post h-entry space-y-8" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="pt-14 min-h-96 flex items-center justify-center bg-cover bg-center bg-no-repeat text-white" style="background-image: url('https://waltz.finos.org/site/img/cover_image.png')">
+    <div class="text-center px-6 py-12">
+      <img class="mx-auto max-w-sm w-full" src="https://waltz.finos.org/site/img/waltz_badge_mono_600px.png" alt="Waltz">
+      <div class="mt-8 text-white">
+        <span class="block text-xl md:text-2xl">Waltz Blog</span>
+        <h1 class="post-title p-name mt-3 text-3xl font-semibold leading-tight text-white md:text-5xl" itemprop="name headline">{{ page.title | escape }}</h1>
+      </div>
+      <p class="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-200 md:text-base">
+          <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+            {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+            {{ page.date | date: date_format }}
+          </time>
+          {%- if page.author -%}
+            • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
+          {%- endif -%}
+          {%- if page.categories and page.categories.size > 0 -%}
+            •
+            {%- for category in page.categories -%}
+              <span class="inline-flex items-center rounded bg-sky-50 px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-sky-700">{{ category }}</span>
+            {%- endfor -%}
+          {%- endif -%}
+      </p>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
+      <div class="post-content" itemprop="articleBody">
+        {{ content }}
+      </div>
+
+      {%- if site.disqus.shortname -%}
+        {%- include disqus_comments.html -%}
+      {%- endif -%}
+
+      <p class="mt-10 text-sm"><a class="inline-flex items-center font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ "/" | relative_url }}">&larr; Back to blog</a></p>
+    </div>
+  </div>
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>
+

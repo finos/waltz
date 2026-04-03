@@ -1,0 +1,21 @@
+<!-- Tailwind CDN for selective utility classes in blog templates. -->
+<link rel="icon" type="image/png" href="https://waltz.finos.org/site/img/waltz_circle_300px.png">
+<link rel="shortcut icon" href="https://waltz.finos.org/site/img/waltz_circle_300px.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false
+    },
+    theme: {
+      extend: {
+        colors: {
+          waltzNavy: "#2a3142",
+          waltzNavyAlt: "#2e3444",
+          waltzSky: "#4a90d9"
+        }
+      }
+    }
+  };
+</script>
+

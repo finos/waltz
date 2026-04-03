@@ -2,42 +2,63 @@
 layout: default
 ---
 
-<div class="home">
-  {%- if page.title -%}
-    <h1 class="page-heading">{{ page.title }}</h1>
-  {%- endif -%}
+<section class="home">
+  <section class="pt-14 min-h-96 flex items-center justify-center bg-cover bg-center bg-no-repeat text-white" style="background-image: url('https://waltz.finos.org/site/img/cover_image.png')">
+    <div class="text-center px-6 py-12">
+      <img class="mx-auto max-w-sm w-full" src="https://waltz.finos.org/site/img/waltz_badge_mono_600px.png" alt="Waltz">
+      <p class="mt-10 text-white">
+        <span class="block text-3xl font-semibold">{{ page.title | default: site.title }}</span>
+        <span class="block text-xl mt-2">{{ page.description | default: site.description }}</span>
+      </p>
+    </div>
+  </section>
 
-  {{ content }}
+  {%- assign page_content = content | strip -%}
+  {%- if page_content != "" -%}
+  <section class="mx-auto max-w-3xl px-6 py-16 text-center text-gray-700">
+    <div class="text-lg leading-8 md:text-xl">
+      {{ content }}
+    </div>
+  </section>
+  {%- endif -%}
 
   {%- if site.posts.size > 0 -%}
-    <h2 class="post-list-heading">{{ page.list_title | default: "Posts" }}</h2>
-    <ul class="post-list">
-      {%- for post in site.posts -%}
-      <li class="post-item">
-        <div class="post-item-meta">
-          {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-          <span class="post-meta">{{ post.date | date: date_format }}</span>
-          {%- for category in post.categories -%}
-            <span class="post-category">{{ category }}</span>
-          {%- endfor -%}
-        </div>
-        <h3 class="post-item-title">
-          <a class="post-link" href="{{ post.url | relative_url }}">
-            {{ post.title | escape }}
-          </a>
-        </h3>
-        {%- if site.show_excerpts -%}
-          <div class="post-excerpt">
-            {{ post.excerpt | strip_html | truncatewords: 40 }}
+  <section class="py-16 text-white" style="background-color: #2e3444;">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="mb-12 text-center">
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-sky-200">Latest Updates</p>
+        <h2 class="text-3xl font-bold text-white md:text-4xl">{{ page.list_title | default: "Posts" }}</h2>
+        <p class="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-300">Product updates, screencasts, release notes and implementation guidance from the Waltz community.</p>
+      </div>
+
+      <ul class="m-0 list-none space-y-6 p-0">
+        {%- for post in site.posts -%}
+        <li class="rounded-lg border border-slate-200 bg-white p-6 text-slate-900 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg md:p-8">
+          <div class="mb-3 flex flex-wrap items-center gap-2">
+            {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+            <span class="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">{{ post.date | date: date_format }}</span>
+            {%- for category in post.categories -%}
+              <span class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">{{ category }}</span>
+            {%- endfor -%}
           </div>
-          <a class="read-more" href="{{ post.url | relative_url }}">Read more &rarr;</a>
-        {%- endif -%}
-      </li>
-      {%- endfor -%}
-    </ul>
+          <h3 class="mb-3 text-2xl font-semibold leading-snug text-gray-900 md:text-3xl">
+            <a class="transition-colors hover:text-sky-700" href="{{ post.url | relative_url }}">
+              {{ post.title | escape }}
+            </a>
+          </h3>
+          {%- if site.show_excerpts -%}
+            <div class="post-excerpt mb-4 text-base leading-relaxed text-slate-700 md:text-lg">
+              {{ post.excerpt | strip_html | truncatewords: 40 }}
+            </div>
+          {%- endif -%}
+          <a class="inline-flex items-center text-sm font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ post.url | relative_url }}">Read more &rarr;</a>
+        </li>
+        {%- endfor -%}
+      </ul>
 
-    <p class="rss-subscribe">Subscribe <a href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
+      <p class="mt-8 text-sm text-slate-300">Subscribe <a class="font-semibold text-sky-200 hover:text-white" href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
+    </div>
+  </section>
   {%- endif -%}
-
-</div>
+</section>
 

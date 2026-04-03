@@ -1,113 +1,190 @@
-// Custom overrides for the Waltz blog post listing
+// Tailored blog polish while using Tailwind for layout and shell.
 
-// Post list item: card-style with border, padding and shadow
-.post-list {
-  margin-left: 0;
-  list-style: none;
+body {
+  margin: 0;
+  padding: 0;
+  color: #374151;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 }
 
-.post-item {
-  border: 1px solid #e0e0e0;
-  border-left: 4px solid #4a90d9;
-  border-radius: 4px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-  }
+ul,
+ol {
+  margin: 0;
 }
 
-// Meta row: date + category tags on same line
-.post-item-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.post-meta {
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.post-category {
-  font-size: 0.75rem;
-  background: #eef4fb;
-  color: #4a90d9;
-  border-radius: 3px;
-  padding: 1px 7px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-// Post title: keep it readable, not huge
-.post-item-title {
-  margin: 0 0 10px;
-  font-size: 1.25rem;
-  line-height: 1.4;
-
-  .post-link {
-    display: inline;
-    font-size: inherit;
-    color: #2c5f9e;
-    font-weight: 600;
-
-    &:hover {
-      color: #1a3f6f;
-      text-decoration: underline;
-    }
-  }
-}
-
-// Excerpt: plain, moderate size, muted
+// Keep post excerpts compact and clean in cards.
 .post-excerpt {
-  font-size: 0.95rem;
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 12px;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #374151;
 
-  // Suppress any stray heading tags that slip through
-  h1, h2, h3, h4 {
-    font-size: 0.95rem;
-    font-weight: normal;
+  h1,
+  h2,
+  h3,
+  h4 {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+    font-weight: 600;
+  }
+
+  p {
+    display: inline;
     margin: 0;
   }
 }
 
-// Read more link
-.read-more {
-  font-size: 0.875rem;
-  color: #4a90d9;
-  font-weight: 500;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-    color: #1a3f6f;
-  }
+.waltz-blog-hero {
+  background-color: #2a3142;
+  background-image: linear-gradient(135deg, rgba(42, 49, 66, 0.62), rgba(46, 52, 68, 0.68)), url("https://waltz.finos.org/site/img/cover_image.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-// Post page: keep h1 inside post content proportionate
+.waltz-blog-hero--full {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.waltz-blog-band--full {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background-color: #2e3444;
+}
+
+.site-footer--full {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.waltz-blog-hero__overlay {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: saturate(120%);
+}
+
+.waltz-site-header a[aria-current="page"] {
+  text-shadow: 0 0 18px rgba(147, 197, 253, 0.25);
+}
+
+.waltz-site-nav a,
+.waltz-site-nav a:visited {
+  color: #ffffff !important;
+}
+
+.waltz-site-nav a:hover,
+.waltz-site-nav a:focus {
+  color: #93c5fd !important;
+  text-decoration: none;
+}
+
+// Main post article typography.
 .post-content {
+  color: #374151;
+  line-height: 1.75;
+  font-size: 1.05rem;
+
+  > h1:first-child {
+    display: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #1f2937;
+    margin-top: 1.6rem;
+    margin-bottom: 0.65rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
   h1 {
-    font-size: 1.75rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 0.3rem;
+    font-size: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.35rem;
   }
 
   h2 {
-    font-size: 1.4rem;
-    margin-top: 1.4rem;
+    font-size: 1.55rem;
   }
 
   h3 {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
+  }
+
+  p,
+  ul,
+  ol,
+  pre,
+  blockquote,
+  table {
+    margin-bottom: 1rem;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.2rem;
+  }
+
+  blockquote {
+    border-left: 4px solid #93c5fd;
+    background: #f8fafc;
+    padding: 0.7rem 1rem;
+    color: #334155;
+  }
+
+  img {
+    border-radius: 0.4rem;
+    max-width: 100%;
+    height: auto;
+  }
+
+  a {
+    color: #0369a1;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  a:hover {
+    color: #075985;
+  }
+
+  code {
+    background: #f1f5f9;
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.92em;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
   }
 }
+
+.home p,
+.home ul,
+.home ol {
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.home a {
+  color: #0369a1;
+}
+
+.home a:hover {
+  color: #075985;
+}
+
+// Footer include already defines spacing/colors.
+.site-footer {
+  border-top: 0;
+  padding: 0;
+}
+
 
