@@ -46,7 +46,14 @@ excerpt_separator: "<!--more-->"
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
 exclude:
+  - .bundle/
+  - vendor/
+  - .jekyll-cache/
+  - .jekyll-metadata
   - blog/vendor/
   - blog/.bundle/
+  - blog/.jekyll-cache/
+  - blog/.jekyll-metadata
   - .sass-cache/
+  - blog/.sass-cache/
   - _site/
