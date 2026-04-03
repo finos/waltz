@@ -2,6 +2,7 @@
 layout: default
 ---
 <article class="post h-entry space-y-8" itemscope itemtype="http://schema.org/BlogPosting">
+  {%- assign site_root = site.github.url | default: site.baseurl | default: '' -%}
   <header class="pt-14 min-h-96 flex items-center justify-center bg-cover bg-center bg-no-repeat text-white" style="background-image: url('https://waltz.finos.org/site/img/cover_image.png')">
     <div class="text-center px-6 py-12">
       <img class="mx-auto max-w-sm w-full" src="https://waltz.finos.org/site/img/waltz_badge_mono_600px.png" alt="Waltz">
@@ -37,9 +38,9 @@ layout: default
         {%- include disqus_comments.html -%}
       {%- endif -%}
 
-      <p class="mt-10 text-sm"><a class="inline-flex items-center font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ "/blog/" | relative_url }}">&larr; Back to blog</a></p>
+      <p class="mt-10 text-sm"><a class="inline-flex items-center font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ site_root }}/blog/">&larr; Back to blog</a></p>
     </div>
   </div>
-  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+  <a class="u-url" href="{{ site_root }}{{ page.url }}" hidden></a>
 </article>
 

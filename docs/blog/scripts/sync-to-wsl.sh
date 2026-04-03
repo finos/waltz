@@ -26,6 +26,7 @@ RSYNC_ARGS=(
   --exclude=.bundle/
   --exclude=.jekyll-cache/
   --exclude=.jekyll-metadata
+  --exclude=.sass-cache/
   --exclude=_site/
   --exclude=vendor/bundle/
 )

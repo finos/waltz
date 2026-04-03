@@ -48,4 +48,5 @@ excerpt_separator: "<!--more-->"
 exclude:
   - blog/vendor/
   - blog/.bundle/
+  - .sass-cache/
   - _site/

@@ -3,6 +3,7 @@ layout: default
 ---
 
 <section class="home">
+  {%- assign site_root = site.github.url | default: site.baseurl | default: '' -%}
   <section class="pt-14 min-h-96 flex items-center justify-center bg-cover bg-center bg-no-repeat text-white" style="background-image: url('https://waltz.finos.org/site/img/cover_image.png')">
     <div class="text-center px-6 py-12">
       <img class="mx-auto max-w-sm w-full" src="https://waltz.finos.org/site/img/waltz_badge_mono_600px.png" alt="Waltz">
@@ -42,7 +43,7 @@ layout: default
             {%- endfor -%}
           </div>
           <h3 class="mb-3 text-2xl font-semibold leading-snug text-gray-900 md:text-3xl">
-            <a class="transition-colors hover:text-sky-700" href="{{ post.url | relative_url }}">
+            <a class="transition-colors hover:text-sky-700" href="{{ site_root }}{{ post.url }}">
               {{ post.title | escape }}
             </a>
           </h3>
@@ -51,12 +52,12 @@ layout: default
               {{ post.excerpt | strip_html | truncatewords: 40 }}
             </div>
           {%- endif -%}
-          <a class="inline-flex items-center text-sm font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ post.url | relative_url }}">Read more &rarr;</a>
+          <a class="inline-flex items-center text-sm font-semibold uppercase tracking-[0.18em] text-sky-700 hover:text-sky-900" href="{{ site_root }}{{ post.url }}">Read more &rarr;</a>
         </li>
         {%- endfor -%}
       </ul>
 
-      <p class="mt-8 text-sm text-slate-300">Subscribe <a class="font-semibold text-sky-200 hover:text-white" href="{{ "/blog/feed.xml" | relative_url }}">via RSS</a></p>
+      <p class="mt-8 text-sm text-slate-300">Subscribe <a class="font-semibold text-sky-200 hover:text-white" href="{{ site_root }}/blog/feed.xml">via RSS</a></p>
     </div>
   </section>
   {%- endif -%}

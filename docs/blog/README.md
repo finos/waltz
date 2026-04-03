@@ -11,6 +11,12 @@ This folder contains the Jekyll-based Waltz blog served under `/blog`.
 
 Shared Jekyll config and reusable includes now live one level up under `docs/`.
 
+Internal blog links are environment-aware:
+
+- local builds fall back to root-relative local paths
+- GitHub Pages fork builds use `site.github.url`
+- FINOS production continues to work at the custom domain root
+
 ## Running Locally
 
 From `docs/`:
@@ -27,6 +33,7 @@ Why this runs from `docs/`:
 - the blog content itself still lives in `docs/blog/`
 - `BUNDLE_GEMFILE=blog/Gemfile` keeps Bundler pointed at the blog Gemfile while serving from the docs root
 - `docs/_config.yml` excludes `blog/vendor/` and `blog/.bundle/` so Jekyll does not try to treat Bundler internals as site content
+- `docs/_config.yml` and the sync script exclude `.sass-cache/` so Sass cache files do not trigger endless rebuild loops
 
 Default local URL:
 
