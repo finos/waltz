@@ -1,7 +1,10 @@
 package org.finos.waltz.service.attestation;
 
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.attestation.AttestationPreCheckCommandResponse;
+import org.finos.waltz.model.attestation.ImmutableAttestationPreCheckCommandResponse;
 import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
+import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
@@ -122,37 +125,43 @@ public class AttestationPreCheckService {
         return failures;
     }
 
-    public List<String> calcLogicalFlowPreCheckFailuresWithProposed(EntityReference entityRef, String username) {
+    public AttestationPreCheckCommandResponse calcLogicalFlowPreCheckFailuresWithProposed(EntityReference entityRef, String username) {
         Map<String, String> messageTemplates = settingsService.indexByPrefix("attestation.logical-flow.fail");
 
-        List<String> failures = new ArrayList<>();
         EntityWorkflowDefinition workflowDefinition = entityWorkflowService.searchByName(ProposedFlowDao.PROPOSE_FLOW_LIFECYCLE_WORKFLOW);
 
         // Rule 1: Block if user is a target approver for upstream pending flow for this app
         if (proposedFlowWorkflowService.isAppInvolvedInPendingApprovals(entityRef, username, workflowDefinition.id().get())) {
 
-            failures.add(mkFailureMessage(
-                    messageTemplates,
-                    "attestation.logical-flow.fail.pending.approval",
-                    "Cannot attest as there are pending flows requiring your app's approval. Please review them first.",
-                    0));
-            return failures;
+            return ImmutableAttestationPreCheckCommandResponse.builder()
+                    .outcome(CommandOutcome.FAILURE)
+                    .message(mkFailureMessage(
+                            messageTemplates,
+                            "attestation.logical-flow.fail.pending.approval",
+                            "Cannot attest as there are pending flows requiring your app's approval. Please review them first.",
+                            0))
+                    .build();
         }
 
         // 1. Get the base pre-check results
         LogicalFlowAttestationPreChecks preChecks = attestationPreCheckDao.calcLogicalFlowAttestationPreChecks(entityRef);
 
-
+        boolean hasPendingProposals = false;
         // Rule 2: If there are no flows, block unless a creation is pending
         if (preChecks.flowCount() == 0 && !preChecks.exemptFromFlowCountCheck()) {
             if (!proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
-                failures.add(mkFailureMessage(
-                        messageTemplates,
-                        "attestation.logical-flow.fail.count",
-                        "Cannot attest as there are no recorded relevant flows",
-                        preChecks.flowCount()));
+
+                return ImmutableAttestationPreCheckCommandResponse.builder()
+                        .outcome(CommandOutcome.FAILURE)
+                        .message(mkFailureMessage(
+                                messageTemplates,
+                                "attestation.logical-flow.fail.count",
+                                "Cannot attest as there are no recorded relevant flows",
+                                preChecks.flowCount()))
+                        .build();
+            } else {
+                hasPendingProposals = true;
             }
-            return failures;
         }
 
         // Rule 3: If there are unknown/deprecated upstream flows, block unless a removal is pending
@@ -162,15 +171,34 @@ public class AttestationPreCheckService {
             Set<Long> deprecatedOrUnknownPhysicalFlowIds = physicalFlowService.findPhysicalFlowIdsWithProblematicDataTypes(deprecatedOrUnknownFlowIds);
             Set<Long> proposedPhysicalFlowIds = proposedFlowWorkflowService.findPhysicalFlowIdsInPendingProposals(deprecatedOrUnknownFlowIds, workflowDefinition.id().get());
             if (deprecatedOrUnknownPhysicalFlowIds.isEmpty() || !Objects.equals(deprecatedOrUnknownPhysicalFlowIds, proposedPhysicalFlowIds)) {
-                failures.add(mkFailureMessage(
-                        messageTemplates,
-                        "attestation.logical-flow.fail.deprecated",
-                        "Cannot attest as there are deprecated/unknown data type usages (%d violation/s)",
-                        preChecks.deprecatedCount() + preChecks.unknownCount()));
+
+                return ImmutableAttestationPreCheckCommandResponse.builder()
+                        .outcome(CommandOutcome.FAILURE)
+                        .message(mkFailureMessage(
+                                messageTemplates,
+                                "attestation.logical-flow.fail.deprecated",
+                                "Cannot attest as there are deprecated/unknown data type usages (%d violation/s)",
+                                preChecks.deprecatedCount() + preChecks.unknownCount()))
+                        .build();
+            } else {
+                hasPendingProposals = true;
             }
         }
 
-        return failures;
+        if (hasPendingProposals) {
+            return ImmutableAttestationPreCheckCommandResponse.builder()
+                    .outcome(CommandOutcome.SUCCESS)
+                    .message(mkFailureMessage(
+                            messageTemplates,
+                            "attestation.logical-flow.pending.proposed-flow.message",
+                            "Given you have pending flow(s), you are still able to attest",
+                            0))
+                    .build();
+        }
+
+        return ImmutableAttestationPreCheckCommandResponse.builder()
+                .outcome(CommandOutcome.SUCCESS)
+                .build();
     }
 
     private String mkFailureMessage(Map<String, String> messageTemplates,

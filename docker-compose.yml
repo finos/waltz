@@ -1,9 +1,12 @@
 services:
   waltz-postgres:
     image: ghcr.io/finos/waltz:postgres
-    #    build:
-    #      context: .
-    #      dockerfile: Dockerfile
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      platforms:
+#        - linux/amd64
+#        - linux/arm64
     ports:
       - "8080:8080"
     depends_on:

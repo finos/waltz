@@ -21,6 +21,7 @@ import {initialiseData, invokeFunction} from "../../../common/index";
 import template from "./attestation-confirmation.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+import {PROPOSAL_OUTCOMES} from "../../../common/constants";
 
 
 const bindings = {
@@ -57,6 +58,16 @@ function controller($q, serviceBroker, settingsService) {
         vm.disabled = false;
     }
 
+    function disableSubmissionWithProposedFlow(response) {
+        vm.message = response.message;
+        vm.disabled = true;
+    }
+
+    function enableSubmissionWithProposedFlow(response) {
+        vm.message = response.message;
+        vm.disabled = false;
+    }
+
     function validateLogicalFlows() {
         serviceBroker
             .loadViewData(CORE_API.AttestationPreCheckStore.logicalFlowCheck, [vm.parentEntityRef])
@@ -70,9 +81,9 @@ function controller($q, serviceBroker, settingsService) {
         serviceBroker
             .loadViewData(CORE_API.AttestationPreCheckStore.logicalFlowWithProposedFlowCheck, [vm.parentEntityRef])
             .then(r => r.data)
-            .then(failures =>  _.isEmpty(failures)
-                ? enableSubmission()
-                : disableSubmission(failures))
+            .then(response =>  response.outcome === PROPOSAL_OUTCOMES.SUCCESS
+                ? enableSubmissionWithProposedFlow(response)
+                : disableSubmissionWithProposedFlow(response))
     }
 
     function validateViewpoints() {
