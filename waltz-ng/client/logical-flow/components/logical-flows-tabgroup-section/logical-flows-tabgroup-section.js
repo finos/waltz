@@ -35,7 +35,8 @@ const initialState = {
     visibility: {
         exportButton: false,
         sourcesOverlay: false
-    }
+    },
+    tabSelected: false
 };
 
 
@@ -64,6 +65,10 @@ function controller(serviceBroker) {
     };
 
     vm.$onInit = () => {
+    };
+
+    vm.onTabSelected = () => {
+        vm.tabSelected = true;
     };
 
     vm.$onChanges = (changes) => {

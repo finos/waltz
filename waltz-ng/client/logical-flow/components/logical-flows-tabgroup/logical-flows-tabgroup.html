@@ -78,6 +78,11 @@
                     </div>
                 </div>
 
+                <div ng-if="!$ctrl.visibility.loadingFlows && $ctrl.loadingError">
+                    <div class="alert alert-warning">
+                        Unable to load the diagram, please refresh and try again
+                    </div>
+                </div>
             </uib-tab>
 
             <uib-tab index="3"
