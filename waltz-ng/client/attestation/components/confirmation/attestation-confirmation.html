@@ -51,6 +51,12 @@
         <div style="margin-top: 0.5em"
              ng-if="!$ctrl.disabled && $ctrl.message">
             <waltz-markdown text="$ctrl.message"></waltz-markdown>
+            <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
+                <a ui-sref="main.data-flow.dashboard"
+                   class="clickable">
+                    Go to Data Flow Dashboard
+                </a>
+            </div>
         </div>
 
         <div
