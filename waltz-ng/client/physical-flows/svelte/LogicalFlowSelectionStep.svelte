@@ -17,7 +17,7 @@
     }
 
     export let primaryEntityRef;
-    export let dataFlowProposalSetting;
+    export let dataFlowProposalsEnabled;
 
     let logicalFlowsCall = null;
     let editableFlowsCall = null;
@@ -55,8 +55,6 @@
             $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
         }
     }
-
-    $: dataFlowProposalsEnabled = dataFlowProposalSetting?.value && dataFlowProposalSetting.value.toLowerCase() === "true";
 
     $: {
         if (primaryEntityRef) {

@@ -20,7 +20,9 @@ package org.finos.waltz.web.endpoints.api;
 
 
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.AttestationPreCheckCommandResponse;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.web.WebUtilities;
@@ -62,7 +64,7 @@ public class AttestationPreCheckEndpoint implements Endpoint {
                     return attestationPreCheckService.calcViewpointPreCheckFailures(entityReference, attestedEntityId);
                 };
 
-        ListRoute<String> logicalFlowWithProposedCheckRoute =
+        DatumRoute<AttestationPreCheckCommandResponse> logicalFlowWithProposedCheckRoute =
                 (req, res) -> {
                     EntityReference ref = WebUtilities.getEntityReference(req);
                     String username = WebUtilities.getUsername(req);
@@ -71,6 +73,6 @@ public class AttestationPreCheckEndpoint implements Endpoint {
 
         EndpointUtilities.getForList(logicalFlowCheckPath, logicalFlowCheckRoute);
         EndpointUtilities.getForList(viewpointCheckPath, viewpointFlowCheckRoute);
-        EndpointUtilities.getForList(logicalFlowWithProposedCheckPath, logicalFlowWithProposedCheckRoute);
+        EndpointUtilities.getForDatum(logicalFlowWithProposedCheckPath, logicalFlowWithProposedCheckRoute);
     }
 }

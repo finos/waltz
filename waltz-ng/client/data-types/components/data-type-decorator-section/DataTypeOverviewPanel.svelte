@@ -17,8 +17,7 @@
     import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
     import SuggestedDataTypeTreeSelector from "./SuggestedDataTypeTreeSelector.svelte";
     import {settingsStore} from "../../../svelte-stores/settings-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
-    import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+    import {isDataFlowProposalsEnabledWithSettingsArray} from "../../../common/utils/settings-util";
 
 
     export let primaryEntityReference;
@@ -127,12 +126,9 @@
     $: permissions = $permissionsCall?.data || [];
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
 
-    let settingsCall=settingsStore.loadAll();
+    let settingsCall = settingsStore.loadAll();
 
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
-        [0];
-    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data);
 
 </script>
 

@@ -25,12 +25,19 @@
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
-    import {DATAFLOW_PROPOSAL_SETTING_NAME, PROPOSAL_TYPES} from "../../../../common/constants"
-    import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
+    import {
+        DATAFLOW_PROPOSAL_RATING_SCHEME_SETTING_NAME,
+        DATAFLOW_PROPOSAL_SETTING_NAME,
+        PROPOSAL_TYPES
+    } from "../../../../common/constants"
     import {displayError} from "../../../../common/error-utils";
     import {buildProposalFlowCommand} from "../../../../common/utils/propose-flow-command-util";
     import {handleProposalValidation} from "../../../../common/utils/proposalValidation";
     import {onDestroy} from "svelte";
+    import {
+        getDataFlowProposalsRatingSchemeWithSettingsArray,
+        isDataFlowProposalsEnabledWithSettingsArray
+    } from "../../../../common/utils/settings-util";
 
     export let primaryEntityRef;
     export let targetLogicalFlowId;
@@ -38,11 +45,8 @@
     let settingsCall = settingsStore.loadAll();
     let commandLaunched = false;
 
-    $: dataFlowProposalSetting = $settingsCall.data
-        .filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)
-        [0];
-    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabled($settingsCall.data);
-    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingScheme($settingsCall.data);
+    $: dataFlowProposalsEnabled = isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data);
+    $: dataFlowProposalsRatingSchemeExtId = getDataFlowProposalsRatingSchemeWithSettingsArray($settingsCall.data);
 
     $: sourceEntityCall = loadSvelteEntity(primaryEntityRef);
     $: sourceEntity = $sourceEntityCall.data ?
@@ -126,7 +130,7 @@
                 </NoData>
             {:else}
                 <div class="selection-step">
-                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalSetting}/>
+                    <LogicalFlowSelectionStep primaryEntityRef={sourceEntity} {dataFlowProposalsEnabled}/>
                 </div>
 
                 <div class="selection-step">

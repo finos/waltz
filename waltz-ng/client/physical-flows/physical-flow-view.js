@@ -61,7 +61,6 @@ const initialState = {
     },
     potentialMergeTargets: [],
     mergeTarget: null,
-    settings: null,
     dataFlowProposalsEnabled: null,
     dataFlowProposalsRatingSchemeSetting: null,
     isReasonSelectionOpen: false,
@@ -140,6 +139,7 @@ function controller($q,
                     historyStore,
                     physicalFlowStore,
                     physicalSpecificationStore,
+                    settingsService,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -151,16 +151,14 @@ function controller($q,
 
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
-
-
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
-                vm.ratingSchemeExtId = getDataFlowProposalsRatingScheme(vm.settings);
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
-
+        getDataFlowProposalsRatingScheme(settingsService)
+            .then(ratingSchemes => {
+                vm.ratingSchemeExtId = ratingSchemes;
+            })
 
         const physicalFlowPromise = serviceBroker
             .loadViewData(
@@ -394,6 +392,7 @@ controller.$inject = [
     "HistoryStore",
     "PhysicalFlowStore",
     "PhysicalSpecificationStore",
+    "SettingsService",
     "ServiceBroker"
 ];
 

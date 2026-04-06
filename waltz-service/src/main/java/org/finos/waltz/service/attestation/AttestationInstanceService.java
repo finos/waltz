@@ -33,8 +33,20 @@ import org.finos.waltz.model.IdCommandResponse;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.attestation.ApplicationAttestationInstanceInfo;
+import org.finos.waltz.model.attestation.ApplicationAttestationInstanceSummary;
+import org.finos.waltz.model.attestation.ApplicationAttestationSummaryCounts;
+import org.finos.waltz.model.attestation.ApplicationAttestationSummaryFilters;
+import org.finos.waltz.model.attestation.AttestEntityCommand;
+import org.finos.waltz.model.attestation.AttestationInstance;
+import org.finos.waltz.model.attestation.AttestationPreCheckCommandResponse;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationState;
+import org.finos.waltz.model.attestation.AttestationViewpoint;
+import org.finos.waltz.model.attestation.LatestMeasurableAttestationInfo;
+import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
@@ -212,11 +224,11 @@ public class AttestationInstanceService {
     }
 
 
-    public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
+    public boolean attestForEntity(String username, AttestEntityCommand createCommand, boolean withProposedFlow) {
         checkAttestationPermission(username, createCommand);
 
         if(createCommand.attestedEntityKind() == EntityKind.LOGICAL_DATA_FLOW){
-            checkLogicalFlowsCanBeAttested(createCommand);
+            checkLogicalFlowsCanBeAttested(createCommand, withProposedFlow, username);
         }
 
         if(createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY) {
@@ -285,8 +297,10 @@ public class AttestationInstanceService {
     }
 
 
-    private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand) {
-        List<String> failures = attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
+    private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand, boolean withProposedFlow, String username) {
+        List<String> failures = withProposedFlow
+                ? getLogicalFlowPreCheckFailuresWithProposed(createCommand, username)
+                : attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
         checkEmpty(
                 failures,
                 () -> format(
@@ -388,5 +402,15 @@ public class AttestationInstanceService {
                 .orElse(DSL.trueCondition());
 
         return dateCondition.and(lifecyclePhaseCondition.and(criticalityCondition).and(attestationStateCondition));
+    }
+
+    private List<String> getLogicalFlowPreCheckFailuresWithProposed(AttestEntityCommand createCommand, String username) {
+        return Optional.ofNullable(attestationPreCheckService.calcLogicalFlowPreCheckFailuresWithProposed(
+                        createCommand.entityReference(),
+                        username))
+                .filter(response -> response.outcome() == CommandOutcome.FAILURE)
+                .flatMap(AttestationPreCheckCommandResponse::message)
+                .map(Collections::singletonList)
+                .orElse(Collections.emptyList());
     }
 }

@@ -20,7 +20,9 @@
     import toastStore from "../../../../svelte-stores/toast-store";
     import {physicalFlowStore} from "../../../../svelte-stores/physical-flow-store";
     import {settingsStore} from "../../../../svelte-stores/settings-store";
-    import {isDataFlowProposalsEnabled} from "../../../../common/utils/settings-util";
+    import {
+        isDataFlowProposalsEnabledWithSettingsArray
+    } from "../../../../common/utils/settings-util";
 
     const ActionSectionStates = {
         LIST: "LIST",
@@ -63,7 +65,7 @@
     let isSettingsLoaded;
 
     $: isSettingsLoaded=$settingsCall?.data && Object.keys($settingsCall.data).length > 0
-    $: dataFlowProposalsEnabled = isSettingsLoaded?isDataFlowProposalsEnabled($settingsCall.data):undefined;
+    $: dataFlowProposalsEnabled = isSettingsLoaded ? isDataFlowProposalsEnabledWithSettingsArray($settingsCall.data):undefined;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;

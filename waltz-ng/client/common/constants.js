@@ -31,3 +31,8 @@ export const PROPOSAL_TYPES = {
 
 export const ARC_DROPDOWN_DEFINITION= "feature.survey.arc.dropdown-definition";
 export const ARC_EXTERNAL_URL= "arc.external.base.url";
+
+export const REMOTE_API_STATUS = {
+    LOADED: "loaded",
+    LOADING: "loading"
+}

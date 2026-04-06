@@ -36,20 +36,17 @@ const initialState = {
     visibility: {
         overviewEditor: false
     },
-    settings:null,
     dataFlowProposalsEnabled:null
 };
 
-function controller(serviceBroker) {
+function controller(serviceBroker,settingsService) {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(vm.settings)
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
 
         serviceBroker.loadViewData(CORE_API.PhysicalSpecificationStore.findPermissionsForSpec, [vm.specification.id])
@@ -62,7 +59,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 

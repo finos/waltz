@@ -10,7 +10,16 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
-import org.finos.waltz.test_common.helpers.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
+import org.finos.waltz.test_common.helpers.PermissionGroupHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.PhysicalFlowHelper;
+import org.finos.waltz.test_common.helpers.PhysicalSpecHelper;
+import org.finos.waltz.test_common.helpers.UserHelper;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +29,17 @@ import java.util.Set;
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
+import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,10 +75,27 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private UserHelper userHelper;
 
+    @Autowired
+    private DSLContext dsl;
+
     private final String stem = "fpc";
 
+    @BeforeEach
+    public void setUp() {
+        dsl.deleteFrom(PERMISSION_GROUP_INVOLVEMENT).execute();
+        dsl.deleteFrom(PERMISSION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(PERMISSION_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP_ENTRY).execute();
+        dsl.deleteFrom(INVOLVEMENT_GROUP).execute();
+        dsl.deleteFrom(INVOLVEMENT).execute();
+        dsl.deleteFrom(PERSON).execute();
+        dsl.deleteFrom(PHYSICAL_FLOW).execute();
+        dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
+        dsl.deleteFrom(APPLICATION).execute();
+    }
 
-    //    @Test
+    @Test
     public void findPermissionsForFlow() {
 
         String u1 = mkName(stem, "user1");
@@ -81,13 +118,23 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         LogicalFlow flowAB = flowHelper.createLogicalFlow(appA, appB);
         LogicalFlow flowBC = flowHelper.createLogicalFlow(appB, appC);
 
+        PermissionGroupRecord defaultPg = permissionHelper.createGroup("default");
+        permissionHelper.createDefaultPermGroup(defaultPg.getId());
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                defaultPg.getId(),
+                EntityKind.LOGICAL_DATA_FLOW,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                null);
+
+        Set<Operation> takesDefaults = flowPermissionChecker.findPermissionsForFlow(flowAB.id().get(), u1);
+        assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group");
+
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
-
-        Set<Operation> takesDefaults = flowPermissionChecker.findPermissionsForFlow(flowAB.id().get(), u1);
-        assertEquals(asSet(Operation.ATTEST), takesDefaults, "If no specified override, takes default permission group"); // created via changelog
 
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
         permissionHelper.setupPermissionGroupEntry(appB, pg.getId());

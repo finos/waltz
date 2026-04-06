@@ -43,7 +43,8 @@ function getInstancesForRun(runsWithInstances, runId) {
 
 function controller($q,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    settingsService) {
     const vm = initialiseData(this, initialState);
 
     userService
@@ -106,7 +107,7 @@ function controller($q,
         const index = _.findIndex(instances, i => i.id === instance.id)
         const nextInstanceId =  _.get(instances, [index + 1, "id"]);
 
-        return attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind, instance.attestedEntityId)
+        return attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind, instance.attestedEntityId, settingsService)
             .then(() => loadData())
             .then(() => {
                 const remainingInstances = getInstancesForRun(vm.runsWithInstances, instance.attestationRunId);
@@ -139,6 +140,7 @@ controller.$inject = [
     "$q",
     "ServiceBroker",
     "UserService",
+    "SettingsService",
 ];
 
 
