@@ -48,6 +48,17 @@
             <waltz-markdown text="$ctrl.message"></waltz-markdown>
         </div>
 
+        <div style="margin-top: 0.5em"
+             ng-if="!$ctrl.disabled && $ctrl.message">
+            <waltz-markdown text="$ctrl.message"></waltz-markdown>
+            <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
+                <a ui-sref="main.data-flow.dashboard"
+                   class="clickable">
+                    Go to Data Flow Dashboard
+                </a>
+            </div>
+        </div>
+
         <div
             style="display: grid; grid-template-columns: 50px 100px; align-items: center;"
             ng-if="$ctrl.attestationKind === 'MEASURABLE_CATEGORY'

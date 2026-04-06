@@ -47,7 +47,8 @@ function controller($q,
                     $stateParams,
                     $window,
                     serviceBroker,
-                    historyStore)
+                    historyStore,
+                    settingsService)
 {
     const vm = initialiseData(this, initialState);
 
@@ -93,11 +94,9 @@ function controller($q,
             vm.canRestore = vm.canEdit && vm.isRemoved;
         });
 
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                let settings = r.data;
-                vm.dataFlowProposalsEnabled = isDataFlowProposalsEnabled(settings)
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
 
     };
@@ -187,7 +186,8 @@ controller.$inject = [
     "$stateParams",
     "$window",
     "ServiceBroker",
-    "HistoryStore"
+    "HistoryStore",
+    "SettingsService"
 ];
 
 
