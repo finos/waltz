@@ -218,7 +218,10 @@
 
     const debouncedAutoSave = debounce(autoSave, 5000);
 
-    $: dirty && debouncedAutoSave();
+    const isCurrentResponseUndefined = currentResponse === undefined;
+    const noArcs = !arcs.length;
+
+    $: ((isCurrentResponseUndefined && noArcs) || dirty) && debouncedAutoSave();
 
     onDestroy(() => {
         $arcSurveyState = [];
@@ -227,7 +230,7 @@
 
 </script>
 
-{#if currentResponse === undefined || startedOver}
+{#if (isCurrentResponseUndefined && !tableSaved) || startedOver}
 <div class="table-container">
     <table>
         <thead>
