@@ -1,0 +1,72 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.81.0.xml">
+
+    <changeSet id="v1-80-1-tag"
+               author="jainshrk">
+        <tagDatabase tag="v1.80.1"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20260401-5397-1" author="jainshrk">
+        <addColumn tableName="entity_workflow_state">
+            <column name="version"
+                    type="bigint"
+                    defaultValueNumeric="0"
+                    valueNumeric="0"/>
+        </addColumn>
+        <addNotNullConstraint tableName="entity_workflow_state"
+                              columnDataType="bigint"
+                              columnName="version"/>
+    </changeSet>
+
+    <changeSet id="20260401-5432-1" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="logical_flow_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="logical_flow_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260401-5432-2" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="physical_flow_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="physical_flow_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260401-5432-3" author="kumarohb">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="proposed_flow" columnName="specification_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="proposed_flow">
+            <column name="specification_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

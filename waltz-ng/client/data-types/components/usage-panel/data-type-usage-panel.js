@@ -24,7 +24,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {entity} from "../../../common/services/enums/entity";
-import { isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
+import {getDataFlowProposalsRatingScheme, isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 
 const bindings = {
@@ -42,12 +42,11 @@ const initialState = {
         editor: false,
         controls: false
     },
-    settings:null,
     dataFlowProposalsEnabled:null
 };
 
 
-function controller(serviceBroker, userService, $q) {
+function controller(serviceBroker, userService, $q, settingsService) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
@@ -57,11 +56,9 @@ function controller(serviceBroker, userService, $q) {
 
     vm.$onInit = () => {
 
-        const settingsPromise = serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
         const decoratedRef = vm.parentEntityRef
             ? vm.parentEntityRef
@@ -119,7 +116,8 @@ function controller(serviceBroker, userService, $q) {
 controller.$inject = [
     "ServiceBroker",
     "UserService",
-    "$q"
+    "$q",
+    "SettingsService"
 ];
 
 
