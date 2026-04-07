@@ -20,6 +20,7 @@ import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
@@ -123,18 +124,7 @@ public class ProposedFlowWorkflowService {
             entityWorkflowService.createEntityWorkflow(proposedFlowRef, workflowDefinition.id().get(),
                     username, PROPOSED_FLOW_SUBMITTED, PROPOSED_CREATE.name(), newState.name(), proposedFlowCommand.reason().description());
 
-            if (isAutoApprovalEnabled()) {
-                taskExecutor.execute(() -> {
-                    try {
-                        autoApproveForExternalActor(
-                                proposedFlowRef,
-                                ADMIN,
-                                proposedFlowCommand);
-                    } catch (Exception e) {
-                        LOG.error("Unable to auto approve external actor endpoint(s) for proposed flow id={}", proposedFlowRef.id(), e);
-                    }
-                });
-            }
+            autoApproveFlowsForExternalActors(proposedFlowRef,proposedFlowCommand);
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = FAILURE;
@@ -149,7 +139,20 @@ public class ProposedFlowWorkflowService {
                 .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
                 .build();
     }
-
+    private void autoApproveFlowsForExternalActors(EntityReference proposedFlowRef, ProposedFlowCommand proposedFlowCommand) {
+        if (isAutoApproveEnabledForExternalActors()) {
+            taskExecutor.execute(() -> {
+                try {
+                    autoApproveForExternalActor(
+                            proposedFlowRef,
+                            ADMIN,
+                            proposedFlowCommand);
+                } catch (Exception e) {
+                    LOG.error("Unable to auto approve external actor endpoint(s) for proposed flow id={}", proposedFlowRef.id(), e);
+                }
+            });
+        }
+    }
     private void autoApproveForExternalActor(EntityReference proposedFlowRef, String username, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
 
         boolean isSourceExternalActor = isExternalActor(proposedFlowCommand.source());
@@ -179,7 +182,7 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    private boolean isAutoApprovalEnabled() {
+    private boolean isAutoApproveEnabledForExternalActors() {
         return settingsService
                 .getValue(AUTO_APPROVE_SETTING_KEY)
                 .map(Boolean::valueOf)
@@ -231,7 +234,7 @@ public class ProposedFlowWorkflowService {
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    ProposeFlowPermission flowPermission,
                                                    String username,
-                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
         String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
         CommandOutcome outcome = SUCCESS;
 
@@ -288,6 +291,10 @@ public class ProposedFlowWorkflowService {
 
         } catch (TransitionPredicateFailedException e) {
             errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
+            LOG.error(errorMessage, e);
+            outcome = FAILURE;
+        } catch (TransitionUpdateFailedException e) {
+            errorMessage = String.format("Failed to '%s' proposed flow. The workflow may have updated.", transitionAction);
             LOG.error(errorMessage, e);
             outcome = FAILURE;
         } catch (Exception e) {
