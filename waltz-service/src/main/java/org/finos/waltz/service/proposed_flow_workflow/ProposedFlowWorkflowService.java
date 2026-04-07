@@ -139,11 +139,12 @@ public class ProposedFlowWorkflowService {
                 .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
                 .build();
     }
+
     private void autoApproveFlowsForExternalActors(EntityReference proposedFlowRef, ProposedFlowCommand proposedFlowCommand) {
         if (isAutoApproveEnabledForExternalActors()) {
             taskExecutor.execute(() -> {
                 try {
-                    autoApproveForExternalActor(
+                    approveForExternalActor(
                             proposedFlowRef,
                             ADMIN,
                             proposedFlowCommand);
@@ -153,7 +154,8 @@ public class ProposedFlowWorkflowService {
             });
         }
     }
-    private void autoApproveForExternalActor(EntityReference proposedFlowRef, String username, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+
+    private void approveForExternalActor(EntityReference proposedFlowRef, String username, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
 
         boolean isSourceExternalActor = isExternalActor(proposedFlowCommand.source());
         boolean isTargetExternalActor = isExternalActor(proposedFlowCommand.target());
@@ -188,6 +190,7 @@ public class ProposedFlowWorkflowService {
                 .map(Boolean::valueOf)
                 .orElse(false);
     }
+
     private boolean isExternalActor(EntityReference entityReference) {
         if (entityReference == null || entityReference.kind() != ACTOR) {
             return false;
