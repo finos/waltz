@@ -316,7 +316,7 @@ public class ProposedFlowWorkflowService {
     public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
-                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
         ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
         checkNotNull(proposedFlow, "No proposed flow found");
 
