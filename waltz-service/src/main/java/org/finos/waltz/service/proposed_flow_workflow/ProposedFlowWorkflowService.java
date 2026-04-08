@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -291,6 +292,16 @@ public class ProposedFlowWorkflowService {
 
             // Refresh Return Object
             proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlow.id());
+
+            //Update the proposed flow table with final values of logical, physical and specification ids
+            Optional.of(proposedFlow)
+                    .filter(pf -> pf.flowDef().proposalType() == ProposalType.CREATE)
+                    .filter(pf -> valueOf(pf.workflowState().state()) == ProposedFlowWorkflowState.FULLY_APPROVED)
+                    .ifPresent(pf -> proposedFlowDao.updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(
+                            pf.id(),
+                            pf.logicalFlowId(),
+                            pf.physicalFlowId(),
+                            pf.specificationId()));
 
         } catch (TransitionPredicateFailedException e) {
             errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
