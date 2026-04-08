@@ -69,4 +69,14 @@
             <column name="specification_id" type="BIGINT"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="20260408" author="jainkhu">
+        <insert tableName="settings">
+            <column name="name" value="feature.auto-approve-flow-for-external-actors"/>
+            <column name="value" value="false"/>
+            <column name="description" value="This setting is to enable auto approval of flows involving external actors."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
