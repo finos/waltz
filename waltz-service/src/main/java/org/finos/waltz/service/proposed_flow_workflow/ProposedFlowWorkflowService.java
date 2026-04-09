@@ -6,24 +6,19 @@ import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import org.finos.waltz.model.proposed_flow.FlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
-import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
-import org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState;
+import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
+import org.finos.waltz.service.actor.ActorService;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
@@ -32,24 +27,25 @@ import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.command.CommandOutcome.FAILURE;
 import static org.finos.waltz.model.command.CommandOutcome.SUCCESS;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
-import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.valueOf;
+import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.*;
+import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.APPROVE;
 import static org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction.PROPOSE;
 
 
@@ -62,14 +58,19 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_ALREADY_EXIST = "Proposed Flow Already Exist";
     private static final String PHYSICAL_FLOW_ALREADY_EXIST = "Physical Flow Already Exist";
     private static final String PROPOSED_FLOW_ACTION_SUCCESS = "Proposed Flow Action success";
+    private static final String AUTO_APPROVAL_REASON = "Auto approved for external actor";
+    private static final String ADMIN = "Admin";
+    private static final String AUTO_APPROVE_SETTING_KEY = "feature.auto-approve-flow-for-external-actors";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
     private final DataFlowService dataFlowService;
     private final ProposedFlowDao proposedFlowDao;
-    private final WorkflowDefinition proposedFlowWorkflowDefinition;
     private final WorkflowStateMachine<ProposedFlowWorkflowState, ProposedFlowWorkflowTransitionAction, ProposedFlowWorkflowContext>
             proposedFlowStateMachine;
+    private final ActorService actorService;
+    private final SettingsService settingsService;
+    private final TaskExecutor taskExecutor;
 
     @Autowired
     ProposedFlowWorkflowService(EntityWorkflowService entityWorkflowService,
@@ -77,7 +78,9 @@ public class ProposedFlowWorkflowService {
                                 DSLContext dslContext,
                                 WorkflowDefinition proposedFlowWorkflowDefinition,
                                 ProposedFlowWorkflowPermissionService permissionService,
-                                DataFlowService dataFlowService) {
+                                DataFlowService dataFlowService,
+                                ActorService actorService, SettingsService settingsService,
+                                TaskExecutor taskExecutor) {
         checkNotNull(entityWorkflowService, "entityWorkflowService cannot be null");
         checkNotNull(proposedFlowDao, "proposedFlowDao cannot be null");
         checkNotNull(dslContext, "dslContext cannot be null");
@@ -87,11 +90,13 @@ public class ProposedFlowWorkflowService {
 
         this.entityWorkflowService = entityWorkflowService;
         this.proposedFlowDao = proposedFlowDao;
-        this.proposedFlowWorkflowDefinition = proposedFlowWorkflowDefinition;
 //        Get the state machine from the definition
         this.proposedFlowStateMachine = proposedFlowWorkflowDefinition.getMachine();
         this.permissionService = permissionService;
         this.dataFlowService = dataFlowService;
+        this.actorService = actorService;
+        this.settingsService = settingsService;
+        this.taskExecutor = taskExecutor;
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(String username, ProposedFlowCommand proposedFlowCommand) {
@@ -118,6 +123,8 @@ public class ProposedFlowWorkflowService {
             ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(PROPOSED_CREATE, PROPOSE, workflowContext);
             entityWorkflowService.createEntityWorkflow(proposedFlowRef, workflowDefinition.id().get(),
                     username, PROPOSED_FLOW_SUBMITTED, PROPOSED_CREATE.name(), newState.name(), proposedFlowCommand.reason().description());
+
+            autoApproveFlowsForExternalActors(proposedFlowRef,proposedFlowCommand);
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = FAILURE;
@@ -131,6 +138,66 @@ public class ProposedFlowWorkflowService {
                 .proposedFlowId(proposedFlowId)
                 .workflowDefinitionId(workflowDefinition != null ? workflowDefinition.id().get() : null)
                 .build();
+    }
+
+    private void autoApproveFlowsForExternalActors(EntityReference proposedFlowRef, ProposedFlowCommand proposedFlowCommand) {
+        if (isAutoApproveEnabledForExternalActors()) {
+            taskExecutor.execute(() -> {
+                try {
+                    approveForExternalActor(
+                            proposedFlowRef,
+                            ADMIN,
+                            proposedFlowCommand);
+                } catch (Exception e) {
+                    LOG.error("Unable to auto approve external actor endpoint(s) for proposed flow id={}", proposedFlowRef.id(), e);
+                }
+            });
+        }
+    }
+
+    private void approveForExternalActor(EntityReference proposedFlowRef, String username, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+
+        boolean isSourceExternalActor = isExternalActor(proposedFlowCommand.source());
+        boolean isTargetExternalActor = isExternalActor(proposedFlowCommand.target());
+
+        if (!isSourceExternalActor && !isTargetExternalActor) {
+            return;
+        }
+
+        ProposedFlowResponse proposedFlow = getProposedFlowResponseById(proposedFlowRef.id());
+
+        ProposeFlowPermission flowPermission = ImmutableProposeFlowPermission.builder()
+                .sourceApprover(isSourceExternalActor ? Set.of(Operation.APPROVE) : Set.of())
+                .targetApprover(isTargetExternalActor ? Set.of(Operation.APPROVE) : Set.of())
+                .build();
+
+        ProposedFlowActionCommand proposedFlowActionCommand = ImmutableProposedFlowActionCommand.builder()
+                .comment(AUTO_APPROVAL_REASON)
+                .build();
+
+        if (isSourceExternalActor) {
+            proposedFlow = proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
+        }
+
+        if (isTargetExternalActor) {
+            proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
+        }
+    }
+
+    private boolean isAutoApproveEnabledForExternalActors() {
+        return settingsService
+                .getValue(AUTO_APPROVE_SETTING_KEY)
+                .map(Boolean::valueOf)
+                .orElse(false);
+    }
+
+    private boolean isExternalActor(EntityReference entityReference) {
+        if (entityReference == null || entityReference.kind() != ACTOR) {
+            return false;
+        }
+
+        Actor actor = actorService.getById(entityReference.id());
+        return actor != null && actor.isExternal();
     }
 
     private ProposedFlowCommandResponse getDuplicateFlowResponse(ProposedFlowCommand command, FlowIdResponse response,
@@ -166,29 +233,20 @@ public class ProposedFlowWorkflowService {
         return proposedFlowDao.getProposedFlowResponseById(id);
     }
 
-    public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
+    public ProposedFlowResponse proposedFlowAction(ProposedFlowResponse proposedFlow,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
+                                                   ProposeFlowPermission flowPermission,
                                                    String username,
                                                    ProposedFlowActionCommand proposedFlowActionCommand) {
-
         String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
         CommandOutcome outcome = SUCCESS;
-        ImmutableProposedFlowResponse.Builder builder = ImmutableProposedFlowResponse.builder();
-        ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
-        checkNotNull(proposedFlow, "No proposed flow found");
 
-        // Check for approval/rejection permissions
-        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
-                username,
-                proposedFlow.flowDef().source(),
-                proposedFlow.flowDef().target()
-        );
         boolean isSourceApprover = !flowPermission.sourceApprover().isEmpty();
         boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
         boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
 
-        // Fetch the current state
-        ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
+//        Fetch the current state
+        ProposedFlowWorkflowState currentState = ProposedFlowWorkflowState.valueOf(proposedFlow.workflowState().state());
 
         // 2. Get current state and build context
         ProposedFlowWorkflowContext workflowContext =
@@ -222,52 +280,56 @@ public class ProposedFlowWorkflowService {
                     .orElse(null);
 
             if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
-                // refresh as after getting second approval the `proposedFlow` object contains the older version number
-                // in the proposedFlow.workflowState().version() field
-                proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
                 // auto switch to fully approved
                 proposedFlowOperations(proposedFlow, username);
+
+                proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlow.id());
 
                 entityWorkflowService.updateStateTransition(username, proposedFlowActionCommand.comment(),
                         proposedFlow.workflowState(), newState.name(), nextPossibleTransition.name());
             }
 
             // Refresh Return Object
-            proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
-
-            //Update the proposed flow table with final values of logical, physical and specification ids
-            Optional.of(proposedFlow)
-                    .filter(pf -> pf.flowDef().proposalType() == ProposalType.CREATE)
-                    .filter(pf -> valueOf(pf.workflowState().state()) == ProposedFlowWorkflowState.FULLY_APPROVED)
-                    .ifPresent(pf -> proposedFlowDao.updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(
-                            pf.id(),
-                            pf.logicalFlowId(),
-                            pf.physicalFlowId(),
-                            pf.specificationId()));
+            proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlow.id());
 
         } catch (TransitionPredicateFailedException e) {
             errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
             LOG.error(errorMessage, e);
             outcome = FAILURE;
-            builder.message(errorMessage).outcome(outcome);
         } catch (TransitionUpdateFailedException e) {
             errorMessage = String.format("Failed to '%s' proposed flow. The workflow may have updated.", transitionAction);
             LOG.error(errorMessage, e);
             outcome = FAILURE;
-            builder.message(errorMessage).outcome(outcome);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             errorMessage = String.format("Failed to '%s' proposed flow.", transitionAction);
             LOG.error(errorMessage, e);
             outcome = FAILURE;
-            builder.message(errorMessage).outcome(outcome);
         }
 
         return ImmutableProposedFlowResponse.builder()
                 .from(proposedFlow)
                 .outcome(outcome)
-                .message(errorMessage).build();
+                .message(errorMessage)
+                .build();
     }
+
+    public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
+                                                   ProposedFlowWorkflowTransitionAction transitionAction,
+                                                   String username,
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
+        ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
+        checkNotNull(proposedFlow, "No proposed flow found");
+
+        // Check for approval/rejection permissions
+        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
+                username,
+                proposedFlow.flowDef().source(),
+                proposedFlow.flowDef().target()
+        );
+
+        return proposedFlowAction(proposedFlow, transitionAction, flowPermission, username, proposedFlowActionCommand);
+    }
+
 
     public ProposeFlowPermission getUserPermissionsForEntityRef(String username, EntityReference entityRef) {
         if (PROPOSED_FLOW.equals(entityRef.kind())) {
@@ -355,8 +417,8 @@ public class ProposedFlowWorkflowService {
     }
 
     private FlowIdResponse validateProposedFlowForEdit(ProposedFlowCommand command) {
-        checkNotNull(command.logicalFlowId().get(), "logical flow id can not be null");
-        checkNotNull(command.physicalFlowId().get(), "physical flow id can not be null");
+        checkNotNull(command.logicalFlowId(), "logical flow id can not be null");
+        checkNotNull(command.physicalFlowId(), "physical flow id can not be null");
         checkNotEmpty(command.dataTypeIds(), "dataTypeIds can not be empty");
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
