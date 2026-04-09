@@ -1,3 +1,7 @@
+---
+---
+
+<!-- Jekyll front matter is required so Liquid links on this page are rendered. -->
 <!--
   ~ Waltz - Enterprise Architecture
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -23,6 +27,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Waltz is an open source enterprise architecture platform that turns fragmented technology data into a connected map of applications, flows, capabilities and ownership for faster decisions, audit readiness, and risk reduction.">
     <title>FINOS - Waltz</title>
+    <link rel="icon" type="image/png" href="https://waltz.finos.org/site/img/waltz_circle_300px.png">
+    <link rel="shortcut icon" href="https://waltz.finos.org/site/img/waltz_circle_300px.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script src="https://use.fontawesome.com/b2532e0cae.js"></script>
@@ -54,7 +60,7 @@
     </span>
     <ul class="flex flex-wrap gap-x-6 text-base font-medium">
         <li><a href="#" class="text-slate-200 hover:text-blue-300 transition-colors">Home</a></li>
-        <li><a href="/blog/index.html" class="text-slate-200 hover:text-blue-300 transition-colors">Blog</a></li>
+        <li><a href="{{ site.github.url | default: site.baseurl | default: '' }}/blog/" class="text-slate-200 hover:text-blue-300 transition-colors">Blog</a></li>
         <li><a href="https://github.com/finos/waltz/issues/new" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Contact</a></li>
         <li><a href="https://github.com/finos/waltz" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Github</a></li>
         <li><a href="https://demo.waltz.finos.org" target="_blank" class="text-slate-200 hover:text-blue-300 transition-colors">Waltz Demo</a></li>

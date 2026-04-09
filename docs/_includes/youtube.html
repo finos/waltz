@@ -1,0 +1,10 @@
+<div class="youtube-embed">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/{{ include.id }}{% if include.list %}?list={{ include.list }}{% endif %}"
+    title="{{ include.title | default: 'YouTube video player' | escape }}"
+    loading="lazy"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
+</div>

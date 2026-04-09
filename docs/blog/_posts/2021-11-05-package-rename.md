@@ -10,6 +10,8 @@ categories: waltz dev
 As part of the development of **Waltz 1.39** we have (finally) completed the renaming of Waltz assets away from `com.khartec`
 and onto `org.finos`.
 
+<!--more-->
+
 This has involved changes to over 1.3K files - thankfully Intellij's refactoring capabilities took care of most of these!
 
 ## What's changed
