@@ -25,7 +25,7 @@
         <tagDatabase tag="v1.80.1"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-    <changeSet id="20260401-5397-1" author="jainshrk">
+    <changeSet id="20260401-7488-1" author="jainshrk">
         <addColumn tableName="entity_workflow_state">
             <column name="version"
                     type="bigint"
@@ -37,40 +37,31 @@
                               columnName="version"/>
     </changeSet>
 
-    <changeSet id="20260401-5432-1" author="kumarohb">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="proposed_flow" columnName="logical_flow_id"/>
-            </not>
-        </preConditions>
+    <changeSet id="20260401-7488-2" author="kumarohb">
         <addColumn tableName="proposed_flow">
             <column name="logical_flow_id" type="BIGINT"/>
         </addColumn>
-    </changeSet>
-
-    <changeSet id="20260401-5432-2" author="kumarohb">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="proposed_flow" columnName="physical_flow_id"/>
-            </not>
-        </preConditions>
         <addColumn tableName="proposed_flow">
             <column name="physical_flow_id" type="BIGINT"/>
         </addColumn>
-    </changeSet>
-
-    <changeSet id="20260401-5432-3" author="kumarohb">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="proposed_flow" columnName="specification_id"/>
-            </not>
-        </preConditions>
         <addColumn tableName="proposed_flow">
             <column name="specification_id" type="BIGINT"/>
         </addColumn>
     </changeSet>
 
-    <changeSet id="20260408" author="jainkhu">
+   <changeSet id="20260409-7488-3" author="kumarohb">
+        <sql>
+            UPDATE proposed_flow
+            SET logical_flow_id  = CAST(JSON_VALUE(flow_def, '$.logicalFlowId') AS BIGINT),
+                physical_flow_id = CAST(JSON_VALUE(flow_def, '$.physicalFlowId') AS BIGINT),
+                specification_id = CAST(JSON_VALUE(flow_def, '$.specification.id') AS BIGINT)
+            WHERE logical_flow_id IS NULL
+              AND ISJSON(flow_def) > 0
+              AND JSON_VALUE(flow_def, '$.logicalFlowId') IS NOT NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260409-7488-4" author="jainkhu">
         <insert tableName="settings">
             <column name="name" value="feature.auto-approve-flow-for-external-actors"/>
             <column name="value" value="false"/>
