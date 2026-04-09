@@ -26,6 +26,11 @@
     </changeSet>
 
     <changeSet id="20260401-5397-1" author="jainshrk">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="entity_workflow_state" columnName="version"/>
+            </not>
+        </preConditions>
         <addColumn tableName="entity_workflow_state">
             <column name="version"
                     type="bigint"
