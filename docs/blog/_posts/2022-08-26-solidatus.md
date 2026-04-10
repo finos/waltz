@@ -8,6 +8,7 @@ categories: waltz
 
 [Solidatus](https://www.solidatus.com/) is a fantastic piece of software for understanding your organizations data lineage:
 
+<!--more-->
 
 > Using Solidatus, you can quickly create data blueprints that map how your data flows, and how it’s affected, as it moves around your systems, both now and at other points in time.
 

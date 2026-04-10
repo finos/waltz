@@ -12,6 +12,8 @@ We've recently been focussed on making Waltz more welcoming to newcomers.  Part 
 - Docker images are now published as part of each release via GitHub actions.  Thanks to [Ljubo Nikolic](https://github.com/ljubon) for this great [contribution](https://github.com/finos/waltz/pull/5801)
 - We are working with [Canonical](https://canonical.com/) to offer Waltz as a [JuJu Charm](https://juju.is/).  See the [working group](https://github.com/finos/waltz/issues/5911) and this [sub-project](https://github.com/finos/waltz-integration-juju) for more information
 
+<!--more-->
+
 However, in this post we wish to focus on how we are improving our documentation and taking a look at some database related process enhancements.
 
 # Database documentation

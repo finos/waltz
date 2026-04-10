@@ -9,6 +9,8 @@ categories: waltz sql
 
 We recently issued a batch of custom application surveys to several hundred participants.  Using the standard survey functionality we identified the applications (using an app group) and the participants by their involvement to the applications in the group.
 
+<!--more-->
+
 The survey issuance parameters looked something like this:
 
 * **Survey Template**: _Records Management Survey_

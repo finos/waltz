@@ -2,11 +2,13 @@
 layout: post
 title:  "Screencast: Flow Diagrams and Overlays"
 date:   2021-06-30
-categories: waltz
+categories: waltz screencast
 ---
 
 # Screencast: Flow Diagrams and Overlays
 In this post we will look at the new _Flow Diagrams_ features introduced as part of [Waltz 1.34](https://github.com/finos/waltz/releases/tag/1.34).
+
+<!--more-->
 
 
 ## Flow Diagrams
@@ -22,7 +24,7 @@ The new overlay feature allows users to select multiple taxonomy elements (or ap
 
 ## Demonstration
 
-[![Waltz: Flow Diagrams](http://img.youtube.com/vi/MLmAZJ2xcJE/0.jpg)](https://www.youtube.com/watch?v=MLmAZJ2xcJE&list=PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4)
+{% include youtube.html id="MLmAZJ2xcJE" list="PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4" title="Waltz Flow Diagrams" %}
 
 
 ## Conclusion

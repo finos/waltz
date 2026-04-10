@@ -8,6 +8,8 @@ categories: waltz
 # Tutorial: Creating Conditional Surveys
 In this tutorial we will look at the new _Conditional Survey_ feature introduced as part of [Waltz 1.27](https://github.com/finos/waltz/releases/tag/1.27.2).
 
+<!--more-->
+
 
 ## Predicates
 Questions in conditional surveys may have predicates associated to them. 

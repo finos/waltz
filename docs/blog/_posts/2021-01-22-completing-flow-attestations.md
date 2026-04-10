@@ -2,7 +2,7 @@
 layout: post
 title:  "Screencast: Completing Flow Attestations"
 date:   2021-01-22
-categories: waltz 
+categories: waltz screencast
 ---
 
 # Screencast: Completing Flow Attestations
@@ -10,7 +10,9 @@ categories: waltz
 To promote data quality Waltz supports attestations.
 In this short screencast Mark will walk you through how to ensure attestations are completed accurately.  
 
-[![Waltz: Mapping](http://img.youtube.com/vi/dZVWKXxzZWQ/0.jpg)](https://www.youtube.com/watch?v=dZVWKXxzZWQ)
+<!--more-->
+
+{% include youtube.html id="dZVWKXxzZWQ" title="Waltz Completing Flow Attestations" %}
 
 
 
