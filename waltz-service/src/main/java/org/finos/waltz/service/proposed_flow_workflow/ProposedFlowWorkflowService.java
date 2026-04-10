@@ -63,11 +63,11 @@ public class ProposedFlowWorkflowService {
     private static final String PROPOSED_FLOW_ALREADY_EXIST = "Proposed Flow Already Exist";
     private static final String PHYSICAL_FLOW_ALREADY_EXIST = "Physical Flow Already Exist";
     private static final String PROPOSED_FLOW_ACTION_SUCCESS = "Proposed Flow Action success";
-    private static final String SYSTEM_USER = "admin";
     private static final String TIME_OUT_REASON = "Auto cancelled; pending for more than 30 days";
     private static final String AUTO_APPROVAL_REASON = "Auto approved for external actor";
     private static final String ADMIN = "Admin";
     private static final String AUTO_APPROVE_SETTING_KEY = "feature.auto-approve-flow-for-external-actors";
+    private static final String PENDING_FLOWS_TIME_OUT_THRESHOLD = "feature.data-flows-timeout-threshold";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
@@ -507,28 +507,27 @@ public class ProposedFlowWorkflowService {
     }
 
     public void pendingFlowsTimeOut(JobKey jobKey) {
-        //will have to check how to give a default value for this
-        int effectiveTimeoutDays = 30;
 
-        Optional<String> settingValue = settingsService.getValue(jobKey.name());
-        if (settingValue.isPresent()) {
-            try {
-                effectiveTimeoutDays = Integer.parseInt(settingValue.get());
-            } catch (NumberFormatException e) {
-                LOG.warn("Invalid timeout days value in settings for jobKey {}: {}.",
-                        jobKey, settingValue.get());
-            }
-        }
-        LOG.info("Running pending proposed flow timeout job with timeoutDays={}", effectiveTimeoutDays);
+        int timeoutDays = getTimeoutDays(PENDING_FLOWS_TIME_OUT_THRESHOLD);
+
+        LOG.info("Running pending proposed flow timeout job with timeoutDays={}", timeoutDays);
 
         int processedCount = autoCancelPendingProposedFlows(
-                effectiveTimeoutDays,
-                SYSTEM_USER,
+                timeoutDays,
+                ADMIN,
                 TIME_OUT_REASON);
 
         LOG.info("Completed pending proposed flow timeout job. processedCount={}", processedCount);
     }
-    public int autoCancelPendingProposedFlows(int timeoutDays,
+
+    private int getTimeoutDays(String settingName) {
+        return settingsService
+                .getValue(settingName)
+                .map(Integer::valueOf)
+                .orElse(30);
+    }
+
+    private int autoCancelPendingProposedFlows(int timeoutDays,
                                               String username,
                                               String reason) {
 
@@ -556,7 +555,7 @@ public class ProposedFlowWorkflowService {
                                 reason)
                                 .setSourceApprover(true)
                                 .setTargetApprover(true)
-                                .setMaker(true)
+                                .setMaker(false)
                                 .setCurrentState(currentState);
 
                 ProposedFlowWorkflowState newState = proposedFlowStateMachine.fire(

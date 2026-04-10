@@ -17,21 +17,21 @@ import java.util.function.Consumer;
 
 @ExcludeFromIntegrationTesting
 @Service
-public class ScheduledJobs {
-    private static final Logger LOG = LoggerFactory.getLogger(ScheduledJobs.class);
+public class PendingFlowsSLAScheduledJob {
+    private static final Logger LOG = LoggerFactory.getLogger(PendingFlowsSLAScheduledJob.class);
 
     private final ScheduledJobDao scheduledJobDao;
     private final ProposedFlowWorkflowService proposedFlowWorkflowService;
 
     @Autowired
-    public ScheduledJobs( ScheduledJobDao scheduledJobDao, ProposedFlowWorkflowService proposedFlowWorkflowService) {
+    public PendingFlowsSLAScheduledJob(ScheduledJobDao scheduledJobDao, ProposedFlowWorkflowService proposedFlowWorkflowService) {
         this.scheduledJobDao = scheduledJobDao;
         this.proposedFlowWorkflowService = proposedFlowWorkflowService;
     }
 
     @Scheduled(cron = "${waltz.proposed-flow.pending-timeout-cron:-}")
     public void run() {
-        LOG.info("Running scheduled jobs");
+        Thread.currentThread().setName("WaltzPendingFlowsJobService");
         runIfNeeded(JobKey.PENDING_FLOWS_TIME_OUT, proposedFlowWorkflowService::pendingFlowsTimeOut);
     }
     private void runIfNeeded(JobKey jobKey, Consumer<JobKey> jobExecutor) {
