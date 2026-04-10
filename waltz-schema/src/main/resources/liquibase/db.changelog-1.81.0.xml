@@ -49,19 +49,7 @@
         </addColumn>
     </changeSet>
 
-   <changeSet id="20260409-7488-3" author="kumarohb">
-        <sql>
-            UPDATE proposed_flow
-            SET logical_flow_id  = CAST(JSON_VALUE(flow_def, '$.logicalFlowId') AS BIGINT),
-                physical_flow_id = CAST(JSON_VALUE(flow_def, '$.physicalFlowId') AS BIGINT),
-                specification_id = CAST(JSON_VALUE(flow_def, '$.specification.id') AS BIGINT)
-            WHERE logical_flow_id IS NULL
-              AND ISJSON(flow_def) > 0
-              AND JSON_VALUE(flow_def, '$.logicalFlowId') IS NOT NULL;
-        </sql>
-    </changeSet>
-
-    <changeSet id="20260409-7488-4" author="jainkhu">
+    <changeSet id="20260409-7488-3" author="jainkhu">
         <insert tableName="settings">
             <column name="name" value="feature.auto-approve-flow-for-external-actors"/>
             <column name="value" value="false"/>
