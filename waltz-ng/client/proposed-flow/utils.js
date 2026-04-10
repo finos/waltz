@@ -8,7 +8,8 @@ export const STATES = {
     TARGET_APPROVED: "TARGET_APPROVED",
     TARGET_REJECTED: "TARGET_REJECTED",
     FULLY_APPROVED: "FULLY_APPROVED",
-    CANCELLED: "CANCELLED"
+    CANCELLED: "CANCELLED",
+    TIMED_OUT: "TIMED_OUT"
 };
 
 export const stateMeta = {
@@ -18,7 +19,8 @@ export const stateMeta = {
     TARGET_APPROVED: { label: 'Target Approved', color: '#1976d2', icon: 'check' },
     TARGET_REJECTED: { label: 'Target Rejected', color: '#d9534f', icon: 'xmark' },
     FULLY_APPROVED: { label: 'Fully Approved', color: '#25b740', icon: 'check' },
-    CANCELLED: { label: 'Cancelled', color: '#d9534f', icon: 'xmark' }
+    CANCELLED: { label: 'Cancelled', color: '#d9534f', icon: 'xmark' },
+    TIMED_OUT: { label: 'Timed out', color: '#d9534f', icon: 'xmark' }
 };
 
 export const defaultPermissions = {
