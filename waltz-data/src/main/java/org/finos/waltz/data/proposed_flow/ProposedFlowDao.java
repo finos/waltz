@@ -51,13 +51,15 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.APPROVE;
 import static org.finos.waltz.model.Operation.REJECT;
-import static org.finos.waltz.model.proposed_flow.ProposalType.*;
+import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
+import static org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
+import static org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.TARGET_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
@@ -116,15 +118,6 @@ public class ProposedFlowDao {
         proposedFlowCommand.specification().id().ifPresent(proposedFlowRecord::setSpecificationId);
         proposedFlowRecord.store();
         return proposedFlowRecord.getId();
-    }
-
-    public int updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(long proposedFlowId, Long logicalFlowId, Long physicalFlowId, Long specificationId) {
-        return dsl.update(PROPOSED_FLOW)
-                .set(PROPOSED_FLOW.LOGICAL_FLOW_ID, logicalFlowId)
-                .set(PROPOSED_FLOW.PHYSICAL_FLOW_ID, physicalFlowId)
-                .set(PROPOSED_FLOW.SPECIFICATION_ID, specificationId)
-                .where(PROPOSED_FLOW.ID.eq(proposedFlowId))
-                .execute();
     }
 
     public ProposedFlowResponse getProposedFlowResponseById(long id) {
