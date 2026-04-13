@@ -32,20 +32,14 @@ const labelsByKind = {
 };
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker,settingsService) {
     const vm = initialiseData(this, initialState);
 
-    const loadSettings = () => {
-        return serviceBroker
-            .loadViewData(CORE_API.SettingsStore.findAll, [])
-            .then(r => {
-                vm.settings = r.data;
-                vm.dataFlowProposalsEnabled= isDataFlowProposalsEnabled(vm.settings)
-            });
-    }
-
     vm.$onInit = () => {
-        loadSettings()
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
+            })
             .then(() => serviceBroker.loadViewData(
                 CORE_API.NotificationStore.findAll,
                 [],
@@ -72,7 +66,8 @@ function controller(serviceBroker) {
 }
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 

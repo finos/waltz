@@ -12,6 +12,7 @@ import org.finos.waltz.model.proposed_flow.FlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableFlowIdResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
+import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -23,8 +24,8 @@ import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.workflow_state_machine.WorkflowDefinition;
 import org.finos.waltz.service.workflow_state_machine.WorkflowStateMachine;
-import org.finos.waltz.service.workflow_state_machine.exception.TransitionNotFoundException;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionPredicateFailedException;
+import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowContext;
 import org.finos.waltz.service.workflow_state_machine.proposed_flow.ProposedFlowWorkflowTransitionAction;
 import org.jooq.DSLContext;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -167,7 +169,7 @@ public class ProposedFlowWorkflowService {
     public ProposedFlowResponse proposedFlowAction(Long proposedFlowId,
                                                    ProposedFlowWorkflowTransitionAction transitionAction,
                                                    String username,
-                                                   ProposedFlowActionCommand proposedFlowActionCommand) throws FlowCreationException, TransitionNotFoundException {
+                                                   ProposedFlowActionCommand proposedFlowActionCommand) {
 
         String errorMessage = PROPOSED_FLOW_ACTION_SUCCESS;
         CommandOutcome outcome = SUCCESS;
@@ -185,7 +187,7 @@ public class ProposedFlowWorkflowService {
         boolean isTargetApprover = !flowPermission.targetApprover().isEmpty();
         boolean isMaker = proposedFlow.createdBy().equalsIgnoreCase(username);
 
-//        Fetch the current state
+        // Fetch the current state
         ProposedFlowWorkflowState currentState = valueOf(proposedFlow.workflowState().state());
 
         // 2. Get current state and build context
@@ -220,6 +222,9 @@ public class ProposedFlowWorkflowService {
                     .orElse(null);
 
             if (ProposedFlowWorkflowState.FULLY_APPROVED.equals(nextPossibleTransition)) {
+                // refresh as after getting second approval the `proposedFlow` object contains the older version number
+                // in the proposedFlow.workflowState().version() field
+                proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
                 // auto switch to fully approved
                 proposedFlowOperations(proposedFlow, username);
 
@@ -230,12 +235,28 @@ public class ProposedFlowWorkflowService {
             // Refresh Return Object
             proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
 
+            //Update the proposed flow table with final values of logical, physical and specification ids
+            Optional.of(proposedFlow)
+                    .filter(pf -> pf.flowDef().proposalType() == ProposalType.CREATE)
+                    .filter(pf -> valueOf(pf.workflowState().state()) == ProposedFlowWorkflowState.FULLY_APPROVED)
+                    .ifPresent(pf -> proposedFlowDao.updateLogicalFlowPhysicalFlowAndSpecIdsInProposedFlowRecord(
+                            pf.id(),
+                            pf.logicalFlowId(),
+                            pf.physicalFlowId(),
+                            pf.specificationId()));
+
         } catch (TransitionPredicateFailedException e) {
             errorMessage = String.format("%s Failed. The workflow may have been updated or you no longer have permissions to %s this item.", transitionAction, transitionAction.getVerb());
             LOG.error(errorMessage, e);
             outcome = FAILURE;
             builder.message(errorMessage).outcome(outcome);
-        } catch (Exception e) {
+        } catch (TransitionUpdateFailedException e) {
+            errorMessage = String.format("Failed to '%s' proposed flow. The workflow may have updated.", transitionAction);
+            LOG.error(errorMessage, e);
+            outcome = FAILURE;
+            builder.message(errorMessage).outcome(outcome);
+        }
+        catch (Exception e) {
             errorMessage = String.format("Failed to '%s' proposed flow.", transitionAction);
             LOG.error(errorMessage, e);
             outcome = FAILURE;
@@ -340,12 +361,9 @@ public class ProposedFlowWorkflowService {
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
-                .filter(record -> {
-                    ProposedFlowCommand flow = getFlowDefinition(record);
-                    return flow.logicalFlowId().isPresent() && flow.physicalFlowId().isPresent()
-                            && flow.logicalFlowId().get().equals(command.logicalFlowId().orElse(null))
-                            && flow.physicalFlowId().get().equals(command.physicalFlowId().orElse(null));
-                })
+                .filter(record ->
+                        Objects.equals(record.getLogicalFlowId(), command.logicalFlowId().orElse(null))
+                                && Objects.equals(record.getPhysicalFlowId(), command.physicalFlowId().orElse(null)))
                 .findFirst()
                 .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
                 .orElse(null);
@@ -357,12 +375,9 @@ public class ProposedFlowWorkflowService {
 
         return proposedFlowDao.proposedFlowRecordsByProposalType(command)
                 .stream()
-                .filter(record -> {
-                    ProposedFlowCommand flow = getFlowDefinition(record);
-                    return flow.logicalFlowId().isPresent() && flow.physicalFlowId().isPresent()
-                            && flow.logicalFlowId().get().equals(command.logicalFlowId().orElse(null))
-                            && flow.physicalFlowId().get().equals(command.physicalFlowId().orElse(null));
-                })
+                .filter(record ->
+                        Objects.equals(record.getLogicalFlowId(), command.logicalFlowId().orElse(null))
+                                && Objects.equals(record.getPhysicalFlowId(), command.physicalFlowId().orElse(null)))
                 .findFirst()
                 .map(proposedFlowRecord -> buildFlowIdResponse(proposedFlowRecord.getId(), PROPOSED_FLOW))
                 .orElse(null);
