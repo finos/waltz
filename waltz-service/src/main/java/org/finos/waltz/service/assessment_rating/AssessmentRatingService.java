@@ -53,7 +53,6 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
-import org.jooq.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -443,7 +442,7 @@ public class AssessmentRatingService {
                 comment);
 
         // Truncate the message to 4000 characters, adding an ellipsis if shortened.
-        String truncatedMessage = StringUtils.abbreviate(originalMessage, 4000);
+        String truncatedMessage = StringUtilities.truncate(originalMessage, 4000);
 
         ImmutableChangeLog log = ImmutableChangeLog.builder()
                 .message(truncatedMessage)

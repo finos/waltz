@@ -359,6 +359,31 @@ public class StringUtilities {
                 .replaceAll("_+", "_");
     }
 
+    /**
+     * Truncates a String to the desired length, adding an ellipsis (...) if the string
+     * was shortened. If the maxLength is less than 4, this method will simply limit
+     * the string to the given length without an ellipsis.
+     * <p>
+     * Example:
+     * <pre>
+     *     truncate("Hello World", 8)  // "Hello..."
+     *     truncate("Hello World", 20) // "Hello World"
+     *     truncate(null, 10)          // null
+     *     truncate("abc", 3)          // "abc"
+     * </pre>
+     *
+     * @param str       The string to truncate
+     * @param maxLength The maximum length of the resulting string (including ellipsis)
+     * @return The truncated string, or the original string if it was shorter than maxLength.
+     */
+    public static String truncate(String str, int maxLength) {
+        if (isEmpty(str) || str.length() <= maxLength) {
+            return str;
+        }
+        // Not enough space for ellipsis, so just limit
+        return str.substring(0, Math.min(str.length(), maxLength - 3)) + "...";
+    }
+
 
 }
 
