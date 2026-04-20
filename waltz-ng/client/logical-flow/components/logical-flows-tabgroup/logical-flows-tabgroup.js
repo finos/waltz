@@ -29,7 +29,8 @@ import FlowDetailPanel from "../../../data-flow/components/svelte/flow-detail-ta
 
 const bindings = {
     filters: "<",
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+    onTabSelected: "&?"
 };
 
 const initialState = {
@@ -40,7 +41,8 @@ const initialState = {
         loadingStats: false
     },
     FlowDetailPanel,
-    currentTabIndex: 0
+    currentTabIndex: 0,
+    loadingError: false
 };
 
 function controller($q,
@@ -69,6 +71,9 @@ function controller($q,
             .all([flowPromise, decoratorPromise])
             .then(() => {
                 vm.visibility.loadingFlows = false;
+            })
+            .catch(e => {
+                vm.loadingError = true;
             });
     };
 
@@ -85,6 +90,9 @@ function controller($q,
     };
 
     vm.tabSelected = (tabName, index) => {
+        if (_.isFunction(vm.onTabSelected)) {
+            vm.onTabSelected();
+        }
         if(index > 0) {
             loadDetail();
         }

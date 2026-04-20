@@ -43,10 +43,24 @@
 
     <div ng-if="$ctrl.hasFlows">
         <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef"
-                                      filters="$ctrl.filters">
+                                      filters="$ctrl.filters"
+                                      on-tab-selected="$ctrl.onTabSelected()">
         </waltz-logical-flows-tabgroup>
     </div>
-    <div ng-if="!$ctrl.hasFlows">
+    <div ng-if="!$ctrl.visibility.loading && $ctrl.hasFlows && !$ctrl.tabSelected">
+        <waltz-warning>
+            <message>
+                Please select a view: Choose Graph, Table, or flow Details to display data
+            </message>
+            <content></content>
+        </waltz-warning>
+    </div>
+    <div ng-if="$ctrl.loadingStats">
+        <waltz-loading-notification show="$ctrl.loadingStats"
+                                    name="Please wait while we retrieve this data">
+        </waltz-loading-notification>
+    </div>
+    <div ng-if="!$ctrl.loadingStats && !$ctrl.hasFlows">
         <waltz-no-data>
             <message>
                 <strong>No related flows found.</strong>
