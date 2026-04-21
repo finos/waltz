@@ -33,7 +33,7 @@ public class PendingFlowsSLAScheduledJob {
 
     @Scheduled(cron = "${waltz.proposed-flow.pending-timeout-cron:0 20 15 * * *}")
     public void run() {
-        Thread.currentThread().setName("WaltzPendingFlowsJobService");
+        Thread.currentThread().setName("WaltzAutoTimeOutPendingJobsService");
         proposedFlowWorkflowService.timeOutPendingFlows(PENDING_FLOWS_TIME_OUT_THRESHOLD);
     }
     private void runIfNeeded(JobKey jobKey, Consumer<JobKey> jobExecutor) {
