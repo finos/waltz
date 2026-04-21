@@ -27,21 +27,24 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.schema.tables.records.EntityWorkflowStateRecord;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.*;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
 
 @Repository
 public class EntityWorkflowStateDao {
     public static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
-        EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
+        EntityWorkflowStateRecord r = record.into(org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE);
 
         return ImmutableEntityWorkflowState
                 .builder()
@@ -83,7 +86,7 @@ public class EntityWorkflowStateDao {
                                     String username,
                                     String workflowState,
                                     String description) {
-        EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
+        EntityWorkflowStateRecord stateRecord = dsl.newRecord(org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(workflowDefId);
         stateRecord.setEntityId(ref.id());
         stateRecord.setEntityKind(ref.kind().name());
@@ -95,17 +98,76 @@ public class EntityWorkflowStateDao {
         stateRecord.insert();
     }
 
-    public long updateState(Long workflowDefId, EntityReference ref, String user, EntityWorkflowState workflowState) {
-        return dsl
-                .update(ENTITY_WORKFLOW_STATE)
-                .set(ENTITY_WORKFLOW_STATE.STATE, workflowState.state())
-                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
-                .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, user)
-                .set(ENTITY_WORKFLOW_STATE.VERSION, (workflowState.version() + 1L))
-                .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowDefId)
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(ref.id()))
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(ref.kind().name())))
-                        .and(ENTITY_WORKFLOW_STATE.VERSION.eq(workflowState.version()))
-                .execute();
+    public long updateState(String username,
+                            String reason,
+                            List<EntityWorkflowState> workflowStates,
+                            List<String> currentStates,
+                            String newState) {
+        checkNotNull(workflowStates, "workflowStates cannot be null");
+        checkNotNull(currentStates, "currentStates cannot be null");
+        checkTrue(workflowStates.size() == currentStates.size(), "workflowStates and currentStates must have the same size");
+
+        if (workflowStates.isEmpty()) {
+            return 0;
+        }
+
+        final long[] result = new long[1];
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+            result[0] = doUpdateStateTransition(tx, username, reason, workflowStates, currentStates, newState);
+        });
+        return result[0];
+    }
+
+    private long doUpdateStateTransition(DSLContext tx,String username,String reason,List<EntityWorkflowState> workflowStates,
+                                         List<String> currentStates,String newState) {
+
+        Timestamp now = Timestamp.valueOf(DateTimeUtilities.nowUtc());
+
+        Query[] stateQueries = new Query[workflowStates.size()];
+        Query[] transitionQueries = new Query[workflowStates.size()];
+
+        for (int i = 0; i < workflowStates.size(); i++) {
+            EntityWorkflowState workflowState = workflowStates.get(i);
+
+            stateQueries[i] = tx.update(ENTITY_WORKFLOW_STATE)
+                    .set(ENTITY_WORKFLOW_STATE.STATE, newState)
+                    .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, now)
+                    .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, username)
+                    .set(ENTITY_WORKFLOW_STATE.VERSION, workflowState.version() + 1)
+                    .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowState.workflowId()))
+                    .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(workflowState.entityReference().kind().name()))
+                    .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(workflowState.entityReference().id()))
+                    .and(ENTITY_WORKFLOW_STATE.VERSION.eq(workflowState.version()));
+
+            transitionQueries[i] = tx.insertInto(ENTITY_WORKFLOW_TRANSITION)
+                    .set(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID, workflowState.workflowId())
+                    .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID, workflowState.entityReference().id())
+                    .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND, workflowState.entityReference().kind().name())
+                    .set(ENTITY_WORKFLOW_TRANSITION.FROM_STATE, currentStates.get(i))
+                    .set(ENTITY_WORKFLOW_TRANSITION.TO_STATE, newState)
+                    .set(ENTITY_WORKFLOW_TRANSITION.REASON, reason)
+                    .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT, now)
+                    .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY, username)
+                    .set(ENTITY_WORKFLOW_TRANSITION.PROVENANCE, "waltz");
+        }
+
+
+        int updatedRows = Arrays.stream(tx.batch(stateQueries).execute()).sum();
+        int insertedRows = Arrays.stream(tx.batch(transitionQueries).execute()).sum();
+
+        checkTrue(updatedRows == workflowStates.size(),
+                "Workflow state update failed. Updated rows: %s, expected rows: %s",
+                updatedRows,
+                workflowStates.size());
+
+        checkTrue(insertedRows == workflowStates.size(),
+                "Workflow transition insert failed. Inserted rows: %s, expected rows: %s",
+                insertedRows,
+                workflowStates.size());
+
+        return updatedRows;
+
+
     }
 }

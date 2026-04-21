@@ -32,18 +32,15 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
-import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.ADD;
 import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -111,27 +108,30 @@ public class EntityWorkflowService {
         changeLogService.write(changeLogList);
     }
 
-    public void updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
-                                      String currentState, String newState) throws TransitionUpdateFailedException {
-        long updatedRows = entityWorkflowStateDao.updateState(workflowState.workflowId(), workflowState.entityReference(),
-                username, ImmutableEntityWorkflowState
-                        .copyOf(workflowState)
-                        .withState(newState));
+    public long updateStateTransition(String username, String reason, List<EntityWorkflowState> workflowStates,
+                                      List<String> currentStates, String newState) throws TransitionUpdateFailedException {
 
-        if(updatedRows == 0L) {
-            throw new TransitionUpdateFailedException("Workflow state update failed.");
+        long processedCount = entityWorkflowStateDao.updateState(
+                username,
+                reason,
+                workflowStates,
+                currentStates,
+                newState);
+
+
+        List<ChangeLog> changeLogList = new ArrayList<>();
+
+        for (int i = 0; i < workflowStates.size(); i++) {
+            EntityWorkflowState workflowState = workflowStates.get(i);
+            String currentState = currentStates.get(i);
+            changeLogList.add(mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                    format(STATE_CHANGE_LOG, workflowState.entityReference().id(), newState)));
+            changeLogList.add(mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                    format(TRANSITION_CHANGE_LOG, workflowState.entityReference().id(), currentState, newState)));
         }
-
-        entityWorkflowTransitionDao.createWorkflowTransition(workflowState.workflowId(), workflowState.entityReference(),
-                username, currentState, newState, reason);
-
-        List<ChangeLog> changeLogList = Arrays.asList(
-                mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format(STATE_CHANGE_LOG, workflowState.entityReference().id(), newState)),
-                mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                        format(TRANSITION_CHANGE_LOG, workflowState.entityReference().id(), currentState, newState))
-        );
         changeLogService.write(changeLogList);
+
+        return processedCount;
     }
 
     public void createEntityWorkflowResult(Long entityWorkflowDefinitionId, EntityReference workflowEntity, EntityReference resultEntity, String username) {

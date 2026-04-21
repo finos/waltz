@@ -78,32 +78,6 @@ import static org.jooq.impl.DSL.selectOne;
 @Repository
 public class ProposedFlowDao {
 
-    public static final class TimeoutTransition {
-        public final long workflowId;
-        public final long proposedFlowId;
-        public final String fromState;
-        public final String toState;
-
-        public TimeoutTransition(long workflowId, long proposedFlowId, String fromState, String toState) {
-            this.workflowId = workflowId;
-            this.proposedFlowId = proposedFlowId;
-            this.fromState = fromState;
-            this.toState = toState;
-        }
-    }
-    public static final class TimeoutCandidate {
-        public final long proposedFlowId;
-        public final long workflowId;
-        public final String currentState;
-
-        public TimeoutCandidate(long proposedFlowId, long workflowId, String currentState) {
-            this.proposedFlowId = proposedFlowId;
-            this.workflowId = workflowId;
-            this.currentState = currentState;
-        }
-    }
-
-
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
     private static final List<String> ACTION_PENDING_SOURCE_APPROVER_STATE = Arrays.asList(
@@ -114,16 +88,12 @@ public class ProposedFlowDao {
             ProposedFlowWorkflowState.SOURCE_APPROVED.name());
 
     private final DSLContext dsl;
-    private final EntityWorkflowStateDao entityWorkflowStateDao;
-    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
     @Autowired
     public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
         checkNotNull(dsl, "dsl cannot be null");
 
-        this.entityWorkflowStateDao = entityWorkflowStateDao;
-        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.dsl = dsl;
     }
@@ -549,16 +519,13 @@ public class ProposedFlowDao {
 
     }
 
-    public List<TimeoutCandidate> findPendingTimeoutCandidatesOlderThanDays(int timeoutDays) {
+    public List<Long> findPendingFlowsOlderThanDays(int timeoutDays) {
         Long workflowId = fetchWorkflowID();
 
         Timestamp threshold = Timestamp.valueOf(DateTimeUtilities.nowUtc().minusDays(timeoutDays));
 
         return dsl
-                .select(
-                        PROPOSED_FLOW.ID,
-                        ENTITY_WORKFLOW_STATE.WORKFLOW_ID,
-                        ENTITY_WORKFLOW_STATE.STATE)
+                .select(PROPOSED_FLOW.ID)
                 .from(PROPOSED_FLOW)
                 .join(ENTITY_WORKFLOW_STATE)
                 .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
@@ -566,87 +533,6 @@ public class ProposedFlowDao {
                 .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
                 .where(PROPOSED_FLOW.CREATED_AT.le(threshold))
                 .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES.stream().map(Enum::name).collect(Collectors.toList())))
-                .fetch(r -> new TimeoutCandidate(
-                        r.get(PROPOSED_FLOW.ID),
-                        r.get(ENTITY_WORKFLOW_STATE.WORKFLOW_ID),
-                        r.get(ENTITY_WORKFLOW_STATE.STATE)));
+                .fetch(r -> r.get(PROPOSED_FLOW.ID));
     }
-
-
-    public int batchApplyTimeoutTransitions(List<TimeoutTransition> transitions,
-                                            String username,
-                                            String reason) {
-        if (transitions == null || transitions.isEmpty()) {
-            return 0;
-        }
-
-        Timestamp now = Timestamp.valueOf(DateTimeUtilities.nowUtc());
-
-        var transitionBatch = dsl.batch(
-                dsl.insertInto(
-                                ENTITY_WORKFLOW_TRANSITION,
-                                ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID,
-                                ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND,
-                                ENTITY_WORKFLOW_TRANSITION.ENTITY_ID,
-                                ENTITY_WORKFLOW_TRANSITION.PROVENANCE,
-                                ENTITY_WORKFLOW_TRANSITION.FROM_STATE,
-                                ENTITY_WORKFLOW_TRANSITION.TO_STATE,
-                                ENTITY_WORKFLOW_TRANSITION.REASON,
-                                ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY,
-                                ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT)
-                        .values(
-                                (Long) null,
-                                null,
-                                (Long) null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                (Timestamp) null)
-        );
-
-        var stateBatch = dsl.batch(
-                dsl.update(ENTITY_WORKFLOW_STATE)
-                        .set(ENTITY_WORKFLOW_STATE.STATE, (String) null)
-                        .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, (String) null)
-                        .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, (Timestamp) null)
-                        .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq((Long) null))
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq((String) null))
-                        .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq((Long) null))
-                        .and(ENTITY_WORKFLOW_STATE.STATE.eq((String) null))
-        );
-
-        for (TimeoutTransition t : transitions) {
-            transitionBatch.bind(
-                    t.workflowId,
-                    EntityKind.PROPOSED_FLOW.name(),
-                    t.proposedFlowId,
-                    "waltz",
-                    t.fromState,
-                    t.toState,
-                    reason,
-                    username,
-                    now
-            );
-
-            stateBatch.bind(
-                    t.toState,
-                    username,
-                    now,
-                    t.workflowId,
-                    EntityKind.PROPOSED_FLOW.name(),
-                    t.proposedFlowId,
-                    t.fromState
-            );
-
-        }
-
-        int updated = java.util.Arrays.stream(stateBatch.execute()).sum();
-        int inserted = java.util.Arrays.stream(transitionBatch.execute()).sum();
-
-        return Math.min(updated, inserted);
-    }
-
-
 }

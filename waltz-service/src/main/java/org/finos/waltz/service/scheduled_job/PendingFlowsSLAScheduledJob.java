@@ -23,16 +23,18 @@ public class PendingFlowsSLAScheduledJob {
     private final ScheduledJobDao scheduledJobDao;
     private final ProposedFlowWorkflowService proposedFlowWorkflowService;
 
+    private static final String PENDING_FLOWS_TIME_OUT_THRESHOLD = "feature.data-flows-timeout-threshold";
+
     @Autowired
     public PendingFlowsSLAScheduledJob(ScheduledJobDao scheduledJobDao, ProposedFlowWorkflowService proposedFlowWorkflowService) {
         this.scheduledJobDao = scheduledJobDao;
         this.proposedFlowWorkflowService = proposedFlowWorkflowService;
     }
 
-    @Scheduled(cron = "${waltz.proposed-flow.pending-timeout-cron:-}")
+    @Scheduled(cron = "${waltz.proposed-flow.pending-timeout-cron:0 20 15 * * *}")
     public void run() {
         Thread.currentThread().setName("WaltzPendingFlowsJobService");
-        runIfNeeded(JobKey.PENDING_FLOWS_TIME_OUT, proposedFlowWorkflowService::pendingFlowsTimeOut);
+        proposedFlowWorkflowService.timeOutPendingFlows(PENDING_FLOWS_TIME_OUT_THRESHOLD);
     }
     private void runIfNeeded(JobKey jobKey, Consumer<JobKey> jobExecutor) {
         runIfNeeded(jobKey, jobExecutor, Collections.emptySet());
