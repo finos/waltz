@@ -32,8 +32,10 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowResult;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.workflow_state_machine.exception.TransitionUpdateFailedException;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +43,7 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.ADD;
 import static org.finos.waltz.model.Operation.UPDATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.PROPOSED_CREATE;
@@ -52,14 +55,17 @@ public class EntityWorkflowService {
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowResultDao entityWorkflowResultDao;
+    private final DSLContext dsl;
     private static final String STATE_CHANGE_LOG = "Entity Workflow State changed for [proposedFlowId=%d] to %s";
     private static final String TRANSITION_CHANGE_LOG = "Entity Workflow Transition saved for [proposedFlowId=%d] with from: %s to: %s State";
     private static final String CREATE_FLOW_CHANGE_LOG = "New Workflow Created with [proposedFlowId=%d]";
 
     @Autowired
-    public EntityWorkflowService(ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
+    public EntityWorkflowService(DSLContext dsl,
+                                 ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
                                  EntityWorkflowStateDao entityWorkflowStateDao,
                                  EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowResultDao entityWorkflowResultDao) {
+        this.dsl = dsl;
         this.changeLogService = changeLogService;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
@@ -118,6 +124,8 @@ public class EntityWorkflowService {
                 currentStates,
                 newState);
 
+        if(processedCount == 0)
+            throw new TransitionUpdateFailedException("Workflow state update failed.");
 
         List<ChangeLog> changeLogList = new ArrayList<>();
 
