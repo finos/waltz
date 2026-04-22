@@ -376,7 +376,7 @@ public class StringUtilities {
      * @param maxLength The maximum length of the resulting string (including ellipsis)
      * @return The truncated string, or the original string if it was shorter than maxLength.
      */
-    public static String truncate(String str, int maxLength) {
+    public static String abbreviate(String str, int maxLength) {
         if (isEmpty(str) || str.length() <= maxLength) {
             return str;
         }

@@ -442,7 +442,7 @@ public class AssessmentRatingService {
                 comment);
 
         // Truncate the message to 4000 characters, adding an ellipsis if shortened.
-        String truncatedMessage = StringUtilities.truncate(originalMessage, 4000);
+        String truncatedMessage = StringUtilities.abbreviate(originalMessage, 4000);
 
         ImmutableChangeLog log = ImmutableChangeLog.builder()
                 .message(truncatedMessage)
