@@ -147,7 +147,7 @@ public class ProposedFlowWorkflowService {
                 proposedFlow = autoApproveFlowsForExternalActors(proposedFlow,proposedFlowCommand);
                 proposedFlow = autoApproveWhenProposerIsApprover(proposedFlow,username);
             } catch (Exception e) {
-                LOG.error("Unable to auto approve external actor endpoint(s) for proposed flow id={}", proposedFlowRef.id(), e);
+                LOG.error("Unable to auto approve the proposed flow id={}", proposedFlowRef.id(), e);
             }
         });
     }
@@ -169,9 +169,6 @@ public class ProposedFlowWorkflowService {
                 proposedFlow.flowDef().source(),
                 proposedFlow.flowDef().target()
         );
-        if(flowPermission.sourceApprover().isEmpty() && flowPermission.targetApprover().isEmpty()) {
-            return proposedFlow;
-        }
 
         if(!flowPermission.sourceApprover().isEmpty()) {
             ProposedFlowActionCommand proposedFlowActionCommand = ImmutableProposedFlowActionCommand.builder()
