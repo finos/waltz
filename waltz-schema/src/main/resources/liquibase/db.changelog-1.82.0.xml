@@ -30,7 +30,7 @@
         <createIndex indexName="idx_involvement_group_entry_involvement_kind_id"
                      tableName="involvement_group_entry"
                      unique="false">
-            <column name="involvement_kind_id" type="${id.type}"></column>
+            <column name="involvement_kind_id" ></column>
         </createIndex>
     </changeSet>
 
@@ -39,9 +39,9 @@
         <createIndex indexName="idx_ews_workflow_id_entity_id_entity_kind"
                      tableName="entity_workflow_state"
                      unique="false">
-            <column name="workflow_id" type="${id.type}"></column>
-            <column name="entity_id" type="${id.type}"></column>
-            <column name="entity_kind" type="${enum.type}"></column>
+            <column name="workflow_id" ></column>
+            <column name="entity_id" ></column>
+            <column name="entity_kind" ></column>
         </createIndex>
     </changeSet>
 
@@ -50,9 +50,9 @@
         <createIndex indexName="idx_ewt_workflow_id_entity_id_entity_kind"
                      tableName="entity_workflow_transition"
                      unique="false">
-            <column name="workflow_id" type="${id.type}"></column>
-            <column name="entity_id" type="${id.type}"></column>
-            <column name="entity_kind" type="${enum.type}"></column>
+            <column name="workflow_id" ></column>
+            <column name="entity_id" ></column>
+            <column name="entity_kind" ></column>
         </createIndex>
     </changeSet>
 
