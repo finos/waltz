@@ -3,6 +3,7 @@
     import ProposedFlowSection from "./ProposedFlowSection.svelte";
     import {proposeDataFlowRemoteStore} from "../../../../svelte-stores/propose-data-flow-remote-store";
     import {displayError} from "../../../../common/error-utils";
+    import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
 
     export let userName;
     export let dataTypeIdToNameMap = {};
@@ -117,6 +118,7 @@
     let selectedTab = TABS.ACTIVE;
 
     let flows = [];
+    let isLoadingFlows = false;
 
     $: selectionOptions = {
         entityLifecycleStatuses: ["ACTIVE"],
@@ -129,11 +131,14 @@
     }
 
     $ : {
+        isLoadingFlows=true;
         proposeDataFlowRemoteStore.findProposedFlowsBySelector(selectionOptions)
         .then(r => {
             flows = r.data;
+            isLoadingFlows=false;
         })
         .catch(e => {
+            isLoadingFlows=false;
             displayError("Something went wrong, please try again.");
         })
     }
@@ -149,8 +154,7 @@
         : [];
 
     // flows that require 'my' action
-    $: myActionableFlowsCall = proposeDataFlowRemoteStore
-        .findPendingActionFlowsForPersonWhereSourceOrTargetApprover(person.id);
+    $: myActionableFlowsCall = !isLoadingFlows && flows? proposeDataFlowRemoteStore.findPendingActionFlowsForPersonWhereSourceOrTargetApprover(person.id) : null;
 
     $: myActionableFlowsMap = new Map($myActionableFlowsCall?.data?.map(t => [t, true])
         .filter(Boolean));
@@ -179,7 +183,10 @@
         </span>
     </label>
     <div class="wt-tab wt-active">
-        { #if selectedTab === TABS.ACTIVE }
+        {#if isLoadingFlows}
+            <LoadingPlaceholder/>
+        {/if}
+        { #if selectedTab === TABS.ACTIVE && !isLoadingFlows}
         <ProposedFlowSection userName={userName}
                              flows={actionableFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
@@ -189,7 +196,7 @@
                              actionablePillDefs={actionablePillDefs}
                              currentTabText={TABS.ACTIVE}
                              myActionables={myActionableFlowsMap}/>
-        { :else if selectedTab === TABS.COMPLETED }
+        { :else if selectedTab === TABS.COMPLETED && !isLoadingFlows}
         <ProposedFlowSection userName={userName}
                              flows={historicalFlows}
                              dataTypeIdToNameMap={dataTypeIdToNameMap}
