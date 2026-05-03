@@ -20,6 +20,7 @@ description: >-
 url: "http://waltz.finos.org"
 twitter_username: finosfoundation
 github_username: finos
+google_analytics: G-0G2YB07622
 
 # Build settings
 source: .
