@@ -434,13 +434,18 @@ public class AssessmentRatingService {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(rating.assessmentDefinitionId());
         RatingSchemeItem ratingItem = ratingSchemeDAO.getRatingSchemeItemById(rating.ratingId());
 
+        String originalMessage = format(
+                "Updated comment for assessment '%s', rating '%s' from: '%s' to '%s'",
+                assessmentDefinition.name(),
+                ratingItem.name(),
+                rating.comment(),
+                comment);
+
+        // Truncate the message to 4000 characters, adding an ellipsis if shortened.
+        String truncatedMessage = StringUtilities.abbreviate(originalMessage, 4000);
+
         ImmutableChangeLog log = ImmutableChangeLog.builder()
-                .message(format(
-                        "Updated comment for assessment '%s', rating '%s' from: '%s' to '%s'",
-                        assessmentDefinition.name(),
-                        ratingItem.name(),
-                        rating.comment(),
-                        comment))
+                .message(truncatedMessage)
                 .parentReference(rating.entityReference())
                 .userId(username)
                 .severity(Severity.INFORMATION)
