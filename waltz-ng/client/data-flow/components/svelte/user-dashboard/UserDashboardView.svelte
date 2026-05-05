@@ -6,6 +6,7 @@
     import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
     import ProposedFlows from "./ProposedFlows.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import LoadingPlaceholder from "../../../../common/svelte/LoadingPlaceholder.svelte";
 
     $: userCall = userStore.load();
     $: user = $userCall?.data;
@@ -22,6 +23,9 @@
             acc[d.id] = d.name;
             return acc;
         }, {});
+
+    // Check if any of the API calls are still loading
+    $: isLoading = !$userCall?.data || !$personCall?.data || !$dataTypesCall?.data;
 </script>
 
 <div>
@@ -35,7 +39,9 @@
                 </ol>
             </div>
             <div slot="summary">
-                { #if user }
+                { #if isLoading }
+                    <LoadingPlaceholder/>
+                { :else if user }
                     <ProposedFlows userName={user.userName} dataTypeIdToNameMap={dataTypeIdToNameMap} person={person}/>
                 { :else }
                     <NoData>No data available for you.</NoData>

@@ -211,12 +211,8 @@ public class ProposedFlowDao {
         SelectFieldOrAsterisk[] selectFields = Stream.of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(), ENTITY_WORKFLOW_TRANSITION.fields())
                 .flatMap(Arrays::stream).map(f -> (SelectFieldOrAsterisk) f).toArray(SelectFieldOrAsterisk[]::new);
 
-        // --- Base CTE: current person
-        SelectConditionStep<Record3<Long, String, String>> currentPerson = getCurrentPerson(personId);
-        CommonTableExpression<Record3<Long, String, String>> currentPersonCte =
-                name("current_person").fields("id", "employee_id", "email").as(currentPerson);
         // --- Optional subordinate CTE if needed
-        CommonTableExpression<Record3<Long, String, String>> personScopeCte = getPersonScope(includeSubordinates, currentPerson);
+        CommonTableExpression<Record3<Long, String, String>> personScopeCte = getPersonScope(includeSubordinates, getCurrentPerson(personId));
         // table reference for unified CTE
         Table<?> personScopeTbl = personScopeCte.as("ps");
 
@@ -251,8 +247,7 @@ public class ProposedFlowDao {
                     .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
         }
         // --- Build the shared query
-        return dsl
-                .with(currentPersonCte)
+                return dsl
                 .with(personScopeCte)
                 .with(userPermissionsCte)
                 .select(selectFields)
