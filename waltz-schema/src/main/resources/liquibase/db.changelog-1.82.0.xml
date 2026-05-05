@@ -24,4 +24,36 @@
                author="ramerav">
         <tagDatabase tag="v1.81.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <changeSet id="20260429-7510-1"
+               author="kumarohb">
+        <createIndex indexName="idx_involvement_group_entry_involvement_kind_id"
+                     tableName="involvement_group_entry"
+                     unique="false">
+            <column name="involvement_kind_id" ></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260429-7510-2"
+               author="kumarohb">
+        <createIndex indexName="idx_ews_workflow_id_entity_id_entity_kind"
+                     tableName="entity_workflow_state"
+                     unique="false">
+            <column name="workflow_id" ></column>
+            <column name="entity_id" ></column>
+            <column name="entity_kind" ></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260429-7510-3"
+               author="kumarohb">
+        <createIndex indexName="idx_ewt_workflow_id_entity_id_entity_kind"
+                     tableName="entity_workflow_transition"
+                     unique="false">
+            <column name="workflow_id" ></column>
+            <column name="entity_id" ></column>
+            <column name="entity_kind" ></column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
