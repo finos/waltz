@@ -50,6 +50,19 @@ All Maintainer votes MUST be carried out transparently, with all discussion and 
 
 Any Contributor who has made a substantial contribution to the project MAY apply (or be nominated) to become a Maintainer. The existing Maintainers SHALL decide whether to approve the nomination according to the Maintainer Voting process above.
 
+In considering whether a Contributor is eligible to become a Maintainer, the Maintainers SHOULD take into account whether the Contributor has demonstrated:
+
+* sustained and constructive engagement with the project over time;
+* sound judgement and a collaborative approach in issues, pull requests, and discussions;
+* familiarity with the project's contribution process, governance, and technical direction;
+* willingness to take on maintainership responsibilities such as reviewing pull requests, helping other contributors, and supporting routine project maintenance;
+* participation in public project meetings and active support of the community to help increase the project's adoption; and
+* engagement with the project's documentation, including reading, understanding, and contributing improvements to user or contributor documentation (for example, the README or the waltz.finos.org website).
+
+A Contributor would normally be expected to have contributed not only code, but also some combination of documentation improvements, pull request review, issue discussion, or other project stewardship activity.
+
+Substantial contributions MAY include code, documentation, issue triage, pull request reviews, design discussion, community support, or other work that materially improves the project.
+
 ### Changes to this Document
 
 This document MAY be amended by a vote of the Maintainers according to the Maintainer Voting process above.
