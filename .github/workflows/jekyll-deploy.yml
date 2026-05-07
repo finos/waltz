@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'docs/**'
+      - '.github/workflows/jekyll-deploy.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - '.github/workflows/jekyll-deploy.yml'
   workflow_dispatch:
 
 permissions:
@@ -47,7 +56,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
 
   deploy:
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
