@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.Operation.ADD;
@@ -55,17 +56,16 @@ public class EntityWorkflowService {
     private final EntityWorkflowStateDao entityWorkflowStateDao;
     private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowResultDao entityWorkflowResultDao;
-    private final DSLContext dsl;
     private static final String STATE_CHANGE_LOG = "Entity Workflow State changed for [proposedFlowId=%d] to %s";
     private static final String TRANSITION_CHANGE_LOG = "Entity Workflow Transition saved for [proposedFlowId=%d] with from: %s to: %s State";
     private static final String CREATE_FLOW_CHANGE_LOG = "New Workflow Created with [proposedFlowId=%d]";
 
     @Autowired
-    public EntityWorkflowService(DSLContext dsl,
-                                 ChangeLogService changeLogService, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
+    public EntityWorkflowService(ChangeLogService changeLogService,
+                                 EntityWorkflowDefinitionDao entityWorkflowDefinitionDao,
                                  EntityWorkflowStateDao entityWorkflowStateDao,
-                                 EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowResultDao entityWorkflowResultDao) {
-        this.dsl = dsl;
+                                 EntityWorkflowTransitionDao entityWorkflowTransitionDao,
+                                 EntityWorkflowResultDao entityWorkflowResultDao) {
         this.changeLogService = changeLogService;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.entityWorkflowStateDao = entityWorkflowStateDao;
@@ -114,6 +114,11 @@ public class EntityWorkflowService {
         changeLogService.write(changeLogList);
     }
 
+    public long updateStateTransition(String username, String reason, EntityWorkflowState workflowState,
+                                      String currentState, String newState) throws TransitionUpdateFailedException {
+        return updateStateTransition(username, reason, singletonList(workflowState), singletonList(currentState), newState);
+    }
+
     public long updateStateTransition(String username, String reason, List<EntityWorkflowState> workflowStates,
                                       List<String> currentStates, String newState) throws TransitionUpdateFailedException {
 
@@ -124,18 +129,21 @@ public class EntityWorkflowService {
                 currentStates,
                 newState);
 
-        if(processedCount == 0)
+        if (processedCount == 0) {
             throw new TransitionUpdateFailedException("Workflow state update failed.");
+        }
 
         List<ChangeLog> changeLogList = new ArrayList<>();
 
         for (int i = 0; i < workflowStates.size(); i++) {
             EntityWorkflowState workflowState = workflowStates.get(i);
             String currentState = currentStates.get(i);
-            changeLogList.add(mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                    format(STATE_CHANGE_LOG, workflowState.entityReference().id(), newState)));
-            changeLogList.add(mkChangeLog(workflowState.entityReference(), username, UPDATE,
-                    format(TRANSITION_CHANGE_LOG, workflowState.entityReference().id(), currentState, newState)));
+            changeLogList.add(
+                    mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                            format(STATE_CHANGE_LOG, workflowState.entityReference().id(), newState)));
+            changeLogList.add(
+                    mkChangeLog(workflowState.entityReference(), username, UPDATE,
+                            format(TRANSITION_CHANGE_LOG, workflowState.entityReference().id(), currentState, newState)));
         }
         changeLogService.write(changeLogList);
 

@@ -35,6 +35,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
@@ -111,45 +112,47 @@ public class EntityWorkflowStateDao {
             return 0;
         }
 
-        final long[] result = new long[1];
+        final AtomicInteger result = new AtomicInteger();
         dsl.transaction(ctx -> {
             DSLContext tx = ctx.dsl();
-            result[0] = doUpdateStateTransition(tx, username, reason, workflowStates, currentStates, newState);
+            result.set(doUpdateStateTransition(tx, username, reason, workflowStates, currentStates, newState));
         });
-        return result[0];
+        return result.get();
     }
 
-    private long doUpdateStateTransition(DSLContext tx,String username,String reason,List<EntityWorkflowState> workflowStates,
-                                         List<String> currentStates,String newState) {
+    private Integer doUpdateStateTransition(DSLContext tx, String username, String reason, List<EntityWorkflowState> workflowStates,
+                                         List<String> currentStates, String newState) {
 
         Timestamp now = Timestamp.valueOf(DateTimeUtilities.nowUtc());
 
-        Query[] stateQueries = new Query[workflowStates.size()];
-        Query[] transitionQueries = new Query[workflowStates.size()];
+        List<Query> stateQueries = new ArrayList<>(workflowStates.size());
+        List<Query> transitionQueries = new ArrayList<>(workflowStates.size());
 
         for (int i = 0; i < workflowStates.size(); i++) {
             EntityWorkflowState workflowState = workflowStates.get(i);
 
-            stateQueries[i] = tx.update(ENTITY_WORKFLOW_STATE)
-                    .set(ENTITY_WORKFLOW_STATE.STATE, newState)
-                    .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, now)
-                    .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, username)
-                    .set(ENTITY_WORKFLOW_STATE.VERSION, workflowState.version() + 1)
-                    .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowState.workflowId()))
-                    .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(workflowState.entityReference().kind().name()))
-                    .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(workflowState.entityReference().id()))
-                    .and(ENTITY_WORKFLOW_STATE.VERSION.eq(workflowState.version()));
+            stateQueries.add(
+                    tx.update(ENTITY_WORKFLOW_STATE)
+                            .set(ENTITY_WORKFLOW_STATE.STATE, newState)
+                            .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_AT, now)
+                            .set(ENTITY_WORKFLOW_STATE.LAST_UPDATED_BY, username)
+                            .set(ENTITY_WORKFLOW_STATE.VERSION, workflowState.version() + 1)
+                            .where(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowState.workflowId()))
+                            .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(workflowState.entityReference().kind().name()))
+                            .and(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(workflowState.entityReference().id()))
+                            .and(ENTITY_WORKFLOW_STATE.VERSION.eq(workflowState.version())));
 
-            transitionQueries[i] = tx.insertInto(ENTITY_WORKFLOW_TRANSITION)
-                    .set(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID, workflowState.workflowId())
-                    .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID, workflowState.entityReference().id())
-                    .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND, workflowState.entityReference().kind().name())
-                    .set(ENTITY_WORKFLOW_TRANSITION.FROM_STATE, currentStates.get(i))
-                    .set(ENTITY_WORKFLOW_TRANSITION.TO_STATE, newState)
-                    .set(ENTITY_WORKFLOW_TRANSITION.REASON, reason)
-                    .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT, now)
-                    .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY, username)
-                    .set(ENTITY_WORKFLOW_TRANSITION.PROVENANCE, "waltz");
+            transitionQueries.add(
+                    tx.insertInto(ENTITY_WORKFLOW_TRANSITION)
+                            .set(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID, workflowState.workflowId())
+                            .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID, workflowState.entityReference().id())
+                            .set(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND, workflowState.entityReference().kind().name())
+                            .set(ENTITY_WORKFLOW_TRANSITION.FROM_STATE, currentStates.get(i))
+                            .set(ENTITY_WORKFLOW_TRANSITION.TO_STATE, newState)
+                            .set(ENTITY_WORKFLOW_TRANSITION.REASON, reason)
+                            .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_AT, now)
+                            .set(ENTITY_WORKFLOW_TRANSITION.LAST_UPDATED_BY, username)
+                            .set(ENTITY_WORKFLOW_TRANSITION.PROVENANCE, "waltz"));
         }
 
 
