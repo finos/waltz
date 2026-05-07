@@ -33,7 +33,7 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true
-          working-directory: ./docs
+          working-directory: ./docs/blog
 
       - name: Setup Pages
         id: pages
@@ -47,14 +47,15 @@ jobs:
           echo "google_analytics: $GOOGLE_ANALYTICS_ID" > _config.secret.yml
 
       - name: Build with Jekyll
-        working-directory: ./docs
+        working-directory: ./docs/blog
         env:
           JEKYLL_ENV: production
         run: |
           bundle exec jekyll build \
+            --source .. \
             --baseurl "${{ steps.pages.outputs.base_path }}" \
-            -d _site \
-            --config _config.yml,_config.secret.yml
+            -d ../_site \
+            --config ../_config.yml,../_config.secret.yml
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -71,6 +72,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-
-
