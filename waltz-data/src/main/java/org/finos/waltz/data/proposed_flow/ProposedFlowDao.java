@@ -3,7 +3,6 @@ package org.finos.waltz.data.proposed_flow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
-import org.finos.waltz.data.entity_workflow.EntityWorkflowResultDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import org.finos.waltz.model.EntityKind;
@@ -11,6 +10,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,11 +55,11 @@ import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.*;
 import static org.finos.waltz.model.proposed_flow.ProposalType.*;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.TARGET_APPROVED;
-import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_RESULT;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_TRANSITION;
 import static org.finos.waltz.schema.Tables.PERSON;
@@ -117,13 +116,45 @@ public class ProposedFlowDao {
     }
 
     public ProposedFlowResponse getProposedFlowResponseById(long id) {
-        return getProposedFlowResponsesByIds(List.of(id))
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException(format("ProposedFlow not found: %d", id)));
+        ProposedFlowRecord proposedFlowRecord = getProposedFlowById(id);
+        checkNotNull(proposedFlowRecord, format("ProposedFlow not found: %d", proposedFlowRecord.getId()));
+
+        EntityReference entityReference = mkRef(EntityKind.PROPOSED_FLOW, proposedFlowRecord.getId());
+        EntityWorkflowView entityWorkflowView = entityWorkflowDefinitionDao.getEntityWorkflowView(PROPOSE_FLOW_LIFECYCLE_WORKFLOW, entityReference);
+        try {
+            ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+
+            return ImmutableProposedFlowResponse.builder()
+                    .id(proposedFlowRecord.getId())
+                    .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
+                    .createdBy(proposedFlowRecord.getCreatedBy())
+                    .flowDef(flowDefinition)
+                    .workflowState(entityWorkflowView.workflowState())
+                    .workflowTransitionList(entityWorkflowView.workflowTransitionList())
+                    .logicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(LOGICAL_DATA_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getLogicalFlowId()))
+                    .physicalFlowId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_FLOW))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getPhysicalFlowId()))
+                    .specificationId(entityWorkflowView.entityWorkflowResultList()
+                            .stream()
+                            .filter(e -> e.kind().equals(PHYSICAL_SPECIFICATION))
+                            .findFirst()
+                            .map(EntityReference::id).orElse(proposedFlowRecord.getSpecificationId()))
+                    .build();
+
+        } catch (JsonProcessingException e) {
+            LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
+            throw new IllegalArgumentException("Invalid flow definition JSON", e);
+        }
     }
 
-    public List<ProposedFlowResponse> getProposedFlowResponsesByIds(List<Long> ids) {
+    public List<ProposedFlowResponse> getProposedFlowsForTimeout(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }
@@ -131,81 +162,39 @@ public class ProposedFlowDao {
         Long workflowId = fetchWorkflowID();
 
         SelectFieldOrAsterisk[] selectFields = Stream
-                .of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(),
-                        ENTITY_WORKFLOW_TRANSITION.fields(), ENTITY_WORKFLOW_RESULT.fields())
+                .of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields())
                 .flatMap(Arrays::stream)
                 .map(f -> (SelectFieldOrAsterisk) f)
                 .toArray(SelectFieldOrAsterisk[]::new);
 
-        Result<Record> flatResults = dsl
+        Result<Record> results = dsl
                 .select(selectFields)
                 .from(PROPOSED_FLOW)
                 .join(ENTITY_WORKFLOW_STATE)
-                    .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                    .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
-                    .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .leftJoin(ENTITY_WORKFLOW_TRANSITION)
-                    .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                    .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
-                    .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .leftJoin(ENTITY_WORKFLOW_RESULT)
-                    .on(ENTITY_WORKFLOW_RESULT.WORKFLOW_ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                    .and(ENTITY_WORKFLOW_RESULT.WORKFLOW_ID.eq(workflowId))
-                    .and(ENTITY_WORKFLOW_RESULT.WORKFLOW_ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
                 .where(PROPOSED_FLOW.ID.in(ids))
                 .fetch();
 
-        Map<Long, List<Record>> recordsByFlowId = flatResults.stream()
-                .collect(Collectors.groupingBy(r -> r.get(PROPOSED_FLOW.ID)));
-
-        return recordsByFlowId.values().stream()
-                .map(recordsForOneFlow -> {
-
-                    Record firstRecord = recordsForOneFlow.get(0);
-                    ProposedFlowRecord proposedFlowRecord = firstRecord.into(ProposedFlowRecord.class);
-                    EntityWorkflowState entityWorkflowState = EntityWorkflowStateDao.TO_DOMAIN_MAPPER.map(firstRecord);
-
-                    List<EntityWorkflowTransition> transitions = recordsForOneFlow.stream()
-                            .filter(r -> r.get(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID) != null)
-                            .map(r -> EntityWorkflowTransitionDao.TO_DOMAIN_MAPPER.map(r))
-                            .distinct()
-                            .collect(Collectors.toList());
-
-                    List<EntityReference> resultEntities = recordsForOneFlow.stream()
-                            .filter(r -> r.get(ENTITY_WORKFLOW_RESULT.WORKFLOW_ID) != null)
-                            .map(r -> EntityWorkflowResultDao.TO_DOMAIN_MAPPER.map(r.into(ENTITY_WORKFLOW_RESULT)).resultEntity())
-                            .collect(Collectors.toList());
-
-                    Function<EntityKind, Long> resultId = kind ->
-                            resultEntities.stream()
-                                    .filter(e -> e.kind().equals(kind))
-                                    .findFirst()
-                                    .map(EntityReference::id)
-                                    .orElse(null);
-
+        return results.stream()
+                .map(record -> {
                     try {
-                        ProposedFlowCommand flowDefinition = getJsonMapper()
-                                .readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+                        ProposedFlowRecord proposedFlowRecord = record.into(ProposedFlowRecord.class);
+                        ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
 
                         return ImmutableProposedFlowResponse.builder()
-                                .id(proposedFlowRecord.getId())
-                                .createdAt(proposedFlowRecord.getCreatedAt().toLocalDateTime())
-                                .createdBy(proposedFlowRecord.getCreatedBy())
+                                .id(record.get(PROPOSED_FLOW.ID))
+                                .createdAt(record.get(PROPOSED_FLOW.CREATED_AT).toLocalDateTime())
+                                .createdBy(record.get(PROPOSED_FLOW.CREATED_BY))
                                 .flowDef(flowDefinition)
-                                .workflowState(entityWorkflowState)
-                                .workflowTransitionList(transitions)
-                                .logicalFlowId(Optional.ofNullable(resultId.apply(LOGICAL_DATA_FLOW))
-                                        .orElse(proposedFlowRecord.getLogicalFlowId()))
-                                .physicalFlowId(Optional.ofNullable(resultId.apply(PHYSICAL_FLOW))
-                                        .orElse(proposedFlowRecord.getPhysicalFlowId()))
-                                .specificationId(Optional.ofNullable(resultId.apply(PHYSICAL_SPECIFICATION))
-                                        .orElse(proposedFlowRecord.getSpecificationId()))
+                                .workflowState(EntityWorkflowStateDao.TO_DOMAIN_MAPPER.map(record))
                                 .build();
-
                     } catch (JsonProcessingException e) {
-                        LOG.error("Failed to parse flow definition JSON for proposed flow id: {}", proposedFlowRecord.getId(), e);
+                        LOG.error("Failed to parse flow definition JSON for proposed flow id: {}",
+                                record.get(PROPOSED_FLOW.ID), e);
                         throw new IllegalStateException(
-                                "Failed to parse flow definition JSON for proposed flow id: " + proposedFlowRecord.getId(), e);
+                                "Failed to parse flow definition JSON for proposed flow id: " + record.get(PROPOSED_FLOW.ID), e);
                     }
                 })
                 .collect(Collectors.toList());
@@ -363,6 +352,13 @@ public class ProposedFlowDao {
                 .build();
     }
 
+    private ProposedFlowRecord getProposedFlowById(long id) {
+        return dsl
+                .select(PROPOSED_FLOW.fields())
+                .from(PROPOSED_FLOW)
+                .where(PROPOSED_FLOW.ID.eq(id))
+                .fetchOneInto(ProposedFlowRecord.class);
+    }
 
     public List<ProposedFlowRecord> proposedFlowRecordsByProposalType(ProposedFlowCommand proposedFlowCommand) {
         Long workflowId = fetchWorkflowID();

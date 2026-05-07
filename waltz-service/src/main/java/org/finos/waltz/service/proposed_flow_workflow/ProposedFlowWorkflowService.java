@@ -562,11 +562,10 @@ public class ProposedFlowWorkflowService {
         List<EntityWorkflowState> workflowStates = new ArrayList<>();
         List<String> currentStates = new ArrayList<>();
 
-        List<ProposedFlowResponse> proposedFlowResponses = proposedFlowDao.getProposedFlowResponsesByIds(proposedFlowIds);
+        List<ProposedFlowResponse> proposedFlowResponses = proposedFlowDao.getProposedFlowsForTimeout(proposedFlowIds);
 
         for (int i = 0; i < proposedFlowIds.size(); i++) {
             try {
-//                ProposedFlowResponse proposedFlow = proposedFlowDao.getProposedFlowResponseById(proposedFlowId);
                 ProposedFlowResponse proposedFlow = proposedFlowResponses.get(i);
                 if (proposedFlow == null || proposedFlow.workflowState() == null) {
                     LOG.warn("Skipping timeout for proposed flow {} because workflow state was not found", proposedFlowIds.get(i));
