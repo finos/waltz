@@ -5,9 +5,7 @@ on:
     branches:
       - main
       - master
-    paths:
-      - 'docs/**'
-      - '.github/workflows/jekyll-deploy.yml'
+      - '7515-New-Case-Study'
   pull_request:
     branches:
       - main
