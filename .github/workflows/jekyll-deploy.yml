@@ -1,15 +1,10 @@
-name: Build and Deploy Jekyll Site
+name: Deploy Jekyll with GitHub Pages dependencies preinstalled
 
 on:
   push:
     branches:
-      - main
       - master
       - '7515-New-Case-Study'
-  pull_request:
-    branches:
-      - main
-      - master
   workflow_dispatch:
 
 permissions:
@@ -19,7 +14,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -28,41 +23,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
-          working-directory: ./docs/blog
-
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v5
-
       - name: Create Jekyll config with secrets
         working-directory: ./docs
         env:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
+          REPOSITORY: ${{ github.repository }}
         run: |
-          echo "google_analytics: $GOOGLE_ANALYTICS_ID" > _config.secret.yml
+          sed -i "s|google_analytics: null|google_analytics: $GOOGLE_ANALYTICS_ID|" _config.yml
+          sed -i "s|repository: null|repository: $REPOSITORY|" _config.yml
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Build with Jekyll
-        working-directory: ./docs/blog
-        env:
-          JEKYLL_ENV: production
-        run: |
-          bundle exec jekyll build \
-            --source .. \
-            --baseurl "${{ steps.pages.outputs.base_path }}" \
-            -d ../_site \
-            --config ../_config.yml,../_config.secret.yml
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+          build_revision: ${{ github.sha }}
+          future: false
+          token: ${{ github.token }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./docs/_site
 
   deploy:
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/7515-New-Case-Study'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -71,4 +57,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
