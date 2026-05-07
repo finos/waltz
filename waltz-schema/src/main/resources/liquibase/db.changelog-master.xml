@@ -278,4 +278,7 @@
 
     <include file="db.changelog-1.81.0.xml"
              relativeToChangelogFile="true"/>
+
+	 <include file="db.changelog-1.82.0.xml" 
+ 			 relativeToChangelogFile="true"/>
 </databaseChangeLog>

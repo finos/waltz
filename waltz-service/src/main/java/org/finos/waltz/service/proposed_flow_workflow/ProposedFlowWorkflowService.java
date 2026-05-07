@@ -128,7 +128,7 @@ public class ProposedFlowWorkflowService {
             entityWorkflowService.createEntityWorkflow(proposedFlowRef, workflowDefinition.id().get(),
                     username, PROPOSED_FLOW_SUBMITTED, PROPOSED_CREATE.name(), newState.name(), proposedFlowCommand.reason().description());
 
-            autoApproveFlowsForExternalActors(proposedFlowRef,proposedFlowCommand);
+            doAutoApprovals(proposedFlowRef,proposedFlowCommand,username);
         } catch (Exception e) {
             msg = PROPOSED_FLOW_CREATED_WITH_FAILURE;
             outcome = FAILURE;
@@ -144,31 +144,59 @@ public class ProposedFlowWorkflowService {
                 .build();
     }
 
-    private void autoApproveFlowsForExternalActors(EntityReference proposedFlowRef, ProposedFlowCommand proposedFlowCommand) {
-        if (isAutoApproveEnabledForExternalActors()) {
-            taskExecutor.execute(() -> {
-                try {
-                    approveForExternalActor(
-                            proposedFlowRef,
-                            ADMIN,
-                            proposedFlowCommand);
-                } catch (Exception e) {
-                    LOG.error("Unable to auto approve external actor endpoint(s) for proposed flow id={}", proposedFlowRef.id(), e);
-                }
-            });
-        }
+    private void doAutoApprovals(EntityReference proposedFlowRef, ProposedFlowCommand proposedFlowCommand, String username) {
+        taskExecutor.execute(() -> {
+            try {
+                ProposedFlowResponse proposedFlow = getProposedFlowResponseById(proposedFlowRef.id());
+                proposedFlow = autoApproveFlowsForExternalActors(proposedFlow,proposedFlowCommand);
+                proposedFlow = autoApproveWhenProposerIsApprover(proposedFlow,username);
+            } catch (Exception e) {
+                LOG.error("Unable to auto approve the proposed flow id={}", proposedFlowRef.id(), e);
+            }
+        });
     }
 
-    private void approveForExternalActor(EntityReference proposedFlowRef, String username, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+    private ProposedFlowResponse autoApproveFlowsForExternalActors(ProposedFlowResponse proposedFlow, ProposedFlowCommand proposedFlowCommand) throws FlowCreationException, TransitionNotFoundException, TransitionPredicateFailedException {
+        if (isAutoApproveEnabledForExternalActors()) {
+            return approveForExternalActor(
+                    proposedFlow,
+                    ADMIN,
+                    proposedFlowCommand);
+        }
+        return proposedFlow;
+    }
 
+    private ProposedFlowResponse autoApproveWhenProposerIsApprover(ProposedFlowResponse proposedFlow, String username) {
+
+        ProposeFlowPermission flowPermission = permissionService.checkUserPermission(
+                username,
+                proposedFlow.flowDef().source(),
+                proposedFlow.flowDef().target()
+        );
+
+        if(!flowPermission.sourceApprover().isEmpty()) {
+            ProposedFlowActionCommand proposedFlowActionCommand = ImmutableProposedFlowActionCommand.builder()
+                    .comment("Approved as proposer is approver for source")
+                    .build();
+            proposedFlow = proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
+        }
+
+        if(!flowPermission.targetApprover().isEmpty()) {
+            ProposedFlowActionCommand proposedFlowActionCommand = ImmutableProposedFlowActionCommand.builder()
+                    .comment("Approved as proposer is approver for target")
+                    .build();
+            proposedFlow = proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
+        }
+        return proposedFlow;
+    }
+
+    private ProposedFlowResponse approveForExternalActor(ProposedFlowResponse proposedFlow, String username, ProposedFlowCommand proposedFlowCommand) {
         boolean isSourceExternalActor = isExternalActor(proposedFlowCommand.source());
         boolean isTargetExternalActor = isExternalActor(proposedFlowCommand.target());
 
         if (!isSourceExternalActor && !isTargetExternalActor) {
-            return;
+            return  proposedFlow;
         }
-
-        ProposedFlowResponse proposedFlow = getProposedFlowResponseById(proposedFlowRef.id());
 
         ProposeFlowPermission flowPermission = ImmutableProposeFlowPermission.builder()
                 .sourceApprover(isSourceExternalActor ? Set.of(Operation.APPROVE) : Set.of())
@@ -184,8 +212,9 @@ public class ProposedFlowWorkflowService {
         }
 
         if (isTargetExternalActor) {
-            proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
+            proposedFlow = proposedFlowAction(proposedFlow, APPROVE, flowPermission, username, proposedFlowActionCommand);
         }
+        return proposedFlow;
     }
 
     private boolean isAutoApproveEnabledForExternalActors() {
