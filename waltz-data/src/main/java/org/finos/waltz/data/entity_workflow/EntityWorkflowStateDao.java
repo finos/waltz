@@ -45,7 +45,7 @@ import static org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_
 @Repository
 public class EntityWorkflowStateDao {
     public static final RecordMapper<? super Record, EntityWorkflowState> TO_DOMAIN_MAPPER = record -> {
-        EntityWorkflowStateRecord r = record.into(org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE);
+        EntityWorkflowStateRecord r = record.into(ENTITY_WORKFLOW_STATE);
 
         return ImmutableEntityWorkflowState
                 .builder()
@@ -87,7 +87,7 @@ public class EntityWorkflowStateDao {
                                     String username,
                                     String workflowState,
                                     String description) {
-        EntityWorkflowStateRecord stateRecord = dsl.newRecord(org.finos.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE);
+        EntityWorkflowStateRecord stateRecord = dsl.newRecord(ENTITY_WORKFLOW_STATE);
         stateRecord.setWorkflowId(workflowDefId);
         stateRecord.setEntityId(ref.id());
         stateRecord.setEntityKind(ref.kind().name());
