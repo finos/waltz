@@ -10,6 +10,7 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.actor.ActorService;
@@ -29,12 +30,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
+
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
@@ -519,5 +525,23 @@ public class ProposedFlowWorkflowService {
                 newProposal.flowAttributes().criticality());
 
         return specIdMatches && attributesMatch;
+    }
+
+    public ProposedFlowApprovers findApprovers(long proposedFlowId) {
+
+        List<ProposedFlowDao.ApproverWithType> allApprovers = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
+
+        // 2. Partition the single list into two lists based on the 'approverType'
+        Map<String, List<Person>> partitionedApprovers = allApprovers
+                .stream()
+                .collect(Collectors.groupingBy(
+                        approver -> approver.approverType,
+                        Collectors.mapping(approver -> approver.person, Collectors.toList())));
+
+        // 3. Build the final structured response object
+        return ImmutableProposedFlowApprovers.builder()
+                .sourceApprovers(partitionedApprovers.getOrDefault("SOURCE", emptyList()))
+                .targetApprovers(partitionedApprovers.getOrDefault("TARGET", emptyList()))
+                .build();
     }
 }

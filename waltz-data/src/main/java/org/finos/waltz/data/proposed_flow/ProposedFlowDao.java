@@ -5,12 +5,14 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
+import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -25,7 +27,9 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Record3;
+import org.jooq.RecordMapper;
 import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectFieldOrAsterisk;
 import org.jooq.SelectUnionStep;
@@ -76,6 +80,7 @@ import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.name;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.selectOne;
+import static org.jooq.impl.DSL.val;
 
 @Repository
 public class ProposedFlowDao {
@@ -517,5 +522,68 @@ public class ProposedFlowDao {
                 .and(userPermissionsCte.field("operation", String.class).in(APPROVE.name(), REJECT.name()))
                 .fetch(ProposedFlow.PROPOSED_FLOW.ID);
 
+    }
+
+    // Define a simple, private inner class to hold the combined result from the DB
+    public static class ApproverWithType {
+        public final Person person;
+        public final String approverType;
+
+        private ApproverWithType(Person person, String approverType) {
+            this.person = person;
+            this.approverType = approverType;
+        }
+    }
+
+    // Mapper to convert a DB record into our temporary ApproverWithType object
+    private static final RecordMapper<Record, ApproverWithType> TO_APPROVER_WITH_TYPE_MAPPER = r -> {
+        Person person = PersonDao.personMapper.map(r);
+        String approverType = r.get("approver_type", String.class);
+        return new ApproverWithType(person, approverType);
+    };
+
+
+    /**
+     * Finds all source and target approvers for a given proposed flow in a single query.
+     *
+     * @param proposedFlowId The ID of the proposed flow.
+     * @return A single list containing all approvers, each tagged with their type ('SOURCE' or 'TARGET').
+     */
+    public List<ApproverWithType> findApproversForProposedFlow(long proposedFlowId) {
+
+        Condition sourceJoinCondition = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
+                .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND))
+                .and(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND));
+
+        Condition targetJoinCondition = PROPOSED_FLOW.TARGET_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
+                .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND))
+                .and(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND));
+
+        Select<Record> sourceApprovers = mkApproverQuery(proposedFlowId, "SOURCE", sourceJoinCondition);
+        Select<Record> targetApprovers = mkApproverQuery(proposedFlowId, "TARGET", targetJoinCondition);
+
+        // Execute a single UNION query against the database
+        return sourceApprovers
+                .union(targetApprovers)
+                .fetch(TO_APPROVER_WITH_TYPE_MAPPER);
+    }
+
+
+    // This private helper method remains mostly the same, but selects all person fields
+    private Select<Record> mkApproverQuery(long proposedFlowId,
+                                           String approverType,
+                                           Condition joinCondition) {
+        return dsl
+                .select(val(approverType).as("approver_type"))
+                .select(PERSON.fields()) // Select all fields from the person table
+                .from(PERSON)
+                .join(INVOLVEMENT).on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                .join(INVOLVEMENT_KIND).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT.KIND_ID))
+                .join(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
+                .join(PERMISSION_GROUP_INVOLVEMENT).on(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID.eq(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID))
+                .join(PROPOSED_FLOW).on(joinCondition)
+                .where(PROPOSED_FLOW.ID.eq(proposedFlowId))
+                .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .and(PERMISSION_GROUP_INVOLVEMENT.OPERATION.in("APPROVE", "REJECT"));
     }
 }
