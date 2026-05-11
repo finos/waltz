@@ -528,15 +528,15 @@ public class ProposedFlowWorkflowService {
     }
 
     public ProposedFlowApprovers findApprovers(long proposedFlowId) {
-
-        List<ProposedFlowDao.ApproverWithType> allApprovers = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
+        // 1. It receives a List<ApproverWithType>.
+        List<ApproverWithType> allApproversFromDao = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
 
         // 2. Partition the single list into two lists based on the 'approverType'
-        Map<String, List<Person>> partitionedApprovers = allApprovers
+        Map<String, List<Person>> partitionedApprovers = allApproversFromDao
                 .stream()
                 .collect(Collectors.groupingBy(
-                        approver -> approver.approverType,
-                        Collectors.mapping(approver -> approver.person, Collectors.toList())));
+                        ApproverWithType::approverType,
+                        Collectors.mapping(ApproverWithType::person, Collectors.toList()))); // Use method reference
 
         // 3. Build the final structured response object
         return ImmutableProposedFlowApprovers.builder()

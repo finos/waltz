@@ -34,6 +34,7 @@ import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
@@ -45,6 +46,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -786,4 +788,68 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(proposedFlowResponse.physicalFlowId());
         assertNotNull(proposedFlowResponse.specificationId());
     }
+
+    @Test
+    public void findApprovers_shouldReturnEmptyListsForInvalidFlowId() {
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(-1L);
+        assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty for an invalid flow ID");
+        assertTrue(approvers.targetApprovers().isEmpty(), "Target approvers should be empty for an invalid flow ID");
+    }
+
+    @Test
+    public void findApprovers_shouldReturnEmptyListsWhenNoPermissionsExist() {
+        // 1. Arrange: Create a flow but set up no permissions
+        EntityReference sourceApp = appHelper.createNewApp("sourceNoPerms", ouIds.a);
+        EntityReference targetApp = appHelper.createNewApp("targetNoPerms", ouIds.a1);
+
+        ProposedFlowCommand createCommand = proposedFlowWorkflowHelper.mkCreateCommand(sourceApp, targetApp);
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow("proposer", createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+
+        // 2. Act: Call the method
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(proposedFlowId);
+
+        // 3. Assert: Both lists should be empty
+        assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty when no permissions are configured");
+        assertTrue(approvers.targetApprovers().isEmpty(), "Target approvers should be empty when no permissions are configured");
+    }
+
+    @Test
+    public void findApprovers_shouldFindSourceAndTargetApprovers() {
+        // 1. Arrange: Create apps, people, and the proposed flow
+        EntityReference sourceApp = appHelper.createNewApp("sourceWithPerms", ouIds.a);
+        EntityReference targetApp = appHelper.createNewApp("targetWithPerms", ouIds.a1);
+
+        ProposedFlowCommand createCommand = proposedFlowWorkflowHelper.mkCreateCommand(sourceApp, targetApp);
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow("proposer", createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+
+        Person sourceApprover = personHelper.getPersonObj("source.approver@db.com");
+        Person targetApprover = personHelper.getPersonObj("target.approver@db.com");
+        personHelper.createPerson("non.approver@db.com"); // A person with no relevant permissions
+
+        // 2. Arrange: Set up the permission chain
+        long involvementKind = involvementHelper.mkInvolvementKind("PROPOSED_FLOW_APPROVER");
+
+        // --- Source Approver Permissions ---
+        involvementHelper.createInvolvement(sourceApprover.id().get(), involvementKind, sourceApp);
+        InvolvementGroupRecord sourceIg = permissionHelper.setupInvolvementGroup(involvementKind, "source_ig");
+        permissionHelper.setupPermissionGroupForProposedFlow(sourceApp, sourceIg, "source_pg", Operation.APPROVE);
+
+        // --- Target Approver Permissions ---
+        involvementHelper.createInvolvement(targetApprover.id().get(), involvementKind, targetApp);
+        InvolvementGroupRecord targetIg = permissionHelper.setupInvolvementGroup(involvementKind, "target_ig");
+        permissionHelper.setupPermissionGroupForProposedFlow(targetApp, targetIg, "target_pg", Operation.APPROVE);
+
+        // 3. Act: Call the method to find approvers
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(proposedFlowId);
+
+        // 4. Assert: Check the contents of the returned lists
+        assertEquals(1, approvers.sourceApprovers().size(), "Should find exactly one source approver");
+        assertEquals(sourceApprover.id(), approvers.sourceApprovers().get(0).id(), "The correct person should be identified as the source approver");
+
+        assertEquals(1, approvers.targetApprovers().size(), "Should find exactly one target approver");
+        assertEquals(targetApprover.id(), approvers.targetApprovers().get(0).id(), "The correct person should be identified as the target approver");
+    }
+
 }

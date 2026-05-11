@@ -13,6 +13,8 @@ import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowView;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.proposed_flow.ApproverWithType;
+import org.finos.waltz.model.proposed_flow.ImmutableApproverWithType;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
@@ -92,6 +94,16 @@ public class ProposedFlowDao {
     private static final List<String> ACTION_PENDING_TARGET_APPROVER_STATE = Arrays.asList(
             ProposedFlowWorkflowState.PENDING_APPROVALS.name(),
             ProposedFlowWorkflowState.SOURCE_APPROVED.name());
+    // Mapper to convert a DB record into our ApproverWithType object
+    private static final RecordMapper<Record, ApproverWithType> TO_APPROVER_WITH_TYPE_MAPPER = r -> {
+        Person person = PersonDao.personMapper.map(r);
+        String approverType = r.get("approver_type", String.class);
+
+        return ImmutableApproverWithType.builder()
+                .person(person)
+                .approverType(approverType)
+                .build();
+    };
 
     private final DSLContext dsl;
     private final EntityWorkflowStateDao entityWorkflowStateDao;
@@ -524,31 +536,13 @@ public class ProposedFlowDao {
 
     }
 
-    // Define a simple, private inner class to hold the combined result from the DB
-    public static class ApproverWithType {
-        public final Person person;
-        public final String approverType;
-
-        private ApproverWithType(Person person, String approverType) {
-            this.person = person;
-            this.approverType = approverType;
-        }
-    }
-
-    // Mapper to convert a DB record into our temporary ApproverWithType object
-    private static final RecordMapper<Record, ApproverWithType> TO_APPROVER_WITH_TYPE_MAPPER = r -> {
-        Person person = PersonDao.personMapper.map(r);
-        String approverType = r.get("approver_type", String.class);
-        return new ApproverWithType(person, approverType);
-    };
-
-
-    /**
+   /**
      * Finds all source and target approvers for a given proposed flow in a single query.
      *
      * @param proposedFlowId The ID of the proposed flow.
      * @return A single list containing all approvers, each tagged with their type ('SOURCE' or 'TARGET').
      */
+
     public List<ApproverWithType> findApproversForProposedFlow(long proposedFlowId) {
 
         Condition sourceJoinCondition = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
