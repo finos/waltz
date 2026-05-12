@@ -27,7 +27,7 @@
 
     <changeSet id="20260512-7523-1" author="jainkhu">
         <insert tableName="settings">
-            <column name="name" value="feature.data-flows-timeout-threshold"/>
+            <column name="name" value="feature.data-flows-timeout-threshold-in-days"/>
             <column name="value" value="30"/>
             <column name="description" value="This specifies the threshold for days after which pending flows will time out."/>
             <column name="restricted" valueBoolean="false"/>
