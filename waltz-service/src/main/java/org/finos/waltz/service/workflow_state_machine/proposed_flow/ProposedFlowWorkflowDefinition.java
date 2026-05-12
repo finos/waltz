@@ -77,6 +77,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                         isTargetApprover)
                 .permit(PENDING_APPROVALS, CANCELLED, CANCEL,
                         isMaker)
+                .permit(PENDING_APPROVALS, TIMED_OUT, TIME_OUT)
 
                 // SOURCE_APPROVED transitions
                 .permit(SOURCE_APPROVED, FULLY_APPROVED, APPROVE,
@@ -87,6 +88,7 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                         isTargetApprover)
                 .permit(SOURCE_APPROVED, CANCELLED, CANCEL,
                         isMaker)
+                .permit(SOURCE_APPROVED, TIMED_OUT, TIME_OUT)
 
                 // TARGET_APPROVED transitions
                 .permit(TARGET_APPROVED, FULLY_APPROVED, APPROVE,
@@ -96,7 +98,8 @@ public class ProposedFlowWorkflowDefinition implements WorkflowDefinition<Propos
                 .permit(TARGET_APPROVED, SOURCE_REJECTED, REJECT,
                         isSourceApprover)
                 .permit(TARGET_APPROVED, CANCELLED, CANCEL,
-                        isMaker);
+                        isMaker)
+                .permit(TARGET_APPROVED, TIMED_OUT, TIME_OUT);
 
         return builder.build();
     }

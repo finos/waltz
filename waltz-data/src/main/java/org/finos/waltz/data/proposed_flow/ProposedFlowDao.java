@@ -22,6 +22,7 @@ import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Record3;
@@ -55,11 +56,8 @@ import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.Operation.APPROVE;
-import static org.finos.waltz.model.Operation.REJECT;
-import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
-import static org.finos.waltz.model.proposed_flow.ProposalType.DELETE;
-import static org.finos.waltz.model.proposed_flow.ProposalType.EDIT;
+import static org.finos.waltz.model.Operation.*;
+import static org.finos.waltz.model.proposed_flow.ProposalType.*;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.END_STATES;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.TARGET_APPROVED;
 import static org.finos.waltz.schema.Tables.ENTITY_WORKFLOW_STATE;
@@ -79,6 +77,7 @@ import static org.jooq.impl.DSL.selectOne;
 
 @Repository
 public class ProposedFlowDao {
+
     public static final String PROPOSE_FLOW_LIFECYCLE_WORKFLOW = "Propose Flow Lifecycle Workflow";
     private static final Logger LOG = LoggerFactory.getLogger(ProposedFlowDao.class);
     private static final List<String> ACTION_PENDING_SOURCE_APPROVER_STATE = Arrays.asList(
@@ -89,16 +88,12 @@ public class ProposedFlowDao {
             ProposedFlowWorkflowState.SOURCE_APPROVED.name());
 
     private final DSLContext dsl;
-    private final EntityWorkflowStateDao entityWorkflowStateDao;
-    private final EntityWorkflowTransitionDao entityWorkflowTransitionDao;
     private final EntityWorkflowDefinitionDao entityWorkflowDefinitionDao;
 
     @Autowired
     public ProposedFlowDao(DSLContext dsl, EntityWorkflowStateDao entityWorkflowStateDao, EntityWorkflowTransitionDao entityWorkflowTransitionDao, EntityWorkflowDefinitionDao entityWorkflowDefinitionDao) {
         checkNotNull(dsl, "dsl cannot be null");
 
-        this.entityWorkflowStateDao = entityWorkflowStateDao;
-        this.entityWorkflowTransitionDao = entityWorkflowTransitionDao;
         this.entityWorkflowDefinitionDao = entityWorkflowDefinitionDao;
         this.dsl = dsl;
     }
@@ -157,6 +152,52 @@ public class ProposedFlowDao {
             LOG.error("Invalid flow definition JSON : {} ", e.getMessage());
             throw new IllegalArgumentException("Invalid flow definition JSON", e);
         }
+    }
+
+    public List<ProposedFlowResponse> getProposedFlowsForTimeout(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Long workflowId = fetchWorkflowID();
+
+        SelectFieldOrAsterisk[] selectFields = Stream
+                .of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields())
+                .flatMap(Arrays::stream)
+                .map(f -> (SelectFieldOrAsterisk) f)
+                .toArray(SelectFieldOrAsterisk[]::new);
+
+        Result<Record> results = dsl
+                .select(selectFields)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .where(PROPOSED_FLOW.ID.in(ids))
+                .fetch();
+
+        return results.stream()
+                .map(record -> {
+                    try {
+                        ProposedFlowRecord proposedFlowRecord = record.into(ProposedFlowRecord.class);
+                        ProposedFlowCommand flowDefinition = getJsonMapper().readValue(proposedFlowRecord.getFlowDef(), ProposedFlowCommand.class);
+
+                        return ImmutableProposedFlowResponse.builder()
+                                .id(record.get(PROPOSED_FLOW.ID))
+                                .createdAt(record.get(PROPOSED_FLOW.CREATED_AT).toLocalDateTime())
+                                .createdBy(record.get(PROPOSED_FLOW.CREATED_BY))
+                                .flowDef(flowDefinition)
+                                .workflowState(EntityWorkflowStateDao.TO_DOMAIN_MAPPER.map(record))
+                                .build();
+                    } catch (JsonProcessingException e) {
+                        LOG.error("Failed to parse flow definition JSON for proposed flow id: {}",
+                                record.get(PROPOSED_FLOW.ID), e);
+                        throw new IllegalStateException(
+                                "Failed to parse flow definition JSON for proposed flow id: " + record.get(PROPOSED_FLOW.ID), e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public List<ProposedFlowResponse> getProposedFlowsByUser(Long personId, boolean isHierarchyRequired, Long workflowId) throws JsonProcessingException {
@@ -517,5 +558,22 @@ public class ProposedFlowDao {
                 .and(userPermissionsCte.field("operation", String.class).in(APPROVE.name(), REJECT.name()))
                 .fetch(ProposedFlow.PROPOSED_FLOW.ID);
 
+    }
+
+    public List<Long> findPendingFlowsOlderThanDays(int timeoutDays) {
+        Long workflowId = fetchWorkflowID();
+
+        Timestamp threshold = Timestamp.valueOf(DateTimeUtilities.nowUtc().minusDays(timeoutDays));
+
+        return dsl
+                .select(PROPOSED_FLOW.ID)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
+                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .where(PROPOSED_FLOW.CREATED_AT.le(threshold))
+                .and(ENTITY_WORKFLOW_STATE.STATE.notIn(END_STATES))
+                .fetch(r -> r.get(PROPOSED_FLOW.ID));
     }
 }
