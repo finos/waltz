@@ -207,63 +207,74 @@ public class ProposedFlowDao {
     }
 
     private Result<Record> fetchFlowsForPerson(Long personId,
-                                               boolean includeSubordinates, Long workflowId) {
+                                               boolean includeSubordinates,
+                                               Long workflowId) {
         SelectFieldOrAsterisk[] selectFields = Stream.of(PROPOSED_FLOW.fields(), ENTITY_WORKFLOW_STATE.fields(), ENTITY_WORKFLOW_TRANSITION.fields())
-                .flatMap(Arrays::stream).map(f -> (SelectFieldOrAsterisk) f).toArray(SelectFieldOrAsterisk[]::new);
+                .flatMap(Arrays::stream)
+                .map(f -> (SelectFieldOrAsterisk) f)
+                .toArray(SelectFieldOrAsterisk[]::new);
 
-        // --- Optional subordinate CTE if needed
+        // CTE to define the scope of people (person and, optionally, their subordinates)
         CommonTableExpression<Record3<Long, String, String>> personScopeCte = getPersonScope(includeSubordinates, getCurrentPerson(personId));
-        // table reference for unified CTE
-        Table<?> personScopeTbl = personScopeCte.as("ps");
+        Table<Record3<Long, String, String>> personScopeTbl = personScopeCte.as("ps");
 
-        // CTE to find permission-based involvements for PROPOSED_FLOW
+        // CTE to find all permissions for the people in scope related to proposed flows
         CommonTableExpression<Record3<String, Long, String>> userPermissionsCte = name("userPermissions")
                 .fields("entity_kind", "entity_id", "operation")
-                .as(select(INVOLVEMENT.ENTITY_KIND, INVOLVEMENT.ENTITY_ID, PERMISSION_GROUP_INVOLVEMENT.OPERATION)
-                        .from(PERMISSION_GROUP_INVOLVEMENT)
-                        .join(INVOLVEMENT_GROUP_ENTRY)
-                        .on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
-                        .join(INVOLVEMENT)
-                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
-                        .join(INVOLVEMENT_KIND)
-                        .on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
-                        .join(PERSON)
-                        .on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                        .where(PERSON.IS_REMOVED.eq(false))
-                        .and(PERSON.EMPLOYEE_ID.eq(select(field(name("employee_id"), String.class)).from(personScopeCte)))
+                .as(select(
+                        INVOLVEMENT.ENTITY_KIND,
+                        INVOLVEMENT.ENTITY_ID,
+                        PERMISSION_GROUP_INVOLVEMENT.OPERATION)
+                        .from(personScopeTbl)
+                        .join(PERSON).on(personScopeTbl.field("employee_id", String.class).eq(PERSON.EMPLOYEE_ID))
+                        .join(INVOLVEMENT).on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                        .join(INVOLVEMENT_KIND).on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                        .join(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
+                        .join(PERMISSION_GROUP_INVOLVEMENT).on(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID.eq(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID))
+                        .where(PERSON.IS_REMOVED.isFalse())
                         .and(INVOLVEMENT.ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND))
                         .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name())));
 
-        SelectConditionStep<?> involvements = dsl.selectOne().from(userPermissionsCte)
-                .where(
-                        (userPermissionsCte.field("entity_kind", String.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
-                                .and(userPermissionsCte.field("entity_id", Long.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
-                                .or
-                                        (userPermissionsCte.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                                                .and(userPermissionsCte.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
-                );
-        if (includeSubordinates) {
-            involvements = involvements
-                    .and(INVOLVEMENT_KIND.TRANSITIVE.eq(true));
-        }
-        // --- Build the shared query
-                return dsl
+        Table<?> userPermissions = userPermissionsCte.as("userPermissions");
+
+        SelectConditionStep<Record> queryByCreator = dsl
+                .select(selectFields)
+                .from(PROPOSED_FLOW)
+                .join(ENTITY_WORKFLOW_STATE)
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID)
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .join(ENTITY_WORKFLOW_TRANSITION)
+                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID)
+                        .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .where(PROPOSED_FLOW.CREATED_BY.in(
+                        select(personScopeTbl.field("email", String.class))
+                                .from(personScopeTbl)
+                ));
+
+        return dsl
                 .with(personScopeCte)
                 .with(userPermissionsCte)
                 .select(selectFields)
                 .from(PROPOSED_FLOW)
                 .join(ENTITY_WORKFLOW_STATE)
-                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
+                .on(ENTITY_WORKFLOW_STATE.ENTITY_ID.eq(PROPOSED_FLOW.ID)
+                        .and(ENTITY_WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_STATE.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
                 .join(ENTITY_WORKFLOW_TRANSITION)
-                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID))
-                .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId)).and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .whereExists(involvements)
-                .or(PROPOSED_FLOW.CREATED_BY.in(
-                        dsl
-                                .select(field(name("email"), String.class))
-                                .from(personScopeTbl))
-                )
+                .on(ENTITY_WORKFLOW_TRANSITION.ENTITY_ID.eq(PROPOSED_FLOW.ID)
+                        .and(ENTITY_WORKFLOW_TRANSITION.WORKFLOW_ID.eq(workflowId))
+                        .and(ENTITY_WORKFLOW_TRANSITION.ENTITY_KIND.eq(EntityKind.PROPOSED_FLOW.name())))
+                .where(exists(
+                        selectOne()
+                                .from(userPermissions)
+                                .where(userPermissions.field("entity_kind", String.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND)
+                                        .and(userPermissions.field("entity_id", Long.class).eq(PROPOSED_FLOW.SOURCE_ENTITY_ID)))
+                                .or(userPermissions.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                        .and(userPermissions.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID)))
+                ))
+                .union(queryByCreator)
                 .fetch();
     }
 
@@ -369,16 +380,16 @@ public class ProposedFlowDao {
                         .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(appRef.kind().name()));
 
         // Create a table reference to the CTE to be used in the main query
-        Table<?> up = userPermissionsCte.as("up");
+        Table<?> userPermissions = userPermissionsCte.as("userPermissions");
 
         // Condition to check if the user has APPROVE/REJECT permissions on the flow's source or target
         Condition userIsApprover = exists(
                 selectOne()
-                        .from(up)
-                        .where(up.field("operation", String.class).in("APPROVE", "REJECT"))
+                        .from(userPermissions)
+                        .where(userPermissions.field("operation", String.class).in("APPROVE", "REJECT"))
                         .and(
-                                up.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
-                                        .and(up.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
+                                userPermissions.field("entity_kind", String.class).eq(PROPOSED_FLOW.TARGET_ENTITY_KIND)
+                                        .and(userPermissions.field("entity_id", Long.class).eq(PROPOSED_FLOW.TARGET_ENTITY_ID))
                         ));
 
 
