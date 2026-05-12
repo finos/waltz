@@ -532,16 +532,35 @@ public class ProposedFlowWorkflowService {
         List<ApproverWithType> allApproversFromDao = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
 
         // 2. Partition the single list into two lists based on the 'approverType'
-        Map<String, List<Person>> partitionedApprovers = allApproversFromDao
+        Map<String, List<ApproverWithType>> partitionedApprovers = allApproversFromDao
                 .stream()
                 .collect(Collectors.groupingBy(
-                        ApproverWithType::approverType,
-                        Collectors.mapping(ApproverWithType::person, Collectors.toList()))); // Use method reference
+                        ApproverWithType::approverType));
+        // 3. NEW: Map the internal DTOs to the final response DTOs
+        List<ProposedFlowApprover> sourceApprovers = partitionedApprovers
+                .getOrDefault("SOURCE", emptyList())
+                .stream()
+                .map(daoApprover -> ImmutableProposedFlowApprover.builder()
+                        .person(daoApprover.person())
+                        .involvementKindId(daoApprover.involvementKindId())
+                        .involvementKindName(daoApprover.involvementKindName())
+                        .build())
+                .collect(Collectors.toList());
 
-        // 3. Build the final structured response object
+        List<ProposedFlowApprover> targetApprovers = partitionedApprovers
+                .getOrDefault("TARGET", emptyList())
+                .stream()
+                .map(daoApprover -> ImmutableProposedFlowApprover.builder()
+                        .person(daoApprover.person())
+                        .involvementKindId(daoApprover.involvementKindId())
+                        .involvementKindName(daoApprover.involvementKindName())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 4. Build the final structured response object
         return ImmutableProposedFlowApprovers.builder()
-                .sourceApprovers(partitionedApprovers.getOrDefault("SOURCE", emptyList()))
-                .targetApprovers(partitionedApprovers.getOrDefault("TARGET", emptyList()))
+                .sourceApprovers(sourceApprovers)
+                .targetApprovers(targetApprovers)
                 .build();
     }
 }

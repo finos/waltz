@@ -98,10 +98,14 @@ public class ProposedFlowDao {
     private static final RecordMapper<Record, ApproverWithType> TO_APPROVER_WITH_TYPE_MAPPER = r -> {
         Person person = PersonDao.personMapper.map(r);
         String approverType = r.get("approver_type", String.class);
+        Long involvementKindId = r.get(INVOLVEMENT_KIND.ID);
+        String involvementKindName = r.get(INVOLVEMENT_KIND.NAME);
 
         return ImmutableApproverWithType.builder()
                 .person(person)
                 .approverType(approverType)
+                .involvementKindId(involvementKindId)
+                .involvementKindName(involvementKindName)
                 .build();
     };
 
@@ -569,8 +573,10 @@ public class ProposedFlowDao {
         return dsl
                 .select(val(approverType).as("approver_type"))
                 .select(PERSON.fields()) // Select all fields from the person table
+                .select(INVOLVEMENT_KIND.ID, INVOLVEMENT_KIND.NAME) // Select the involvements fields
                 .from(PERSON)
                 .join(INVOLVEMENT).on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                .join(INVOLVEMENT_KIND).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT.KIND_ID))
                 .join(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
                 .join(PERMISSION_GROUP_INVOLVEMENT).on(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID.eq(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID))
                 .join(PROPOSED_FLOW).on(joinCondition)

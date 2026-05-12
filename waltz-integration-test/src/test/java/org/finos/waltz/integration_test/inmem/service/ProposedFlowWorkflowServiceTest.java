@@ -46,6 +46,7 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprover;
 import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
@@ -824,32 +825,43 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow("proposer", createCommand);
         Long proposedFlowId = proposeResponse.proposedFlowId();
 
-        Person sourceApprover = personHelper.getPersonObj("source.approver@db.com");
-        Person targetApprover = personHelper.getPersonObj("target.approver@db.com");
+        Person sourceApproverPerson = personHelper.getPersonObj("source.approver@db.com");
+        Person targetApproverPerson = personHelper.getPersonObj("target.approver@db.com");
         personHelper.createPerson("non.approver@db.com"); // A person with no relevant permissions
 
-        // 2. Arrange: Set up the permission chain
-        long involvementKind = involvementHelper.mkInvolvementKind("PROPOSED_FLOW_APPROVER");
+        // 2. Arrange: Set up the permission chain and store the kind details
+        String involvementKindName = "PROPOSED_FLOW_APPROVER";
+        long involvementKindId = involvementHelper.mkInvolvementKind(involvementKindName);
 
-        // --- Source Approver Permissions ---
-        involvementHelper.createInvolvement(sourceApprover.id().get(), involvementKind, sourceApp);
-        InvolvementGroupRecord sourceIg = permissionHelper.setupInvolvementGroup(involvementKind, "source_ig");
+        involvementHelper.createInvolvement(sourceApproverPerson.id().get(), involvementKindId, sourceApp);
+        InvolvementGroupRecord sourceIg = permissionHelper.setupInvolvementGroup(involvementKindId, "source_ig");
         permissionHelper.setupPermissionGroupForProposedFlow(sourceApp, sourceIg, "source_pg", Operation.APPROVE);
 
         // --- Target Approver Permissions ---
-        involvementHelper.createInvolvement(targetApprover.id().get(), involvementKind, targetApp);
-        InvolvementGroupRecord targetIg = permissionHelper.setupInvolvementGroup(involvementKind, "target_ig");
+        involvementHelper.createInvolvement(targetApproverPerson.id().get(), involvementKindId, targetApp);
+        InvolvementGroupRecord targetIg = permissionHelper.setupInvolvementGroup(involvementKindId, "target_ig");
         permissionHelper.setupPermissionGroupForProposedFlow(targetApp, targetIg, "target_pg", Operation.APPROVE);
 
         // 3. Act: Call the method to find approvers
         ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(proposedFlowId);
 
-        // 4. Assert: Check the contents of the returned lists
+        // 4. Assert: Check the contents of the DTOs in the response
         assertEquals(1, approvers.sourceApprovers().size(), "Should find exactly one source approver");
-        assertEquals(sourceApprover.id(), approvers.sourceApprovers().get(0).id(), "The correct person should be identified as the source approver");
+
+        // Get the custom DTO from the response list
+        ProposedFlowApprover actualSourceApprover = approvers.sourceApprovers().get(0);
+
+        // Assert both person details and the contextual role details
+        assertEquals(sourceApproverPerson.id(), actualSourceApprover.person().id());
+        assertEquals(involvementKindId, actualSourceApprover.involvementKindId());
+        assertEquals(involvementKindName, actualSourceApprover.involvementKindName(), "The correct source involvement kind name should be returned");
 
         assertEquals(1, approvers.targetApprovers().size(), "Should find exactly one target approver");
-        assertEquals(targetApprover.id(), approvers.targetApprovers().get(0).id(), "The correct person should be identified as the target approver");
+        ProposedFlowApprover actualTargetApprover = approvers.targetApprovers().get(0);
+
+        assertEquals(targetApproverPerson.id(), actualTargetApprover.person().id());
+        assertEquals(involvementKindId, actualTargetApprover.involvementKindId());
+        assertEquals(involvementKindName, actualTargetApprover.involvementKindName(), "The correct target involvement kind name should be returned");
     }
 
 }

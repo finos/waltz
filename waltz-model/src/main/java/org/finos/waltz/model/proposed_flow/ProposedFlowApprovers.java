@@ -12,8 +12,8 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableProposedFlowApprovers.class)
 public abstract class ProposedFlowApprovers {
 
-    public abstract List<Person> sourceApprovers();
+    public abstract List<ProposedFlowApprover> sourceApprovers();
 
-    public abstract List<Person> targetApprovers();
+    public abstract List<ProposedFlowApprover> targetApprovers();
 
 }

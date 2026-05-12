@@ -6,11 +6,15 @@ import org.finos.waltz.model.person.Person;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableApproverWithType.class)
-@JsonDeserialize(as = ImmutableApproverWithType.class)
-public abstract class ApproverWithType {
+@JsonSerialize(as = ImmutableProposedFlowApprover.class)
+@JsonDeserialize(as = ImmutableProposedFlowApprover.class)
+public abstract class ProposedFlowApprover {
+
+    // Person Details
     public abstract Person person();
-    public abstract String approverType();
+
+    // Involvement Kind Details
     public abstract Long involvementKindId();
     public abstract String involvementKindName();
+
 }
