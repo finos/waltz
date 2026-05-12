@@ -542,7 +542,6 @@ public class ProposedFlowDao {
      * @param proposedFlowId The ID of the proposed flow.
      * @return A single list containing all approvers, each tagged with their type ('SOURCE' or 'TARGET').
      */
-
     public List<ApproverWithType> findApproversForProposedFlow(long proposedFlowId) {
 
         Condition sourceJoinCondition = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
@@ -572,7 +571,6 @@ public class ProposedFlowDao {
                 .select(PERSON.fields()) // Select all fields from the person table
                 .from(PERSON)
                 .join(INVOLVEMENT).on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .join(INVOLVEMENT_KIND).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT.KIND_ID))
                 .join(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID))
                 .join(PERMISSION_GROUP_INVOLVEMENT).on(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID.eq(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID))
                 .join(PROPOSED_FLOW).on(joinCondition)

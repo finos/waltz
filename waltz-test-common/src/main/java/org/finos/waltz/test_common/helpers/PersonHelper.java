@@ -28,8 +28,6 @@ public class PersonHelper {
     @Autowired
     private PersonDao personDao;
 
-
-
     public Long createPerson(String name) {
         PersonRecord p = dsl.newRecord(PERSON);
         p.setDepartmentName("dept");
@@ -89,7 +87,6 @@ public class PersonHelper {
      * @return The fully populated Person object created from the new database record.
      */
     public Person getPersonObj(String email) {
-
         Long personId = createPerson(email);
 
         // to ensure we have the ID and all other fields correctly populated.
