@@ -55,6 +55,12 @@
             borderColor: "#c16644",
             textColor: "#000000",
             bgColor: "#666666"
+        },
+        TIMED_OUT: {
+            name: "Timed Out",
+            borderColor: "#c16644",
+            textColor: "#000000",
+            bgColor: "#666666"
         }
     }
     const historicalStatuses = Object.keys(historicalStatusPillDefs)
