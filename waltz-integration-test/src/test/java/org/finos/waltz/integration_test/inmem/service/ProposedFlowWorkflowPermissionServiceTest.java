@@ -4,6 +4,7 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
+import org.finos.waltz.model.proposed_flow.ProposedFlowEntityReference;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowPermissionService;
 import org.finos.waltz.test_common.helpers.AppHelper;
@@ -79,7 +80,7 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
         permissionHelper.setupPermissionGroupForProposedFlow(appB, ig, stem, REJECT);
 
         // 2. Act --------------------------------------------------------------
-        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(userName, appA, appB);
+        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(userName, ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()), ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()));
 
         // 3. Assert -----------------------------------------------------------
         assertNotNull(proposeFlowPermission);
@@ -105,7 +106,7 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
         EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.a);
 
         // 2. Act --------------------------------------------------------------
-        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission("unknown_user", appA, appB);
+        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission("unknown_user", ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()), ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()));
 
         // 3. Assert -----------------------------------------------------------
         Set<Operation> permittedOperationsForSourceApprover = proposeFlowPermission.sourceApprover();
@@ -127,7 +128,7 @@ public class ProposedFlowWorkflowPermissionServiceTest extends BaseInMemoryInteg
         Long personA = personHelper.createPerson(userName);
 
         // 2. Act --------------------------------------------------------------
-        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(userName, appA, appB);
+        ProposeFlowPermission proposeFlowPermission = proposedFlowWorkflowPermissionService.checkUserPermission(userName, ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()), ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()));
 
         // 3. Assert -----------------------------------------------------------
         Set<Operation> permittedOperationsForSourceApprover = proposeFlowPermission.sourceApprover();
