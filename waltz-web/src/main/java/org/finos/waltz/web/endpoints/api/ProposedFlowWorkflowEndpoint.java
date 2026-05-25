@@ -59,7 +59,7 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
         getForList(mkPath(BASE_URL, "propose-flow", "pending-actions", "person", ":personId"), this::findPendingActionFlowsForPersonWhereSourceOrTargetApprover);
-        getForDatum(mkPath(BASE_URL, "propose-flow", "approvers", "id", ":id"), this::findApprovers);
+        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id", "approvers"), this::findApprovers);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {

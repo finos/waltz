@@ -43,7 +43,7 @@ export function store($http) {
 
     const getFlowApprovers = (id) => {
         return $http
-            .get(`${mcBase}/propose-flow/approvers/id/${id}`)
+            .get(`${mcBase}/propose-flow/id/${id}/approvers`)
             .then(r => r.data);
     }
 

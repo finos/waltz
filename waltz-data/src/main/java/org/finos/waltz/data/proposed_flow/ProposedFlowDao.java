@@ -26,7 +26,6 @@ import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Record3;
@@ -619,11 +618,11 @@ public class ProposedFlowDao {
 
         Condition sourceJoinCondition = PROPOSED_FLOW.SOURCE_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
                 .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND))
-                .and(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND.eq(PROPOSED_FLOW.SOURCE_ENTITY_KIND));
+                .and(PROPOSED_FLOW.SOURCE_ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND));
 
         Condition targetJoinCondition = PROPOSED_FLOW.TARGET_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
                 .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND))
-                .and(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND.eq(PROPOSED_FLOW.TARGET_ENTITY_KIND));
+                .and(PROPOSED_FLOW.TARGET_ENTITY_KIND.eq(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND));
 
         Select<Record> sourceApprovers = mkApproverQuery(proposedFlowId, "SOURCE", sourceJoinCondition);
         Select<Record> targetApprovers = mkApproverQuery(proposedFlowId, "TARGET", targetJoinCondition);
@@ -651,6 +650,6 @@ public class ProposedFlowDao {
                 .join(PROPOSED_FLOW).on(joinCondition)
                 .where(PROPOSED_FLOW.ID.eq(proposedFlowId))
                 .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.PROPOSED_FLOW.name()))
-                .and(PERMISSION_GROUP_INVOLVEMENT.OPERATION.in("APPROVE", "REJECT"));
+                .and(PERMISSION_GROUP_INVOLVEMENT.OPERATION.in(APPROVE.name(), REJECT.name()));
     }
 }
