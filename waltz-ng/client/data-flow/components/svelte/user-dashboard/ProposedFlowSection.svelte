@@ -98,7 +98,7 @@ const columnDefs = [
     {
         field: "createdBy",
         name: "Proposed By",
-        sortable: true,
+        sortable: true
     },
     {
         field: "createdAt",
