@@ -97,8 +97,8 @@ const columnDefs = [
     { field: "flowDef.reason.description", name: "Proposal Reason" },
     {
         field: "createdBy",
-        name: "Created By",
-        sortable: true
+        name: "Proposed By",
+        sortable: true,
     },
     {
         field: "createdAt",
@@ -107,7 +107,7 @@ const columnDefs = [
     },
     {
         field: "sourceApprovedBy",
-        name: "Source Approver",
+        name: "Source Approved By",
         sortable: true
     },
     {
@@ -117,7 +117,7 @@ const columnDefs = [
     },
     {
         field: "targetApprovedBy",
-        name: "Target Approver",
+        name: "Target Approved By",
         sortable: true
     },
     {
