@@ -33,4 +33,14 @@
             <column name="restricted" valueBoolean="false"/>
         </insert>
     </changeSet>
+
+    <changeSet id="20260522-7523-2" author="kumarohb" >
+        <modifyDataType columnName="flow_def"
+                        newDataType="${clob.type}"
+                        tableName="proposed_flow"/>
+        <addNotNullConstraint tableName="proposed_flow"
+                              columnName="flow_def"
+                              columnDataType="${clob.type}"/>
+        <comment>Update proposed_flow table to change flow_def to TEXT and add not-null constraint</comment>
+    </changeSet>
 </databaseChangeLog>

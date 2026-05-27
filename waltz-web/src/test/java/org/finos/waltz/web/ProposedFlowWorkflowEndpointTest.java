@@ -253,8 +253,8 @@ class ProposedFlowWorkflowEndpointTest {
         workflowTransitionList.add(workflowTransition);
         workflowTransitionList.add(workflowTransition2);
         ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
-                .source(entityReference)
-                .target(entityReference)
+                .source(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
+                .target(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
                 .reason(reason)
                 .logicalFlowId(123L)
                 .physicalFlowId(234L)
@@ -358,8 +358,8 @@ class ProposedFlowWorkflowEndpointTest {
         workflowTransitionList.add(workflowTransition);
         workflowTransitionList.add(workflowTransition2);
         ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
-                .source(entityReference)
-                .target(entityReference)
+                .source(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
+                .target(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
                 .reason(reason)
                 .logicalFlowId(123L)
                 .physicalFlowId(234L)

@@ -225,7 +225,7 @@ public class ProposedFlowWorkflowService {
                 .orElse(false);
     }
 
-    private boolean isExternalActor(EntityReference entityReference) {
+    private boolean isExternalActor(ProposedFlowEntityReference entityReference) {
         if (entityReference == null || entityReference.kind() != ACTOR) {
             return false;
         }
