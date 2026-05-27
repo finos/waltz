@@ -792,7 +792,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
     @Test
     public void findApprovers_shouldReturnEmptyListsForInvalidFlowId() {
-        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(-1L);
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(-1L);
         assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty for an invalid flow ID");
         assertTrue(approvers.targetApprovers().isEmpty(), "Target approvers should be empty for an invalid flow ID");
     }
@@ -808,7 +808,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Long proposedFlowId = proposeResponse.proposedFlowId();
 
         // 2. Act: Call the method
-        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(proposedFlowId);
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(proposedFlowId);
 
         // 3. Assert: Both lists should be empty
         assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty when no permissions are configured");
@@ -843,7 +843,7 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         permissionHelper.setupPermissionGroupForProposedFlow(targetApp, targetIg, "target_pg", Operation.APPROVE);
 
         // 3. Act: Call the method to find approvers
-        ProposedFlowApprovers approvers = proposedFlowWorkflowService.findApprovers(proposedFlowId);
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(proposedFlowId);
 
         // 4. Assert: Check the contents of the DTOs in the response
         assertEquals(1, approvers.sourceApprovers().size(), "Should find exactly one source approver");
