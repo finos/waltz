@@ -11,11 +11,7 @@ import org.finos.waltz.model.physical_flow.TransportKindValue;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.ImmutableReason;
-import org.finos.waltz.model.proposed_flow.ProposalType;
-import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
-import org.finos.waltz.model.proposed_flow.Reason;
+import org.finos.waltz.model.proposed_flow.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -102,8 +98,8 @@ public class ProposedFlowWorkflowHelper {
                 .build();
 
         return ImmutableProposedFlowCommand.builder()
-                .source(source)
-                .target(target)
+                .source(ProposedFlowEntityReference.mkRef(source.kind(), source.id()))
+                .target(ProposedFlowEntityReference.mkRef(target.kind(), target.id()))
                 .reason(reason)
                 .specification(defaultSpec)
                 .flowAttributes(flowAttributes)
