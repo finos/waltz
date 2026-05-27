@@ -16,7 +16,6 @@ import static java.util.Collections.emptySet;
 @Value.Immutable
 @JsonSerialize(as = ImmutableProposedFlowCommand.class)
 @JsonDeserialize(as = ImmutableProposedFlowCommand.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ProposedFlowCommand implements Command {
     public abstract ProposedFlowEntityReference source();
 
