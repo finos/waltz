@@ -12,6 +12,7 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.proposed_flow.*;
 import org.finos.waltz.schema.tables.records.ProposedFlowRecord;
 import org.finos.waltz.service.actor.ActorService;
@@ -31,10 +32,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
+
 
 import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
@@ -603,5 +612,42 @@ public class ProposedFlowWorkflowService {
             LOG.error("Failed to persist auto-timeout batch for {} proposed flows", workflowStates.size(), e);
             return 0;
         }
+    }
+
+    public ProposedFlowApprovers findApprovers(long proposedFlowId) {
+        // 1. It receives a List<ApproverWithType>.
+        List<ApproverWithType> allApproversFromDao = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
+
+        // 2. Partition the single list into two lists based on the 'approverType'
+        Map<String, List<ApproverWithType>> partitionedApprovers = allApproversFromDao
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ApproverWithType::approverType));
+        // 3. NEW: Map the internal DTOs to the final response DTOs
+        List<ProposedFlowApprover> sourceApprovers = partitionedApprovers
+                .getOrDefault("SOURCE", emptyList())
+                .stream()
+                .map(daoApprover -> ImmutableProposedFlowApprover.builder()
+                        .person(daoApprover.person())
+                        .involvementKindId(daoApprover.involvementKindId())
+                        .involvementKindName(daoApprover.involvementKindName())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<ProposedFlowApprover> targetApprovers = partitionedApprovers
+                .getOrDefault("TARGET", emptyList())
+                .stream()
+                .map(daoApprover -> ImmutableProposedFlowApprover.builder()
+                        .person(daoApprover.person())
+                        .involvementKindId(daoApprover.involvementKindId())
+                        .involvementKindName(daoApprover.involvementKindName())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 4. Build the final structured response object
+        return ImmutableProposedFlowApprovers.builder()
+                .sourceApprovers(sourceApprovers)
+                .targetApprovers(targetApprovers)
+                .build();
     }
 }

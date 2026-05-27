@@ -22,6 +22,8 @@ import FlowWizard from "./components/FlowWizard.svelte";
 import ProposedFlowDetails from "./components/ProposedFlowDetails.svelte";
 import ProposedFlowActions from "./components/ProposedFlowActions.svelte";
 import FlowTransitionDetails from "./components/FlowTransitionDetails.svelte";
+import FlowApproversDetail from "./components/FlowApproversDetail.svelte";
+
 import { CORE_API } from "../common/services/core-api-utils";
 
 
@@ -31,7 +33,8 @@ const initialState = {
     FlowWizard,
     ProposedFlowDetails,
     ProposedFlowActions,
-    FlowTransitionDetails
+    FlowTransitionDetails,
+    FlowApproversDetail
 };
 
 function controller($q,
@@ -50,25 +53,38 @@ function controller($q,
 
     const loadProposedFlow = () => {
         serviceBroker
-                .loadViewData(
-                    CORE_API.ProposedFlowStore.getById,
-                    [vm.parentEntityRef.id],
-                    {force: true})
-                .then(r => {
-                    vm.proposedFlow = r.data;
-                    vm.usedDataTypes = (vm.proposedFlow?.flowDef?.dataTypeIds || []).map(id => ({ dataTypeId: id }));
-                    vm.dataTypeHelpText = "Data types used by this flow.";
+            .loadViewData(
+                CORE_API.ProposedFlowStore.getById,
+                [vm.parentEntityRef.id],
+                {force: true})
+            .then(r => {
+                vm.proposedFlow = r.data;
+                vm.usedDataTypes = (vm.proposedFlow?.flowDef?.dataTypeIds || []).map(id => ({ dataTypeId: id }));
+                vm.dataTypeHelpText = "Data types used by this flow.";
 
-                    const transitions = vm.proposedFlow?.workflowTransitionList;
-                    if (transitions && Array.isArray(transitions) && transitions.length > 0) {
-                        const emails = transitions.map(t => t.lastUpdatedBy);
-                        const uniqueEmails = [...new Set(emails.filter(Boolean))]; // Filters out falsy values and gets unique emails
+                const transitions = vm.proposedFlow?.workflowTransitionList;
+                if (transitions && Array.isArray(transitions) && transitions.length > 0) {
+                    const emails = transitions.map(t => t.lastUpdatedBy);
+                    const uniqueEmails = [...new Set(emails.filter(Boolean))]; // Filters out falsy values and gets unique emails
 
-                        if (uniqueEmails.length > 0) {
-                            loadPerson(uniqueEmails);
-                        }
+                    if (uniqueEmails.length > 0) {
+                        loadPerson(uniqueEmails);
                     }
-                });
+                }
+            });
+    }
+
+    const loadFlowApprovers = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.ProposedFlowStore.getFlowApprovers,
+                [vm.parentEntityRef.id],
+                {force: true})
+            .then(r => {
+                vm.flowApprovers = r.data;
+                vm.groupedSourceApprovers = groupApproversByInvolvement(vm.flowApprovers.sourceApprovers);
+                vm.groupedTargetApprovers = groupApproversByInvolvement(vm.flowApprovers.targetApprovers);
+            });
     }
 
     const loadPerson = (emails) => {
@@ -81,9 +97,22 @@ function controller($q,
             });
     };
 
+    const groupApproversByInvolvement = (approvers) => {
+        if (!approvers || !Array.isArray(approvers)) return {};
+
+        return approvers.reduce((grouped, approver) => {
+            const involvement = approver.involvementKindName;
+            if (!grouped[involvement]) {
+                grouped[involvement] = [];
+            }
+            grouped[involvement].push(approver);
+            return grouped;
+        }, {});
+    };
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
         loadProposedFlow();
+        loadFlowApprovers();
     };
 
     vm.refreshState = () => {
