@@ -614,7 +614,7 @@ public class ProposedFlowWorkflowService {
         }
     }
 
-    public ProposedFlowApprovers findApprovers(long proposedFlowId) {
+    public ProposedFlowApprovers getApprovers(long proposedFlowId) {
         // 1. It receives a List<ApproverWithType>.
         List<ApproverWithType> allApproversFromDao = proposedFlowDao.findApproversForProposedFlow(proposedFlowId);
 

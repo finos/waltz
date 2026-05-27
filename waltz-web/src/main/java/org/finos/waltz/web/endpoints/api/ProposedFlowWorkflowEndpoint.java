@@ -59,7 +59,7 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
         getForList(mkPath(BASE_URL, "propose-flow", "pending-actions", "person", ":personId"), this::findPendingActionFlowsForPersonWhereSourceOrTargetApprover);
-        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id", "approvers"), this::findApprovers);
+        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id", "approvers"), this::getApproversForFlow);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -100,8 +100,8 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
         return proposedFlowWorkflowService.fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(personId);
     }
 
-    public ProposedFlowApprovers findApprovers(Request request, Response response) {
+    public ProposedFlowApprovers getApproversForFlow(Request request, Response response) {
         long proposedFlowId = WebUtilities.getLong(request, "id");
-        return proposedFlowWorkflowService.findApprovers(proposedFlowId);
+        return proposedFlowWorkflowService.getApprovers(proposedFlowId);
     }
 }
