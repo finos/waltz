@@ -10,7 +10,7 @@ This file lists the maintainers of this repository.
 | @davidwatkins73 | David Watkins | *please add organization* | davidwatkins73@gmail.com |
 | @jain-shreyans-db | Shreyans Jain | @deutschebank  | *please add email* |
 | @jessica-woodland-scott | *please add name* | *please add organization* | *please add email* |
-| @kamransaleem | Kamran Saleem | @hmxlabs  | *please add email* |
+| @kamransaleem | Kamran Saleem | @hmxlabs  | kamran@hmxlabs.io |
 | @kuldeep-jindal-db | *please add name* | *please add organization* | *please add email* |
 | @mayank-d-gupta-db | Mayank Gupta | @deutschebank | *please add email* |
 | @meenakshi-saraf-db | *please add name* | *please add organization* | *please add email* |
