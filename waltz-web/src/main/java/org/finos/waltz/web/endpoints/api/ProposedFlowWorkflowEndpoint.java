@@ -5,6 +5,7 @@ import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
@@ -58,6 +59,7 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
 
         postForList(mkPath(BASE_URL, "propose-flow"), this::findProposedFlows);
         getForList(mkPath(BASE_URL, "propose-flow", "pending-actions", "person", ":personId"), this::findPendingActionFlowsForPersonWhereSourceOrTargetApprover);
+        getForDatum(mkPath(BASE_URL, "propose-flow", "id", ":id", "approvers"), this::getApproversForFlow);
     }
 
     public ProposedFlowCommandResponse proposeNewFlow(Request request, Response response) throws IOException {
@@ -96,5 +98,10 @@ public class ProposedFlowWorkflowEndpoint implements Endpoint {
     public List<Long> findPendingActionFlowsForPersonWhereSourceOrTargetApprover(Request request, Response response) {
         Long personId = WebUtilities.getLong(request, "personId");
         return proposedFlowWorkflowService.fetchPendingActionFlowsForPersonWhereSourceOrTargetApprover(personId);
+    }
+
+    public ProposedFlowApprovers getApproversForFlow(Request request, Response response) {
+        long proposedFlowId = WebUtilities.getLong(request, "id");
+        return proposedFlowWorkflowService.getApprovers(proposedFlowId);
     }
 }

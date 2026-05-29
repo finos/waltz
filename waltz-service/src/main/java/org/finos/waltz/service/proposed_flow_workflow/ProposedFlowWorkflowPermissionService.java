@@ -6,6 +6,7 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.proposed_flow.ImmutableProposeFlowPermission;
 import org.finos.waltz.model.proposed_flow.ProposeFlowPermission;
+import org.finos.waltz.model.proposed_flow.ProposedFlowEntityReference;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ProposedFlowWorkflowPermissionService {
@@ -29,11 +31,12 @@ public class ProposedFlowWorkflowPermissionService {
         this.permissionGroupService = permissionGroupService;
     }
 
-    public ProposeFlowPermission checkUserPermission(String username, EntityReference sourceEntityReference, EntityReference targetEntityReference) {
-        Set<Operation> sourceOperationSet = fetchPermittedOperationsForUser(username, sourceEntityReference);
+    public ProposeFlowPermission checkUserPermission(String username, ProposedFlowEntityReference  sourceEntityReference, ProposedFlowEntityReference targetEntityReference) {
+
+        Set<Operation> sourceOperationSet = fetchPermittedOperationsForUser(username, mkRef(sourceEntityReference.kind(), sourceEntityReference.id()));
         LOG.debug("For user {}, permitted operations are: {} for source {}",
                 username, sourceOperationSet, sourceEntityReference);
-        Set<Operation> targetOperationSet = fetchPermittedOperationsForUser(username, targetEntityReference);
+        Set<Operation> targetOperationSet = fetchPermittedOperationsForUser(username, mkRef(targetEntityReference.kind(), targetEntityReference.id()));
         LOG.debug("For user {}, permitted operations are: {} for target {}",
                 username, targetOperationSet, targetEntityReference);
         return ImmutableProposeFlowPermission.builder()

@@ -85,8 +85,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -129,8 +129,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -178,8 +178,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     private AddLogicalFlowCommand mapProposedFlowToAddLogicalFlowCommand(ProposedFlowResponse proposedFlow) {
         return ImmutableAddLogicalFlowCommand.builder()
-                .source(proposedFlow.flowDef().source())
-                .target(proposedFlow.flowDef().target())
+                .source(mkRef(proposedFlow.flowDef().source().kind(), proposedFlow.flowDef().source().id()))
+                .target(mkRef(proposedFlow.flowDef().target().kind(), proposedFlow.flowDef().target().id()))
                 .build();
     }
 
@@ -194,8 +194,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -264,8 +264,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -331,8 +331,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
