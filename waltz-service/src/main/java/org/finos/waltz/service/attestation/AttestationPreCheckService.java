@@ -1,8 +1,15 @@
 package org.finos.waltz.service.attestation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao; // Import MeasurableCategoryDao
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.attestation.AttestationPreCheckCommandResponse;
 import org.finos.waltz.model.attestation.ImmutableAttestationPreCheckCommandResponse;
+import org.finos.waltz.model.attestation.ImmutableAttestationPrimaryFlagSetting;
+import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
@@ -10,41 +17,46 @@ import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.settings.SettingsService;
-import org.finos.waltz.data.attestation.AttestationPreCheckDao;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class AttestationPreCheckService {
+
+    private static final String ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY = "ATTESTATION_PRECHECK_PRIMARY_FLAG";
 
     private final AttestationPreCheckDao attestationPreCheckDao;
     private final SettingsService settingsService;
     private final ProposedFlowWorkflowService proposedFlowWorkflowService;
     private final PhysicalFlowService physicalFlowService;
     private final EntityWorkflowService entityWorkflowService;
+    private final MeasurableCategoryDao measurableCategoryDao; // Inject MeasurableCategoryDao
 
     @Autowired
     public AttestationPreCheckService(AttestationPreCheckDao attestationPreCheckDao,
                                       SettingsService settingsService,
                                       ProposedFlowWorkflowService proposedFlowWorkflowService,
                                       PhysicalFlowService physicalFlowService,
-                                      EntityWorkflowService entityWorkflowService) {
+                                      EntityWorkflowService entityWorkflowService,
+                                      MeasurableCategoryDao measurableCategoryDao) { // Add MeasurableCategoryDao to constructor
         this.attestationPreCheckDao = checkNotNull(attestationPreCheckDao, "AttestationPreCheckEvaluatorDao cannot be null");
         this.settingsService = checkNotNull(settingsService, "settingsService cannot be null");
         this.proposedFlowWorkflowService = proposedFlowWorkflowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
+        this.measurableCategoryDao = checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null"); // Initialize MeasurableCategoryDao
     }
 
 
@@ -122,6 +134,38 @@ public class AttestationPreCheckService {
                     preChecks.zeroAllocationCount()));
         }
 
+        // Check if the measurable category allows primary ratings using MeasurableCategoryDao
+        boolean allowPrimaryRatings = measurableCategoryDao.getById(attestedEntityId).allowPrimaryRatings();
+
+        if (allowPrimaryRatings) { // Wrap the primary flag check in this condition
+            Optional<String> primaryFlagSetting = settingsService.getValue(ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY);
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<ImmutableAttestationPrimaryFlagSetting> primaryFlagSettings = primaryFlagSetting
+                    .map(str -> {
+                        try {
+                            ImmutableAttestationPrimaryFlagSetting[] settings = mapper.readValue(str, ImmutableAttestationPrimaryFlagSetting[].class);
+                            return Arrays.asList(settings);
+                        } catch (JsonProcessingException e) {
+                            // LOG.error("Failed to parse AttestationPrimaryFlagSetting(s) from settings value: {}", str); // Need to add LOG
+                            return new ArrayList<ImmutableAttestationPrimaryFlagSetting>();
+                        }
+                    })
+                    .orElseGet(ArrayList::new);
+
+            boolean isPrimaryMandatory = primaryFlagSettings.stream()
+                    .filter(s -> Objects.equals(s.measurableCategoryId(), attestedEntityId))
+                    .map(ImmutableAttestationPrimaryFlagSetting::isPrimaryMandatory)
+                    .findFirst()
+                    .orElse(false);
+            if (isPrimaryMandatory && preChecks.primaryRatingsCount() == 0) {
+                failures.add(mkFailureMessage(
+                        messageTemplates,
+                        "attestation.viewpoint.fail.primaryFlag.count",
+                        "Cannot attest as one of the viewpoint mapping should have a Primary flag.",
+                        preChecks.mappingCount()));
+            }
+        }
         return failures;
     }
 
