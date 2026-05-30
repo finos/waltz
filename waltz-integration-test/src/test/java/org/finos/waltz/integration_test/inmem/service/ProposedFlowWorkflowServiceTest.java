@@ -233,8 +233,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1017))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2027))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -262,8 +262,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1018))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2028))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -431,8 +431,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
-        EntityReference appA = appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a);
-        EntityReference appB = appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a);
+        EntityReference appA = appHelper.createNewApp(mkName(USER_NAME, "appA_a"), ouIds.a);
+        EntityReference appB = appHelper.createNewApp(mkName(USER_NAME, "appB_b"), ouIds.a);
 
         // Create a proposed flow command for a new flow (CREATE proposal type)
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
@@ -775,8 +775,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1018))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2028))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
