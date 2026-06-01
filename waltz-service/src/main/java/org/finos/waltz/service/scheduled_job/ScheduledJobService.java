@@ -32,6 +32,7 @@ import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
+import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
 import org.finos.waltz.service.survey.SurveyInstanceActionQueueService;
 import org.finos.waltz.service.survey.SurveyInstanceService;
@@ -69,7 +70,7 @@ public class ScheduledJobService {
     private final SurveyInstanceActionQueueService surveyInstanceActionQueueService;
     private final ComplexityService complexityService;
     private final AssessmentRatingRippler assessmentRatingRippler;
-
+    private final ProposedFlowWorkflowService proposedFlowWorkflowService;
 
     @Autowired
     public ScheduledJobService(AttestationRunService attestationRunService,
@@ -84,9 +85,8 @@ public class ScheduledJobService {
                                ScheduledJobDao scheduledJobDao,
                                SurveyInstanceActionQueueService surveyInstanceActionQueueService,
                                SurveyInstanceService surveyInstanceService,
-                               AssessmentRatingRippler assessmentRatingRippler) {
-
-
+                               AssessmentRatingRippler assessmentRatingRippler,
+                               ProposedFlowWorkflowService proposedFlowWorkflowService) {
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(complexityService, "complexityService cannot be null");
         checkNotNull(costService, "costService cannot be null");
@@ -99,6 +99,7 @@ public class ScheduledJobService {
         checkNotNull(surveyInstanceActionQueueService, "surveyInstanceActionQueueService cannot be null");
         checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
         checkNotNull(assessmentRatingRippler, "assessmentRatingRippler cannot be null");
+        checkNotNull(proposedFlowWorkflowService, "proposedFlowWorkflowService cannot be null");
 
         this.attestationRunService = attestationRunService;
         this.complexityService = complexityService;
@@ -113,6 +114,7 @@ public class ScheduledJobService {
         this.surveyInstanceActionQueueService = surveyInstanceActionQueueService;
         this.surveyInstanceService = surveyInstanceService;
         this.assessmentRatingRippler = assessmentRatingRippler;
+        this.proposedFlowWorkflowService = proposedFlowWorkflowService;
     }
 
 
@@ -173,6 +175,9 @@ public class ScheduledJobService {
                 (jk) -> assessmentRatingRippler.rippleAssessments());
 
         surveyInstanceActionQueueService.performActions();
+
+        runIfNeeded(JobKey.TIME_OUT_PENDING_FLOWS,
+                (jk) -> proposedFlowWorkflowService.timeOutPendingFlows());
 
     }
 

@@ -32,7 +32,8 @@ public enum ProposedFlowWorkflowState {
     FULLY_APPROVED("Fully Approved", true),
     SOURCE_REJECTED("Source Rejected", true),
     TARGET_REJECTED("Target Rejected", true),
-    CANCELLED("Cancelled", true);
+    CANCELLED("Cancelled", true),
+    TIMED_OUT("Timed Out", true);
 
     public static final List<ProposedFlowWorkflowState> END_STATES =
             Collections.unmodifiableList(
