@@ -18,6 +18,10 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.SETTINGS;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -46,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Disabled("Problem with H2")
 public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest {
 
+    private static final String ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY = "ATTESTATION_PRECHECK_PRIMARY_FLAG" ;
     @Autowired
     private LogicalFlowHelper lfHelper;
 
@@ -60,6 +65,10 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
     @Autowired
     private AppGroupHelper appGroupHelper;
+
+    private static final long TEST_MEASURABLE_CATEGORY_ID = 33L;
+    private final EntityReference TEST_ENTITY_REF = mkNewAppRef();
+
 
 
     @Test
@@ -158,6 +167,51 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         assertTrue(result.isEmpty(), "should be allowed to attest as in the no-flows exemption group");
     }
 
+    // --- New test cases for primary ratings logic ---
+
+    @Test
+    public void shouldFailIfPrimaryRatingsMandatoryAndNoneExist() {
+        createMeasurableCategory(TEST_MEASURABLE_CATEGORY_ID, true); // Category allows primary ratings
+        createSetting(ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY, "[{\"measurableCategoryId\": " + TEST_MEASURABLE_CATEGORY_ID + ", \"isPrimaryMandatory\": true}]");
+        List<String> failures = aipcSvc.calcViewpointPreCheckFailures(TEST_ENTITY_REF, TEST_MEASURABLE_CATEGORY_ID);
+
+        assertFalse(failures.isEmpty(), "Should fail because primary ratings are mandatory but none exist");
+        assertTrue(failures.get(0).contains("atleast one primary viewpoint should be present"), "Failure message should indicate missing primary ratings");
+    }
+
+    @Test
+    public void shouldPassIfPrimaryRatingsNotMandatory() {
+        createMeasurableCategory(TEST_MEASURABLE_CATEGORY_ID, true); // Category allows primary ratings
+        createSetting(ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY, "[{\"measurableCategoryId\": " + TEST_MEASURABLE_CATEGORY_ID + ", \"isPrimaryMandatory\": false}]");
+
+        List<String> failures = aipcSvc.calcViewpointPreCheckFailures(TEST_ENTITY_REF, TEST_MEASURABLE_CATEGORY_ID);
+
+        assertTrue(failures.isEmpty(), "Should pass because primary ratings are not mandatory, even if none exist");
+    }
+
+    @Test
+    public void shouldPassIfPrimaryRatingsMandatoryAndExist() {
+        createMeasurableCategory(TEST_MEASURABLE_CATEGORY_ID, true); // Category allows primary ratings
+        createSetting(ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY, "[{\"measurableCategoryId\": " + TEST_MEASURABLE_CATEGORY_ID + ", \"isPrimaryMandatory\": true}]");
+
+        long measurableId = counter.incrementAndGet();
+        createMeasurable(measurableId, TEST_MEASURABLE_CATEGORY_ID);
+        createMeasurableRating(TEST_ENTITY_REF, measurableId, true); // Create a primary rating
+
+        List<String> failures = aipcSvc.calcViewpointPreCheckFailures(TEST_ENTITY_REF, TEST_MEASURABLE_CATEGORY_ID);
+
+        assertTrue(failures.isEmpty(), "Should pass because primary ratings are mandatory and exist");
+    }
+
+    @Test
+    public void shouldPassIfPrimaryRatingsNotAllowedByCategory() {
+        createMeasurableCategory(TEST_MEASURABLE_CATEGORY_ID, false); // Category does NOT allow primary ratings
+        createSetting(ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY, "[{\"measurableCategoryId\": " + TEST_MEASURABLE_CATEGORY_ID + ", \"isPrimaryMandatory\": true}]");
+
+        List<String> failures = aipcSvc.calcViewpointPreCheckFailures(TEST_ENTITY_REF, TEST_MEASURABLE_CATEGORY_ID);
+
+        assertTrue(failures.isEmpty(), "Should pass because category does not allow primary ratings, so the check is skipped");
+    }
 
     private void createGroupWithApps(String extId, EntityReference appRef) throws InsufficientPrivelegeException {
         Long groupId = appGroupHelper.createAppGroupWithAppRefs(mkName(extId), asSet(appRef));
@@ -177,11 +231,75 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     }
 
 
-    @AfterEach
+   /* @AfterEach
     public void removeExemptionGroups() {
         dsl.deleteFrom(Tables.APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.EXTERNAL_ID.eq(AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK))
                 .execute();
+    }*/
+
+    private void createMeasurableCategory(long id, boolean allowPrimaryRatings) {
+        dsl.insertInto(MEASURABLE_CATEGORY)
+                .set(MEASURABLE_CATEGORY.ID, id)
+                .set(MEASURABLE_CATEGORY.NAME, "Test Measurable Category " + id)
+                .set(MEASURABLE_CATEGORY.DESCRIPTION, "Description for " + id)
+                .set(MEASURABLE_CATEGORY.RATING_SCHEME_ID, 1L) // Assuming a default rating scheme exists
+                .set(MEASURABLE_CATEGORY.LAST_UPDATED_BY, "test")
+                .set(MEASURABLE_CATEGORY.LAST_UPDATED_AT, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()))
+                .set(MEASURABLE_CATEGORY.EDITABLE, true)
+                .set(MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS, allowPrimaryRatings)
+                .execute();
     }
+
+    private void createSetting(String key, String value) {
+        dsl.insertInto(SETTINGS)
+                .set(SETTINGS.NAME, key)
+                .set(SETTINGS.VALUE, value)
+                .set(SETTINGS.DESCRIPTION, "test")
+                .set(SETTINGS.RESTRICTED, Boolean.FALSE)
+                .execute();
+    }
+
+    private void createMeasurable(long id, long categoryId) {
+        dsl.insertInto(MEASURABLE)
+                .set(MEASURABLE.ID, id)
+                .set(MEASURABLE.NAME, "Test Measurable " + id)
+                .set(MEASURABLE.DESCRIPTION, "Desc")
+                .set(MEASURABLE.MEASURABLE_CATEGORY_ID, categoryId)
+                .set(MEASURABLE.CONCRETE, true)
+                .set(MEASURABLE.LAST_UPDATED_BY, "test")
+                .set(MEASURABLE.LAST_UPDATED_AT, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()))
+                .execute();
+    }
+
+    private void createMeasurableRating(EntityReference entityRef, long measurableId, boolean isPrimary) {
+        dsl.insertInto(MEASURABLE_RATING)
+                .set(MEASURABLE_RATING.ENTITY_ID, entityRef.id())
+                .set(MEASURABLE_RATING.ENTITY_KIND, entityRef.kind().name())
+                .set(MEASURABLE_RATING.MEASURABLE_ID, measurableId)
+                .set(MEASURABLE_RATING.RATING, "G") // Assuming 'G' is a valid rating
+                .set(MEASURABLE_RATING.DESCRIPTION, "Test Rating")
+                .set(MEASURABLE_RATING.LAST_UPDATED_BY, "test")
+                .set(MEASURABLE_RATING.LAST_UPDATED_AT, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()))
+                .set(MEASURABLE_RATING.IS_PRIMARY, isPrimary)
+                .execute();
+    }
+
+
+    @AfterEach
+    public void cleanup() {
+        dsl.deleteFrom(Tables.APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.EXTERNAL_ID.eq(AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK))
+                .execute();
+        dsl.deleteFrom(Tables.APPLICATION_GROUP_ENTRY).execute();
+        dsl.deleteFrom(Tables.DATA_TYPE).execute();
+        dsl.deleteFrom(Tables.LOGICAL_FLOW).execute();
+        dsl.deleteFrom(Tables.LOGICAL_FLOW_DECORATOR).execute();
+        dsl.deleteFrom(MEASURABLE_RATING).execute();
+        dsl.deleteFrom(MEASURABLE).execute();
+        dsl.deleteFrom(MEASURABLE_CATEGORY).execute();
+        dsl.deleteFrom(SETTINGS).execute();
+    }
+
 
 }

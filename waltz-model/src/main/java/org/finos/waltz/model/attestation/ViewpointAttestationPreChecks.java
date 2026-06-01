@@ -8,4 +8,5 @@ public abstract class ViewpointAttestationPreChecks {
     public abstract int zeroAllocationCount();
     public abstract int totalAllocation();
     public abstract int nonConcreteCount();
+    public abstract int primaryRatingsCount();
 }
