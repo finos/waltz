@@ -162,7 +162,7 @@ public class AttestationPreCheckService {
                 failures.add(mkFailureMessage(
                         messageTemplates,
                         "attestation.viewpoint.fail.primaryFlag.count",
-                        "Cannot attest as one of the viewpoint mapping should have a Primary flag.",
+                        "Cannot attest as one of the viewpoint mapping should have a Primary flag",
                         preChecks.mappingCount()));
             }
         }
