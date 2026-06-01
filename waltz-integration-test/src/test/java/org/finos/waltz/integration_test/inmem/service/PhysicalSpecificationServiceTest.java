@@ -33,12 +33,15 @@ import org.finos.waltz.model.physical_specification.*;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.test_common.helpers.*;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -49,6 +52,9 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,7 +83,15 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
     @Autowired
     private DataTypeDecoratorService dtdSvc;
 
+    @Autowired
+    private DSLContext dsl;
 
+    @BeforeEach
+    public void beforeEach() {
+        dsl.deleteFrom(PHYSICAL_SPECIFICATION).execute();
+        dsl.deleteFrom(PHYSICAL_FLOW).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
+    }
 
     @Test
     public void getById() {
@@ -85,7 +99,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         PhysicalSpecification unknownId = psSvc.getById(-1);
         assertNull(unknownId, "If unknown id returns null");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "getById");
 
         PhysicalSpecification spec = psSvc.getById(specId);
@@ -103,8 +118,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         Set<PhysicalSpecification> whereEntityUnrelated = psSvc.findByEntityReference(mkRef(EntityKind.COST_KIND, -1));
         assertEquals(emptySet(), whereEntityUnrelated, "Returns an empty set where entity is not related");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
@@ -142,8 +158,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         assertEquals(CommandOutcome.FAILURE, responseNoSpec.outcome(), "Fails to mark removed if spec not found");
         assertEquals("Specification not found", responseNoSpec.message().get(), "Should inform of reason for failure");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
@@ -167,8 +184,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         assertEquals(emptyList(), psSvc.findByIds(emptyList()), "Returns empty list if empty list provided");
         assertEquals(emptyList(), psSvc.findByIds(asList(-1L)), "Returns empty set if empty ids cannot be found");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
         Long specId2 = psHelper.createPhysicalSpec(b, "findByEntityReference");
@@ -191,7 +209,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 () -> psSvc.updateExternalId(null, null),
                 "Should throw exception if spec id is null");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
 
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
@@ -218,7 +237,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 () -> psSvc.makeActive(null, username),
                 "Should throw exception if spec id is null");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
         int active = psSvc.makeActive(specId, username);
@@ -239,8 +259,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
     public void propagateDataTypesToLogicalFlows() {
 
         String username = mkName("propagateDataTypesToLogicalFlows");
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
@@ -286,7 +307,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 () -> psSvc.create(null),
                 "Should throw exception if create command is null");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
 
         String name = mkName("create");
 
@@ -321,8 +343,10 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 "Specification id must not be null");
 
         String username = mkName("propagateDataTypesToLogicalFlows");
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
@@ -343,7 +367,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 () -> psSvc.findBySelector(null),
                 "Options cannot be null");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
         IdSelectionOptions specOpts = mkOpts(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
@@ -352,7 +377,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         assertEquals(1, specs.size(), "When selector is a spec only returns one result");
         assertEquals(specId, first(specs).id().get(), "Returns spec when using spec selector");
 
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix2 = UUID.randomUUID().toString();
+        EntityReference b = appHelper.createNewApp("b" + suffix2, ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId2 = psHelper.createPhysicalSpec(b, "findByEntityReference");
 
@@ -398,7 +424,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         List<PhysicalSpecification> noResults = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "search"));
         assertEquals(emptyList(), noResults, "Entity qry should return empty results");
 
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "search");
 
         List<PhysicalSpecification> result = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "search"));
@@ -417,9 +444,10 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
     @Test
     public void validateSpecificationForEdit_shouldFailWhenSpecUsedByMultipleLogicalFlows() {
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
-        EntityReference c = appHelper.createNewApp("c", ouIds.b);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c" + suffix, ouIds.b);
 
         String specName = mkName("validateFail");
         Long specId = psHelper.createPhysicalSpec(a, specName);
@@ -440,8 +468,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
     @Test
     public void validateSpecificationForEdit_shouldSucceedWhenSpecUsedBySingleLogicalFlow() {
-        EntityReference a = appHelper.createNewApp("a", ouIds.a);
-        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        String suffix = UUID.randomUUID().toString();
+        EntityReference a = appHelper.createNewApp("a" + suffix, ouIds.a);
+        EntityReference b = appHelper.createNewApp("b" + suffix, ouIds.a1);
 
         String specName = mkName("validateSuccess");
         Long specId = psHelper.createPhysicalSpec(a, specName);

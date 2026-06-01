@@ -209,7 +209,7 @@ class ProposedFlowWorkflowEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
+        EntityReference owningEntity = mkRef(APPLICATION, 187030L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
@@ -314,7 +314,7 @@ class ProposedFlowWorkflowEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
+        EntityReference owningEntity = mkRef(APPLICATION, 187031L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)

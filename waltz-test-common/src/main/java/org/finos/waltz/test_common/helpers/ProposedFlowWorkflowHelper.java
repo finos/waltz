@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
@@ -33,7 +34,7 @@ public class ProposedFlowWorkflowHelper {
 
     public EntityReference getOwningEntity() {
         return ImmutableEntityReference.builder()
-                .id(18703)
+                .id(ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE))
                 .kind(APPLICATION)
                 .name("AMG")
                 .externalId("60487-1")
