@@ -26,6 +26,8 @@ import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow.DataFlowService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,6 +44,8 @@ import static org.finos.waltz.model.EntityKind.PROPOSED_FLOW;
 import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
@@ -74,6 +78,16 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     PhysicalFlowDao physicalFlowDao;
 
+    @Autowired
+    private DSLContext dsl;
+
+    @BeforeEach
+    public void before() {
+        dsl.deleteFrom(org.finos.waltz.schema.tables.ProposedFlow.PROPOSED_FLOW).execute();
+        dsl.deleteFrom(LOGICAL_FLOW).execute();
+        dsl.deleteFrom(PHYSICAL_FLOW).execute();
+    }
+
     @Test
     void testWhenLogicalFlowIdIsNotPresentThenCreatesBothLogicalAndPhysicalFlow() throws JsonProcessingException, FlowCreationException {
 
@@ -85,8 +99,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1012))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2022))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -129,8 +143,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1013))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2023))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -194,8 +208,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1014))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2024))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -264,8 +278,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1015))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2025))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -331,8 +345,8 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> dataTypeIdSet = getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 101))
-                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1016))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2026))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -437,7 +451,7 @@ public class DataFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     private EntityReference getOwningEntity() {
         return ImmutableEntityReference.builder()
-                .id(18703)
+                .id(187034)
                 .kind(APPLICATION)
                 .name("AMG")
                 .externalId("60487-1")
