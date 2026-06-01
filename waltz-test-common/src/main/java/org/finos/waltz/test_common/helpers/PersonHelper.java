@@ -1,6 +1,8 @@
 package org.finos.waltz.test_common.helpers;
 
+import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.user.UserDao;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.person.PersonKind;
 import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.jooq.DSLContext;
@@ -23,6 +25,8 @@ public class PersonHelper {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private PersonDao personDao;
 
     public Long createPerson(String name) {
         PersonRecord p = dsl.newRecord(PERSON);
@@ -72,5 +76,20 @@ public class PersonHelper {
                 .set(PERSON.MANAGER_EMPLOYEE_ID, mgrEmpId)
                 .where(PERSON.ID.eq(employee))
                 .execute();
+    }
+
+    /**
+     * Creates a new person record in the database with a simplified set of attributes
+     * for use in tests.
+     *
+     * @param email The email to use for the person. This will also be used to generate
+     *              the employeeId and displayName.
+     * @return The fully populated Person object created from the new database record.
+     */
+    public Person getPersonObj(String email) {
+        Long personId = createPerson(email);
+
+        // to ensure we have the ID and all other fields correctly populated.
+        return personDao.getById(personId);
     }
 }

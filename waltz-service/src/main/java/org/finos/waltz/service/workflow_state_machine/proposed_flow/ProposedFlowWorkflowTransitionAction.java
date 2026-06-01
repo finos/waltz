@@ -7,7 +7,8 @@ public enum ProposedFlowWorkflowTransitionAction {
     PROPOSE("Propose", "propose"),
     APPROVE("Approve", "approve"),
     REJECT("Reject", "reject"),
-    CANCEL("Cancel", "cancel");
+    CANCEL("Cancel", "cancel"),
+    TIME_OUT("Time Out", "time_out");
 
     private final String display;
     private final String verb;

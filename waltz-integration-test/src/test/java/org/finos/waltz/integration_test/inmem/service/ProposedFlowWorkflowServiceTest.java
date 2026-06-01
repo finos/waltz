@@ -34,6 +34,7 @@ import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.physical_flow.FlowAttributes;
 import org.finos.waltz.model.physical_flow.FrequencyKindValue;
@@ -45,8 +46,11 @@ import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowActionCommand;
 import org.finos.waltz.model.proposed_flow.ImmutableProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposalType;
 import org.finos.waltz.model.proposed_flow.ProposedFlowActionCommand;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprover;
+import org.finos.waltz.model.proposed_flow.ProposedFlowApprovers;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommand;
 import org.finos.waltz.model.proposed_flow.ProposedFlowCommandResponse;
+import org.finos.waltz.model.proposed_flow.ProposedFlowEntityReference;
 import org.finos.waltz.model.proposed_flow.ProposedFlowResponse;
 import org.finos.waltz.model.proposed_flow.Reason;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
@@ -83,7 +87,6 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.Operation.REJECT;
 import static org.finos.waltz.model.proposed_flow.ProposalType.CREATE;
 import static org.finos.waltz.model.proposed_flow.ProposedFlowWorkflowState.FULLY_APPROVED;
@@ -205,8 +208,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         spec = psSvc.getById(specId);
 
         baseCreateCommand = ImmutableProposedFlowCommand.builder()
-                .source(source)
-                .target(target)
+                .source(ProposedFlowEntityReference.mkRef(source.kind(), source.id()))
+                .target(ProposedFlowEntityReference.mkRef(target.kind(), target.id()))
                 .specification(spec)
                 .flowAttributes(ImmutableFlowAttributes.builder()
                         .basisOffset(0)
@@ -230,8 +233,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1017))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2027))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -259,8 +262,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1018))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2028))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -293,8 +296,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 1011))
-                .target(mkRef(APPLICATION, 2022))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1011))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2022))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -324,8 +327,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 10111))
-                .target(mkRef(APPLICATION, 20222))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 10111))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 20222))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -336,8 +339,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         LocalDateTime now = nowUtc();
         LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
-                .source(command.source())
-                .target(command.target())
+                .source(EntityReference.mkRef(command.source().kind(), command.source().id()))
+                .target(EntityReference.mkRef(command.target().kind(), command.target().id()))
                 .lastUpdatedAt(now)
                 .lastUpdatedBy(USER_NAME)
                 .created(UserTimestamp.mkForUser(USER_NAME, now))
@@ -428,10 +431,13 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
+        EntityReference appA = appHelper.createNewApp(mkName(USER_NAME, "appA_a"), ouIds.a);
+        EntityReference appB = appHelper.createNewApp(mkName(USER_NAME, "appB_b"), ouIds.a);
+
         // Create a proposed flow command for a new flow (CREATE proposal type)
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
-                .source(appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a))
-                .target(appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a))
+                .source(ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()))
+                .target(ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()))
                 // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
                 .reason(reason)
                 .specification(physicalSpecification)
@@ -451,14 +457,14 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Long personA = personHelper.createPerson(userName);
 
         long involvementKind = involvementHelper.mkInvolvementKind("rel_abc");
-        involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
-        involvementHelper.createInvolvement(personA, involvementKind, createCommand.target());
+        involvementHelper.createInvolvement(personA, involvementKind, EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()));
+        involvementHelper.createInvolvement(personA, involvementKind, EntityReference.mkRef(createCommand.target().kind(), createCommand.target().id()));
 
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, REJECT);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, USER_NAME, Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.target(), ig, USER_NAME, REJECT);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()), ig, USER_NAME, REJECT);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.target().kind(), createCommand.target().id()), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.target().kind(), createCommand.target().id()), ig, USER_NAME, REJECT);
 
         // Action command for source approval
         ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
@@ -509,9 +515,12 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
+        EntityReference appA = appHelper.createNewApp(mkName(USER_NAME, "appA_1"), ouIds.a);
+        EntityReference appB = appHelper.createNewApp(mkName(USER_NAME, "appB_1"), ouIds.a);
+
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
-                .source(appHelper.createNewApp(mkName(USER_NAME, "appA_1"), ouIds.a))
-                .target(appHelper.createNewApp(mkName(USER_NAME, "appB_1"), ouIds.a))
+                .source(ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()))
+                .target(ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()))
                 .reason(reason)
                 .specification(physicalSpecification)
                 .flowAttributes(flowAttributes)
@@ -552,10 +561,13 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         FlowAttributes flowAttributes = proposedFlowWorkflowHelper.getFlowAttributes();
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
+        EntityReference appA = appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a);
+        EntityReference appB = appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a);
+
         // Create a proposed flow command for a new flow (CREATE proposal type)
         ProposedFlowCommand createCommand = ImmutableProposedFlowCommand.builder()
-                .source(appHelper.createNewApp(mkName(USER_NAME, "appA"), ouIds.a))
-                .target(appHelper.createNewApp(mkName(USER_NAME, "appB"), ouIds.a))
+                .source(ProposedFlowEntityReference.mkRef(appA.kind(), appA.id()))
+                .target(ProposedFlowEntityReference.mkRef(appB.kind(), appB.id()))
                 // For a CREATE proposal, logicalFlowId and physicalFlowId should not be set initially
                 .reason(reason)
                 .specification(physicalSpecification)
@@ -575,11 +587,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Long personA = personHelper.createPerson(userName);
 
         long involvementKind = involvementHelper.mkInvolvementKind("rel_abcd");
-        involvementHelper.createInvolvement(personA, involvementKind, createCommand.source());
+        involvementHelper.createInvolvement(personA, involvementKind, EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()));
 
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, USER_NAME);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(createCommand.source(), ig, USER_NAME, REJECT);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()), ig, USER_NAME, Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(createCommand.source().kind(), createCommand.source().id()), ig, USER_NAME, REJECT);
 
         // Action command for source approval
         ProposedFlowActionCommand sourceApproveCommand = ImmutableProposedFlowActionCommand.builder()
@@ -677,13 +689,13 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Long personA = personHelper.createPerson(testStem);
 
         long involvementKind = involvementHelper.mkInvolvementKind("_rel");
-        involvementHelper.createInvolvement(personA, involvementKind, baseCreateCommand.source());
-        involvementHelper.createInvolvement(personA, involvementKind, baseCreateCommand.target());
+        involvementHelper.createInvolvement(personA, involvementKind, EntityReference.mkRef(baseCreateCommand.source().kind(), baseCreateCommand.source().id()));
+        involvementHelper.createInvolvement(personA, involvementKind, EntityReference.mkRef(baseCreateCommand.target().kind(), baseCreateCommand.target().id()));
 
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(involvementKind, "_rel_ig");
 
-        permissionHelper.setupPermissionGroupForProposedFlow(baseCreateCommand.source(), ig, "_rel_pg", Operation.APPROVE);
-        permissionHelper.setupPermissionGroupForProposedFlow(baseCreateCommand.target(), ig, "_rel_pg", Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(baseCreateCommand.source().kind(), baseCreateCommand.source().id()), ig, "_rel_pg", Operation.APPROVE);
+        permissionHelper.setupPermissionGroupForProposedFlow(EntityReference.mkRef(baseCreateCommand.target().kind(), baseCreateCommand.target().id()), ig, "_rel_pg", Operation.APPROVE);
 
         List<ProposedFlowResponse> failures = new ArrayList<>();
         List<ProposedFlowResponse> responses = new ArrayList<>();
@@ -763,8 +775,8 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         Set<Long> dataTypeIdSet = proposedFlowWorkflowHelper.getDataTypeIdSet();
 
         ProposedFlowCommand command = ImmutableProposedFlowCommand.builder()
-                .source(mkRef(APPLICATION, 101))
-                .target(mkRef(APPLICATION, 202))
+                .source(ProposedFlowEntityReference.mkRef(APPLICATION, 1018))
+                .target(ProposedFlowEntityReference.mkRef(APPLICATION, 2028))
                 .logicalFlowId(12345)
                 .physicalFlowId(12345)
                 .reason(reason)
@@ -786,4 +798,79 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
         assertNotNull(proposedFlowResponse.physicalFlowId());
         assertNotNull(proposedFlowResponse.specificationId());
     }
+
+    @Test
+    public void findApprovers_shouldReturnEmptyListsForInvalidFlowId() {
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(-1L);
+        assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty for an invalid flow ID");
+        assertTrue(approvers.targetApprovers().isEmpty(), "Target approvers should be empty for an invalid flow ID");
+    }
+
+    @Test
+    public void findApprovers_shouldReturnEmptyListsWhenNoPermissionsExist() {
+        // 1. Arrange: Create a flow but set up no permissions
+        EntityReference sourceApp = appHelper.createNewApp("sourceNoPerms", ouIds.a);
+        EntityReference targetApp = appHelper.createNewApp("targetNoPerms", ouIds.a1);
+
+        ProposedFlowCommand createCommand = proposedFlowWorkflowHelper.mkCreateCommand(sourceApp, targetApp);
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow("proposer", createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+
+        // 2. Act: Call the method
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(proposedFlowId);
+
+        // 3. Assert: Both lists should be empty
+        assertTrue(approvers.sourceApprovers().isEmpty(), "Source approvers should be empty when no permissions are configured");
+        assertTrue(approvers.targetApprovers().isEmpty(), "Target approvers should be empty when no permissions are configured");
+    }
+
+    @Test
+    public void findApprovers_shouldFindSourceAndTargetApprovers() {
+        // 1. Arrange: Create apps, people, and the proposed flow
+        EntityReference sourceApp = appHelper.createNewApp("sourceWithPerms", ouIds.a);
+        EntityReference targetApp = appHelper.createNewApp("targetWithPerms", ouIds.a1);
+
+        ProposedFlowCommand createCommand = proposedFlowWorkflowHelper.mkCreateCommand(sourceApp, targetApp);
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow("proposer", createCommand);
+        Long proposedFlowId = proposeResponse.proposedFlowId();
+
+        Person sourceApproverPerson = personHelper.getPersonObj("source.approver@db.com");
+        Person targetApproverPerson = personHelper.getPersonObj("target.approver@db.com");
+        personHelper.createPerson("non.approver@db.com"); // A person with no relevant permissions
+
+        // 2. Arrange: Set up the permission chain and store the kind details
+        String involvementKindName = "PROPOSED_FLOW_APPROVER";
+        long involvementKindId = involvementHelper.mkInvolvementKind(involvementKindName);
+
+        involvementHelper.createInvolvement(sourceApproverPerson.id().get(), involvementKindId, sourceApp);
+        InvolvementGroupRecord sourceIg = permissionHelper.setupInvolvementGroup(involvementKindId, "source_ig");
+        permissionHelper.setupPermissionGroupForProposedFlow(sourceApp, sourceIg, "source_pg", Operation.APPROVE);
+
+        // --- Target Approver Permissions ---
+        involvementHelper.createInvolvement(targetApproverPerson.id().get(), involvementKindId, targetApp);
+        InvolvementGroupRecord targetIg = permissionHelper.setupInvolvementGroup(involvementKindId, "target_ig");
+        permissionHelper.setupPermissionGroupForProposedFlow(targetApp, targetIg, "target_pg", Operation.APPROVE);
+
+        // 3. Act: Call the method to find approvers
+        ProposedFlowApprovers approvers = proposedFlowWorkflowService.getApprovers(proposedFlowId);
+
+        // 4. Assert: Check the contents of the DTOs in the response
+        assertEquals(1, approvers.sourceApprovers().size(), "Should find exactly one source approver");
+
+        // Get the custom DTO from the response list
+        ProposedFlowApprover actualSourceApprover = approvers.sourceApprovers().get(0);
+
+        // Assert both person details and the contextual role details
+        assertEquals(sourceApproverPerson.id(), actualSourceApprover.person().id());
+        assertEquals(involvementKindId, actualSourceApprover.involvementKindId());
+        assertEquals(involvementKindName, actualSourceApprover.involvementKindName(), "The correct source involvement kind name should be returned");
+
+        assertEquals(1, approvers.targetApprovers().size(), "Should find exactly one target approver");
+        ProposedFlowApprover actualTargetApprover = approvers.targetApprovers().get(0);
+
+        assertEquals(targetApproverPerson.id(), actualTargetApprover.person().id());
+        assertEquals(involvementKindId, actualTargetApprover.involvementKindId());
+        assertEquals(involvementKindName, actualTargetApprover.involvementKindName(), "The correct target involvement kind name should be returned");
+    }
+
 }
