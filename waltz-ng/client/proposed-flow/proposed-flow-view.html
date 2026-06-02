@@ -67,6 +67,9 @@
                     <!-- Transition Metadata -->
                     <div ng-include="'wpfv-transitions-data'"></div>
                     <br />
+                    <!-- Approvers Metadata -->
+                    <div ng-include="'wpfv-approvers-data'"></div>
+                    <br />
                 </div>
             </div>
         </div>
@@ -130,3 +133,15 @@
         </content>
     </waltz-sub-section>
 </script>
+    <script type="text/ng-template" id="wpfv-approvers-data">
+        <waltz-sub-section name="Flow Approvers">
+            <content>
+                <waltz-svelte-component
+                    component="$ctrl.FlowApproversDetail"
+                    grouped-source-approvers="$ctrl.groupedSourceApprovers"
+                    grouped-target-approvers="$ctrl.groupedTargetApprovers"
+                >
+            </content>
+        </waltz-sub-section>
+    </script>
+

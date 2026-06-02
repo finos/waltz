@@ -40,7 +40,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 101\n" +
+                "        \"id\": 1010\n" +
                 "    },\n" +
                 "    \"target\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -54,7 +54,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
                 "        \"owningEntity\": {\n" +
-                "            \"id\": 18703,\n" +
+                "            \"id\": 187032,\n" +
                 "            \"kind\": \"APPLICATION\",\n" +
                 "            \"name\": \"AMG\",\n" +
                 "            \"externalId\": \"60487-1\",\n" +
@@ -99,7 +99,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
         String requestBody = "{\n" +
                 "    \"source\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
-                "        \"id\": 101\n" +
+                "        \"id\": 1011\n" +
                 "    },\n" +
                 "    \"target\": {\n" +
                 "        \"kind\": \"APPLICATION\",\n" +
@@ -113,7 +113,7 @@ public class ProposedFlowDaoTest extends BaseInMemoryIntegrationTest {
                 "    \"physicalFlowId\": 12345,\n" +
                 "    \"specification\": {\n" +
                 "        \"owningEntity\": {\n" +
-                "            \"id\": 18703,\n" +
+                "            \"id\": 187033,\n" +
                 "            \"kind\": \"APPLICATION\",\n" +
                 "            \"name\": \"AMG\",\n" +
                 "            \"externalId\": \"60487-1\",\n" +

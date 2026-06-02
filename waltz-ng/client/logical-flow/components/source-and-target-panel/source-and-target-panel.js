@@ -36,6 +36,7 @@ import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 import FlowRatingCell from "../../../common/svelte/FlowRatingCell.svelte"
 import {flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
 import {DATAFLOW_PROPOSAL_SETTING_NAME} from "../../../common/constants"
+import {isDataFlowProposalsEnabled} from "../../../common/utils/settings-util";
 
 const bindings = {
     entityRef: "<",
@@ -188,7 +189,8 @@ function controller($element,
                     $scope,
                     $window,
                     displayNameService,
-                    serviceBroker) {
+                    serviceBroker,
+                    settingsService) {
     const vm = initialiseData(this, initialState);
 
     function applyFilter(fn) {
@@ -252,13 +254,18 @@ function controller($element,
 
         vm.diagramElem = _.head($element.find("waltz-source-and-target-graph"));
 
-        serviceBroker
-            .loadViewData(
-                CORE_API.SettingsStore.findAll, [], {force: true}
-            )
-            .then(r => {
-                const dataFlowProposalSetting = r.data.filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
-                vm.dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value === 'true';
+        // serviceBroker
+        //     .loadViewData(
+        //         CORE_API.SettingsStore.findAll, [], {force: true}
+        //     )
+        //     .then(r => {
+        //         const dataFlowProposalSetting = r.data.filter(t => t.name === DATAFLOW_PROPOSAL_SETTING_NAME)[0];
+        //         vm.dataFlowProposalsEnabled = dataFlowProposalSetting && dataFlowProposalSetting.value === 'true';
+        //     });
+
+        isDataFlowProposalsEnabled(settingsService)
+            .then(value => {
+                vm.dataFlowProposalsEnabled = value;
             });
     };
 
@@ -493,7 +500,8 @@ controller.$inject = [
     "$scope",
     "$window",
     "DisplayNameService",
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 
