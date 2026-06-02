@@ -23,7 +23,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
-import org.jooq.Record3;
+import org.jooq.Record5; // Import Record5
 import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,10 +178,10 @@ public class AttestationPreCheckDao {
     public ViewpointAttestationPreChecks calcViewpointAttestationPreChecks(EntityReference ref,
                                                                            Long categoryId) {
 
-        CommonTableExpression<Record3<Long, Boolean, Long>> viewpoints = DSL
+        CommonTableExpression<Record5<Long, Boolean, Long, Boolean, Boolean>> viewpoints = DSL
                 .name("viewpoints")
                 .as(DSL
-                        .select(measurable.ID, measurable.CONCRETE, mr.ID.as("mr_id"))
+                        .select(measurable.ID, measurable.CONCRETE, mr.ID.as("mr_id"), mr.IS_PRIMARY, mc.ALLOW_PRIMARY_RATINGS)
                         .from(mc)
                         .innerJoin(measurable)
                         .on(measurable.MEASURABLE_CATEGORY_ID.eq(mc.ID))
@@ -245,6 +245,16 @@ public class AttestationPreCheckDao {
                                 DSL.count().as("count"))
                         .from(zeroAllocation));
 
+        CommonTableExpression<Record2<String, Integer>> primaryRatingsCount = DSL
+                .name("primary_ratings_count")
+                .as(DSL
+                        .select(DSL.val("PRIMARY_RATINGS").as("chk"),
+                                DSL.count().as("count"))
+                        .from(viewpoints)
+                        .where(viewpoints.field(mr.IS_PRIMARY).isTrue()
+                                .and(viewpoints.field(mc.ALLOW_PRIMARY_RATINGS).isTrue())));
+
+
         SelectOrderByStep<Record> qry = dsl
                 .with(viewpoints)
                 .with(nonConcreteMappings)
@@ -254,10 +264,12 @@ public class AttestationPreCheckDao {
                 .with(totalAllocationCount)
                 .with(zeroAllocation)
                 .with(zeroAllocationCount)
+                .with(primaryRatingsCount)
                 .select(mappingCount.asterisk()).from(mappingCount)
                 .union(DSL.select(nonConcreteCount.asterisk()).from(nonConcreteCount))
                 .union(DSL.select(totalAllocationCount.asterisk()).from(totalAllocationCount))
-                .union(DSL.select(zeroAllocationCount.asterisk()).from(zeroAllocationCount));
+                .union(DSL.select(zeroAllocationCount.asterisk()).from(zeroAllocationCount))
+                .union(DSL.select(primaryRatingsCount.asterisk()).from(primaryRatingsCount));
 
 
         ImmutableViewpointAttestationPreChecks.Builder builder = ImmutableViewpointAttestationPreChecks.builder();
@@ -278,6 +290,9 @@ public class AttestationPreCheckDao {
                     break;
                 case "ZERO_ALLOCATION":
                     builder.zeroAllocationCount(count);
+                    break;
+                case "PRIMARY_RATINGS":
+                    builder.primaryRatingsCount(count);
                     break;
                 default:
                     throw new IllegalArgumentException("Unexpected check: " + check);
