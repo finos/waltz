@@ -124,8 +124,8 @@ public class DataFlowService {
 
     public AddLogicalFlowCommand mapProposedFlowToAddLogicalFlowCommand(ProposedFlowResponse proposedFlow) {
         return ImmutableAddLogicalFlowCommand.builder()
-                .source(proposedFlow.flowDef().source())
-                .target(proposedFlow.flowDef().target())
+                .source(mkRef(proposedFlow.flowDef().source().kind(), proposedFlow.flowDef().source().id()))
+                .target(mkRef(proposedFlow.flowDef().target().kind(), proposedFlow.flowDef().target().id()))
                 .build();
     }
 
