@@ -39,7 +39,11 @@
             notification = "This proposed flow has been rejected and can no longer be acted upon.";
             return false;
         }
-
+        if(currentState === STATES.TIMED_OUT) {
+            // No further actions possible
+            notification = "This proposed flow has timed out and can no longer be acted upon.";
+            return false;
+        }
         if (currentState === STATES.PENDING_APPROVALS) {
             // Either source or target approver can act
             return (permissions.sourceApprover && permissions.sourceApprover.length > 0) ||
@@ -67,6 +71,7 @@
             case STATES.FULLY_APPROVED:
             case STATES.SOURCE_REJECTED:
             case STATES.TARGET_REJECTED:
+            case STATES.TIMED_OUT:
                 return true;
             default:
                 return false;
