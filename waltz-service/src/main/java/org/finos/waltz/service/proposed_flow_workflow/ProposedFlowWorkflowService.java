@@ -70,7 +70,7 @@ public class ProposedFlowWorkflowService {
     private static final String AUTO_APPROVAL_REASON = "Auto approved for external actor";
     private static final String ADMIN = "Admin";
     private static final String AUTO_APPROVE_SETTING_KEY = "feature.auto-approve-flow-for-external-actors";
-    private static final String PENDING_FLOWS_TIME_OUT_THRESHOLD = "feature.data-flows-timeout-threshold";
+    private static final String PENDING_FLOWS_TIME_OUT_THRESHOLD = "feature.data-flows-timeout-threshold-in-days";
 
     private final EntityWorkflowService entityWorkflowService;
     private final ProposedFlowWorkflowPermissionService permissionService;
@@ -562,7 +562,7 @@ public class ProposedFlowWorkflowService {
 
         List<Long> proposedFlowIds = proposedFlowDao.findPendingFlowsOlderThanDays(timeoutDays);
 
-        LOG.info("Fetched pending flows for more than 30 days. countOfFlows={}", proposedFlowIds.size());
+        LOG.info("Fetched pending flows for more than {} days. countOfFlows={}",timeoutDays, proposedFlowIds.size());
 
         if (proposedFlowIds.isEmpty()) {
             return 0;
