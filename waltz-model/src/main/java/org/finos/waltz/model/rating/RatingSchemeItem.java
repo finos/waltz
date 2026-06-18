@@ -56,4 +56,7 @@ public abstract class RatingSchemeItem implements
         return false;
     }
 
+    @Nullable
+    public abstract String dynamicType();
+
 }

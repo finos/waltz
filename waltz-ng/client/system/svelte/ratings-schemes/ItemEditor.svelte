@@ -32,8 +32,20 @@
         yellowHex
     ];
 
-    let workingCopy = Object.assign({}, item);
+    let workingCopy = Object.assign({}, item, { isDynamic: item.dynamicType != null, dynamicType: item.dynamicType || null });
     let savePromise = null;
+
+    // Reactive statement to handle 'Is Dynamic' and 'Requires Comment' interaction
+    $: {
+        if (workingCopy.isDynamic) {
+            workingCopy.requiresComment = true;
+            if (!workingCopy.dynamicType) {
+                workingCopy.dynamicType = 'TEXT'; // Default to TEXT if dynamic and no type selected
+            }
+        } else {
+            workingCopy.dynamicType = null;
+        }
+    }
 
     function save() {
         savePromise = doSave(workingCopy);
@@ -144,6 +156,53 @@
             Determines if <i>anyone</i> can select this rating (set to false if it's not meant for end user usage)
         </div>
 
+        <!-- IS DYNAMIC -->
+        <label for="isDynamic">
+            Is Dynamic ?
+        </label>
+        <input type=checkbox
+               id="isDynamic"
+               bind:checked={workingCopy.isDynamic}>
+        <span class="text-muted">
+            {#if workingCopy.isDynamic}
+                Yes, this rating allows free text entry
+                <Icon name="lock"/>
+            {:else}
+                No, this rating does not allow free text entry
+                <Icon name="unlock"/>
+            {/if}
+        </span>
+        <div class="help-block">
+            Determines if this rating allows users to provide free text input.
+        </div>
+
+        {#if workingCopy.isDynamic}
+            <fieldset class="form-group">
+                <legend>Select Type</legend>
+                <div class="radio">
+                    <label>
+                        <input type="radio"
+                               name="dynamicType"
+                               value="NUMERIC"
+                               bind:group={workingCopy.dynamicType}>
+                        NUMERIC
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio"
+                               name="dynamicType"
+                               value="DATE"
+                               bind:group={workingCopy.dynamicType}>
+                        DATE
+                    </label>
+                </div>
+                <div class="help-block">
+                    Choose the type of free text entry allowed (e.g., plain text or a date).
+                </div>
+            </fieldset>
+        {/if}
+
 
         <!-- REQUIRES COMMENT -->
         <label for="requiresComment">
@@ -151,7 +210,8 @@
         </label>
         <input type=checkbox
                id="requiresComment"
-               bind:checked={workingCopy.requiresComment}>
+               bind:checked={workingCopy.requiresComment}
+               disabled={workingCopy.isDynamic}>
         <span class="text-muted">
             {#if workingCopy.requiresComment}
                 Yes, user must supply a comment when selecting this item
@@ -241,5 +301,17 @@
 <style>
     label {
         display: block;
+    }
+
+    .radio {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    legend {
+        font-size: inherit;
+        font-weight: bold;
+        border-bottom: none;
+        margin-bottom: 5px;
     }
 </style>

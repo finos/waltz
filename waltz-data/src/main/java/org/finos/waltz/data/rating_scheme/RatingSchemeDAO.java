@@ -3,11 +3,11 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 20 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-20.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -83,7 +83,8 @@ public class RatingSchemeDAO {
                 .description(r.getDescription())
                 .externalId(ofNullable(r.getExternalId()))
                 .ratingGroup(r.getRatingGroup())
-                .requiresComment(r.getRequiresComment());
+                .requiresComment(r.getRequiresComment())
+                .dynamicType(r.getDynamicType());
 
 
         if (record.field(IS_RESTRICTED_FIELD) != null){
@@ -245,6 +246,8 @@ public class RatingSchemeDAO {
 
     public Long saveRatingItem(long schemeId,
                                RatingSchemeItem item) {
+
+
         RatingSchemeItemRecord r = dsl.newRecord(RATING_SCHEME_ITEM);
 
         r.setSchemeId(schemeId);
@@ -256,6 +259,10 @@ public class RatingSchemeDAO {
         r.setUserSelectable(item.userSelectable());
         r.setRatingGroup(item.ratingGroup());
         r.setRequiresComment(item.requiresComment());
+        if (null != item.dynamicType()) {
+            r.setRequiresComment(true);
+        }           
+        r.setDynamicType(item.dynamicType());
 
         item.externalId().ifPresent(r::setExternalId);
 

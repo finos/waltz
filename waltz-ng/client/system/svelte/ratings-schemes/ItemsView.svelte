@@ -103,6 +103,7 @@
             <th width="20%"><i>Group</i></th>
             <th width="25%">Rating</th>
             <th width="5%">Code</th>
+            <th width="25%">Dynamic Type</th>
             <th width="10%">Req. Comment</th>
 
             <th width="10%">Color</th>
@@ -116,6 +117,7 @@
                 <td>{rating.ratingGroup || '-'}</td>
                 <td>{rating.name}</td>
                 <td>{rating.rating}</td>
+                 <td>{rating.dynamicType || '-'}</td>
                 <td>
                     {#if rating.requiresComment}
                         <Icon name="check"/>
