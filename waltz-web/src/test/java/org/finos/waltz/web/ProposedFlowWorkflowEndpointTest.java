@@ -209,7 +209,7 @@ class ProposedFlowWorkflowEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
+        EntityReference owningEntity = mkRef(APPLICATION, 187030L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
@@ -253,8 +253,8 @@ class ProposedFlowWorkflowEndpointTest {
         workflowTransitionList.add(workflowTransition);
         workflowTransitionList.add(workflowTransition2);
         ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
-                .source(entityReference)
-                .target(entityReference)
+                .source(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
+                .target(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
                 .reason(reason)
                 .logicalFlowId(123L)
                 .physicalFlowId(234L)
@@ -314,7 +314,7 @@ class ProposedFlowWorkflowEndpointTest {
                 .externalId("567s")
                 .build();
 
-        EntityReference owningEntity = mkRef(APPLICATION, 18703L, "AMG", "Testing", "60487-1");
+        EntityReference owningEntity = mkRef(APPLICATION, 187031L, "AMG", "Testing", "60487-1");
 
         PhysicalSpecification physicalSpecification = ImmutablePhysicalSpecification.builder()
                 .owningEntity(owningEntity)
@@ -358,8 +358,8 @@ class ProposedFlowWorkflowEndpointTest {
         workflowTransitionList.add(workflowTransition);
         workflowTransitionList.add(workflowTransition2);
         ProposedFlowCommand proposedFlowcommand = ImmutableProposedFlowCommand.builder()
-                .source(entityReference)
-                .target(entityReference)
+                .source(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
+                .target(ProposedFlowEntityReference.mkRef(entityReference.kind(), entityReference.id()))
                 .reason(reason)
                 .logicalFlowId(123L)
                 .physicalFlowId(234L)

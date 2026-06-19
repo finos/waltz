@@ -41,10 +41,17 @@ export function store($http) {
             .then(r => r.data);
     }
 
+    const getFlowApprovers = (id) => {
+        return $http
+            .get(`${mcBase}/propose-flow/id/${id}/approvers`)
+            .then(r => r.data);
+    }
+
     return {
         getById,
         getByUserEmails,
-        editValidation
+        editValidation,
+        getFlowApprovers
     };
 }
 
@@ -69,5 +76,10 @@ export const ProposedFlowStore_API = {
         serviceName,
         serviceFnName: "editValidation",
         description: "physical specification validation for edit"
+    },
+    getFlowApprovers: {
+        serviceName,
+        serviceFnName: "getFlowApprovers",
+        description: "find the source and target approvers for proposed flow"
     }
 };
