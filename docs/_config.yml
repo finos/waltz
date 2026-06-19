@@ -18,8 +18,10 @@ email: fdx-pmc@finos.org
 description: >-
   Khartec, open source producer of Waltz: An Enterprise Architecture information service
 url: "http://waltz.finos.org"
+repository: null
 twitter_username: finosfoundation
 github_username: finos
+google_analytics: null
 
 # Build settings
 source: .
