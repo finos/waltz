@@ -21,7 +21,7 @@ import {remote} from "./remote";
 
 export function mkStore() {
     const getById = (id, force) => remote
-        .fetchViewDatum(
+        .fetchViewList(
             "GET",
             `api/rating-scheme/id/${id}`,
             null,
