@@ -294,7 +294,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.parseLong(body.getOrDefault("ratingId", "").toString()))
-                .comment(mkSafe((String) body.get("comment")))
+                .comment(mkSafe(String.valueOf(body.get("comment")))) // Ensure comment is always a String
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .provenance("waltz")
@@ -303,7 +303,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private String readComment(Request request) throws IOException {
         Map<String, Object> body = readBody(request, Map.class);
-        return mkSafe((String) body.get("comment"));
+        return mkSafe(String.valueOf(body.get("comment"))); // Ensure comment is always a String
     }
 
 
@@ -341,4 +341,3 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 }
-

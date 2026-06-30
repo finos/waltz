@@ -40,11 +40,16 @@ export function mkStore() {
             `api/rating-scheme`,
             scheme);
 
-    const saveItem = (ratingSchemeItem) => remote
-        .execute(
-            "PUT",
-            `api/rating-scheme/id/${ratingSchemeItem.ratingSchemeId}/rating-item`,
-            ratingSchemeItem);
+    const saveItem = (ratingSchemeItem) => {
+        const payload = { ...ratingSchemeItem }; // Create a shallow copy
+        delete payload.isDynamic; // Remove the UI-specific field
+
+        return remote
+            .execute(
+                "PUT",
+                `api/rating-scheme/id/${payload.ratingSchemeId}/rating-item`,
+                payload); // Send the modified payload
+    };
 
     const removeItem = (itemId) => remote
         .execute(

@@ -77,17 +77,46 @@
             .catch(e => displayError("Failed to unlock rating", e));
     }
 
-    function saveComment(comment) {
-        return assessmentRatingStore
-            .updateComment($selectedRating.rating.id, comment)
-            .then(() => {
-                assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
-                $assessmentRatings = $assessmentRatingCall?.data;
-                rating.comment = comment;
-            })
-            .then(() => toasts.success("Successfully updated comment"))
-            .catch(e => displayError("Failed to update comment", e));
-    }
+      function saveComment(newComment) {
+            if (!canEdit) return; // Prevent saving if not editable
+
+            const dynamicType = $selectedRating.ratingItem.dynamicType;
+            const requiresComment = $selectedRating.ratingItem.requiresComment;
+
+            // --- Client-side Validation ---
+            if (requiresComment && (newComment === null || (typeof newComment === 'string' && newComment.trim() === ''))) {
+                toasts.error("Comment is mandatory for this rating.");
+                return Promise.reject("Comment is mandatory");
+            }
+
+            if (dynamicType === 'DATE') {
+                if (newComment && !/^\d{4}-\d{2}-\d{2}$/.test(newComment)) {
+                    toasts.error("Comment must be a valid date (YYYY-MM-DD).");
+                    return Promise.reject("Invalid date format");
+                }
+            } else if (dynamicType === 'NUMERIC') {
+                if (newComment && isNaN(Number(newComment))) {
+                    toasts.error("Comment must be a valid number.");
+                    return Promise.reject("Invalid number format");
+                }
+            }
+            // --- End Client-side Validation ---
+
+            return assessmentRatingStore
+                .updateComment($selectedRating.rating.id, newComment)
+                .then(() => {
+                    assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
+                    $assessmentRatings = $assessmentRatingCall?.data;
+                    rating.comment = newComment; // Update local state after successful save
+                    toasts.success("Successfully updated comment");
+                })
+                .catch(e => {
+                    displayError("Failed to update comment", e);
+                    return Promise.reject(e); // Propagate error for TextEditableField
+                });
+        }
+
+
 
     function saveRating(newRating) {
         return assessmentRatingStore
