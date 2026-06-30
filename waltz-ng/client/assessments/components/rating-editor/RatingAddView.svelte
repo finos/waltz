@@ -40,19 +40,22 @@
             .groupBy("ratingGroup")
             .value();
 
-        if (grouped[null] && _.size(grouped) > 1) {
+        const hasGroups = _.size(grouped) > 1 || (grouped[null] === undefined && _.size(grouped) > 0);
+
+        if (hasGroups && grouped[null]) {
             grouped["Ungrouped"] = grouped[null];
             delete grouped[null];
         }
 
-        dropdownConfig = grouped[null]
-            ? {style: "simple", options: grouped[null]}
+        dropdownConfig = !hasGroups
+            ? {style: "simple", options: _.first(_.values(grouped))}
             : {style: "grouped", groups: _.map(grouped, (v, k) => ({groupName: k, options: v}))};
     }
 
     $: selectedRating = _.find(
         $selectedAssessment.dropdownEntries,
         d => d.id === newRating.ratingId);
+
 </script>
 
 <h4>Add New Rating:</h4>
@@ -100,12 +103,28 @@
         <label for="comment">
             Comment {#if selectedRating?.requiresComment}<span class="required-indicator">*</span>{/if}
         </label>
-        <textarea id="comment"
-                  class="form-control"
-                  rows="6"
-                  required={selectedRating?.requiresComment}
-                  placeholder="This comment supports markdown"
-                  bind:value={newRating.comment}></textarea>
+
+        {#if selectedRating && selectedRating.dynamicType === 'DATE'}
+            <input type="date"
+                   id="comment"
+                   class="form-control"
+                   required={selectedRating?.requiresComment}
+                   bind:value={newRating.comment}>
+        {:else if selectedRating && selectedRating.dynamicType === 'NUMERIC'}
+            <input type="number"
+                   id="comment"
+                   class="form-control"
+                   required={selectedRating?.requiresComment}
+                   bind:value={newRating.comment}>
+        {:else}
+            <textarea id="comment"
+                      class="form-control"
+                      rows="6"
+                      required={selectedRating?.requiresComment}
+                      placeholder="This comment supports markdown"
+                      bind:value={newRating.comment}></textarea>
+        {/if}
+
         {#if selectedRating?.requiresComment}
             <div class="help-block">
                 A comment is mandatory for this rating
