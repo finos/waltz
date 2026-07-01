@@ -31,6 +31,7 @@ import org.finos.waltz.service.cost.CostService;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
 import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
@@ -60,6 +61,7 @@ public class ScheduledJobService {
     private final EntityHierarchyService entityHierarchyService;
     private final FlowClassificationRuleService flowClassificationRuleService;
     private final LogicalFlowService logicalFlowService;
+    private final PhysicalFlowService physicalFlowService;
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final ScheduledJobDao scheduledJobDao;
     private final AttestationRunService attestationRunService;
@@ -80,6 +82,7 @@ public class ScheduledJobService {
                                EntityHierarchyService entityHierarchyService,
                                FlowClassificationRuleService flowClassificationRuleService,
                                LogicalFlowService logicalFlowService,
+                               PhysicalFlowService physicalFlowService,
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ReportGridFilterViewService reportGridFilterViewService,
                                ScheduledJobDao scheduledJobDao,
@@ -93,6 +96,7 @@ public class ScheduledJobService {
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(reportGridFilterViewService, "reportGridFilterViewService cannot be null");
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
@@ -108,6 +112,7 @@ public class ScheduledJobService {
         this.entityHierarchyService = entityHierarchyService;
         this.flowClassificationRuleService = flowClassificationRuleService;
         this.logicalFlowService = logicalFlowService;
+        this.physicalFlowService = physicalFlowService;
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.reportGridFilterViewService = reportGridFilterViewService;
         this.scheduledJobDao = scheduledJobDao;
@@ -152,6 +157,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.LOGICAL_FLOW_CLEANUP_ORPHANS,
                 (jk) -> logicalFlowService.cleanupOrphans());
+
+        runIfNeeded(JobKey.PHYSICAL_FLOW_CLEANUP_ORPHANS,
+                (jk) -> physicalFlowService.cleanupOrphans());
 
         runIfNeeded(JobKey.ATTESTATION_ISSUE_INSTANCES,
                 (jk) -> attestationRunService.issueInstancesForPendingRuns());
