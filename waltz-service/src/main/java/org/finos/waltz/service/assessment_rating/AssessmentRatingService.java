@@ -532,6 +532,13 @@ public class AssessmentRatingService {
         return rippler.findRippleConfig();
     }
 
+    public Optional<AssessmentRating> getRatingForEntityAndDefinition(EntityReference ref, long assessmentDefinitionId) {
+        return assessmentRatingDao.findForEntity(ref)
+                .stream()
+                .filter(r -> r.assessmentDefinitionId() == assessmentDefinitionId)
+                .findAny();
+    }
+
     /**
      * Validate and update the dependent assessment rating
      * @param definition
