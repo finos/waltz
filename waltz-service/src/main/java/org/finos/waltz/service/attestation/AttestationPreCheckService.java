@@ -221,7 +221,7 @@ public class AttestationPreCheckService {
                     Optional<AssessmentRating> ratingOpt = assessmentRatingService.getRatingForEntityAndDefinition(entityRef, assessDefId);
                     if (ratingOpt.isPresent()) {
                         // Step 5: Assessed -> allow attestation with success message
-                        String ratingValue = ratingSchemeService.getById(ratingOpt.get().ratingId()).name();
+                        String ratingValue = ratingSchemeService.getRatingSchemeItemById(ratingOpt.get().ratingId()).name();
                         return ImmutableAttestationPreCheckCommandResponse.builder()
                                 .outcome(CommandOutcome.SUCCESS)
                                 .message(format("You are attesting that your application has no data flows for the reason %s", ratingValue))
