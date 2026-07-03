@@ -206,38 +206,41 @@ public class AttestationPreCheckService {
         boolean hasPendingProposals = false;
         // Rule 2: If there are no flows, block unless a creation is pending
         if (preChecks.flowCount() == 0 && !preChecks.exemptFromFlowCountCheck()) {
-            // Steps 1 & 2: Get settings
-            Optional<String> assessIdSetting = settingsService.getValue(NO_DATAFLOW_DECLARATION_ASSESS_ID);
-            Optional<String> appGroupSetting = settingsService.getValue(OPTIONAL_DATAFLOW_GROUP);
+            // Priority Check: Does the app have pending flow creations?
+            if (proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
+                hasPendingProposals = true;
+            } else {
+                // No pending flow creations. Check if the app belongs to the Optional Dataflow Group and has proper reasoning.
+                Optional<String> assessIdSetting = settingsService.getValue(NO_DATAFLOW_DECLARATION_ASSESS_ID);
+                Optional<String> appGroupSetting = settingsService.getValue(OPTIONAL_DATAFLOW_GROUP);
 
-            if (assessIdSetting.isPresent() && appGroupSetting.isPresent()) {
-                long assessDefId = Long.parseLong(assessIdSetting.get());
-                long appGroupId = Long.parseLong(appGroupSetting.get());
+                if (assessIdSetting.isPresent() && appGroupSetting.isPresent()) {
+                    long assessDefId = Long.parseLong(assessIdSetting.get());
+                    long appGroupId = Long.parseLong(appGroupSetting.get());
 
-                // Step 3: Check if app belongs to the application group
-                boolean isInGroup = appGroupService.isAppInGroup(appGroupId, entityRef.id());
-                if (isInGroup) {
-                    // Step 4: Check if assessed with the assessment_definition id
-                    Optional<AssessmentRating> ratingOpt = assessmentRatingService.getRatingForEntityAndDefinition(entityRef, assessDefId);
-                    if (ratingOpt.isPresent()) {
-                        // Step 5: Assessed -> allow attestation with success message
-                        String ratingValue = ratingSchemeService.getRatingSchemeItemById(ratingOpt.get().ratingId()).name();
-                        return ImmutableAttestationPreCheckCommandResponse.builder()
-                                .outcome(CommandOutcome.SUCCESS)
-                                .message(format("You are attesting that your application has no data flows for the reason %s", ratingValue))
-                                .build();
-                    } else {
-                        // Step 7: In group but no reasoning (rating) given
-                        return ImmutableAttestationPreCheckCommandResponse.builder()
-                                .outcome(CommandOutcome.FAILURE)
-                                .message("Cannot attest as no dataflows and no reasoning given")
-                                .build();
+                    // Step 3: Check if app belongs to the application group
+                    boolean isInGroup = appGroupService.isAppInGroup(appGroupId, entityRef.id());
+                    if (isInGroup) {
+                        // Step 4: Check if assessed with the assessment_definition id
+                        Optional<AssessmentRating> ratingOpt = assessmentRatingService.getRatingForEntityAndDefinition(entityRef, assessDefId);
+                        if (ratingOpt.isPresent()) {
+                            // Step 5: Assessed -> allow attestation with success message
+                            String ratingValue = ratingSchemeService.getRatingSchemeItemById(ratingOpt.get().ratingId()).name();
+                            return ImmutableAttestationPreCheckCommandResponse.builder()
+                                    .outcome(CommandOutcome.SUCCESS)
+                                    .message(format("You are attesting that your application has no data flows for the reason %s", ratingValue))
+                                    .build();
+                        } else {
+                            // Step 7: In group but no reasoning (rating) given
+                            return ImmutableAttestationPreCheckCommandResponse.builder()
+                                    .outcome(CommandOutcome.FAILURE)
+                                    .message("Cannot attest as no dataflows and no reasoning given")
+                                    .build();
+                        }
                     }
                 }
-            }
 
-            // Fallback (Step 6 / Settings Missing): App is not in the group, or settings were missing entirely
-            if (!proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
+                // Fallback (Step 6 / Settings Missing): App has no pending creations, is not in the group, or settings were missing entirely
                 return ImmutableAttestationPreCheckCommandResponse.builder()
                         .outcome(CommandOutcome.FAILURE)
                         .message(mkFailureMessage(
@@ -246,8 +249,6 @@ public class AttestationPreCheckService {
                                 "Cannot attest as there are no recorded relevant flows",
                                 preChecks.flowCount()))
                         .build();
-            } else {
-                hasPendingProposals = true;
             }
         }
 
