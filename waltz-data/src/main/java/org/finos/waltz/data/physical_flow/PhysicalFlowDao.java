@@ -380,6 +380,7 @@ public class PhysicalFlowDao {
 
         return dsl
                 .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS, REMOVED.name())
                 .set(PHYSICAL_FLOW.IS_REMOVED, true)
                 .where(requiringCleanup)
                 .execute();
