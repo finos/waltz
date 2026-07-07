@@ -199,6 +199,17 @@ public class AssessmentRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+    public Optional<AssessmentRating> getAppRatingByDefinitionId(EntityReference ref, long assessDefId) {
+        return dsl
+                .select(ar.fields())
+                .from(ar)
+                .innerJoin(ad)
+                .on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID))
+                .where(ad.ID.eq(assessDefId))
+                .and(ar.ENTITY_KIND.eq(ref.kind().name()))
+                .and(ar.ENTITY_ID.eq(ref.id()))
+                .fetchOptional(TO_DOMAIN_MAPPER);
+    }
 
     public AssessmentRating getById(long id) {
         return dsl

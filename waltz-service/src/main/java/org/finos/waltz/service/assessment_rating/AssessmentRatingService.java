@@ -539,6 +539,10 @@ public class AssessmentRatingService {
                 .findAny();
     }
 
+    public Optional<AssessmentRating> getAppRatingByDefinitionId(EntityReference ref, long assessmentDefinitionId) {
+        return assessmentRatingDao.getAppRatingByDefinitionId(ref, assessmentDefinitionId);
+    }
+
     /**
      * Validate and update the dependent assessment rating
      * @param definition

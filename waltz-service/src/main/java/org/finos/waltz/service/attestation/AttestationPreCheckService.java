@@ -222,7 +222,7 @@ public class AttestationPreCheckService {
                     boolean isInGroup = appGroupService.isAppInGroup(appGroupId, entityRef.id());
                     if (isInGroup) {
                         // Step 4: Check if assessed with the assessment_definition id
-                        Optional<AssessmentRating> ratingOpt = assessmentRatingService.getRatingForEntityAndDefinition(entityRef, assessDefId);
+                        Optional<AssessmentRating> ratingOpt = assessmentRatingService.getAppRatingByDefinitionId(entityRef, assessDefId);
                         if (ratingOpt.isPresent()) {
                             // Step 5: Assessed -> allow attestation with success message
                             String ratingValue = ratingSchemeService.getRatingSchemeItemById(ratingOpt.get().ratingId()).name();
