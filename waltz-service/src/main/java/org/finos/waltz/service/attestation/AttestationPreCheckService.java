@@ -6,6 +6,7 @@ import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao; // Import MeasurableCategoryDao
 import org.finos.waltz.data.proposed_flow.ProposedFlowDao;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.attestation.AttestationPreCheckCommandResponse;
 import org.finos.waltz.model.attestation.ImmutableAttestationPreCheckCommandResponse;
 import org.finos.waltz.model.attestation.ImmutableAttestationPrimaryFlagSetting;
@@ -13,9 +14,12 @@ import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import org.finos.waltz.model.attestation.ViewpointAttestationPreChecks;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.service.app_group.AppGroupService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.proposed_flow_workflow.ProposedFlowWorkflowService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,8 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 public class AttestationPreCheckService {
 
     private static final String ATTESTATION_PRECHECK_PRIMARY_FLAG_KEY = "ATTESTATION_PRECHECK_PRIMARY_FLAG";
+    private static final String NO_DATAFLOW_DECLARATION_ASSESS_ID = "NO_DATAFLOW_DECLARATION_ASSESS_ID";
+    private static final String OPTIONAL_DATAFLOW_GROUP = "OPTIONAL_DATAFLOW_GROUP";
 
     private final AttestationPreCheckDao attestationPreCheckDao;
     private final SettingsService settingsService;
@@ -43,6 +49,9 @@ public class AttestationPreCheckService {
     private final PhysicalFlowService physicalFlowService;
     private final EntityWorkflowService entityWorkflowService;
     private final MeasurableCategoryDao measurableCategoryDao; // Inject MeasurableCategoryDao
+    private final AppGroupService appGroupService;
+    private final AssessmentRatingService assessmentRatingService;
+    private final RatingSchemeService ratingSchemeService;
 
     @Autowired
     public AttestationPreCheckService(AttestationPreCheckDao attestationPreCheckDao,
@@ -50,13 +59,17 @@ public class AttestationPreCheckService {
                                       ProposedFlowWorkflowService proposedFlowWorkflowService,
                                       PhysicalFlowService physicalFlowService,
                                       EntityWorkflowService entityWorkflowService,
-                                      MeasurableCategoryDao measurableCategoryDao) { // Add MeasurableCategoryDao to constructor
+                                      MeasurableCategoryDao measurableCategoryDao, // Add MeasurableCategoryDao to constructor
+                                      AppGroupService appGroupService, AssessmentRatingService assessmentRatingService, RatingSchemeService ratingSchemeService) {
         this.attestationPreCheckDao = checkNotNull(attestationPreCheckDao, "AttestationPreCheckEvaluatorDao cannot be null");
         this.settingsService = checkNotNull(settingsService, "settingsService cannot be null");
         this.proposedFlowWorkflowService = proposedFlowWorkflowService;
         this.physicalFlowService = physicalFlowService;
         this.entityWorkflowService = entityWorkflowService;
         this.measurableCategoryDao = checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null"); // Initialize MeasurableCategoryDao
+        this.appGroupService = checkNotNull(appGroupService, "appGroupService cannot be null");
+        this.assessmentRatingService = checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
+        this.ratingSchemeService = checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
     }
 
 
@@ -193,8 +206,41 @@ public class AttestationPreCheckService {
         boolean hasPendingProposals = false;
         // Rule 2: If there are no flows, block unless a creation is pending
         if (preChecks.flowCount() == 0 && !preChecks.exemptFromFlowCountCheck()) {
-            if (!proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
+            // Priority Check: Does the app have pending flow creations?
+            if (proposedFlowWorkflowService.hasPendingCreations(entityRef, workflowDefinition.id().get())) {
+                hasPendingProposals = true;
+            } else {
+                // No pending flow creations. Check if the app belongs to the Optional Dataflow Group and has proper reasoning.
+                Optional<String> assessIdSetting = settingsService.getValue(NO_DATAFLOW_DECLARATION_ASSESS_ID);
+                Optional<String> appGroupSetting = settingsService.getValue(OPTIONAL_DATAFLOW_GROUP);
 
+                if (assessIdSetting.isPresent() && appGroupSetting.isPresent()) {
+                    long assessDefId = Long.parseLong(assessIdSetting.get());
+                    long appGroupId = Long.parseLong(appGroupSetting.get());
+
+                    // Step 3: Check if app belongs to the application group
+                    boolean isInGroup = appGroupService.isAppInGroup(appGroupId, entityRef.id());
+                    if (isInGroup) {
+                        // Step 4: Check if assessed with the assessment_definition id
+                        Optional<AssessmentRating> ratingOpt = assessmentRatingService.getAppRatingByDefinitionId(entityRef, assessDefId);
+                        if (ratingOpt.isPresent()) {
+                            // Step 5: Assessed -> allow attestation with success message
+                            String ratingValue = ratingSchemeService.getRatingSchemeItemById(ratingOpt.get().ratingId()).name();
+                            return ImmutableAttestationPreCheckCommandResponse.builder()
+                                    .outcome(CommandOutcome.SUCCESS)
+                                    .message(format("You are attesting that your application has no data flows for the reason %s", ratingValue))
+                                    .build();
+                        } else {
+                            // Step 7: In group but no reasoning (rating) given
+                            return ImmutableAttestationPreCheckCommandResponse.builder()
+                                    .outcome(CommandOutcome.FAILURE)
+                                    .message("Cannot attest as no dataflows and no reasoning given")
+                                    .build();
+                        }
+                    }
+                }
+
+                // Fallback (Step 6 / Settings Missing): App has no pending creations, is not in the group, or settings were missing entirely
                 return ImmutableAttestationPreCheckCommandResponse.builder()
                         .outcome(CommandOutcome.FAILURE)
                         .message(mkFailureMessage(
@@ -203,8 +249,6 @@ public class AttestationPreCheckService {
                                 "Cannot attest as there are no recorded relevant flows",
                                 preChecks.flowCount()))
                         .build();
-            } else {
-                hasPendingProposals = true;
             }
         }
 

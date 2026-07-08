@@ -139,6 +139,13 @@ public class AppGroupService {
                 .build();
     }
 
+    public boolean isAppInGroup(long groupId, long applicationId) {
+        AppGroup group = appGroupDao.getGroup(groupId);
+        if (group == null) {
+            return false;
+        }
+        return appGroupEntryDao.isAppInGroup(groupId, applicationId);
+    }
 
     public Set<AppGroupSubscription> findGroupSubscriptionsForUser(String userId) {
         Set<AppGroupMember> subscriptions = appGroupMemberDao.getSubscriptions(userId);

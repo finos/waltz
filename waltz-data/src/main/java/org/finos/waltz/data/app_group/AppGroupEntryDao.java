@@ -244,4 +244,11 @@ public class AppGroupEntryDao {
                                 r.get(2, Long.class),
                                 r.get(3, String.class)));
     }
+
+    public boolean isAppInGroup(long groupId, long applicationId) {
+        return dsl.fetchExists(org.jooq.impl.DSL
+                .selectFrom(age)
+                .where(age.GROUP_ID.eq(groupId))
+                .and(age.APPLICATION_ID.eq(applicationId)));
+    }
 }

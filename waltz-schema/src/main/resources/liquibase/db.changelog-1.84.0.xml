@@ -34,4 +34,20 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20260706-7547-1" author="rairajea">
+        <insert tableName="settings">
+            <column name="name" value="OPTIONAL_DATAFLOW_GROUP"/>
+            <column name="value" value=""/>
+            <column name="description" value="Id of App Group containing apps where logical flow attestation is optional."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+    <changeSet id="20260706-7547-2" author="rairajea">
+        <insert tableName="settings">
+            <column name="name" value="NO_DATAFLOW_DECLARATION_ASSESS_ID"/>
+            <column name="value" value=""/>
+            <column name="description" value="Assessment containing self declaration of reasoning for not requiring dataflows."/>
+            <column name="restricted" valueBoolean="false"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
