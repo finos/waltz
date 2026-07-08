@@ -24,4 +24,14 @@
                author="ramerav">
         <tagDatabase tag="v1.83.0"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
+
+    <changeSet id="20260618-4672-1" author="mudesmi">
+        <sql>
+            ALTER TABLE RATING_SCHEME_ITEM
+            ADD dynamic_type VARCHAR(50) NULL
+            CONSTRAINT CK_RATING_SCHEME_ITEM_DYNAMIC_TYPE
+            CHECK (dynamic_type IN ('NUMERIC', 'DATE'));
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
