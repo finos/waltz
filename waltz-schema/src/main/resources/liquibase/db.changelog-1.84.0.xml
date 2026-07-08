@@ -50,4 +50,11 @@
             <column name="restricted" valueBoolean="false"/>
         </insert>
     </changeSet>
+    <changeSet id="20260708-7550-1" author="kumarohb">
+        <comment>Change the datatype of column description in table architecture_required_change to TEXT</comment>
+        <modifyDataType
+                columnName="description"
+                newDataType="TEXT"
+                tableName="architecture_required_change"/>
+    </changeSet>
 </databaseChangeLog>
