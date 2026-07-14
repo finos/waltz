@@ -77,6 +77,8 @@ public class AccessLogEndpoint implements Endpoint {
         String findYearOnYearUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
         String findAccessLogYearsPath = WebUtilities.mkPath(BASE_URL, "get_years");
         String findMonthOnMonthUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "month_on_month", ":mode", ":year");
+        String findUsersSummaryPath = WebUtilities.mkPath(BASE_URL, "summary", "period", ":frequency");
+
 
         ListRoute<AccessLog> findForUserRoute = (request, response) ->
                 accessLogService.findForUserId(request.params("userId"), WebUtilities.getLimit(request));
@@ -114,6 +116,14 @@ public class AccessLogEndpoint implements Endpoint {
             return accessLogService.findMonthOnMonthAccessLogSummary(mode, year);
         };
 
+        ListRoute<AccessLogSummary> findUsersSummaryRoute = (request, response) -> {
+            String frequency = request.params("frequency"); // year, day, week, month
+            String startDate = request.queryParams("startDate"); // optional
+            String endDate = request.queryParams("endDate");     // optional
+
+            return accessLogService.findAccessLogSummary(frequency, startDate, endDate);
+        };
+
         EndpointUtilities.getForList(findForUserPath, findForUserRoute);
         EndpointUtilities.getForList(findActiveUsersPath, findActiveUsersRoute);
         EndpointUtilities.postForDatum(writePath, this::writeRoute);
@@ -123,6 +133,53 @@ public class AccessLogEndpoint implements Endpoint {
         EndpointUtilities.getForList(findYearOnYearUsersPath, findYearOnYearUsersRoute);
         EndpointUtilities.getForList(findAccessLogYearsPath, findAccessLogYearsRoute);
         EndpointUtilities.getForList(findMonthOnMonthUsersPath, findMonthOnMonthUsersRoute);
+        EndpointUtilities.getForList(findUsersSummaryPath, findUsersSummaryRoute);
+
+        String findTopPagesPath = WebUtilities.mkPath(BASE_URL, "analytics", "top-pages");
+        String findActivityByHourPath = WebUtilities.mkPath(BASE_URL, "analytics", "activity-by-hour");
+        String findActivityByDayPath = WebUtilities.mkPath(BASE_URL, "analytics", "activity-by-day");
+        String findTopUsersPath = WebUtilities.mkPath(BASE_URL, "analytics", "top-users");
+        String findSessionDurationsPath = WebUtilities.mkPath(BASE_URL, "analytics", "session-durations");
+
+        ListRoute<AccessLogSummary> findTopPagesRoute = (request, response) -> {
+            String startDate = request.queryParams("startDate");
+            String endDate = request.queryParams("endDate");
+            String limitParam = request.queryParams("limit");
+            int limit = limitParam != null ? Integer.parseInt(limitParam) : 10;
+            return accessLogService.findTopPagesByAccess(startDate, endDate, limit);
+        };
+
+        ListRoute<AccessLogSummary> findActivityByHourRoute = (request, response) -> {
+            String startDate = request.queryParams("startDate");
+            String endDate = request.queryParams("endDate");
+            return accessLogService.findActivityByHourOfDay(startDate, endDate);
+        };
+
+        ListRoute<AccessLogSummary> findActivityByDayRoute = (request, response) -> {
+            String startDate = request.queryParams("startDate");
+            String endDate = request.queryParams("endDate");
+            return accessLogService.findActivityByDayOfWeek(startDate, endDate);
+        };
+
+        ListRoute<AccessLogSummary> findTopUsersRoute = (request, response) -> {
+            String startDate = request.queryParams("startDate");
+            String endDate = request.queryParams("endDate");
+            String limitParam = request.queryParams("limit");
+            int limit = limitParam != null ? Integer.parseInt(limitParam) : 10;
+            return accessLogService.findTopActiveUsers(startDate, endDate, limit);
+        };
+
+        ListRoute<AccessLogSummary> findSessionDurationsRoute = (request, response) -> {
+            String startDate = request.queryParams("startDate");
+            String endDate = request.queryParams("endDate");
+            return accessLogService.findSessionDurations(startDate, endDate);
+        };
+
+        EndpointUtilities.getForList(findTopPagesPath, findTopPagesRoute);
+        EndpointUtilities.getForList(findActivityByHourPath, findActivityByHourRoute);
+        EndpointUtilities.getForList(findActivityByDayPath, findActivityByDayRoute);
+        EndpointUtilities.getForList(findTopUsersPath, findTopUsersRoute);
+        EndpointUtilities.getForList(findSessionDurationsPath, findSessionDurationsRoute);
     }
 
 

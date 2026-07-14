@@ -120,4 +120,28 @@ public class AccessLogService {
     public List<AccessLogSummary> findMonthOnMonthAccessLogSummary(String mode, Integer currentYear) {
         return accessLogDao.findMonthOnMonthUsers(mode, currentYear);
     }
+
+    public List<AccessLogSummary> findAccessLogSummary(String freq, String startDate, String endDate){
+        return accessLogDao.findAccessLogSummary(freq,startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findTopPagesByAccess(String startDate, String endDate, int limit) {
+        return accessLogDao.findTopPagesByAccess(startDate, endDate, limit);
+    }
+
+    public List<AccessLogSummary> findActivityByHourOfDay(String startDate, String endDate) {
+        return accessLogDao.findActivityByHourOfDay(startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findActivityByDayOfWeek(String startDate, String endDate) {
+        return accessLogDao.findActivityByDayOfWeek(startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findTopActiveUsers(String startDate, String endDate, int limit) {
+        return accessLogDao.findTopActiveUsers(startDate, endDate, limit);
+    }
+
+    public List<AccessLogSummary> findSessionDurations(String startDate, String endDate) {
+        return accessLogDao.findSessionDurations(startDate, endDate);
+    }
 }
