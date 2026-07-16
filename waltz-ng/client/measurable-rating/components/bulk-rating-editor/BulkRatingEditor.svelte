@@ -150,14 +150,14 @@
         <details>
             <summary>Help <Icon name="circle-question"/></summary>
             <div class="help-block" style="margin-top: 0px;">
-                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, allocation, scheme and comment
+                Each row should reflect a assetCode, taxonomyExternalId, ratingCode, isPrimary, isReadOnly, allocation, scheme and comment
                 combination. For example:
             </div>
 
             <pre>
-assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
-99999-1	99999	G	TRUE	50	scheme	EXAMPLE_CODE
-#99999-1	99999	X	TRUE	50	scheme	Lines prefixed by a '#' will be ignored
+assetCode	taxonomyExternalId	ratingCode	isPrimary	isReadOnly	allocation	scheme	comment
+99999-1	99999	G	TRUE	FALSE	50	scheme	EXAMPLE_CODE
+#99999-1	99999	X	TRUE	TRUE	50	scheme	Lines prefixed by a '#' will be ignored
 </pre>
             <div class="help-note">
                 <strong>Please Note:</strong>
@@ -169,7 +169,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                     </li>
                     <li>
                         Replace mode, all existing measurables, ratings and allocations will be
-                        entirely replaced with the provided inputs. 
+                        entirely replaced with the provided inputs.
                     </li>
                 </ul>
             </div>
@@ -180,7 +180,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                     <div>
                         <textarea
                             bind:value={uploadData}
-                            placeholder="assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment"
+                            placeholder="assetCode	taxonomyExternalId	ratingCode	isPrimary  isReadOnly	allocation	scheme	comment"
                             rows="10"
                             cols="70"
                         ></textarea>
@@ -189,7 +189,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
             </fieldset>
             <div class="form-group">
                 <label>
-                    <input style="display: 
+                    <input style="display:
                         inline-block;"
                         type="radio"
                         bind:group={uploadMode}
@@ -200,7 +200,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                 <span class="text-muted"> - This will only add or update measurable ratings specified in the input</span>
                 <br>
                 <label>
-                    <input type="radio" 
+                    <input type="radio"
                         style="display: inline-block;"
                         bind:group={uploadMode}
                         name="uploadMode"
@@ -238,6 +238,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                             <th>Measurable</th>
                             <th>Rating</th>
                             <th>Primary</th>
+                            <th>Read Only</th>
                             <th>Allocation</th>
                             <th>Scheme</th>
                             <th>Comment</th>
@@ -294,6 +295,9 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
                                         )}>
                                         { obj.parsedItem.isPrimary }
                                     </td>
+                                    <td>
+                                        {obj.parsedItem.isReadOnly}
+                                    </td>
                                     <td
                                         class:cell-error={multipleIncludes(
                                             obj.errors,
@@ -341,7 +345,7 @@ assetCode	taxonomyExternalId	ratingCode	isPrimary	allocation	scheme	comment
         <form autocomplete="off" on:submit|preventDefault={onBulkApply}>
             <div class="form-group">
                 <label>
-                    <input 
+                    <input
                         type="radio"
                         style="display: inline-block;"
                         disabled="true"

@@ -249,6 +249,7 @@ public class BulkMeasurableRatingService {
                         .description(t.v1.comment())
                         .rating(t.v1.ratingCode())
                         .isPrimary(t.v1.isPrimary())
+                        .isReadOnly(t.v1.isReadOnly())
                         .lastUpdatedBy(DUMMY_USER)
                         .provenance(PROVENANCE)
                         .build())
@@ -266,6 +267,7 @@ public class BulkMeasurableRatingService {
                         requiredRatings,
                         d -> tuple(d.entityReference(), d.measurableId()),
                         (a, b) -> a.isPrimary() == b.isPrimary()
+                                && a.isReadOnly() == b.isReadOnly()
                                 && StringUtilities.safeEq(a.description(), b.description())
                                 && a.rating() == b.rating());
 
@@ -346,6 +348,7 @@ public class BulkMeasurableRatingService {
                     r.setRating(d.ratingSchemeItem().rating());
                     r.setDescription(d.parsedItem().comment());
                     r.setIsPrimary(d.parsedItem().isPrimary());
+                    r.setIsReadonly(d.parsedItem().isReadOnly());
                     r.setLastUpdatedBy(userId);
                     r.setLastUpdatedAt(now);
                     r.setProvenance(PROVENANCE);
@@ -362,6 +365,7 @@ public class BulkMeasurableRatingService {
                         .set(mr.RATING, d.ratingSchemeItem().rating())
                         .set(mr.DESCRIPTION, d.parsedItem().comment())
                         .set(mr.IS_PRIMARY, d.parsedItem().isPrimary())
+                        .set(mr.IS_READONLY, d.parsedItem().isReadOnly())
                         .set(mr.LAST_UPDATED_AT, now)
                         .set(mr.LAST_UPDATED_BY, userId)
                         .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())

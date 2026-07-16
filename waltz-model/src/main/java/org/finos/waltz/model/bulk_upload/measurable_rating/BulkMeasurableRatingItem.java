@@ -24,6 +24,10 @@ public interface BulkMeasurableRatingItem {
     @Value.Default
     default boolean isPrimary() { return false; }
 
+    @Value.Default
+    @JsonAlias({"is_readOnly", "is_read_only"})
+    default boolean isReadOnly() { return false; }
+
     @Nullable
     String comment();
 
