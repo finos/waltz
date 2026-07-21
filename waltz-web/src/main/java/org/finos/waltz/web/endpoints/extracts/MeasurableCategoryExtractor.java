@@ -34,13 +34,13 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectSeekStepN;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
@@ -107,11 +107,12 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
             }
 
             // Prepare select fields for each level
-            List<Tuple3<Field<String>, Field<String>, Field<Long>>> levelFields = levelTuples.stream()
+            List<Tuple4<Field<String>, Field<String>, Field<Long>, Field<String>>> levelFields = levelTuples.stream()
                     .map(t -> tuple(
                             _m(t).NAME.as("Level " + t.v1 + " Name"),
                             _m(t).EXTERNAL_ID.as("Level " + t.v1 + " External Id"),
-                            _m(t).ID.as("Level " + t.v1 + " Waltz Id")
+                            _m(t).ID.as("Level " + t.v1 + " Waltz Id"),
+                            _m(t).DESCRIPTION.as("Level " + t.v1 + " Description")
                     ))
                     .collect(Collectors.toList());
 
@@ -127,10 +128,12 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                         selectFields.add(levelFields.get(i).v1);
                         selectFields.add(levelFields.get(i).v2);
                         selectFields.add(levelFields.get(i).v3);
+                        selectFields.add(levelFields.get(i).v4);
                     } else {
                         selectFields.add(DSL.val("").as("Level " + (i+1) + " Name"));
                         selectFields.add(DSL.val("").as("Level " + (i+1) + " External Id"));
                         selectFields.add(DSL.val(null, Long.class).as("Level " + (i+1) + " Waltz Id"));
+                        selectFields.add(DSL.val("").as("Level " + (i+1) + " Description"));
                     }
                 }
 
