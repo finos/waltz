@@ -69,6 +69,7 @@ const issuedOnColumnDef = {
             field: 'issuedOn',
             displayName: 'Issued',
             width: '10%',
+            sort: { direction: 'desc', priority: 0 }, // to set default descending sort
             cellTemplate: `
                    <div class="ui-grid-cell-contents"
                         style="vertical-align: baseline;">
