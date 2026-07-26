@@ -158,7 +158,7 @@ public class ApplicationViewExtractor extends CustomDataExtractor {
                     reportRow.add(app.id().get());
                     reportRow.add(app.name());
                     reportRow.add(app.assetCode());
-                    reportRow.add(app.kind().prettyName());
+                    reportRow.add(app.applicationKind().prettyName());
                     reportRow.add(ouName);
                     reportRow.add(app.lifecyclePhase());
 
