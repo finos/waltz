@@ -20,24 +20,34 @@ package org.finos.waltz.model.application;
 
 public enum ApplicationKind {
     /** Applications which have been developed by in-house software teams */
-    IN_HOUSE,
+    IN_HOUSE("In House"),
 
     /** Deprecated, use THIRD_PARTY or CUSTOMISED instead **/
     @Deprecated
-    INTERNALLY_HOSTED,
+    INTERNALLY_HOSTED("Internally Hosted"),
 
     /** Externally hosted applications such as Salesforce **/
-    EXTERNALLY_HOSTED,
+    EXTERNALLY_HOSTED("Externally Hosted"),
 
     /** End user computing - Applications not owned by IT **/
-    EUC,
+    EUC("End User Computing"),
 
     /** Third party applications which have not been customised **/
-    THIRD_PARTY,
+    THIRD_PARTY("Third Party"),
 
     /** Third party applications which have been customised **/
-    CUSTOMISED,
+    CUSTOMISED("Customised"),
 
     /** Applications which are not owned by the organisation **/
-    EXTERNAL
+    EXTERNAL("External");
+
+    private final String displayName;
+
+    ApplicationKind(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String prettyName() {
+        return displayName;
+    }
 }
