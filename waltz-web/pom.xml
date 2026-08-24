@@ -20,7 +20,7 @@
     <parent>
         <artifactId>waltz</artifactId>
         <groupId>org.finos</groupId>
-        <version>1.85.0-SNAPSHOT</version>
+        <version>1.86.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>waltz-web</artifactId>
@@ -286,6 +286,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
