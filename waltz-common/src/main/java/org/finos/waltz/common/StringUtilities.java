@@ -226,6 +226,9 @@ public class StringUtilities {
 
         List<String> collect = Arrays
                 .stream(words.split("\\s+"))
+                // Leading whitespace produces an empty leading token, which would
+                // otherwise blow up on charAt(0)/substring(1) below.
+                .filter(w -> !w.isEmpty())
                 .map(w -> {
                     String lower = w.toLowerCase().substring(1);
 

@@ -44,6 +44,18 @@ public class StringUtilities_capitaliseTest {
         assertEquals("Hello World", StringUtilities.capitalise("HELLO\tWORLD"));
     }
 
+    @Test
+    public void leadingWhitespace(){
+        // Leading whitespace yields an empty leading token that must not throw
+        assertEquals("Hello", StringUtilities.capitalise(" hello"));
+        assertEquals("Hello World", StringUtilities.capitalise("  hello world"));
+    }
+
+    @Test
+    public void onlyWhitespace(){
+        assertEquals("", StringUtilities.capitalise("   "));
+    }
+
     public void newLineInputWithTab(){
         // "      " => ""
         // "Hello\tWorld" =>
