@@ -1,0 +1,15 @@
+{
+  "name": "waltz-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "End-to-end (Playwright) browser tests for Waltz, seeding via the REST API",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "testcontainers": "^10.13.0"
+  }
+}

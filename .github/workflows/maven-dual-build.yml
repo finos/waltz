@@ -63,6 +63,12 @@ jobs:
         name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web-jakarta.war
 
+    - name: Publish jobs jar (for e2e sample-data seeding)
+      uses: actions/upload-artifact@v4
+      with:
+        name: waltz-jobs-uber-jar
+        path: waltz-jobs/target/uber-waltz-jobs-*.jar
+
     - name: Publish mocha results
       uses: actions/upload-artifact@v4
       with:
@@ -280,3 +286,55 @@ jobs:
           waltz-schema/target/liquibase-scripts.zip
           waltz-web/target/waltz-web-mssql-alt.war
           waltz-web/target/waltz-web-jar-with-dependencies-mssql-alt.jar
+
+
+  # End-to-end (Playwright, JS) browser tests. Reuses the war + jobs jar built by build-postgres —
+  # no Maven rebuild here. The e2e runner (waltz-e2e/scripts/e2e.mjs) spins up throwaway Postgres +
+  # Waltz app containers via Testcontainers, seeds sample data (LoadAll), runs the suite against the
+  # app's mapped port, and tears everything down. No retries — flakiness fails the build.
+  playwright-e2e:
+    needs: build-postgres
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download war (built by build-postgres)
+      uses: actions/download-artifact@v4
+      with:
+        name: waltz-web-postgres.war
+        path: waltz-web/target
+
+    - name: Download jobs jar (built by build-postgres)
+      uses: actions/download-artifact@v4
+      with:
+        name: waltz-jobs-uber-jar
+        path: waltz-jobs/target
+
+    - name: Build Waltz Docker image (from the prebuilt war)
+      run: docker build -t waltz-e2e:ci .
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install e2e deps + browser
+      working-directory: waltz-e2e
+      run: |
+        npm install
+        npx playwright install --with-deps chromium
+
+    - name: Run ephemeral Playwright e2e
+      working-directory: waltz-e2e
+      env:
+        E2E_WALTZ_IMAGE: waltz-e2e:ci
+      run: npm run test:e2e
+
+    - name: Upload Playwright report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: waltz-e2e/playwright-report/
+        if-no-files-found: ignore
