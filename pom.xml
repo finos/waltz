@@ -87,7 +87,6 @@
         <jackson.annotations.version>2.21</jackson.annotations.version>
         <jackson-jsr310.version>2.15.2</jackson-jsr310.version>
         <java.version>17</java.version>
-        <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
         <jgrapht.version>1.5.2</jgrapht.version>
         <jool.version>0.9.15</jool.version>
@@ -297,16 +296,10 @@
             </dependency>
 
 
-            <!-- mail -->
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>${javax.mail.version}</version>
             </dependency>
 
 
