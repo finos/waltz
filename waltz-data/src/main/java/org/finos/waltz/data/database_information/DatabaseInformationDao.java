@@ -42,9 +42,11 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -213,5 +215,53 @@ public class DatabaseInformationDao implements SearchDao<DatabaseInformation> {
         r.store();
 
         return r.getId();
+    }
+
+
+    /**
+     * Upserts a batch of database assets, keyed on their external id: rows with a matching
+     * external id are updated in place (preserving the id, and therefore any existing
+     * usages), everything else is inserted. Callers are expected to supply an external id
+     * for every database (see the service layer). Returns the persisted databases, re-read
+     * so the generated ids are populated.
+     */
+    public Collection<DatabaseInformation> bulkUpsert(List<DatabaseInformation> databases) {
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+            databases.forEach(d -> {
+                String externalId = d.externalId().orElse(null);
+                boolean exists = externalId != null
+                        && tx.fetchExists(DATABASE_INFORMATION, DATABASE_INFORMATION.EXTERNAL_ID.eq(externalId));
+                if (exists) {
+                    tx.update(DATABASE_INFORMATION)
+                            .set(DATABASE_INFORMATION.DATABASE_NAME, d.databaseName())
+                            .set(DATABASE_INFORMATION.INSTANCE_NAME, d.instanceName())
+                            .set(DATABASE_INFORMATION.DBMS_NAME, d.dbmsName())
+                            .set(DATABASE_INFORMATION.DBMS_VENDOR, d.dbmsVendor())
+                            .set(DATABASE_INFORMATION.DBMS_VERSION, d.dbmsVersion())
+                            .set(DATABASE_INFORMATION.END_OF_LIFE_DATE, toSqlDate(d.endOfLifeDate()))
+                            .set(DATABASE_INFORMATION.LIFECYCLE_STATUS, d.lifecycleStatus().name())
+                            .set(DATABASE_INFORMATION.PROVENANCE, d.provenance())
+                            .where(DATABASE_INFORMATION.EXTERNAL_ID.eq(externalId))
+                            .execute();
+                } else {
+                    DatabaseInformationRecord record = TO_RECORD_MAPPER.apply(d);
+                    record.attach(tx.configuration());
+                    record.store();
+                }
+            });
+        });
+
+        List<String> externalIds = databases
+                .stream()
+                .map(d -> d.externalId().orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return dsl
+                .select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .where(DATABASE_INFORMATION.EXTERNAL_ID.in(externalIds))
+                .fetch(DATABASE_RECORD_MAPPER);
     }
 }

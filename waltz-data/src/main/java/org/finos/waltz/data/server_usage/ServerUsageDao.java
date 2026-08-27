@@ -22,6 +22,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.server_usage.ImmutableServerUsage;
 import org.finos.waltz.model.server_usage.ServerUsage;
+import org.finos.waltz.model.server_usage.ServerUsageCreateCommand;
 import org.finos.waltz.schema.tables.records.ServerUsageRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -34,7 +35,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
@@ -112,6 +115,46 @@ public class ServerUsageDao {
         return findByCondition(
                 SERVER_USAGE.ENTITY_ID.eq(ref.id())
                         .and(SERVER_USAGE.ENTITY_KIND.eq(ref.kind().name())));
+    }
+
+
+    /**
+     * Links the given server assets to the referenced entity in the requested environments.
+     * Replaces any existing links between the entity and the same servers (making the call
+     * idempotent), then inserts the new ones. Returns the number of links written.
+     */
+    public int create(EntityReference ref, Collection<ServerUsageCreateCommand> commands, String username) {
+        checkNotNull(ref, "ref cannot be null");
+        checkNotNull(commands, "commands cannot be null");
+
+        Set<Long> serverIds = commands
+                .stream()
+                .map(ServerUsageCreateCommand::serverId)
+                .collect(Collectors.toSet());
+
+        dsl.deleteFrom(SERVER_USAGE)
+                .where(SERVER_USAGE.ENTITY_KIND.eq(ref.kind().name()))
+                .and(SERVER_USAGE.ENTITY_ID.eq(ref.id()))
+                .and(SERVER_USAGE.SERVER_ID.in(serverIds))
+                .execute();
+
+        List<ServerUsageRecord> records = commands
+                .stream()
+                .map(c -> {
+                    ServerUsageRecord record = new ServerUsageRecord();
+                    record.setServerId(c.serverId());
+                    record.setEntityKind(ref.kind().name());
+                    record.setEntityId(ref.id());
+                    record.setEnvironment(c.environment());
+                    record.setProvenance(PROVENANCE);
+                    record.setLastUpdatedBy(username);
+                    record.setLastUpdatedAt(nowUtcTimestamp());
+                    return record;
+                })
+                .collect(Collectors.toList());
+
+        dsl.batchInsert(records).execute();
+        return records.size();
     }
 
 

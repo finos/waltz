@@ -19,16 +19,21 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.service.server_information.ServerInformationService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.server_information.ServerInformation;
 import org.finos.waltz.model.server_information.ServerSummaryBasicStatistics;
 import org.finos.waltz.model.server_information.ServerSummaryStatistics;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -39,13 +44,17 @@ public class ServerInformationEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "server-info");
 
     private final ServerInformationService serverInformationService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public ServerInformationEndpoint(ServerInformationService serverInfoService) {
+    public ServerInformationEndpoint(ServerInformationService serverInfoService,
+                                     UserRoleService userRoleService) {
         checkNotNull(serverInfoService, "serverInformationService must not be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.serverInformationService = serverInfoService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -59,6 +68,7 @@ public class ServerInformationEndpoint implements Endpoint {
         String getByHostnamePath = WebUtilities.mkPath(BASE_URL, "hostname", ":hostname");
         String calculateStatsForAppSelectorPath = WebUtilities.mkPath(BASE_URL, "apps", "stats");
         String calculateBasicStatsForAppSelectorPath = WebUtilities.mkPath(calculateStatsForAppSelectorPath, "basic");
+        String bulkSavePath = WebUtilities.mkPath(BASE_URL, "bulk");
 
         ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
                 -> serverInformationService.findByAssetCode(request.params("assetCode"));
@@ -81,6 +91,13 @@ public class ServerInformationEndpoint implements Endpoint {
         DatumRoute<ServerSummaryBasicStatistics> calculateBasicStatsForAppSelectorRoute = (request, response)
                 -> serverInformationService.calculateBasicStatsForAppSelector(WebUtilities.readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<Collection<ServerInformation>> bulkSaveRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            String username = WebUtilities.getUsername(request);
+            List<ServerInformation> servers = WebUtilities.readList(request, ServerInformation.class);
+            return serverInformationService.bulkSave(servers, username);
+        };
+
 
         EndpointUtilities.getForList(findByAssetCodePath, findByAssetCodeRoute);
         EndpointUtilities.getForList(findByAppIdPath, findByAppIdRoute);
@@ -89,6 +106,7 @@ public class ServerInformationEndpoint implements Endpoint {
         EndpointUtilities.getForDatum(getByHostnamePath, getByHostnameRoute);
         EndpointUtilities.postForDatum(calculateStatsForAppSelectorPath, calculateStatsForAppSelectorRoute);
         EndpointUtilities.postForDatum(calculateBasicStatsForAppSelectorPath, calculateBasicStatsForAppSelectorRoute);
+        EndpointUtilities.postForDatum(bulkSavePath, bulkSaveRoute);
     }
 
 

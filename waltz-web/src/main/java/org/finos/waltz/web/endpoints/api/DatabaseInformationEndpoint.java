@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.service.database_information.DatabaseInformationService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -26,23 +27,33 @@ import org.finos.waltz.web.json.ApplicationDatabases;
 import org.finos.waltz.web.json.ImmutableApplicationDatabases;
 import org.finos.waltz.model.database_information.DatabaseInformation;
 import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class DatabaseInformationEndpoint implements Endpoint {
 
     private final DatabaseInformationService databaseInformationService;
+    private final UserRoleService userRoleService;
 
     private static final String BASE_URL = WebUtilities.mkPath("api", "database");
 
     @Autowired
-    public DatabaseInformationEndpoint(DatabaseInformationService databaseInformationService) {
+    public DatabaseInformationEndpoint(DatabaseInformationService databaseInformationService,
+                                       UserRoleService userRoleService) {
+        checkNotNull(databaseInformationService, "databaseInformationService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         this.databaseInformationService = databaseInformationService;
+        this.userRoleService = userRoleService;
     }
 
     @Override
@@ -53,6 +64,7 @@ public class DatabaseInformationEndpoint implements Endpoint {
         String getByExternalIdPath = WebUtilities.mkPath(BASE_URL, "external-id", ":externalId");
         String findForAppSelectorPath = WebUtilities.mkPath(BASE_URL);
         String calculateStatsForAppIdSelectorPath = WebUtilities.mkPath(BASE_URL, "stats");
+        String bulkSavePath = WebUtilities.mkPath(BASE_URL, "bulk");
 
 
         ListRoute<DatabaseInformation> findForAppRoute = (request, response)
@@ -77,10 +89,18 @@ public class DatabaseInformationEndpoint implements Endpoint {
         DatumRoute<DatabaseSummaryStatistics> calculateStatsForAppIdSelectorRoute = (request, response)
                 -> databaseInformationService.calculateStatsForAppIdSelector(WebUtilities.readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<Collection<DatabaseInformation>> bulkSaveRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            String username = WebUtilities.getUsername(request);
+            List<DatabaseInformation> databases = WebUtilities.readList(request, DatabaseInformation.class);
+            return databaseInformationService.bulkSave(databases, username);
+        };
+
 
         EndpointUtilities.getForList(findForAppPath, findForAppRoute);
         EndpointUtilities.postForList(findForAppSelectorPath, findForAppSelectorRoute);
         EndpointUtilities.postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
+        EndpointUtilities.postForDatum(bulkSavePath, bulkSaveRoute);
         EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
         EndpointUtilities.getForDatum(getByExternalIdPath, getByExternalIdRoute);
 
