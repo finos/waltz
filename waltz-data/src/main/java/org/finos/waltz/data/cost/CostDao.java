@@ -44,7 +44,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -129,10 +128,8 @@ public class CostDao {
                 .orderBy(COST.AMOUNT.desc());
 
         return qry
-                .fetchStream()
-                .map(TO_COST_MAPPER::map)
                 .limit(limit)
-                .collect(Collectors.toSet());
+                .fetchSet(TO_COST_MAPPER);
     }
 
 
