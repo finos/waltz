@@ -47,7 +47,7 @@ public class MariaServerInformationSearch implements FullTextSearch<ServerInform
         }
 
         Condition externalIdCondition = terms.stream()
-                .map(term -> SERVER_INFORMATION.EXTERNAL_ID.like(term + "%"))
+                .map(term -> SERVER_INFORMATION.EXTERNAL_ID.startsWithIgnoreCase(term))
                 .collect(Collectors.reducing(
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
@@ -60,7 +60,7 @@ public class MariaServerInformationSearch implements FullTextSearch<ServerInform
                 .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
 
         Condition hostnameCondition = terms.stream()
-                .map(term -> SERVER_INFORMATION.HOSTNAME.like("%" + term + "%"))
+                .map(term -> SERVER_INFORMATION.HOSTNAME.containsIgnoreCase(term))
                 .collect(Collectors.reducing(
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));

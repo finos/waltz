@@ -56,7 +56,7 @@ public class MariaMeasurableSearch implements FullTextSearch<Measurable>, Databa
         }
 
         Condition externalIdCondition = terms.stream()
-                .map(term -> MEASURABLE.EXTERNAL_ID.like("%" + term + "%"))
+                .map(term -> MEASURABLE.EXTERNAL_ID.containsIgnoreCase(term))
                 .collect(Collectors.reducing(
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
@@ -72,7 +72,7 @@ public class MariaMeasurableSearch implements FullTextSearch<Measurable>, Databa
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
         Condition nameCondition = terms.stream()
-                .map(term -> MEASURABLE.NAME.like("%" + term + "%"))
+                .map(term -> MEASURABLE.NAME.containsIgnoreCase(term))
                 .collect(Collectors.reducing(
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
