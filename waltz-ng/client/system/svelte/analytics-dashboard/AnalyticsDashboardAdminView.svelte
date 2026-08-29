@@ -1,96 +1,46 @@
 <script>
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
-    import { accessLogStore } from "../../../svelte-stores/access-log-store";
-    import { changeLogSummariesStore } from "../../../svelte-stores/change-log-summaries-store";
     import _ from 'lodash';
     import SubSection from "../../../common/svelte/SubSection.svelte";
     import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
-    import GridWithCellRenderer from "../../../common/svelte/GridWithCellRenderer.svelte";
-    import ViewLinkLabelled from "../../../common/svelte/ViewLinkLabelled.svelte";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
-    import AccessLogsChartView from "./AccessLogsChartView.svelte";
-    import ChangeLogsChartView from "./ChangeLogsChartView.svelte";
+    import ChangeLogTrendsChart from "./ChangeLogTrendsChart.svelte";
+    import AccessLogTrendsChart from "./AccessLogTrendsChart.svelte";
+    import TopPagesChart from "./TopPagesChart.svelte";
+    import ActivityHeatmapChart from "./ActivityHeatmapChart.svelte";
+    import SeverityDonutChart from "./SeverityDonutChart.svelte";
+    import DayOfWeekRadarChart from "./DayOfWeekRadarChart.svelte";
+    import TopContributorsTreemap from "./TopContributorsTreemap.svelte";
+    import EntityKindBubbleChart from "./EntityKindBubbleChart.svelte";
+    import OperationsDonutChart from "./OperationsDonutChart.svelte";
+    import OperationTrendsChart from "./OperationTrendsChart.svelte";
+    import AccessLogOperationTrendsChart from "./AccessLogOperationTrendsChart.svelte";
 
-    const VIEW_MODES = {
-        YEARLY: "Yearly",
-        MONTHLY: "Monthly"
+    const FREQUENCY_OPTIONS = [
+        { name: "Day", value: "day" },
+        { name: "Week", value: "week" },
+        { name: "Month", value: "month" },
+        { name: "Year", value: "year" }
+    ];
+
+    let selectedFrequency = "month";
+    let startDate = new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0];
+    let endDate = new Date().toISOString().split('T')[0];
+    let chartKey = Date.now();
+    let refreshing = false;
+
+    function refreshCharts() {
+        chartKey = Date.now();
+        console.log('Charts refreshed with key:', chartKey);
     }
 
-    const numberToMonthMap = {
-        1: "Jan",
-        2: "Feb",
-        3: "Mar",
-        4: "Apr",
-        5: "May",
-        6: "Jun",
-        7: "Jul",
-        8: "Aug",
-        9: "Sep",
-        10: "Oct",
-        11: "Nov",
-        12: "Dec"
+    // Auto-refresh when filters change
+    $: {
+        if (selectedFrequency && startDate && endDate) {
+            refreshCharts();
+        }
     }
-
-    const viewModeItemList = Object.values(VIEW_MODES)
-        .map(d => ({name: d}));
-
-    let viewMode = null;
-
-    let selectedAccessLogYear = new Date().getFullYear();
-    let selectedChangeLogYear = new Date().getFullYear();
-
-    $: mostViewedPagesSinceDays = viewMode === VIEW_MODES.MONTHLY ? 31 : 365;
-
-    $: mostViewedPagesCall = accessLogStore.findAccessLogsSince(mostViewedPagesSinceDays);
-
-    $: changeLogYearsListCall = changeLogSummariesStore.findChangeLogYears();
-
-    $: accessLogYearsListCall = accessLogStore.findAccessLogYears();
-
-    $: changeLogYearsListData = $changeLogYearsListCall.data;
-
-    $: accessLogYearsListData = $accessLogYearsListCall.data;
-
-    $: changeLogYearsList = changeLogYearsListData
-        ? changeLogYearsListData
-            .map(d => ({name: d}))
-            .sort((a, b) => b.name - a.name)
-        : [];
-
-    $: accessLogYearsList = accessLogYearsListData
-        ? accessLogYearsListData
-            .map(d => ({name: d}))
-            .sort((a, b) => b.name - a.name)
-        : [];
-
-    $: mostViewedPages = $mostViewedPagesCall.data;
-
-    $: mostViewedPagesGridData = mostViewedPages
-        ? mostViewedPages
-            .sort((a, b) => b.counts - a.counts)
-            .slice(0, 30)
-            .map(d => ({state: d.state, counts: d.counts.toLocaleString()}))
-        : [];
-
-const mostViewedPagesGridColumns = [
-    {
-        name: "Page",
-        field: "state",
-        maxLength: 50,
-        cellRendererComponent: ViewLinkLabelled,
-        cellRendererProps: row => ({
-            state: row.state.split("|")[0],
-            label: row.state,
-            ctx: {
-                id: Math.floor(Math.random()*100)
-            }
-        }),
-        width: 20
-    },
-    { name: "Views", field: "counts", width: 20 }
-];
-
 </script>
 
 <PageHeader icon="bar-chart"
@@ -106,82 +56,180 @@ const mostViewedPagesGridColumns = [
 
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="row">
-        <div class="col-sm-12">
-            <div class="col-sm-12">
-                <SubSection>
-                    <div slot="header">
-                        Filters
-                    </div>
-                    <div slot="content">
-                        <div class="row row-mini-gutters">
-                            <div class="col-sm-4">
-                                <DropdownPicker
-                                    items={viewModeItemList}
-                                    onSelect={d => _.isNull(d) ? viewMode = null : viewMode = d.name}
-                                    selectedItem={_.find(viewModeItemList, d => d != null ? d.name === viewMode : null) ?? null}
-                                    defaultMessage="Filter Timeframe"/>
-                            </div>
-                            {#if !_.isNull(viewMode) && viewMode === VIEW_MODES.MONTHLY}
-                                <div class="col-sm-4">
-                                    <DropdownPicker
-                                        items={accessLogYearsList}
-                                        onSelect={d => selectedAccessLogYear = d.name }
-                                        selectedItem={_.find(accessLogYearsList, d => d.name === selectedAccessLogYear)}
-                                        defaultMessage="Filter Access Logs"/>
-                                </div>
-                                <div class="col-sm-4">
-                                    <DropdownPicker
-                                        items={changeLogYearsList}
-                                        onSelect={d => selectedChangeLogYear = d.name }
-                                        selectedItem={_.find(changeLogYearsList, d => d.name === selectedChangeLogYear)}
-                                        defaultMessage="Filter Change Logs"/>
-                                </div>
-                            {/if}
+        <div class="col-md-12">
+            <SubSection>
+                <div slot="header">
+                    Date Range & Frequency Filters
+                </div>
+                <div slot="content">
+                    <div class="row row-mini-gutters">
+                        <div class="col-md-3">
+                            <div class="waltz-display-field-label">Start Date</div>
+                            <input type="date"
+                                   id="startDate"
+                                   class="form-control"
+                                   bind:value={startDate} />
+                        </div>
+                        <div class="col-md-3">
+                            <div class="waltz-display-field-label">End Date</div>
+                            <input type="date"
+                                   id="endDate"
+                                   class="form-control"
+                                   bind:value={endDate} />
+                        </div>
+                        <div class="col-md-3">
+                            <div class="waltz-display-field-label">Frequency</div>
+                            <select id="frequency"
+                                    class="form-control"
+                                    bind:value={selectedFrequency}>
+                                {#each FREQUENCY_OPTIONS as option}
+                                    <option value={option.value}>{option.name}</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="col-md-3" style="display: flex; align-items: end;">
+                            <button class="btn btn-primary"
+                                    style="margin-top: 25px;"
+                                    disabled={refreshing}
+                                    on:click={async () => {
+                                        refreshing = true;
+                                        console.log('Refresh button clicked!');
+                                        refreshCharts();
+                                        // Give visual feedback
+                                        await new Promise(resolve => setTimeout(resolve, 1000));
+                                        refreshing = false;
+                                    }}>
+                        {#if refreshing}
+                            🔄 Refreshing...
+                        {:else}
+                            Refresh
+                        {/if}
+                            </button>
                         </div>
                     </div>
-                </SubSection>
-            </div>
+                </div>
+            </SubSection>
         </div>
     </div>
     <hr/>
-    <div class="row" style="margin-bottom: 10px">
-        <div class="col-sm-12">
-            <AccessLogsChartView
-                chartTimeFrame={viewMode}
-                year={selectedAccessLogYear}
-                numToMonthMap={numberToMonthMap}/>
+
+    <!-- ACCESS LOG ANALYTICS SECTION -->
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-12">
+            <h3>
+                <i class="fa fa-users"></i> Access Log Analytics
+            </h3>
         </div>
     </div>
-    <div class="row" style="margin-bottom: 10px">
-        <div class="col-sm-12">
-            <div class="col-sm-6">
-                <SubSection>
-                    <div slot="header">
-                        Most Viewed Pages in the past {viewMode === VIEW_MODES.MONTHLY ? "Month" : "Year"} [Top 30]
-                    </div>
-                    <div slot="content">
-                        <div class="row">
-                            <div class="col-sm-12">
-                            {#if mostViewedPagesGridData.length > 0}
-                                    <GridWithCellRenderer
-                                        columnDefs={mostViewedPagesGridColumns}
-                                        rowData={mostViewedPagesGridData}
-                                        onSelectRow={(r) => console.log(r)}>
-                                    </GridWithCellRenderer>
-                            {:else}
-                                <LoadingPlaceholder/>
-                            {/if}
-                            </div>
-                        </div>
-                    </div>
-                </SubSection>
-            </div>
-            <div class="col-sm-6">
-                <ChangeLogsChartView
-                    chartTimeFrame={viewMode}
-                    year={selectedChangeLogYear}
-                    numToMonthMap={numberToMonthMap}/>
-            </div>
+
+    <!-- Access Log Charts Row 1 -->
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-6">
+            <AccessLogTrendsChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+        <div class="col-md-6">
+            <DayOfWeekRadarChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- Access Log Charts Row 2 -->
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-6">
+            <TopPagesChart
+                {startDate}
+                {endDate}
+                key={chartKey} />
+        </div>
+        <div class="col-md-6">
+            <ActivityHeatmapChart
+                {startDate}
+                {endDate}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- Access Log Operation Trends Chart (Full Width) -->
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-12">
+            <AccessLogOperationTrendsChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- CHANGE LOG ANALYTICS SECTION -->
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-12">
+            <h3>
+                <i class="fa fa-edit"></i> Change Log Analytics
+            </h3>
+        </div>
+    </div>
+
+    <!-- Change Log Charts Row 1 -->
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-6">
+            <ChangeLogTrendsChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+        <div class="col-md-6">
+            <TopContributorsTreemap
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- Change Log Charts Row 2 -->
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-6">
+            <OperationsDonutChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+        <div class="col-md-6">
+            <SeverityDonutChart
+                {startDate}
+                {endDate}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- Change Log Charts Row 3 - Merged Entity & Child Entity Kind -->
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-md-12">
+            <EntityKindBubbleChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
+        </div>
+    </div>
+
+    <!-- Operation Trends Chart (Full Width) -->
+    <div class="row" style="margin-bottom: 30px">
+        <div class="col-md-12">
+            <OperationTrendsChart
+                {startDate}
+                {endDate}
+                period={selectedFrequency}
+                key={chartKey} />
         </div>
     </div>
 </div>

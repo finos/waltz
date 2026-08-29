@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,4 +85,43 @@ public class ChangeLogSummariesService {
         return changeLogSummariesDao.findMonthOnMonthChanges(parentEntityKind, childEntityKind, currentYear);
     }
 
+    public Map<String, Map<String, Long>> findChangesByPeriod(EntityKind parentEntityKind, EntityKind childEntityKind, LocalDate startDate, LocalDate endDate, String freq) {
+        return changeLogSummariesDao.findChangesByPeriod(parentEntityKind, childEntityKind, startDate, endDate, freq);
+    }
+
+    public Map<String, Long> findChangesBySeverity(String startDate, String endDate) {
+        return changeLogSummariesDao.findChangesBySeverity(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByEntityKind(String startDate, String endDate, int limit) {
+        return changeLogSummariesDao.findChangesByEntityKind(startDate, endDate, limit);
+    }
+
+    public Map<String, Long> findTopContributors(String startDate, String endDate, int limit) {
+        return changeLogSummariesDao.findTopContributors(startDate, endDate, limit);
+    }
+
+    public Map<String, Map<String, Long>> findTopContributorsByPeriod(String startDate, String endDate, String freq, int limit) {
+        return changeLogSummariesDao.findTopContributorsByPeriod(startDate, endDate, freq, limit);
+    }
+
+    public Map<Integer, Long> findChangesByHourOfDay(String startDate, String endDate) {
+        return changeLogSummariesDao.findChangesByHourOfDay(startDate, endDate);
+    }
+
+    public Map<Integer, Long> findChangesByDayOfWeek(String startDate, String endDate) {
+        return changeLogSummariesDao.findChangesByDayOfWeek(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByOperation(String startDate, String endDate) {
+        return changeLogSummariesDao.findChangesByOperation(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByChildKind(String startDate, String endDate, int limit) {
+        return changeLogSummariesDao.findChangesByChildKind(startDate, endDate, limit);
+    }
+
+    public Map<String, Map<String, Long>> findOperationTrends(String startDate, String endDate, String freq) {
+        return changeLogSummariesDao.findOperationTrends(startDate, endDate, freq);
+    }
 }
