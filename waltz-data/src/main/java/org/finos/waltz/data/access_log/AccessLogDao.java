@@ -33,16 +33,24 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectSeekStep2;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
+import org.jooq.Condition;
 
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import static org.finos.waltz.data.JooqUtilities.isoWeek;
+import static org.finos.waltz.data.JooqUtilities.mkDateRangeCondition;
 import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 
 
@@ -203,4 +211,199 @@ public class AccessLogDao {
                         .build());
     }
 
+    /**
+     * Get access counts, grouped into buckets for the given frequency, over an (optional) date range.
+     * The period label is built in Java so the query stays dialect agnostic (no db specific
+     * date formatting functions such as {@code to_char} / {@code date_trunc}).
+     */
+    public List<AccessLogSummary> findAccessLogSummary(org.finos.waltz.model.Duration freq,
+                                                       LocalDate startDate,
+                                                       LocalDate endDate) {
+        Condition dateRange = mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate);
+        Field<Long> counts = DSL.count().cast(Long.class);
+        Field<Long> distinctUserCount = DSL.countDistinct(ACCESS_LOG.USER_ID).cast(Long.class);
+
+        Field<Integer> yearField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.YEAR);
+
+        switch (freq) {
+            case DAY: {
+                Field<Date> dayField = DSL.date(ACCESS_LOG.CREATED_AT);
+                return dsl
+                        .select(dayField.as("day"), counts.as("counts"), distinctUserCount.as("distinct_user_count"))
+                        .from(ACCESS_LOG)
+                        .where(dateRange)
+                        .groupBy(dayField)
+                        .orderBy(dayField)
+                        .fetch(r -> ImmutableAccessLogSummary.builder()
+                                .period(r.get("day", Date.class).toLocalDate().toString())
+                                .counts(r.get("counts", Long.class))
+                                .distinctUserCount(r.get("distinct_user_count", Long.class))
+                                .build());
+            }
+            case WEEK: {
+                Field<Integer> weekField = isoWeek(dsl, ACCESS_LOG.CREATED_AT);
+                return dsl
+                        .select(yearField.as("year"), weekField.as("week"), counts.as("counts"), distinctUserCount.as("distinct_user_count"))
+                        .from(ACCESS_LOG)
+                        .where(dateRange)
+                        .groupBy(yearField, weekField)
+                        .orderBy(yearField, weekField)
+                        .fetch(r -> ImmutableAccessLogSummary.builder()
+                                .period(String.format("%04d-W%02d", r.get("year", Integer.class), r.get("week", Integer.class)))
+                                .year(r.get("year", Integer.class))
+                                .week(r.get("week", Integer.class))
+                                .counts(r.get("counts", Long.class))
+                                .distinctUserCount(r.get("distinct_user_count", Long.class))
+                                .build());
+            }
+            case YEAR: {
+                return dsl
+                        .select(yearField.as("year"), counts.as("counts"), distinctUserCount.as("distinct_user_count"))
+                        .from(ACCESS_LOG)
+                        .where(dateRange)
+                        .groupBy(yearField)
+                        .orderBy(yearField)
+                        .fetch(r -> ImmutableAccessLogSummary.builder()
+                                .period(String.format("%04d", r.get("year", Integer.class)))
+                                .year(r.get("year", Integer.class))
+                                .counts(r.get("counts", Long.class))
+                                .distinctUserCount(r.get("distinct_user_count", Long.class))
+                                .build());
+            }
+            case MONTH:
+            default: {
+                Field<Integer> monthField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.MONTH);
+                return dsl
+                        .select(yearField.as("year"), monthField.as("month"), counts.as("counts"), distinctUserCount.as("distinct_user_count"))
+                        .from(ACCESS_LOG)
+                        .where(dateRange)
+                        .groupBy(yearField, monthField)
+                        .orderBy(yearField, monthField)
+                        .fetch(r -> ImmutableAccessLogSummary.builder()
+                                .period(String.format("%04d-%02d", r.get("year", Integer.class), r.get("month", Integer.class)))
+                                .year(r.get("year", Integer.class))
+                                .month(r.get("month", Integer.class))
+                                .counts(r.get("counts", Long.class))
+                                .distinctUserCount(r.get("distinct_user_count", Long.class))
+                                .build());
+            }
+        }
+    }
+
+    /**
+     * Get top pages by access count for a given period
+     */
+    public List<AccessLogSummary> findTopPagesByAccess(LocalDate startDate, LocalDate endDate, int limit) {
+        return dsl
+                .select(ACCESS_LOG.STATE, DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(ACCESS_LOG.STATE)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .state(r.get(ACCESS_LOG.STATE))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get user activity heatmap by hour of day
+     */
+    public List<AccessLogSummary> findActivityByHourOfDay(LocalDate startDate, LocalDate endDate) {
+        Field<Integer> hourField = DSL.extract(ACCESS_LOG.CREATED_AT, DatePart.HOUR);
+
+        return dsl
+                .select(hourField.as("hour"), DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(hourField)
+                .orderBy(hourField)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .hour(r.get("hour", Integer.class))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get user activity by day of week
+     */
+    public List<AccessLogSummary> findActivityByDayOfWeek(LocalDate startDate, LocalDate endDate) {
+        // Bucket by calendar day in the query (portable) then fold into ISO day-of-week (1=Mon..7=Sun)
+        // in Java. This avoids dialect specific weekday extraction (jOOQ's isoDayOfWeek relies on
+        // SQL Server's @@datefirst and is not reliably portable).
+        Field<Date> dayField = DSL.date(ACCESS_LOG.CREATED_AT);
+
+        Map<Integer, Long> countsByDayOfWeek = new TreeMap<>();
+        dsl
+                .select(dayField.as("day"), DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(dayField)
+                .fetch()
+                .forEach(r -> {
+                    int dayOfWeek = r.get("day", Date.class).toLocalDate().getDayOfWeek().getValue();
+                    countsByDayOfWeek.merge(dayOfWeek, r.get("counts", Long.class), Long::sum);
+                });
+
+        return countsByDayOfWeek
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableAccessLogSummary
+                        .builder()
+                        .dayOfWeek(e.getKey())
+                        .counts(e.getValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get top active users by access count
+     */
+    public List<AccessLogSummary> findTopActiveUsers(LocalDate startDate, LocalDate endDate, int limit) {
+        return dsl
+                .select(ACCESS_LOG.USER_ID, DSL.count().as("counts"))
+                .from(ACCESS_LOG)
+                .where(mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(ACCESS_LOG.USER_ID)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetch(r -> ImmutableAccessLogSummary
+                        .builder()
+                        .userId(r.get(ACCESS_LOG.USER_ID))
+                        .counts(r.get("counts", Long.class))
+                        .build());
+    }
+
+    /**
+     * Get session duration analytics (approximate based on access patterns)
+     */
+    public List<AccessLogSummary> findSessionDurations(LocalDate startDate, LocalDate endDate) {
+        // Group sessions by user and day, calculate duration as time between first and last access
+        Field<Date> dateField = DSL.date(ACCESS_LOG.CREATED_AT);
+        Field<Timestamp> minTime = DSL.min(ACCESS_LOG.CREATED_AT);
+        Field<Timestamp> maxTime = DSL.max(ACCESS_LOG.CREATED_AT);
+
+        return dsl
+                .select(ACCESS_LOG.USER_ID, dateField.as("date"), minTime, maxTime, DSL.count().as("page_views"))
+                .from(ACCESS_LOG)
+                .where(mkDateRangeCondition(ACCESS_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(ACCESS_LOG.USER_ID, dateField)
+                .having(DSL.count().gt(1)) // Only sessions with multiple page views
+                .fetch(r -> {
+                    Timestamp min = r.get(minTime);
+                    Timestamp max = r.get(maxTime);
+                    long durationMinutes = (max.getTime() - min.getTime()) / (1000 * 60);
+
+                    return ImmutableAccessLogSummary
+                            .builder()
+                            .userId(r.get(ACCESS_LOG.USER_ID))
+                            .period(r.get("date", Date.class).toLocalDate().toString())
+                            .counts(r.get("page_views", Long.class))
+                            .sessionDuration(durationMinutes)
+                            .build();
+                });
+    }
 }

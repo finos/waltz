@@ -21,6 +21,7 @@ package org.finos.waltz.service.changelog;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
+import org.finos.waltz.model.Duration;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -31,11 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
 
 
 @Service
@@ -84,4 +87,58 @@ public class ChangeLogSummariesService {
         return changeLogSummariesDao.findMonthOnMonthChanges(parentEntityKind, childEntityKind, currentYear);
     }
 
+    public Map<String, Map<String, Long>> findChangesByPeriod(EntityKind parentEntityKind, EntityKind childEntityKind, LocalDate startDate, LocalDate endDate, Duration freq) {
+        checkNotNull(freq, "freq must not be null");
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesByPeriod(parentEntityKind, childEntityKind, startDate, endDate, freq);
+    }
+
+    public Map<String, Long> findChangesBySeverity(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesBySeverity(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByEntityKind(LocalDate startDate, LocalDate endDate, int limit) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesByEntityKind(startDate, endDate, limit);
+    }
+
+    public Map<String, Long> findTopContributors(LocalDate startDate, LocalDate endDate, int limit) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findTopContributors(startDate, endDate, limit);
+    }
+
+    public Map<String, Map<String, Long>> findTopContributorsByPeriod(LocalDate startDate, LocalDate endDate, Duration freq, int limit) {
+        checkNotNull(freq, "freq must not be null");
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findTopContributorsByPeriod(startDate, endDate, freq, limit);
+    }
+
+    public Map<Integer, Long> findChangesByDayOfWeek(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesByDayOfWeek(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByOperation(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesByOperation(startDate, endDate);
+    }
+
+    public Map<String, Long> findChangesByChildKind(LocalDate startDate, LocalDate endDate, int limit) {
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findChangesByChildKind(startDate, endDate, limit);
+    }
+
+    public Map<String, Map<String, Long>> findOperationTrends(LocalDate startDate, LocalDate endDate, Duration freq) {
+        checkNotNull(freq, "freq must not be null");
+        checkDateRange(startDate, endDate);
+        return changeLogSummariesDao.findOperationTrends(startDate, endDate, freq);
+    }
+
+
+    private void checkDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null) {
+            checkTrue(!startDate.isAfter(endDate), "startDate must not be after endDate");
+        }
+    }
 }
