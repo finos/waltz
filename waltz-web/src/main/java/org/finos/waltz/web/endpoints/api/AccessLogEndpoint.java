@@ -18,11 +18,11 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.apache.poi.util.StringUtil;
-import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.Duration;
 import org.finos.waltz.model.accesslog.AccessLogSummary;
 import org.finos.waltz.service.access_log.AccessLogService;
-import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.WaltzVersionInfo;
@@ -37,12 +37,10 @@ import spark.Request;
 import spark.Response;
 
 import java.time.LocalDate;
-import java.time.Year;
-import java.time.temporal.TemporalUnit;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.today;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 
 @Service
@@ -52,22 +50,27 @@ public class AccessLogEndpoint implements Endpoint {
 
     private final AccessLogService accessLogService;
     private final WaltzVersionInfo waltzVersionInfo;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
     public AccessLogEndpoint(AccessLogService accessLogService,
-                             WaltzVersionInfo waltzVersionInfo) {
+                             WaltzVersionInfo waltzVersionInfo,
+                             UserRoleService userRoleService) {
         checkNotNull(accessLogService, "accessLogService cannot be null");
         checkNotNull(waltzVersionInfo, "waltzVersionInfo cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.accessLogService = accessLogService;
         this.waltzVersionInfo = waltzVersionInfo;
+        this.userRoleService = userRoleService;
     }
 
 
     @Override
     public void register() {
 
+        // -- paths ---------------------------------------------------------
         String findForUserPath = WebUtilities.mkPath(BASE_URL, "user", ":userId");
         String findActiveUsersPath = WebUtilities.mkPath(BASE_URL, "active", ":minutes");
         String writePath = WebUtilities.mkPath(BASE_URL, ":state");
@@ -77,7 +80,14 @@ public class AccessLogEndpoint implements Endpoint {
         String findYearOnYearUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "year_on_year", ":mode");
         String findAccessLogYearsPath = WebUtilities.mkPath(BASE_URL, "get_years");
         String findMonthOnMonthUsersPath = WebUtilities.mkPath(BASE_URL, "summary", "month_on_month", ":mode", ":year");
+        String findUsersSummaryPath = WebUtilities.mkPath(BASE_URL, "summary", "period", ":frequency");
+        String findTopPagesPath = WebUtilities.mkPath(BASE_URL, "analytics", "top-pages");
+        String findActivityByHourPath = WebUtilities.mkPath(BASE_URL, "analytics", "activity-by-hour");
+        String findActivityByDayPath = WebUtilities.mkPath(BASE_URL, "analytics", "activity-by-day");
+        String findTopUsersPath = WebUtilities.mkPath(BASE_URL, "analytics", "top-users");
+        String findSessionDurationsPath = WebUtilities.mkPath(BASE_URL, "analytics", "session-durations");
 
+        // -- routes --------------------------------------------------------
         ListRoute<AccessLog> findForUserRoute = (request, response) ->
                 accessLogService.findForUserId(request.params("userId"), WebUtilities.getLimit(request));
 
@@ -101,10 +111,8 @@ public class AccessLogEndpoint implements Endpoint {
             return accessLogService.findDailyUniqueUsersSince(days);
         };
 
-        ListRoute<AccessLogSummary> findYearOnYearUsersRoute = (request, response) -> {
-            String mode = request.params("mode");
-            return accessLogService.findYearOnYearAccessLogSummary(mode);
-        };
+        ListRoute<AccessLogSummary> findYearOnYearUsersRoute = (request, response) ->
+                accessLogService.findYearOnYearAccessLogSummary(request.params("mode"));
 
         ListRoute<Integer> findAccessLogYearsRoute = (request, response) -> accessLogService.findAccessLogYears();
 
@@ -114,6 +122,50 @@ public class AccessLogEndpoint implements Endpoint {
             return accessLogService.findMonthOnMonthAccessLogSummary(mode, year);
         };
 
+        ListRoute<AccessLogSummary> findUsersSummaryRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            Duration frequency = readFrequency(request.params("frequency"));
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findAccessLogSummary(frequency, startDate, endDate);
+        };
+
+        ListRoute<AccessLogSummary> findTopPagesRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findTopPagesByAccess(startDate, endDate, readLimit(request));
+        };
+
+        ListRoute<AccessLogSummary> findActivityByHourRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findActivityByHourOfDay(startDate, endDate);
+        };
+
+        ListRoute<AccessLogSummary> findActivityByDayRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findActivityByDayOfWeek(startDate, endDate);
+        };
+
+        ListRoute<AccessLogSummary> findTopUsersRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findTopActiveUsers(startDate, endDate, readLimit(request));
+        };
+
+        ListRoute<AccessLogSummary> findSessionDurationsRoute = (request, response) -> {
+            WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
+            LocalDate endDate = readEndDate(request);
+            LocalDate startDate = readStartDate(request, endDate);
+            return accessLogService.findSessionDurations(startDate, endDate);
+        };
+
+        // -- registrations -------------------------------------------------
         EndpointUtilities.getForList(findForUserPath, findForUserRoute);
         EndpointUtilities.getForList(findActiveUsersPath, findActiveUsersRoute);
         EndpointUtilities.postForDatum(writePath, this::writeRoute);
@@ -123,6 +175,36 @@ public class AccessLogEndpoint implements Endpoint {
         EndpointUtilities.getForList(findYearOnYearUsersPath, findYearOnYearUsersRoute);
         EndpointUtilities.getForList(findAccessLogYearsPath, findAccessLogYearsRoute);
         EndpointUtilities.getForList(findMonthOnMonthUsersPath, findMonthOnMonthUsersRoute);
+        EndpointUtilities.getForList(findUsersSummaryPath, findUsersSummaryRoute);
+        EndpointUtilities.getForList(findTopPagesPath, findTopPagesRoute);
+        EndpointUtilities.getForList(findActivityByHourPath, findActivityByHourRoute);
+        EndpointUtilities.getForList(findActivityByDayPath, findActivityByDayRoute);
+        EndpointUtilities.getForList(findTopUsersPath, findTopUsersRoute);
+        EndpointUtilities.getForList(findSessionDurationsPath, findSessionDurationsRoute);
+    }
+
+
+    private static final int DEFAULT_LIMIT = 10;
+    private static final int DEFAULT_RANGE_MONTHS = 6;
+
+
+    private static Duration readFrequency(String frequency) {
+        String normalised = frequency == null ? null : frequency.toUpperCase();
+        return readEnum(normalised, Duration.class, s -> Duration.MONTH);
+    }
+
+    private static LocalDate readEndDate(Request request) {
+        return WebUtilities.getLocalDateQueryParam(request, "endDate").orElseGet(() -> today());
+    }
+
+    private static LocalDate readStartDate(Request request, LocalDate endDate) {
+        return WebUtilities.getLocalDateQueryParam(request, "startDate")
+                .orElseGet(() -> endDate.minusMonths(DEFAULT_RANGE_MONTHS));
+    }
+
+    private static int readLimit(Request request) {
+        String limitParam = request.queryParams("limit");
+        return limitParam != null ? Integer.parseInt(limitParam) : DEFAULT_LIMIT;
     }
 
 
