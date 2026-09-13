@@ -14,7 +14,7 @@ const baseURL = process.env.WALTZ_BASE_URL ?? "http://localhost:8080";
  *
  * UI touch-points (waltz-ng/client/system/svelte/analytics-dashboard):
  *  - route /system/analytics-dashboard (state main.system.analytics-dashboard)
- *  - filter controls: #startDate, #endDate, #frequency (options from the `period` enum)
+ *  - filter controls: #startDate, #endDate, #grouping ("Auto" plus the `period` enum options)
  *  - section headings: "Access Log Analytics", "Change Log Analytics"
  *  - each chart is a waltz SubSection (.sub-section); load failures surface as a .alert-danger.
  */
@@ -35,10 +35,10 @@ test("analytics dashboard renders filters and both analytics sections", async ({
 
     await expect(page.locator("#startDate")).toBeVisible();
     await expect(page.locator("#endDate")).toBeVisible();
-    await expect(page.locator("#frequency")).toBeVisible();
+    await expect(page.locator("#grouping")).toBeVisible();
 
-    // Frequency options are sourced from the `period` enum (Day/Week/Month/Year).
-    await expect(page.locator("#frequency option")).toHaveCount(4);
+    // Grouping options: "Auto" plus the `period` enum (Day/Week/Month/Year).
+    await expect(page.locator("#grouping option")).toHaveCount(5);
 
     await expect(page.getByRole("heading", { name: "Access Log Analytics" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Change Log Analytics" })).toBeVisible();
@@ -57,13 +57,13 @@ test("charts load without error for the default range", async ({ page, context }
 });
 
 
-test("changing frequency re-renders the charts without error", async ({ page, context }) => {
+test("changing grouping re-renders the charts without error", async ({ page, context }) => {
     await openDashboard(page, context);
     await expect(page.locator(".sub-section").first()).toBeVisible();
 
     // Switch to weekly buckets; the charts reload off the derived key.
-    await page.locator("#frequency").selectOption("WEEK");
-    await expect(page.locator("#frequency")).toHaveValue("WEEK");
+    await page.locator("#grouping").selectOption("WEEK");
+    await expect(page.locator("#grouping")).toHaveValue("WEEK");
 
     await page.waitForLoadState("networkidle");
     await expect(page.locator(".alert-danger")).toHaveCount(0);
