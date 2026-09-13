@@ -132,8 +132,8 @@ public class ApplicationViewExtractor extends CustomDataExtractor {
     }
 
 
-    private List<List<Object>> prepareReportRows(ApplicationsView viewData,
-                                                 Map<Optional<Long>, String> ouNameById) {
+    List<List<Object>> prepareReportRows(ApplicationsView viewData,
+                                         Map<Optional<Long>, String> ouNameById) {
 
         Map<Long, Measurable> measurablesById = indexByOptionalId(viewData.primaryRatings().measurables());
         Map<EntityReference, Collection<Tuple2<MeasurableRating, Measurable>>> entityToRatingsAndMeasurables = groupBy(
