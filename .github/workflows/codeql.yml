@@ -1,0 +1,56 @@
+name: CodeQL
+
+# Static analysis (SAST) with GitHub CodeQL. Results are published to the repository's
+# Security > Code scanning alerts, with inline annotations on pull requests.
+#
+# Both languages are analysed with build-mode 'none', so CodeQL extracts the source without
+# running the Maven / jOOQ build:
+#   - java-kotlin            Java backend (no Kotlin in this repo, so 'none' is supported)
+#   - javascript-typescript  waltz-ng frontend (interpreted; no build needed)
+#
+# Mode: report-only. Findings surface as code scanning alerts but do not block merges (no
+# required status check is configured). The gate can be tightened later via branch protection.
+#
+# On fork-based pull requests GitHub withholds the 'security-events: write' token, so the
+# upload step is skipped there; the scan still runs on pushes to master and on the schedule.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    # Weekly, Monday 06:00 UTC
+    - cron: '0 6 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: java-kotlin
+            build-mode: none
+          - language: javascript-typescript
+            build-mode: none
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
