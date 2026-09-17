@@ -639,9 +639,7 @@ public class XlsImporter {
     private Map<String, Long> loadOrgExtToIdMap() {
         return dsl.select(ORGANISATIONAL_UNIT.EXTERNAL_ID, ORGANISATIONAL_UNIT.ID)
                 .from(ORGANISATIONAL_UNIT)
-                .stream()
-                .collect(Collectors.toMap(r -> r.value1(), r -> r.value2()));
-
+                .fetchMap(ORGANISATIONAL_UNIT.EXTERNAL_ID, ORGANISATIONAL_UNIT.ID);
     }
 
 

@@ -22,6 +22,7 @@ import org.finos.waltz.schema.tables.records.DatabaseUsageRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.database_usage.DatabaseUsage;
+import org.finos.waltz.model.database_usage.DatabaseUsageCreateCommand;
 import org.finos.waltz.model.database_usage.ImmutableDatabaseUsage;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -32,15 +33,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.schema.tables.DatabaseUsage.DATABASE_USAGE;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 
 @Repository
 public class DatabaseUsageDao {
 
+    private static final String PROVENANCE = "waltz";
     private final DSLContext dsl;
 
 
@@ -76,6 +81,46 @@ public class DatabaseUsageDao {
         return findByCondition(
                 DATABASE_USAGE.ENTITY_ID.eq(ref.id())
                         .and(DATABASE_USAGE.ENTITY_KIND.eq(ref.kind().name())));
+    }
+
+
+    /**
+     * Links the given database assets to the referenced entity in the requested environments.
+     * Replaces any existing links between the entity and the same databases (making the call
+     * idempotent), then inserts the new ones. Returns the number of links written.
+     */
+    public int create(EntityReference ref, Collection<DatabaseUsageCreateCommand> commands, String username) {
+        checkNotNull(ref, "ref cannot be null");
+        checkNotNull(commands, "commands cannot be null");
+
+        Set<Long> databaseIds = commands
+                .stream()
+                .map(DatabaseUsageCreateCommand::databaseId)
+                .collect(Collectors.toSet());
+
+        dsl.deleteFrom(DATABASE_USAGE)
+                .where(DATABASE_USAGE.ENTITY_KIND.eq(ref.kind().name()))
+                .and(DATABASE_USAGE.ENTITY_ID.eq(ref.id()))
+                .and(DATABASE_USAGE.DATABASE_ID.in(databaseIds))
+                .execute();
+
+        List<DatabaseUsageRecord> records = commands
+                .stream()
+                .map(c -> {
+                    DatabaseUsageRecord record = new DatabaseUsageRecord();
+                    record.setDatabaseId(c.databaseId());
+                    record.setEntityKind(ref.kind().name());
+                    record.setEntityId(ref.id());
+                    record.setEnvironment(c.environment());
+                    record.setProvenance(PROVENANCE);
+                    record.setLastUpdatedBy(username);
+                    record.setLastUpdatedAt(nowUtcTimestamp());
+                    return record;
+                })
+                .collect(Collectors.toList());
+
+        dsl.batchInsert(records).execute();
+        return records.size();
     }
 
     // -- helpers ---
