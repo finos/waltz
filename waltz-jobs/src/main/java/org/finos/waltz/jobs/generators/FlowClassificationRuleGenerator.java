@@ -27,6 +27,7 @@ import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -96,6 +97,7 @@ public class FlowClassificationRuleGenerator implements SampleDataGenerator {
                         AuthoritativenessRatingValue.NO_OPINION.value()))
                 .fetch(FLOW_CLASSIFICATION.ID);
 
+        Set<String> seenKeys = new HashSet<>();
         List<FlowClassificationRuleRecord> records = typeIds.stream()
                 .flatMap(t -> IntStream
                         .range(0, 2 + rnd.nextInt(2))
@@ -112,6 +114,8 @@ public class FlowClassificationRuleGenerator implements SampleDataGenerator {
                             record.setLastUpdatedBy(SAMPLE_DATA_USER);
                             return record;
                         }))
+                // dedupe on the unique key (idx_fcr_scope_dt_app_dirn) to avoid batch insert collisions
+                .filter(r -> seenKeys.add(r.getParentId() + "_" + r.getSubjectEntityId() + "_" + r.getDataTypeId()))
                 .collect(Collectors.toList());
 
         dsl.batchStore(records).execute();
