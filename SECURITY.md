@@ -1,4 +1,4 @@
-# Atomist Open Source Security Policies and Procedures
+# Waltz Security Policies and Procedures
 
 This document outlines security procedures and general policies for the
 Waltz Open Source project as found on https://github.com/finos/waltz.
@@ -32,12 +32,11 @@ process, involving the following steps:
   * Prepare fixes for all releases still under maintenance. These fixes
     will be released as fast as possible.
   
-## Current Known Vulvnerabilities
+## Known Vulnerabilities
 
-Below is a list of vulnerabilites we are aware of.  
-Each vulnerability is given a Waltz rating based upon how we _know_ the code is used within the Waltz database.
-
-| Vulnerability | Java/JS | Waltz Severity | Status |
-| --- | --- | --- | --- | 
-| h2  | Java | Low | No fix currently available (2023-Q1).  Not severe as only used for in-memory integration testing |
-| sparkframework | Java | Medium | Fix available but breaks Tomcat deployment (2023-Q1) | 
+Known vulnerabilities in Waltz's dependencies are tracked as GitHub issues — currently the backend
+([#7595](https://github.com/finos/waltz/issues/7595)) and frontend/AngularJS
+([#7596](https://github.com/finos/waltz/issues/7596)) dependency debt — and are surfaced by the
+project's dependency/security scanning. See the
+[vulnerability remediation policy](docs/governance/policies/vulnerability-remediation.md) for how
+findings are triaged and remediated, and the repository **Security** tab for advisories.
