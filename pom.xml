@@ -391,7 +391,7 @@
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
                 <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>2.1.212</jdbc.version>
+                <jdbc.version>${h2.version}</jdbc.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>

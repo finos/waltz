@@ -68,6 +68,12 @@ public class DIBaseConfiguration {
     @Value("${database.pool.min:2}")
     private int dbPoolMin;
 
+    // 0 = disabled (HikariCP default). If > 0 (must be >= 2000), HikariCP logs a stack
+    // trace when a connection is held longer than this many ms without being returned,
+    // surfacing connection leaks instead of letting them silently exhaust the pool.
+    @Value("${database.pool.leak.detection.threshold.ms:0}")
+    private int dbPoolLeakDetectionThresholdMs;
+
     @Value("${jooq.dialect}")
     private String dialect;
 
@@ -87,6 +93,9 @@ public class DIBaseConfiguration {
         dsConfig.setDriverClassName(dbDriver);
         dsConfig.setMaximumPoolSize(dbPoolMax);
         dsConfig.setMinimumIdle(dbPoolMin);
+        if (dbPoolLeakDetectionThresholdMs > 0) {
+            dsConfig.setLeakDetectionThreshold(dbPoolLeakDetectionThresholdMs);
+        }
         return new HikariDataSource(dsConfig);
     }
 
