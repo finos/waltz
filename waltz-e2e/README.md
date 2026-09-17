@@ -98,13 +98,18 @@ test("does a thing", async ({ page, context }) => {
 - App groups: `POST /api/app-group/*` (add-owner, add-application, application-list, etc. — see `AppGroupEndpoint.java`)
 - `PUT /api/assessment-definition` create/update a definition (needs `ADMIN`/`ASSESSMENT_DEFINITION_ADMIN`; body must include `lastUpdatedBy`/`lastUpdatedAt`). Seed a `isReadOnly:false` def to allow rating — baseline defs are read-only.
 - `POST /api/user/:userName/roles` grant roles additively (union with `GET /api/user/whoami`) then re-login; needed for write ops (admin starts with only `ADMIN`).
+- Technology (assets + usages, all `ADMIN`-gated — see `helpers/technology.js`):
+  - `POST /api/server-info/bulk`, `POST /api/database/bulk` → upsert asset rows (keyed on `externalId`); return the saved assets with ids.
+  - `POST /api/server-usage/ref/:kind/:id`, `POST /api/database-usage/ref/:kind/:id` → link assets to an entity (e.g. `APPLICATION`); body `[{serverId|databaseId, environment}]`.
 
 ## Known seeding gaps (no create REST endpoint — confirmed)
 
 These are created direct-to-DB by the Java helpers because there's no API:
 - **Rating schemes** (no create endpoint)
 - **Persons** (feed-loaded; no create endpoint)
-- **Databases** (`DatabaseInformationEndpoint` — no create)
+
+(Servers and databases previously had no create endpoint; they are now seedable via the bulk
+asset + usage endpoints listed above.)
 
 Tests that need these as setup (e.g. report-grid's custom assessment, surveys' recipient person) can:
 - reuse a **baseline** definition/kind queried via API, or
