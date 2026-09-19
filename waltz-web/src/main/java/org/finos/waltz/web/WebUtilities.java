@@ -238,7 +238,9 @@ public class WebUtilities {
 
 
     public static <T> List<T> readList(Request request, Class<T> itemClass) throws IOException {
-        return (List<T>) readBody(request, List.class);
+        return getJsonMapper().readValue(
+                request.bodyAsBytes(),
+                getJsonMapper().getTypeFactory().constructCollectionType(List.class, itemClass));
     }
 
 

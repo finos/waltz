@@ -163,6 +163,48 @@ The workflow includes a `check-jooq-secrets` step which:
 
 ---
 
+---
+
+# 🔎 CVE / Dependency Scanning
+
+The `cve-scanning.yml` workflow checks dependencies for known vulnerabilities and publishes a
+single combined report artifact. It runs two scans in one job:
+
+| Scan | Dependencies | Tool | Required secrets |
+|------|--------------|------|------------------|
+| Java / Maven | backend dependencies | OWASP dependency-check (aggregate HTML report) | `NVD_API_KEY` |
+| Frontend | `waltz-ng` production dependencies | auditjs / Sonatype OSS Index (text report) | `OSSINDEX_USER`, `OSSINDEX_TOKEN` |
+
+### Required secrets
+
+- **`NVD_API_KEY`** — OWASP dependency-check now mandates an NVD API key to download the
+  vulnerability feed. Request a free key: <https://nvd.nist.gov/developers/request-an-api-key>
+- **`OSSINDEX_USER` / `OSSINDEX_TOKEN`** — Sonatype OSS Index no longer allows anonymous audits.
+  Register a free account and token: <https://ossindex.sonatype.org/>
+
+### Triggers
+
+Runs on **push to `master`** (when Maven or `waltz-ng` dependency files change), on a **daily
+schedule**, and via **manual `workflow_dispatch`**. It does **not** run on `pull_request`,
+because — as with the jOOQ secrets above — GitHub does not expose repository secrets to
+fork-based PRs. After adding the secrets, run the workflow once from the Actions tab
+(`Run workflow`) to verify.
+
+### Report artifact
+
+Both reports are published together as a single **`cve-reports`** artifact on each run,
+containing `dependency-check-report.html` (Java) and `auditjs-report.txt` (frontend).
+
+### Mode: report-only
+
+Both scans are **report-only**: they publish findings (in the `cve-reports` artifact) but do
+**not** fail the build. This surfaces the current vulnerability backlog for triage without
+blocking. Remediation of the known backlog (e.g. Spring/Jackson upgrades and the AngularJS
+migration) is tracked in separate issues; the gate can be tightened later (e.g. via
+`failBuildOnCVSS`) once that backlog is cleared.
+
+---
+
 ## Summary
 
 This setup provides:
