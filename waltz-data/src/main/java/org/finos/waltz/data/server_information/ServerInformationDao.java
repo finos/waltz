@@ -48,9 +48,11 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -186,6 +188,66 @@ public class ServerInformationDao {
                                     s.externalId().orElse(null)))
                     .collect(Collectors.toList()))
                 .execute();
+    }
+
+
+    /**
+     * Upserts a batch of server assets, keyed on their external id: rows with a matching
+     * external id are updated in place (preserving the id, and therefore any existing
+     * usages), everything else is inserted. Callers are expected to supply an external id
+     * for every server (see the service layer). Returns the persisted servers, re-read so
+     * the generated ids are populated.
+     */
+    public Collection<ServerInformation> bulkUpsert(List<ServerInformation> servers) {
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+            servers.forEach(s -> {
+                String externalId = s.externalId().orElse(null);
+                boolean exists = externalId != null
+                        && tx.fetchExists(SERVER_INFORMATION, SERVER_INFORMATION.EXTERNAL_ID.eq(externalId));
+                if (exists) {
+                    tx.update(SERVER_INFORMATION)
+                            .set(SERVER_INFORMATION.HOSTNAME, s.hostname())
+                            .set(SERVER_INFORMATION.OPERATING_SYSTEM, s.operatingSystem())
+                            .set(SERVER_INFORMATION.OPERATING_SYSTEM_VERSION, s.operatingSystemVersion())
+                            .set(SERVER_INFORMATION.COUNTRY, s.country())
+                            .set(SERVER_INFORMATION.IS_VIRTUAL, s.virtual())
+                            .set(SERVER_INFORMATION.LOCATION, s.location())
+                            .set(SERVER_INFORMATION.HW_END_OF_LIFE_DATE, toSqlDate(s.hardwareEndOfLifeDate()))
+                            .set(SERVER_INFORMATION.OS_END_OF_LIFE_DATE, toSqlDate(s.operatingSystemEndOfLifeDate()))
+                            .set(SERVER_INFORMATION.LIFECYCLE_STATUS, s.lifecycleStatus().name())
+                            .set(SERVER_INFORMATION.PROVENANCE, s.provenance())
+                            .where(SERVER_INFORMATION.EXTERNAL_ID.eq(externalId))
+                            .execute();
+                } else {
+                    tx.insertInto(SERVER_INFORMATION)
+                            .set(SERVER_INFORMATION.HOSTNAME, s.hostname())
+                            .set(SERVER_INFORMATION.OPERATING_SYSTEM, s.operatingSystem())
+                            .set(SERVER_INFORMATION.OPERATING_SYSTEM_VERSION, s.operatingSystemVersion())
+                            .set(SERVER_INFORMATION.COUNTRY, s.country())
+                            .set(SERVER_INFORMATION.IS_VIRTUAL, s.virtual())
+                            .set(SERVER_INFORMATION.LOCATION, s.location())
+                            .set(SERVER_INFORMATION.HW_END_OF_LIFE_DATE, toSqlDate(s.hardwareEndOfLifeDate()))
+                            .set(SERVER_INFORMATION.OS_END_OF_LIFE_DATE, toSqlDate(s.operatingSystemEndOfLifeDate()))
+                            .set(SERVER_INFORMATION.LIFECYCLE_STATUS, s.lifecycleStatus().name())
+                            .set(SERVER_INFORMATION.PROVENANCE, s.provenance())
+                            .set(SERVER_INFORMATION.EXTERNAL_ID, externalId)
+                            .execute();
+                }
+            });
+        });
+
+        List<String> externalIds = servers
+                .stream()
+                .map(s -> s.externalId().orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return dsl
+                .select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.EXTERNAL_ID.in(externalIds))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
