@@ -19,14 +19,22 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.service.server_usage.ServerUsageService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.server_usage.ServerUsage;
+import org.finos.waltz.model.server_usage.ServerUsageCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 
@@ -36,12 +44,16 @@ public class ServerUsageEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "server-usage");
 
     private final ServerUsageService serverUsageService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public ServerUsageEndpoint(ServerUsageService serverUsageService) {
+    public ServerUsageEndpoint(ServerUsageService serverUsageService,
+                               UserRoleService userRoleService) {
         checkNotNull(serverUsageService, "serverUsageService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         this.serverUsageService = serverUsageService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -57,8 +69,16 @@ public class ServerUsageEndpoint implements Endpoint {
         ListRoute<ServerUsage> findByServerIdRoute = (request, response)
                 -> serverUsageService.findByServerId(getId(request));
 
+        DatumRoute<Collection<ServerUsage>> addUsagesRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.ADMIN);
+            String username = getUsername(request);
+            List<ServerUsageCreateCommand> commands = readList(request, ServerUsageCreateCommand.class);
+            return serverUsageService.addUsages(getEntityReference(request), commands, username);
+        };
+
         getForList(findByReferencedEntityPath, findByReferencedEntityRoute);
         getForList(findByServerIdPath, findByServerIdRoute);
+        postForDatum(findByReferencedEntityPath, addUsagesRoute);
     }
 
 }
