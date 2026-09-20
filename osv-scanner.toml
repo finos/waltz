@@ -1,0 +1,16 @@
+# OSV-Scanner configuration for dependency CVE scanning (see .github/workflows/cve-scanning-osv.yml).
+#
+# Use this file to suppress findings that are confirmed NOT to affect Waltz - for example a
+# false positive from package-name matching, or a vulnerability in a code path Waltz does not
+# use. Every entry MUST record a reason so the decision is reviewable; add an `ignoreUntil`
+# date where the assessment should be revisited.
+#
+# Do NOT use this to hide real, unremediated vulnerabilities - upgrade the dependency instead.
+#
+# There are currently no suppressions: OSV-Scanner produced no false positives on Waltz's
+# dependency set. Add entries only when a finding is confirmed inapplicable, e.g.:
+#
+#   [[IgnoredVulns]]
+#   id = "GHSA-xxxx-xxxx-xxxx"     # a GHSA or CVE id
+#   ignoreUntil = 2026-12-31       # optional; the finding re-surfaces after this date
+#   reason = "Not exploitable in Waltz: <explanation>."
