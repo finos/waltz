@@ -248,6 +248,9 @@ test("issues an individual survey from an application page", async ({ page, cont
     const recipientPicker = section.locator("waltz-user-pick-list").first();
     await recipientPicker.getByRole("button", { name: "Add" }).click();
     await survey.pickInUiSelect(recipientPicker, page, admin.displayName, admin.displayName);
+    // Confirm the recipient is staged before saving, otherwise an INDIVIDUAL issuance would
+    // create no instances and the section would stay empty.
+    await expect(recipientPicker.getByText(admin.displayName)).toBeVisible();
     await recipientPicker.getByRole("button", { name: "Save" }).click();
 
     await runForm.locator('input[name="issuanceKind"][value="INDIVIDUAL"]').check();
