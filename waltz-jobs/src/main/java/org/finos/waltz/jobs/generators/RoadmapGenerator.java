@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.filter;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.ObjectUtilities.any;
@@ -125,6 +126,13 @@ public class RoadmapGenerator implements SampleDataGenerator {
 
             Map<AxisOrientation, Collection<ScenarioAxisItem>> byOrientation = groupBy(ScenarioAxisItem::axisOrientation, axisItems);
 
+            Collection<ScenarioAxisItem> columnAxisItems = byOrientation.get(AxisOrientation.COLUMN);
+            Collection<ScenarioAxisItem> rowAxisItems = byOrientation.get(AxisOrientation.ROW);
+
+            if (isEmpty(columnAxisItems) || isEmpty(rowAxisItems)) {
+                return; // both axes must be populated before scenario rating cells can be placed
+            }
+
             IdSelectionOptions options = mkOpts(scenario.entityReference());
             Map<Long, Collection<MeasurableRating>> ratingsByMeasurableId = groupBy(
                     MeasurableRating::measurableId,
@@ -133,14 +141,15 @@ public class RoadmapGenerator implements SampleDataGenerator {
             List<ScenarioRatingItemRecord> scenarioRatingItems = IntStream
                     .range(0, randomIntBetween(10, 300))
                     .mapToObj(i -> tuple(
-                            randomPick(byOrientation.get(AxisOrientation.COLUMN)),
-                            randomPick(byOrientation.get(AxisOrientation.ROW))))
+                            randomPick(columnAxisItems),
+                            randomPick(rowAxisItems)))
                     .map(t -> t
                             .map1(d -> d.domainItem().id())
                             .map2(d -> d.domainItem().id()))
                     .map(t -> t.concat(tuple(
-                            randomPick(ratingsByMeasurableId.get(t.v1)),
-                            randomPick(ratingsByMeasurableId.get(t.v2)))))
+                            randomPickOrNull(ratingsByMeasurableId.get(t.v1)),
+                            randomPickOrNull(ratingsByMeasurableId.get(t.v2)))))
+                    .filter(t -> t.v3 != null || t.v4 != null)
                     .map(t -> {
                         MeasurableRating rating = t.v3 != null
                                 ? t.v3
@@ -166,6 +175,13 @@ public class RoadmapGenerator implements SampleDataGenerator {
                     .execute();
 
         });
+    }
+
+
+    private static <T> T randomPickOrNull(Collection<T> xs) {
+        return isEmpty(xs)
+                ? null
+                : randomPick(xs);
     }
 
 
