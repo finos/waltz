@@ -28,6 +28,30 @@ async function getOrgUnit(token, id) {
     return ou;
 }
 
+/**
+ * Pick a change initiative whose org unit is selectable through the entity-selector autocomplete.
+ * The entity search ignores queries shorter than three characters (SearchUtilities.mkTerms), so an
+ * org unit with a very short name (e.g. "FX") never surfaces as an option. Returns { ci, orgUnit }.
+ */
+async function pickCiInSelectableOrgUnit(token) {
+    const ctx = await apiContext(baseURL, token);
+    const cis = await (await ctx.get("/api/change-initiative/all")).json();
+    await ctx.dispose();
+    for (const ci of cis) {
+        if (!ci.organisationalUnitId) continue;
+        const orgUnit = await getOrgUnit(token, ci.organisationalUnitId);
+        if (orgUnit?.name && orgUnit.name.trim().length >= 3) {
+            return { ci, orgUnit };
+        }
+    }
+    throw new Error("no change initiative in a selectable org unit found");
+}
+
+/** Anchored RegExp matching the given text exactly, ignoring surrounding whitespace. */
+function exactText(value) {
+    return new RegExp(`^\\s*${value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
+}
+
 /** Ids resolved by an APP_GROUP selector (the same selectors the group view page uses). */
 async function selectorIds(token, path, groupId) {
     const ctx = await apiContext(baseURL, token);
@@ -224,8 +248,7 @@ test("add and remove an org unit, cascading its applications and change initiati
     const group = await createAppGroup(baseURL, token, { name: uniqueName("ts_ag_ou"), description: "ou test", kind: "PUBLIC" });
 
     // Seed deterministic cascade data: a baseline CI in some org unit, plus our own app in that unit.
-    const ci = await pickChangeInitiative(token);
-    const orgUnit = await getOrgUnit(token, ci.organisationalUnitId);
+    const { ci, orgUnit } = await pickCiInSelectableOrgUnit(token);
     const app = await createApp(baseURL, token, uniqueName("ts_ag_ou_app"), orgUnit.id);
 
     await authenticate(context, token);
@@ -237,7 +260,9 @@ test("add and remove an org unit, cascading its applications and change initiati
     await ouSection.locator(".ui-select-match").click();
     const search = page.locator("input.ui-select-search:visible");
     await search.fill(orgUnit.name);
-    const option = page.locator(".ui-select-choices-row").filter({ hasText: orgUnit.name }).first();
+    // Match the option by exact name: several org units share a name prefix (e.g. "Risk IT" is a
+    // substring of "Credit Risk IT"), so a substring match could add the wrong unit.
+    const option = page.locator(".ui-select-choices-row").filter({ hasText: exactText(orgUnit.name) });
     await expect(option).toBeVisible();
     await option.click();
 
