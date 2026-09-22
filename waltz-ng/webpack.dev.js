@@ -33,7 +33,9 @@ module.exports = smp.wrap(merge(common, {
         },
         proxy: [{
             context: ["/data-extract", "/api", "/page", "/authentication"],
-            target: "http://[::1]:8443", // see note [1]
+            // proxy target may be overridden via WALTZ_PROXY_TARGET (e.g. a locally running
+            // packaged backend on http://localhost:8080)
+            target: process.env.WALTZ_PROXY_TARGET || "http://[::1]:8443", // see note [1]
         }]
     }
 }));
