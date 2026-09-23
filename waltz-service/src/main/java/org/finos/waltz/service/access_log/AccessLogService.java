@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 
 
@@ -119,5 +120,43 @@ public class AccessLogService {
 
     public List<AccessLogSummary> findMonthOnMonthAccessLogSummary(String mode, Integer currentYear) {
         return accessLogDao.findMonthOnMonthUsers(mode, currentYear);
+    }
+
+    public List<AccessLogSummary> findAccessLogSummary(org.finos.waltz.model.Duration freq, LocalDate startDate, LocalDate endDate){
+        checkNotNull(freq, "freq must not be null");
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findAccessLogSummary(freq, startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findTopPagesByAccess(LocalDate startDate, LocalDate endDate, int limit) {
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findTopPagesByAccess(startDate, endDate, limit);
+    }
+
+    public List<AccessLogSummary> findActivityByHourOfDay(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findActivityByHourOfDay(startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findActivityByDayOfWeek(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findActivityByDayOfWeek(startDate, endDate);
+    }
+
+    public List<AccessLogSummary> findTopActiveUsers(LocalDate startDate, LocalDate endDate, int limit) {
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findTopActiveUsers(startDate, endDate, limit);
+    }
+
+    public List<AccessLogSummary> findSessionDurations(LocalDate startDate, LocalDate endDate) {
+        checkDateRange(startDate, endDate);
+        return accessLogDao.findSessionDurations(startDate, endDate);
+    }
+
+
+    private void checkDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null) {
+            checkTrue(!startDate.isAfter(endDate), "startDate must not be after endDate");
+        }
     }
 }
