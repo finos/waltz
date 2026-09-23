@@ -321,10 +321,21 @@ export async function invokeSurveyAction(page, label, { needsReason = true } = {
  * row containing the token.
  */
 export async function pickInUiSelect(scope, page, query, token) {
-    await scope.locator(".ui-select-match").click();
+    const match = scope.locator(".ui-select-match");
     const search = page.locator("input.ui-select-search:visible");
-    await search.fill(query);
-    await page.locator(".ui-select-choices-row", { hasText: token }).first().click();
+    const choice = page.locator(".ui-select-choices-row", { hasText: token }).first();
+
+    // ui-select debounces its remote search, so the choices can re-render just as we click and
+    // swallow the selection (leaving the dropdown open and nothing picked). Retry open -> type ->
+    // pick until the selection commits, which closes the dropdown and hides the search box.
+    await expect(async () => {
+        if (!(await search.isVisible().catch(() => false))) {
+            await match.click();
+        }
+        await search.fill(query);
+        await choice.click({ timeout: 3000 });
+        await expect(search).toBeHidden({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
 }
 
 /**
