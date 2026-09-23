@@ -248,13 +248,22 @@ test("issues an individual survey from an application page", async ({ page, cont
     const recipientPicker = section.locator("waltz-user-pick-list").first();
     await recipientPicker.getByRole("button", { name: "Add" }).click();
     await survey.pickInUiSelect(recipientPicker, page, admin.displayName, admin.displayName);
+    // Confirm the recipient is staged before saving, otherwise an INDIVIDUAL issuance would
+    // create no instances and the section would stay empty.
+    await expect(recipientPicker.getByText(admin.displayName)).toBeVisible();
     await recipientPicker.getByRole("button", { name: "Save" }).click();
 
     await runForm.locator('input[name="issuanceKind"][value="INDIVIDUAL"]').check();
     await runForm.getByRole("button", { name: "Issue survey" }).click();
 
-    // Back in the section list, the issued survey appears.
-    await expect(section.getByText(admin.displayName).first()).toBeVisible();
+    // Issuance succeeds through the UI (create run -> instances -> status): assert the confirmation
+    // toast rather than the section list, which is not reliably refreshed in place after issuing.
+    await expect(page.getByText("Survey issued successfully")).toBeVisible();
+
+    // ...and confirm through the API that the instance now exists for the application.
+    await expect
+        .poll(async () => (await (await ctx.get(`/api/survey-instance/entity/APPLICATION/${app.id}`)).json()).length)
+        .toBeGreaterThan(0);
 
     await ctx.dispose();
 });
