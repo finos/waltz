@@ -9,7 +9,7 @@ Target: satisfy OSPS Baseline Maturity Level 3 (the Graduated bar).
 
 - Branch protection: require at least one non-author human review before merge (OSPS-QA-07).
 - Release integrity: sign releases, publish provenance, and document verification steps (OSPS-DO-03, OSPS-BR-02).
-- Software Bill of Materials (SBOM) attached to releases (OSPS-QA-02.02).
+- Software Bill of Materials (SBOM): build-time CycloneDX aggregate SBOM (implemented for scanning in #7628); extend to attach an SBOM to releases, with source and container-image variants and final tooling to follow (OSPS-QA-02.02).
 - Automated SCA + SAST in CI with documented remediation thresholds and blocking policy (OSPS-VM-05, OSPS-VM-06).
 - `SECURITY.md`, threat model / attack-surface analysis (OSPS-SA-03.02), secrets-management policy (OSPS-BR-07.02).
 - Support & EOL policy per release (OSPS-DO-04, OSPS-DO-05).
@@ -34,6 +34,8 @@ Target: satisfy OSPS Baseline Maturity Level 3 (the Graduated bar).
 
 - Publish a staged migration plan away from AngularJS 1.x (end-of-life) for `waltz-ng`.
 - Deliver the first migration slice; ongoing Java/dependency upgrades.
+- Replace the end-of-life Spark Java web framework (`com.sparkjava:spark-core`) in the backend.
+- Data integrity: make multi-step writes (e.g. logical/physical flow creation) transactionally atomic, and move toward declarative transaction management to prevent partial writes and data-quality issues.
 
 ## Theme 5 — Documentation & Onboarding
 

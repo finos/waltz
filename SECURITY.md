@@ -34,9 +34,16 @@ process, involving the following steps:
   
 ## Known Vulnerabilities
 
-Known vulnerabilities in Waltz's dependencies are tracked as GitHub issues — currently the backend
-([#7595](https://github.com/finos/waltz/issues/7595)) and frontend/AngularJS
-([#7596](https://github.com/finos/waltz/issues/7596)) dependency debt — and are surfaced by the
-project's dependency/security scanning. See the
-[vulnerability remediation policy](docs/governance/policies/vulnerability-remediation.md) for how
-findings are triaged and remediated, and the repository **Security** tab for advisories.
+Known vulnerabilities in Waltz's dependencies are tracked as GitHub issues (currently the backend,
+[#7595](https://github.com/finos/waltz/issues/7595), and frontend/AngularJS,
+[#7596](https://github.com/finos/waltz/issues/7596), dependency debt). This section does not hold a
+static list; the current findings are surfaced automatically by the project's scanning:
+
+- **SCA (dependencies):** the CVE scanning workflows, i.e. the OWASP dependency-check `cve-reports`
+  artifact (#7597) and OSV-Scanner code-scanning alerts (#7628).
+- **SAST (code):** GitHub CodeQL (#7616), reported to the Security tab and as pull-request
+  annotations.
+
+See the [vulnerability remediation policy](docs/governance/policies/vulnerability-remediation.md)
+for how findings are triaged and remediated, and the repository **Security** tab for the current
+advisories.

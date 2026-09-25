@@ -34,6 +34,9 @@ published as jar/war/zip assets under the corresponding Git tag.
   project README / deployment docs; those baselines move forward with releases.
 - The AngularJS 1.x frontend is a known end-of-life dependency; its migration is tracked on the
   public roadmap (see #7596 for the associated security exposure).
+- The backend web layer uses Spark Java (`com.sparkjava:spark-core`), which is effectively
+  unmaintained (end-of-life). Replacing or upgrading it is tracked with the backend dependency
+  remediation work (see #7595; e.g. CVE-2018-9159 in spark-core 2.5.5).
 
 ## Related
 - [`../../../SECURITY.md`](../../../SECURITY.md) ·

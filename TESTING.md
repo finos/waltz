@@ -5,14 +5,16 @@ contribution rules in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## When and how tests run
 
-- **On every pull request and push:** the `maven-dual-build.yml` GitHub Actions workflow builds the
-  multi-module Maven project and runs the automated test suite (Java integration tests and frontend
-  `waltz-ng` mocha tests; mocha results are published as CI test output).
+- **Unit and integration tests (Java):** run on every pull request and push via the
+  `maven-dual-build.yml` GitHub Actions workflow, which builds the multi-module Maven project and
+  runs the suite. These MUST pass before a pull request is merged (current behaviour).
+- **Frontend tests (`waltz-ng` mocha):** run in the same workflow; results are published as CI test
+  output.
+- **End-to-end (Playwright):** a growing e2e suite (applications, technology, measurables, surveys,
+  assessments, app-groups, flows, …) runs in CI via the `playwright-e2e` job. It runs on pull
+  requests; coverage continues to grow, and it is being stabilised toward becoming a hard merge gate.
 - **Locally:** contributors run the suite with the standard Maven build (`mvn verify` / the
   documented build command) before opening a pull request.
-- **End-to-end:** a Playwright e2e suite (applications, technology, measurables, surveys,
-  assessments, app-groups, flows, …) runs in CI via the `playwright-e2e` job; coverage continues to
-  grow.
 
 ## Test expectations for changes
 

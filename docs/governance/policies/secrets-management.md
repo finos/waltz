@@ -9,8 +9,8 @@ the operator's responsibility (see the deployment documentation).
 
 In-scope secrets include, but are not limited to:
 
-- GitHub Actions organisation/repository secrets (e.g. `NVD_API_KEY`, `OSSINDEX_USER`,
-  `OSSINDEX_TOKEN` used by CVE scanning; any publish/deploy credentials).
+- GitHub Actions organisation/repository secrets (e.g. `NVD_API_KEY`, `OSS_INDEX_USERNAME`,
+  `OSS_INDEX_TOKEN` used by CVE scanning; any publish/deploy credentials).
 - Any package-registry, artifact-signing, or release-publishing credentials.
 - Bot or automation tokens (e.g. dependency-update automation).
 
@@ -40,7 +40,16 @@ In-scope secrets include, but are not limited to:
 ## Ownership & review
 - Each secret has a named maintainer owner responsible for its lifecycle.
 - The maintainers review the inventory of active secrets at least **every 6 months**, removing
-  any that are unused.
+  any that are unused. This cadence governs unused-secret cleanup only; rotation on suspected
+  exposure is immediate (see Rotation above).
+
+## Current status
+- **Credential logging:** logging of the `Authorization` header and the decoded JWT was removed
+  in #7601 (merged). Related access-token handling is tracked under #7600.
+- **Secret scanning / push protection:** to be enabled at the repository level by a FINOS
+  repository administrator; this section will record the live status once enabled.
+- **Rotation window for exposed secrets:** an exposed secret is rotated immediately on discovery,
+  not on any periodic cycle (see Rotation and Incident response).
 
 ## Incident response
 - On suspected exposure: revoke first, rotate, then assess blast radius. Report per the process
