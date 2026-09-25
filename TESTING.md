@@ -10,9 +10,9 @@ contribution rules in [`CONTRIBUTING.md`](CONTRIBUTING.md).
   runs the suite. These MUST pass before a pull request is merged (current behaviour).
 - **Frontend tests (`waltz-ng` mocha):** run in the same workflow; results are published as CI test
   output.
-- **End-to-end (Playwright):** a growing e2e suite (applications, technology, measurables, surveys,
-  assessments, app-groups, flows, …) runs in CI via the `playwright-e2e` job. It runs on pull
-  requests; coverage continues to grow, and it is being stabilised toward becoming a hard merge gate.
+- **End-to-end (Playwright):** the e2e suite (applications, technology, measurables, surveys,
+  assessments, app-groups, flows, …) runs in CI via the `playwright-e2e` job and MUST pass before a
+  pull request is merged; a failing e2e job blocks the pull request. Coverage continues to grow.
 - **Locally:** contributors run the suite with the standard Maven build (`mvn verify` / the
   documented build command) before opening a pull request.
 
