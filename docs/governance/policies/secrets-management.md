@@ -46,8 +46,8 @@ In-scope secrets include, but are not limited to:
 ## Current status
 - **Credential logging:** logging of the `Authorization` header and the decoded JWT was removed
   in #7601 (merged). Related access-token handling is tracked under #7600.
-- **Secret scanning / push protection:** to be enabled at the repository level by a FINOS
-  repository administrator; this section will record the live status once enabled.
+- **Secret scanning / push protection:** enablement is tracked in #7635 (requires a FINOS
+  repository administrator); this section will record the live status once enabled.
 - **Rotation window for exposed secrets:** an exposed secret is rotated immediately on discovery,
   not on any periodic cycle (see Rotation and Incident response).
 
