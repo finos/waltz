@@ -448,8 +448,11 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         String userName = mkName(USER_NAME, "user1");
 
-        // Propose the new flow
-        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        // Propose as a user who is not an approver, so the asynchronous proposer-is-approver
+        // auto-approval (ProposedFlowWorkflowService#doAutoApprovals) does not race the explicit
+        // approvals below and intermittently return a stale workflow-state response.
+        String proposerUserName = mkName(USER_NAME, "proposer");
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(proposerUserName, createCommand);
         Long proposedFlowId = proposeResponse.proposedFlowId();
         assertNotNull(proposedFlowId, "Proposed flow should be created");
 
@@ -578,8 +581,12 @@ public class ProposedFlowWorkflowServiceTest extends BaseInMemoryIntegrationTest
 
         String userName = mkName(USER_NAME, "user1");
 
-        // Propose the new flow
-        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(userName, createCommand);
+        // Propose as a user who is not an approver. The proposer-is-approver auto-approval runs
+        // asynchronously (see ProposedFlowWorkflowService#doAutoApprovals); if the proposer were
+        // also the source approver it would race this test's explicit approval on the workflow
+        // state's optimistic lock and intermittently return a stale PENDING_APPROVALS response.
+        String proposerUserName = mkName(USER_NAME, "proposer");
+        ProposedFlowCommandResponse proposeResponse = proposedFlowWorkflowService.proposeNewFlow(proposerUserName, createCommand);
         Long proposedFlowId = proposeResponse.proposedFlowId();
         assertNotNull(proposedFlowId, "Proposed flow should be created");
 
