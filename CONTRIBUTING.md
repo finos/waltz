@@ -13,6 +13,17 @@ Before making a contribution, please take the following steps:
 
 NOTE: All contributors must have a contributor license agreement (CLA) on file with FINOS before their pull requests will be merged. Please review the FINOS [contribution requirements](https://finosfoundation.atlassian.net/wiki/spaces/FINOS/pages/75530375/Contribution+Compliance+Requirements) and submit (or have your employer submit) the required CLA before submitting a pull request.
 
+## Project Policies
+
+In addition to the FINOS policies linked above, the Waltz project maintains the following policies:
+
+* [Testing](TESTING.md) — when and how tests run, and test expectations for contributions.
+* [Secrets Management & Credential Rotation](docs/governance/policies/secrets-management.md) — handling of build/CI/release secrets.
+* [Support & End-of-Life](docs/governance/policies/support-and-eol.md) — support scope and security-update duration per release.
+* [Vulnerability Remediation (SCA & SAST)](docs/governance/policies/vulnerability-remediation.md) — how automated security findings are triaged and remediated.
+
+Security vulnerabilities are reported and handled per [`SECURITY.md`](SECURITY.md) (FINOS responsible disclosure).
+
 ## Governance
 
 ### Roles
