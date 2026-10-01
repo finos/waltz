@@ -6,14 +6,14 @@ This file lists the maintainers of this repository.
 
 | GitHub Username | Name | Organization | Email |
 |----------------|------|--------------|-------|
-| @MarkGuerriero | *please add name* | *please add organization* | *please add email* |
-| @davidwatkins73 | David Watkins | *please add organization* | davidwatkins73@gmail.com |
+| @MarkGuerriero | Mark Guerriero | @deutschebank | *please add email* |
+| @davidwatkins73 | David Watkins | @deutschebank | davidwatkins73@gmail.com |
 | @jain-shreyans-db | Shreyans Jain | @deutschebank  | *please add email* |
-| @jessica-woodland-scott | *please add name* | *please add organization* | *please add email* |
-| @kamransaleem | Kamran Saleem |  tbc | kamran@thinkincode.co.uk |
-| @kuldeep-jindal-db | *please add name* | *please add organization* | *please add email* |
+| @jessica-woodland-scott | Jessica Woodland-Scott | @deutschebank | *please add email* |
+| @kamransaleem | Kamran Saleem | Think in Code | kamran@thinkincode.co.uk |
+| @kuldeep-jindal-db | Kuldeep Jindal | @deutschebank | *please add email* |
 | @mayank-d-gupta-db | Mayank Gupta | @deutschebank | *please add email* |
-| @meenakshi-saraf-db | *please add name* | *please add organization* | *please add email* |
+| @meenakshi-saraf-db | Meenakshi Saraf | @deutschebank | *please add email* |
 | @rovats | Rohit Vats | *please add organization* | *please add email* |
 
 For information about maintainer responsibilities and resources, see the [FINOS Maintainers Cheatsheet](https://community.finos.org/docs/finos-maintainers-cheatsheet).
