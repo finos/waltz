@@ -26,10 +26,12 @@ import org.finos.waltz.model.tally.ChangeLogTally;
 import org.finos.waltz.model.tally.DateTally;
 import org.finos.waltz.model.tally.ImmutableChangeLogTally;
 import org.finos.waltz.model.tally.ImmutableDateTally;
+import org.finos.waltz.model.Duration;
 import org.jooq.AggregateFunction;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record5;
@@ -38,19 +40,25 @@ import org.jooq.SelectHavingStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.jooq.DatePart;
+import org.jooq.Result;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.parser.Entity;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
-import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.JooqUtilities.isoWeek;
 import static org.finos.waltz.data.JooqUtilities.mkDateRangeCondition;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -98,6 +106,76 @@ public class ChangeLogSummariesDao {
     public ChangeLogSummariesDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
         this.dsl = dsl;
+    }
+
+
+    /**
+     * Returns the unaliased expressions that a query should group/order by to bucket rows into the
+     * given frequency. Uses jOOQ's dedicated date functions (rather than {@code to_char} /
+     * {@code date_trunc} / generic {@code extract}) so the queries stay dialect agnostic - these
+     * translate to native equivalents on H2, Postgres and SQL Server. Group/order by must use the
+     * unaliased expressions (SQL Server does not permit select-aliases in GROUP BY).
+     */
+    private List<Field<?>> periodGroupFields(Field<Timestamp> ts, Duration freq) {
+        List<Field<?>> fields = new ArrayList<>();
+        switch (freq) {
+            case DAY:
+                fields.add(DSL.date(ts));
+                break;
+            case WEEK:
+                fields.add(DSL.year(ts));
+                fields.add(isoWeek(dsl, ts));
+                break;
+            case YEAR:
+                fields.add(DSL.year(ts));
+                break;
+            case MONTH:
+            default:
+                fields.add(DSL.year(ts));
+                fields.add(DSL.month(ts));
+        }
+        return fields;
+    }
+
+
+    /**
+     * The same expressions as {@link #periodGroupFields}, aliased for use in the SELECT clause so
+     * the label can be reconstructed in Java by {@link #periodLabel}.
+     */
+    private List<Field<?>> periodSelectFields(Field<Timestamp> ts, Duration freq) {
+        List<Field<?>> fields = new ArrayList<>();
+        switch (freq) {
+            case DAY:
+                fields.add(DSL.date(ts).as("p_day"));
+                break;
+            case WEEK:
+                fields.add(DSL.year(ts).as("p_year"));
+                fields.add(isoWeek(dsl, ts).as("p_week"));
+                break;
+            case YEAR:
+                fields.add(DSL.year(ts).as("p_year"));
+                break;
+            case MONTH:
+            default:
+                fields.add(DSL.year(ts).as("p_year"));
+                fields.add(DSL.month(ts).as("p_month"));
+        }
+        return fields;
+    }
+
+
+    private static String periodLabel(Record r, Duration freq) {
+        switch (freq) {
+            case DAY:
+                return r.get("p_day", Date.class).toLocalDate().toString();
+            case WEEK:
+                return String.format("%04d-W%02d", r.get("p_year", Integer.class), r.get("p_week", Integer.class));
+            case YEAR:
+                return String.format("%04d", r.get("p_year", Integer.class));
+            case MONTH:
+            default:
+                return String.format("%04d-%02d", r.get("p_year", Integer.class), r.get("p_month", Integer.class));
+        }
     }
 
 
@@ -203,4 +281,228 @@ public class ChangeLogSummariesDao {
                         r -> r.get("counts", Long.class));
     }
 
+    /**
+     * Get changes for given period
+     */
+    public Map<String, Map<String, Long>> findChangesByPeriod(EntityKind parentEntityKind,
+                                                 EntityKind childEntityKind,
+                                                 LocalDate startDate,
+                                                 LocalDate endDate,
+                                                 Duration freq) {
+
+        Condition parentEntityKindSelector = parentEntityKind == null
+                ? DSL.trueCondition()
+                : CHANGE_LOG.PARENT_KIND.eq(parentEntityKind.name());
+
+        Condition childEntityKindSelector = childEntityKind == null
+                ? DSL.trueCondition()
+                : CHANGE_LOG.CHILD_KIND.eq(childEntityKind.name());
+
+        Condition dateRangeSelector = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        List<Field<?>> periodGroup = periodGroupFields(CHANGE_LOG.CREATED_AT, freq);
+        List<Field<?>> selectFields = new ArrayList<>(periodSelectFields(CHANGE_LOG.CREATED_AT, freq));
+        selectFields.add(DSL.count(CHANGE_LOG.ID).as("counts"));
+        selectFields.add(DSL.countDistinct(CHANGE_LOG.USER_ID).as("distinct_user_count"));
+
+        Result<Record> result = dsl
+                .select(selectFields)
+                .from(CHANGE_LOG)
+                .where(parentEntityKindSelector
+                        .and(childEntityKindSelector)
+                        .and(dateRangeSelector))
+                .groupBy(periodGroup)
+                .orderBy(periodGroup)
+                .fetch();
+
+        Map<String, Map<String, Long>> resultMap = new HashMap<>();
+        for (Record record : result) {
+            Map<String, Long> values = new HashMap<>();
+            values.put("counts", record.get("counts", Long.class));
+            values.put("distinctUserCount", record.get("distinct_user_count", Long.class));
+
+            resultMap.put(periodLabel(record, freq), values);
+        }
+
+        return resultMap;
+    }
+
+    /**
+     * Get change activity by severity level
+     */
+    public Map<String, Long> findChangesBySeverity(LocalDate startDate, LocalDate endDate) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.SEVERITY, DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(condition.and(CHANGE_LOG.SEVERITY.isNotNull()))
+                .groupBy(CHANGE_LOG.SEVERITY)
+                .fetchMap(r -> r.get(CHANGE_LOG.SEVERITY),
+                        r -> r.get("counts", Long.class));
+    }
+
+    /**
+     * Get change activity by entity kind (parent)
+     */
+    public Map<String, Long> findChangesByEntityKind(LocalDate startDate, LocalDate endDate, int limit) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.PARENT_KIND, DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(condition)
+                .groupBy(CHANGE_LOG.PARENT_KIND)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetchMap(r -> r.get(CHANGE_LOG.PARENT_KIND),
+                        r -> r.get("counts", Long.class));
+    }
+
+    /**
+     * Get top contributors by change count
+     */
+    public Map<String, Long> findTopContributors(LocalDate startDate, LocalDate endDate, int limit) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.USER_ID, DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(condition)
+                .groupBy(CHANGE_LOG.USER_ID)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetchMap(r -> r.get(CHANGE_LOG.USER_ID),
+                        r -> r.get("counts", Long.class));
+    }
+
+    /**
+     * Get top contributors with period-based aggregation
+     */
+    public Map<String, Map<String, Long>> findTopContributorsByPeriod(LocalDate startDate, LocalDate endDate, Duration freq, int limit) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        // First, get top contributors overall
+        List<String> topUsers = dsl
+                .select(CHANGE_LOG.USER_ID)
+                .from(CHANGE_LOG)
+                .where(condition)
+                .groupBy(CHANGE_LOG.USER_ID)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetch(r -> r.get(CHANGE_LOG.USER_ID));
+
+        List<Field<?>> periodGroup = periodGroupFields(CHANGE_LOG.CREATED_AT, freq);
+        List<Field<?>> selectFields = new ArrayList<>(periodSelectFields(CHANGE_LOG.CREATED_AT, freq));
+        selectFields.add(0, CHANGE_LOG.USER_ID);
+        selectFields.add(DSL.count().as("counts"));
+        List<Field<?>> groupFields = new ArrayList<>(periodGroup);
+        groupFields.add(CHANGE_LOG.USER_ID);
+
+        // Then get their activity by period
+        Result<Record> result = dsl
+                .select(selectFields)
+                .from(CHANGE_LOG)
+                .where(condition.and(CHANGE_LOG.USER_ID.in(topUsers)))
+                .groupBy(groupFields)
+                .orderBy(periodGroup)
+                .fetch();
+
+        Map<String, Map<String, Long>> trends = new HashMap<>();
+        for (Record record : result) {
+            String userId = record.get(CHANGE_LOG.USER_ID);
+            Long count = record.get("counts", Long.class);
+
+            trends.computeIfAbsent(userId, k -> new HashMap<>()).put(periodLabel(record, freq), count);
+        }
+
+        return trends;
+    }
+
+    /**
+     * Get change activity by day of week
+     */
+    public Map<Integer, Long> findChangesByDayOfWeek(LocalDate startDate, LocalDate endDate) {
+        // Bucket by calendar day in the query (portable) then fold into ISO day-of-week (1=Mon..7=Sun)
+        // in Java, avoiding dialect specific weekday extraction.
+        Field<Date> dayField = DSL.date(CHANGE_LOG.CREATED_AT);
+
+        Map<Integer, Long> countsByDayOfWeek = new TreeMap<>();
+        dsl
+                .select(dayField.as("day"), DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate))
+                .groupBy(dayField)
+                .fetch()
+                .forEach(r -> {
+                    int dayOfWeek = r.get("day", Date.class).toLocalDate().getDayOfWeek().getValue();
+                    countsByDayOfWeek.merge(dayOfWeek, r.get("counts", Long.class), Long::sum);
+                });
+
+        return countsByDayOfWeek;
+    }
+
+    /**
+     * Get change activity by operation type (ADD/UPDATE/REMOVE)
+     */
+    public Map<String, Long> findChangesByOperation(LocalDate startDate, LocalDate endDate) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.OPERATION, DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(condition.and(CHANGE_LOG.OPERATION.isNotNull()))
+                .groupBy(CHANGE_LOG.OPERATION)
+                .fetchMap(r -> r.get(CHANGE_LOG.OPERATION),
+                        r -> r.get("counts", Long.class));
+    }
+
+    /**
+     * Get change activity by child entity kind
+     */
+    public Map<String, Long> findChangesByChildKind(LocalDate startDate, LocalDate endDate, int limit) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.CHILD_KIND, DSL.count().as("counts"))
+                .from(CHANGE_LOG)
+                .where(condition.and(CHANGE_LOG.CHILD_KIND.isNotNull()))
+                .groupBy(CHANGE_LOG.CHILD_KIND)
+                .orderBy(DSL.count().desc())
+                .limit(limit)
+                .fetchMap(r -> r.get(CHANGE_LOG.CHILD_KIND),
+                        r -> r.get("counts", Long.class));
+    }
+
+    /**
+     * Get operation trends over time
+     */
+    public Map<String, Map<String, Long>> findOperationTrends(LocalDate startDate, LocalDate endDate, Duration freq) {
+        Condition condition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        List<Field<?>> periodGroup = periodGroupFields(CHANGE_LOG.CREATED_AT, freq);
+        List<Field<?>> selectFields = new ArrayList<>(periodSelectFields(CHANGE_LOG.CREATED_AT, freq));
+        selectFields.add(CHANGE_LOG.OPERATION);
+        selectFields.add(DSL.count().as("counts"));
+        List<Field<?>> groupFields = new ArrayList<>(periodGroup);
+        groupFields.add(CHANGE_LOG.OPERATION);
+
+        Result<Record> result = dsl
+                .select(selectFields)
+                .from(CHANGE_LOG)
+                .where(condition.and(CHANGE_LOG.OPERATION.isNotNull()))
+                .groupBy(groupFields)
+                .orderBy(periodGroup)
+                .fetch();
+
+        Map<String, Map<String, Long>> trends = new HashMap<>();
+        for (Record record : result) {
+            String operation = record.get(CHANGE_LOG.OPERATION);
+            Long count = record.get("counts", Long.class);
+
+            trends.computeIfAbsent(operation, k -> new HashMap<>()).put(periodLabel(record, freq), count);
+        }
+
+        return trends;
+    }
 }

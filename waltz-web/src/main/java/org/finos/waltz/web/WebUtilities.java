@@ -368,6 +368,17 @@ public class WebUtilities {
 
     public static Optional<LocalDate> getLocalDateParam(Request request, String paramName) {
         String dateVal = request.params(paramName);
+        return parseLocalDate(dateVal);
+    }
+
+
+    public static Optional<LocalDate> getLocalDateQueryParam(Request request, String paramName) {
+        String dateVal = request.queryParams(paramName);
+        return parseLocalDate(dateVal);
+    }
+
+
+    private static Optional<LocalDate> parseLocalDate(String dateVal) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return Optional
                 .ofNullable(dateVal)

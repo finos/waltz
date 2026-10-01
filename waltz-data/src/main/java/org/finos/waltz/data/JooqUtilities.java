@@ -53,6 +53,7 @@ import org.jooq.impl.DSL;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -376,6 +377,43 @@ public class JooqUtilities {
         Timestamp endOfDay = new Timestamp(timeAfterDay);
 
         return field.ge(startOfDay).and(field.lt(endOfDay));
+    }
+
+
+    /**
+     * Returns the ISO week-of-year (1-53) for a timestamp field, rendered natively per dialect.
+     * <p>
+     * jOOQ 3.18 renders {@code DSL.week(...)} / {@code extract(WEEK ...)} as ANSI
+     * {@code extract(week from ...)}, which SQL Server does not understand, so the native
+     * {@code datepart(iso_week, ...)} is emitted there instead. Postgres and H2 both produce ISO
+     * week numbers via {@code DSL.week(...)}. Keeping this shim in one place avoids scattering db
+     * specific date SQL through the DAOs.
+     */
+    public static Field<Integer> isoWeek(DSLContext dsl, Field<Timestamp> field) {
+        // Compare by name rather than the SQLDialect.SQLSERVER constant: that constant only exists in
+        // the commercial jOOQ edition, so referencing it directly would break the OSS (Postgres / H2 /
+        // MariaDB) builds at runtime with a NoSuchFieldError.
+        if ("SQLSERVER".equals(dsl.dialect().family().name())) {
+            return DSL.field("datepart(iso_week, {0})", Integer.class, field);
+        }
+        return DSL.week(field);
+    }
+
+
+    /**
+     * Builds an inclusive date range condition (dialect agnostic) over a timestamp field.
+     * Either bound may be null, in which case that side of the range is left open.
+     * The end date is treated as inclusive (up to, but not including, the start of the following day).
+     */
+    public static Condition mkDateRangeCondition(Field<Timestamp> field, LocalDate startDate, LocalDate endDate) {
+        Condition condition = DSL.noCondition();
+        if (startDate != null) {
+            condition = condition.and(field.greaterOrEqual(Timestamp.valueOf(startDate.atStartOfDay())));
+        }
+        if (endDate != null) {
+            condition = condition.and(field.lessThan(Timestamp.valueOf(endDate.plusDays(1).atStartOfDay())));
+        }
+        return condition;
     }
 
 

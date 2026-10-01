@@ -63,7 +63,7 @@ const userManagementOptions = [
         state: "main.system.permissions",
         icon: "users-rectangle"
     }, {
-        name: "Analytics Dashboard (Beta)",
+        name: "Analytics Dashboard",
         role: "USER_ADMIN",
         description: "Dashboard for quick insights",
         state: "main.system.analytics-dashboard",

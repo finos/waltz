@@ -42,6 +42,7 @@ import { lifecycleStatus } from "./lifecycle-status";
 import { messageSeverity } from "./message-severity";
 import { usageKind } from "./usage-kind";
 import { orgUnitKind } from "./org-unit-kind";
+import { period } from "./period";
 import { participantKind } from "./participation-kind";
 import { rag } from "./rag";
 import { relationshipKind } from "./relationship-kind";
@@ -85,6 +86,7 @@ export const enums = {
     rollupKind,
     endOfLifeStatus,
     frequencyKind,
+    period,
     dataFormatKind,
     lifecycleStatus,
     fieldDataType,
