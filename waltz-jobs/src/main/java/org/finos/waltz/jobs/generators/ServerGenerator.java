@@ -113,7 +113,7 @@ public class ServerGenerator implements SampleDataGenerator {
 
         HashSet<Tuple2<Long,Long>> serverAppMappings = new HashSet<>();
 
-        IntStream.range(0, 20_000)
+        IntStream.range(0, 1_000)
                 .forEach(i -> {
                     serverAppMappings.add(Tuple.tuple(randomPick(serverIds), randomPick(appIds)));
                 });
